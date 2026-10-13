@@ -89,6 +89,27 @@ export class SyncRoom extends ProbeRoom {
     this.permissionTail = work.catch(() => {}); return work;
   }
 
+  async capture(scope: Scope): Promise<{ data: Uint8Array; checkpoint: number; generation: string; capturedAt: number }> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(async () => {
+      const matches = async () => await roomName(scope.owner, scope.page, scope.generation) === this.name
+        && !!await this.env.DB.prepare(`SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?
+          AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(scope.page, scope.owner, scope.generation, scope.owner).first();
+      if (!await matches()) throw new Error('備份頁面世代或結構已變更');
+      await this.ctx.storage.sync();
+      // 從持久紀錄重建，避免以尚未落盤的程序狀態宣稱備份成功。
+      const doc = await this.onLoad();
+      try {
+        const data = Y.encodeStateAsUpdate(doc);
+        const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
+        const capturedAt = await this.now();
+        if (!await matches()) throw new Error('備份頁面世代或結構已變更');
+        return { data, checkpoint, capturedAt, generation: scope.generation };
+      } finally { doc.destroy(); }
+    });
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
   private async index(scope: Scope): Promise<void> {
     if (await roomName(scope.owner, scope.page, scope.generation) !== this.name) return;
     const fragment = this.document.getXmlFragment('body');
