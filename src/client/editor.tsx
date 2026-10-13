@@ -60,7 +60,10 @@ export function Editor({ session, title }: { session: Session; title?: string })
       })().catch(() => setCloud('連線失敗，可重試'));
     };
     const closed = (event: CloseEvent) => {
-      if (event.code === 4001) { provider.disconnect(); setCloud('登入或頁面權限已失效'); void session.checkAccess?.(); }
+      if (event.code === 4001 || event.code === 4002) {
+        provider.disconnect(); setCloud('登入或頁面權限已失效');
+        void session.checkAccess?.().catch(() => { if (!disposed) setCloud('連線失敗，可重試'); });
+      }
     };
     const foreground = () => { if (document.visibilityState === 'visible' && navigator.onLine && session.checkAccess) online(); };
     doc.on('update', update);

@@ -33,6 +33,7 @@ async function main() {
   const { readFile, readdir } = await import('node:fs/promises');
   const probe = process.argv.includes('--probe');
   const auth = process.argv.includes('--auth');
+  const pages = process.argv.includes('--pages');
   const projects = ['chromium-desktop', 'chromium-mobile', 'webkit-mobile'];
   let required = [];
   if (auth) {
@@ -50,6 +51,7 @@ async function main() {
       const text = await readFile(`${dir}/${name}/spec.md`, 'utf8');
       for (const match of text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g)) {
         const [, id, method] = match;
+        if (pages && !id.startsWith('PAGE-')) continue;
         if (method.includes('Workers')) required.push(`${id}@integration`);
         else if (method.includes('Vitest')) required.push(`${id}@unit`);
         if (method.includes('Playwright')) required.push(...projects.map(project => `${id}@${project}`));
@@ -63,7 +65,7 @@ async function main() {
     actual.push(...reportCases(report, environment));
   }
   const failures = checkCoverage(required, actual);
-  console.log(JSON.stringify({ 範圍: auth ? '本輪登入' : probe ? '技術原型' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
+  console.log(JSON.stringify({ 範圍: auth ? '登入' : probe ? '技術原型' : pages ? '頁面與日記' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
   if (failures.length) process.exitCode = 1;
 }
 

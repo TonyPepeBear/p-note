@@ -1,6 +1,7 @@
 import { handle, ProbeRoom, SyncRoom as AppSyncRoom } from '../src/worker/app';
 import probe from '../src/worker/index';
 import migration from '../migrations/0001.sql';
+import pagesMigration from '../migrations/0002.sql';
 
 export { ProbeRoom };
 export class SyncRoom extends AppSyncRoom {
@@ -10,7 +11,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of migration.split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
@@ -22,6 +23,12 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path.startsWith('/__test/assets/')) {
+        const key = path.slice('/__test/assets/'.length);
+        if (request.method === 'POST') { await env.ASSETS.put(key, await request.arrayBuffer()); return Response.json({ ok: true }); }
+        const object = await env.ASSETS.get(key);
+        return object ? new Response(object.body) : new Response('Not found', { status: 404 });
+      }
       if (path === '/__test/control' && request.method === 'POST') {
         const { now, fail } = await request.json<{ now?: number; fail?: boolean }>();
         await env.DB.prepare('INSERT OR REPLACE INTO test_control VALUES (1, ?, ?)').bind(now ?? Date.now(), fail ? 1 : 0).run();

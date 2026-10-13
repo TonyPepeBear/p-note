@@ -3,6 +3,9 @@ import { ProbeRoom } from './index';
 import { SyncRoom } from './sync-room';
 import { configured, createAuth, sessionFor, tokenIdentifier } from './auth';
 import { roomName } from '../shared/room';
+import { handlePages, visiblePage, PageError } from './pages';
+import type { PageRow } from '../shared/pages';
+import { body } from './request';
 
 export { ProbeRoom, SyncRoom };
 
@@ -12,25 +15,7 @@ export type Services = {
 };
 
 const unavailable: Services = { now: Date.now, sendMail: async () => { throw new Error('尚未設定寄信服務'); } };
-export type PageRow = { id: string; owner_id: string; kind: string; title: string; journal_date: string | null; sync_generation: string; deleted_at: number | null };
 const error = (message: string, status: number) => Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
-
-async function body(request: Request): Promise<Record<string, unknown>> {
-  if (!request.headers.get('Content-Type')?.startsWith('application/json')) throw new Error('請使用 JSON');
-  const reader = request.body?.getReader(); if (!reader) throw new Error('缺少內容');
-  let size = 0; const chunks: Uint8Array[] = [];
-  try {
-    while (true) {
-      const { done, value } = await reader.read(); if (done) break;
-      size += value.length; if (size > 4096) throw new Error('內容超限'); chunks.push(value);
-    }
-  } catch (error) { await reader.cancel(); throw error; }
-  const bytes = new Uint8Array(size); let offset = 0;
-  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
-  const value: unknown = JSON.parse(new TextDecoder().decode(bytes));
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('無效內容');
-  return value as Record<string, unknown>;
-}
 
 export async function handle(request: Request, env: Env, services: Services = unavailable): Promise<Response> {
   const url = new URL(request.url); const path = url.pathname;
@@ -85,18 +70,12 @@ export async function handle(request: Request, env: Env, services: Services = un
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
-    let page: PageRow | null = null;
-    if (path === '/api/today' && request.method === 'GET') {
-      const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).format(services.now());
-      await env.DB.prepare(`INSERT INTO pages (id, owner_id, kind, title, journal_date, sync_generation, created_at, updated_at)
-        VALUES (?, ?, 'journal', ?, ?, ?, ?, ?) ON CONFLICT(owner_id, journal_date) DO NOTHING`).bind(crypto.randomUUID(), session.user.id, date, date, crypto.randomUUID(), services.now(), services.now()).run();
-      page = await env.DB.prepare('SELECT * FROM pages WHERE owner_id = ? AND journal_date = ?').bind(session.user.id, date).first<PageRow>();
-    } else if (/^\/api\/pages\/[^/]+$/.test(path) && request.method === 'GET') {
-      page = await env.DB.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(path.split('/')[3], session.user.id).first<PageRow>();
-    } else if (path.startsWith('/parties/sync/')) {
-      page = await env.DB.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(url.searchParams.get('page'), session.user.id).first<PageRow>();
+    const pageResponse = await handlePages(request, env, session.user.id, services.now());
+    if (pageResponse) return pageResponse;
+    if (path.startsWith('/parties/sync/')) {
+      const page = await env.DB.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(url.searchParams.get('page'), session.user.id).first<PageRow>();
       if (!page) return error('找不到頁面', 404);
-      if (page.deleted_at !== null || page.sync_generation !== url.searchParams.get('generation')) return error('頁面狀態已改變，本機內容已隔離', 409);
+      if (!await visiblePage(env.DB, session.user.id, page.id) || page.sync_generation !== url.searchParams.get('generation')) return error('頁面狀態已改變，本機內容已隔離', 409);
       if (path !== `/parties/sync/${await roomName(session.user.id, page.id, page.sync_generation)}`) return error('無效房間', 403);
       if (request.headers.get('Upgrade')?.toLowerCase() !== 'websocket' || origin !== env.BETTER_AUTH_URL) return error('無效同步請求', 400);
       const headers = new Headers(request.headers);
@@ -104,11 +83,9 @@ export async function handle(request: Request, env: Env, services: Services = un
       headers.set('x-p-note-session', session.session.id); headers.set('x-p-note-owner', session.user.id);
       headers.set('x-p-note-page', page.id); headers.set('x-p-note-generation', page.sync_generation);
       return await routePartykitRequest(new Request(request, { headers }), env) ?? error('找不到房間', 404);
-    } else return new Response('Not found', { status: 404 });
-    if (!page) return error('找不到頁面', 404);
-    if (page.deleted_at !== null) return error('日記已在垃圾桶，請還原原日記', 409);
-    return Response.json({ ...page, room: await roomName(session.user.id, page.id, page.sync_generation) }, { headers: { 'Cache-Control': 'no-store' } });
-  } catch { return error('服務暫時無法完成，請稍後重試', 503); }
+    }
+    return new Response('Not found', { status: 404 });
+  } catch (failure) { return error(failure instanceof PageError ? failure.message : '服務暫時無法完成，請稍後重試', failure instanceof PageError ? failure.status : 503); }
 }
 
 export default { fetch: (request: Request, env: Env) => handle(request, env) } satisfies ExportedHandler<Env>;

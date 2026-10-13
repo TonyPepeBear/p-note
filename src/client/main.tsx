@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Editor, start, type Session } from './editor';
-
-type PageInfo = { id: string; owner_id: string; sync_generation: string; title: string };
-
-async function api(path: string, body?: object): Promise<Response> {
-  return fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' });
-}
+import type { PageInfo } from '../shared/pages';
+import { api, navigate } from './api';
+import { Navigation } from './navigation';
 
 function Login({ confirm = false }: { confirm?: boolean }) {
   const [email, setEmail] = useState('');
@@ -40,7 +37,8 @@ function Login({ confirm = false }: { confirm?: boolean }) {
 
 function App() {
   const [session, setSession] = useState<Session>();
-  const [title, setTitle] = useState('');
+  const [page, setPage] = useState<PageInfo>();
+  const [recovery, setRecovery] = useState<PageInfo>();
   const [login, setLogin] = useState(false);
   const [error, setError] = useState('');
   const confirm = location.pathname === '/login/confirm';
@@ -51,7 +49,12 @@ function App() {
       const id = new URLSearchParams(location.search).get('page');
       const response = await api(id ? `/api/pages/${encodeURIComponent(id)}` : '/api/today');
       if (response.status === 401) { setLogin(true); return; }
-      if (!response.ok) { setError((await response.json() as { message: string }).message); return; }
+      if (!response.ok) {
+        const failure = await response.json() as { message: string; page?: PageInfo };
+        setError(failure.message);
+        if (failure.page) { setRecovery(failure.page); history.replaceState(null, '', '/?page=' + failure.page.id); }
+        return;
+      }
       const page = await response.json() as PageInfo;
       const previous = sessionStorage.getItem('p-note-scope');
       if (previous) {
@@ -63,6 +66,7 @@ function App() {
       history.replaceState(null, '', `/?page=${page.id}`);
       sessionStorage.setItem('p-note-return-url', location.pathname + location.search);
       sessionStorage.setItem('p-note-scope', JSON.stringify(page));
+      setPage(page);
       const checkAccess = async () => {
         const current = await api(`/api/pages/${page.id}`);
         if (disposed) return false;
@@ -76,7 +80,7 @@ function App() {
       };
       opened = await start([page.owner_id, page.id, page.sync_generation], checkAccess);
       if (disposed) { opened.provider.destroy(); await opened.cache.destroy(); opened.doc.destroy(); return; }
-      setTitle('日記 ' + page.title); setSession(opened);
+      setSession(opened);
     })().catch(() => setError('載入失敗，請連線後再試'));
     return () => { disposed = true; opened?.provider.destroy(); void opened?.cache.destroy(); opened?.doc.destroy(); };
   }, [confirm]);
@@ -84,7 +88,16 @@ function App() {
   return <>
     {error && <p role="alert">{error}</p>}
     {login && <main><Login /></main>}
-    {session ? <Editor session={session} title={title} /> : !login && !error && <main><p>載入中</p></main>}
+    <div className="workspace">
+      {(page || recovery) && <Navigation page={(page ?? recovery)!} changed={setPage} error={setError} />}
+      {recovery && <main><button onClick={() => {
+        void api(`/api/pages/${recovery.id}/restore`, {}).then(async response => {
+          if (!response.ok) { setError((await response.json() as { message: string }).message); return; }
+          await navigate(recovery.id);
+        }).catch(() => setError('還原失敗，請重試'));
+      }}>還原此頁</button></main>}
+      {session && page ? <Editor session={session} title={(page.kind === 'journal' ? '日記 ' : '筆記 ') + page.title} /> : !login && !error && <main><p>載入中</p></main>}
+    </div>
   </>;
 }
 
