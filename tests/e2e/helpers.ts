@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 
 export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
-  await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+  await page.goto(`/probe?page=${room}&owner=${owner}&generation=${generation}`);
   await expect(page.locator('.tiptap[contenteditable="true"]'), '須建立真正 BlockNote 編輯器').toHaveCount(1);
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();

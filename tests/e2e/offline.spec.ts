@@ -76,7 +76,7 @@ test('PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗
   const room = await open(page);
   await saved(page);
   await context.setOffline(true);
-  await page.goto(`/?page=${randomUUID()}`);
+  await page.goto(`/probe?page=${randomUUID()}`);
   await expect(page.getByRole('alert')).toHaveText('此頁尚未下載，請連線後再開啟');
   await expect(page.locator('.tiptap')).toHaveCount(0);
   await context.setOffline(false);

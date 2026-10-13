@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:worker": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js dev --config wrangler.probe.jsonc --ip 127.0.0.1 --port 8787 --local",
+    "dev:test-worker": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js dev --config wrangler.test.jsonc --ip 127.0.0.1 --port 8787 --local --persist-to .wrangler/test-state",
     "build": "vite build",
     "check": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "test:unit": "vitest run --config vitest.unit.config.ts",
@@ -13,7 +14,7 @@
     "test:e2e": "playwright test",
     "test:spec-coverage": "node scripts/spec-coverage.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
-    "worker:types": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js types --config wrangler.probe.jsonc",
+    "worker:types": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js types --config wrangler.app.jsonc",
     "test:probe": "npm test && npm run test:spec-coverage -- --probe",
     "check:spec": "node scripts/check-spec.mjs",
     "validate:probe": "npm run test:probe && npm run check && npm run build && npm run check:spec"
@@ -22,6 +23,7 @@
     "@blocknote/core": "0.55.0",
     "@blocknote/mantine": "0.55.0",
     "@blocknote/react": "0.55.0",
+    "better-auth": "1.7.7",
     "lib0": "0.2.119",
     "partyserver": "0.5.10",
     "react": "19.3.0",

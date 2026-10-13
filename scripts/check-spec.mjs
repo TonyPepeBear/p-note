@@ -50,3 +50,14 @@ for (const [name, values] of Object.entries(contracts)) {
   for (const value of values) assert(text.includes(value), `${name} 決策不一致：${value}`);
 }
 console.log(JSON.stringify({ 文件: files.length, 本地連結: links, 唯一情境: ids.length, 決策契約: '通過' }));
+const appConfig = JSON.parse(await readFile('wrangler.app.jsonc', 'utf8'));
+assert.deepEqual(appConfig.secrets.required, ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET']);
+assert(!appConfig.vars, '應用設定不得提交私有值');
+assert.equal(appConfig.main, 'src/worker/app.ts');
+const testConfig = JSON.parse(await readFile('wrangler.test.jsonc', 'utf8'));
+assert.equal(testConfig.main, 'tests/runtime.ts');
+assert.notEqual(appConfig.d1_databases[0].database_id, testConfig.d1_databases[0].database_id);
+assert.notEqual(appConfig.r2_buckets[0].bucket_name, testConfig.r2_buckets[0].bucket_name);
+assert(!JSON.stringify([appConfig, testConfig]).includes('"remote":true'));
+assert((await readFile('index.html', 'utf8')).includes('<meta name="referrer" content="no-referrer"'), '登入 token 不得送出為 referrer');
+console.log('登入設定來源與本機測試隔離契約：通過');

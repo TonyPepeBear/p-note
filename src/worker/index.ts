@@ -102,7 +102,7 @@ export class ProbeRoom extends YServer<Env> {
 }
 
 export default {
-  async fetch(request, env): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (!['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) {
       return new Response('原型只限本機', { status: 403 });

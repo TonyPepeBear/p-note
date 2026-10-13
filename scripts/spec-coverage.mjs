@@ -32,9 +32,13 @@ export function reportCases(report, environment) {
 async function main() {
   const { readFile, readdir } = await import('node:fs/promises');
   const probe = process.argv.includes('--probe');
+  const auth = process.argv.includes('--auth');
   const projects = ['chromium-desktop', 'chromium-mobile', 'webkit-mobile'];
   let required = [];
-  if (probe) {
+  if (auth) {
+    required = Array.from({ length: 8 }, (_, n) => `AUTH-0${n + 1}@integration`);
+    for (const n of [1, 3, 4, 5, 6]) required.push(...projects.map(project => `AUTH-0${n}@${project}`));
+  } else if (probe) {
     required = [2, 3, 4, 5, 6, 7].map(n => `PROBE-SYNC-${String(n).padStart(2, '0')}@integration`);
     required.push(...['ORDER', 'BOUNDARY', 'LOAD', 'CHECKPOINT'].map(name => `PROBE-${name}-01@integration`));
     for (const id of [...[1, 2, 3, 4, 5].map(n => `PROBE-EDIT-0${n}`), ...[1, 4, 8, 9, 12].map(n => `PROBE-SYNC-${String(n).padStart(2, '0')}`)]) {
@@ -59,7 +63,7 @@ async function main() {
     actual.push(...reportCases(report, environment));
   }
   const failures = checkCoverage(required, actual);
-  console.log(JSON.stringify({ 範圍: probe ? '技術原型' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
+  console.log(JSON.stringify({ 範圍: auth ? '本輪登入' : probe ? '技術原型' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
   if (failures.length) process.exitCode = 1;
 }
 
