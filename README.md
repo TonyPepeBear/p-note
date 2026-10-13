@@ -29,6 +29,8 @@ npm run validate:probe
 
 設定來源、權限邊界與驗證見 [登入開發文件](docs/auth-development.md)。
 
+編輯器的「備份設定」提供建立備份與完整 ZIP 下載；格式、權限、串流與獨立解析驗證見 [匯出開發](docs/export-development.md)。覆蓋還原仍在實作，尚未部署。
+
 ## 本機原型
 
 分別啟動兩個終端：

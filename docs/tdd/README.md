@@ -12,6 +12,10 @@ Q3 私人部署輸入與原生 Email adapter 已接入，證據與實際寄信�
 
 已建立持久正文擷取子案例與最小 RPC，範圍、Red／Green／Refactor 與 60 個 Workers 回歸見 [備份開發](../backup-development.md)。完整 BACKUP 情境與 7.1～7.3 尚未完成，保持未勾選。
 
+## 第八階段：完整 ZIP 匯出
+
+設定頁、私有串流 ZIP 與完整清單驗證已完成，BACKUP-06 的 Workers／三種瀏覽器環境通過。完整回歸為單元 5、Workers 75、瀏覽器 129，共 209；獨立 ZIP 解析 3／3。證據與限制見 [匯出開發](../export-development.md)。7.2 的備份／校驗／保留已完成；7.1／7.3 與 V3／V4 的完整還原仍未完成。
+
 ## 第五階段：正式編輯器
 
 OpenSpec 5.5／5.6 已完成。有效 Red／Green／Refactor、72 個相關瀏覽器結果、51 個 Workers 回歸及 EDIT 17／17 追蹤見 [正式編輯器開發](../editor-development.md)。同步／備份／完整產品驗收仍在進行，不封存或部署。
