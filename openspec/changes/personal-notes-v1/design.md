@@ -1,6 +1,6 @@
 # Design
 
-狀態：技術方向與設計提案，不是已完成的實作。決策以 [需求整理](../../../docs/v1-scope.md) 為準；已授權本機測試環境與 BlockNote／持久化／離線重連 TDD。
+狀態：技術方向與設計提案，不是已完成的實作。決策以 [需求整理](../../../docs/v1-scope.md) 為準；已完成本機技術驗證，本輪授權資料結構與登入 TDD。
 
 ## Context
 
@@ -16,7 +16,7 @@
 
 **Non-Goals:**
 
-- 此次技術驗證不實作正式登入、頁面資料結構、私有資產、備份或部署。
+- 本輪實作資料結構、登入、今日入口與登入失效的同步權限邊界；完整頁面操作、私有資產、備份與部署留待後續。
 - 第一版提案不建立團隊權限、資料庫視圖、完整歷史時間軸或整站同秒快照。
 - 不自行發明 Yjs 協定，也不承諾 CRDT 能保留所有互相矛盾的編輯意圖。
 
@@ -33,7 +33,7 @@ Yjs 取代整篇 JSON 版本衝突提案。整篇樂觀鎖較簡單，但不符�
 | 位置 | 概念資料 | 責任 |
 | --- | --- | --- |
 | D1：Better Auth 管理的表 | 使用者、session、驗證資料 | 登入原始來源，不另建重複機制 |
-| D1：pages | id、owner_id、kind、title、parent_id、journal_date、sync_generation、metadata_revision、created_at、updated_at、deleted_at | 頁面與結構原始來源；未建立 schema |
+| D1：pages | id、owner_id、kind、title、parent_id、journal_date、sync_generation、metadata_revision、created_at、updated_at、deleted_at | 頁面與結構原始來源；本輪建立 schema |
 | D1：搜尋資料 | 純文字、摘要、indexed_generation、indexed_checkpoint | 由 Yjs 重建，舊檢查點不能覆蓋新索引 |
 | D1：assets | id、owner_id、object_key、original_name、mime_type、byte_size、checksum、created_at | 圖片索引與所有權 |
 | 每頁的 SQLite-backed DO | 房間狀態、Yjs 快照、更新紀錄、提交確認／檢查點 | 內文原始來源 |
@@ -136,4 +136,14 @@ IndexedDB 以 owner／page／generation 雜湊名稱隔離。y-indexeddb 9.0.12 
 
 ## 待確認與技術驗證門檻
 
-需求整理的 Q1–Q9 會改變產品行為或範圍，V1–V4 決定架構可行性。tasks 先列產品輸入與自動檢查，再列 Red／Green／Refactor 任務；不得將人工驗收當完成條件。已授權此次本機技術驗證；正式 Email／域名在接入服務前提供，V3／V4 不在此次範圍。
+需求整理的 Q1–Q9 會改變產品行為或範圍，V1–V4 決定架構可行性。tasks 先列產品輸入與自動檢查，再列 Red／Green／Refactor 任務；不得將人工驗收當完成條件。已授權此次資料結構與登入 TDD；正式 Email／域名在接入服務前提供，V3／V4 不在此次範圍。
+
+## 本輪資料結構與登入範圍
+
+Better Auth 直接使用 D1 binding，固定版本；建立 user／session／account／verification 與 pages／assets／page_search 的 SQL migration，不執行雲端 migration。日記日期在垃圾桶內仍唯一，parent 外鍵必須同 owner。Yjs 內文不放入 D1。
+
+登入只允許 OWNER_EMAIL；BETTER_AUTH_URL 與 BETTER_AUTH_SECRET 由 Worker binding／私有設定提供，缺值即拒絕。測試寄件匣只存在本機測試 Worker，故障／時鐘入口不放在應用 Worker。正式寄信 adapter 留待接入服務，不以假寄信宣稱可部署。
+
+magic link 憑證雜湊保存、單次原子消耗、10 分鐘有效；郵件連結先開無副作用確認頁，由使用者按鈕以 POST 兌換，避免掃描 GET 消耗 token。限制 Email／IP 由 D1 原子計數維持，不採程序記憶體。session 固定 30×24 小時、disableSessionRefresh、禁用 cookie session cache。
+
+所有 /api 私人入口與同步房間檢查 session、owner、頁面／世代；過期／撤銷連線不得收到其他有效連線的廣播。舊本機原型保留在獨立 /probe 與 ROOMS，正式 SYNC 房間不能從原型路由存取。首頁新增最小登入／今日入口，沿用既有編輯器保存本機草稿，重新登入後回原頁且重查世代。完整階層與資產操作另輪實作。
