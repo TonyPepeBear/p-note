@@ -1,0 +1,63 @@
+固定基線：8e12e32 的應用入口；沿用正確隔離儲存 fixture，尚無備份 API。
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-catalog.test.ts -t ^(BACKUP-05|ASSET-05)
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/backup-catalog.test.ts (10 tests | 2 failed | 8 skipped) 871ms
+   ↓ BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證
+   ↓ BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變
+   ↓ BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代
+   ↓ BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗
+   ↓ BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留
+   ↓ BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查
+   ↓ BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始
+   ↓ BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成
+   × BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新 463ms
+   × ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔 407ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ tests/workers/backup-catalog.test.ts:215:27
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:26:99
+     24| async function create(auth: Auth, now = auth.now) {
+     25|   await auth.post('/__test/control', { now });
+     26|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     27|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     28| }
+ ❯ tests/workers/backup-catalog.test.ts:228:45
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 skipped (10)
+   Start at  18:05:15
+   Duration  4.66s (transform 1.04s, setup 0ms, import 2.44s, tests 871ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

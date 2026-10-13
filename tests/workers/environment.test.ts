@@ -8,6 +8,7 @@ afterEach(reset);
 it('ENV-02：D1／SQLite DO／R2 是隔離的真實本機儲存且可清理', async () => {
   await env.DB.exec('CREATE TABLE fixture (value TEXT); INSERT INTO fixture VALUES (\'隔離\')');
   await env.ASSETS.put('fixture', '原圖 fixture');
+  await env.BACKUPS.put('fixture', '獨立備份 fixture');
   const stub = env.ROOMS.getByName('environment');
   await runInDurableObject(stub, async (_instance, state) => {
     state.storage.sql.exec('CREATE TABLE fixture (value TEXT)');
@@ -16,8 +17,10 @@ it('ENV-02：D1／SQLite DO／R2 是隔離的真實本機儲存且可清理', as
   });
   expect(await env.DB.prepare('SELECT value FROM fixture').first('value')).toBe('隔離');
   expect(await (await env.ASSETS.get('fixture'))?.text()).toBe('原圖 fixture');
+  expect(await (await env.BACKUPS.get('fixture'))?.text()).toBe('獨立備份 fixture');
   await reset();
   expect(await env.ASSETS.get('fixture')).toBeNull();
+  expect(await env.BACKUPS.get('fixture')).toBeNull();
   expect(await env.DB.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'fixture'").first('n')).toBe(0);
   await runInDurableObject(env.ROOMS.getByName('environment'), (_instance, state) => {
     expect(state.storage.sql.exec("SELECT count(*) AS n FROM sqlite_master WHERE name = 'fixture'").one().n).toBe(0);

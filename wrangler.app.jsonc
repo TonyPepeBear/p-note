@@ -9,9 +9,10 @@
   "observability": { "enabled": true },
   "secrets": { "required": ["OWNER_EMAIL", "BETTER_AUTH_URL", "BETTER_AUTH_SECRET", "SENDER_EMAIL"] },
   "send_email": [{ "name": "EMAIL" }],
+  "triggers": { "crons": ["0 19 * * *"] },
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "ProbeRoom" }, { "name": "SYNC", "class_name": "SyncRoom" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ProbeRoom", "SyncRoom"] }],
   "d1_databases": [{ "binding": "DB", "database_name": "p-note-local-app", "database_id": "00000000-0000-0000-0000-000000000002", "migrations_dir": "migrations" }],
-  "r2_buckets": [{ "binding": "ASSETS", "bucket_name": "p-note-local-app" }],
+  "r2_buckets": [{ "binding": "ASSETS", "bucket_name": "p-note-local-app" }, { "binding": "BACKUPS", "bucket_name": "p-note-local-app-backups" }],
   "rules": [{ "type": "Text", "globs": ["**/*.sql"], "fallthrough": true }]
 }

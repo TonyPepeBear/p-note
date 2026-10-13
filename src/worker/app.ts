@@ -8,6 +8,7 @@ import type { PageRow } from '../shared/pages';
 import { body } from './request';
 import { handleAssets } from './assets';
 import { sendLoginMail } from './mail';
+import { cleanupBackups, createBackup, handleBackups } from './backups';
 
 export { ProbeRoom, SyncRoom };
 
@@ -71,6 +72,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
+    const backupResponse = await handleBackups(request, env, session.user.id, services.now);
+    if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());
     if (assetResponse) return assetResponse;
     const pageResponse = await handlePages(request, env, session.user.id, services.now());
@@ -91,4 +94,12 @@ export async function handle(request: Request, env: Env, services: Services = { 
   } catch (failure) { return error(failure instanceof PageError ? failure.message : '服務暫時無法完成，請稍後重試', failure instanceof PageError ? failure.status : 503); }
 }
 
-export default { fetch: (request: Request, env: Env) => handle(request, env) } satisfies ExportedHandler<Env>;
+export default {
+  fetch: (request: Request, env: Env) => handle(request, env),
+  async scheduled(controller: ScheduledController, env: Env) {
+    if (controller.cron !== '0 19 * * *' || !configured(env)) throw new Error('備份排程設定不完整');
+    const owner = await env.DB.prepare('SELECT id FROM user WHERE email = ?').bind(env.OWNER_EMAIL.toLowerCase()).first<string>('id');
+    try { if (owner) await createBackup(env, owner, Date.now); }
+    finally { await cleanupBackups(env, Date.now()); }
+  },
+} satisfies ExportedHandler<Env>;

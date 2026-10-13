@@ -2,6 +2,7 @@ import { handle, ProbeRoom, SyncRoom as AppSyncRoom } from '../src/worker/app';
 import probe from '../src/worker/index';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
+import backupsMigration from '../migrations/0003.sql';
 
 export { ProbeRoom };
 export class SyncRoom extends AppSyncRoom {
@@ -18,7 +19,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');

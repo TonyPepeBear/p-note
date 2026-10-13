@@ -1,0 +1,59 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-catalog.test.ts -t BACKUP-PUBLISH
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/backup-catalog.test.ts (8 tests | 2 failed | 6 skipped) 850ms
+   ↓ BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證
+   ↓ BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變
+   ↓ BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代
+   ↓ BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗
+   ↓ BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留
+   × BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查 471ms
+   × BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始 377ms
+   ↓ BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查
+AssertionError: expected 201 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 201
+
+ ❯ tests/workers/backup-catalog.test.ts:163:99
+    161|     const value = Reflect.get(target, property, target); return typeof…
+    162|   } }) };
+    163|   const failed = await request(f.auth, '/api/backups', configured, 'PO…
+       |                                                                                                   ^
+    164|   expect(await env.DB.prepare('SELECT sync_generation FROM pages WHERE…
+    165|   const list = await (await request(f.auth, '/api/backups')).json<{ la…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始
+AssertionError: expected 1791971531823 to be 1791971532823 // Object.is equality
+
+- Expected
++ Received
+
+- 1791971532823
++ 1791971531823
+
+ ❯ tests/workers/backup-catalog.test.ts:181:31
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 6 skipped (8)
+   Start at  17:52:07
+   Duration  4.53s (transform 1.29s, setup 0ms, import 2.90s, tests 850ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

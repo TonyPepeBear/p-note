@@ -1,0 +1,36 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs
+
+{
+  "範圍": "完整產品",
+  "必需結果": 129,
+  "已通過": 104,
+  "未通過": [
+    "缺漏 BACKUP-01@integration",
+    "缺漏 BACKUP-06@integration",
+    "缺漏 BACKUP-06@chromium-desktop",
+    "缺漏 BACKUP-06@chromium-mobile",
+    "缺漏 BACKUP-06@webkit-mobile",
+    "缺漏 BACKUP-07@integration",
+    "缺漏 BACKUP-08@integration",
+    "缺漏 BACKUP-08@chromium-desktop",
+    "缺漏 BACKUP-08@chromium-mobile",
+    "缺漏 BACKUP-08@webkit-mobile",
+    "缺漏 BACKUP-09@integration",
+    "缺漏 BACKUP-09@chromium-desktop",
+    "缺漏 BACKUP-09@chromium-mobile",
+    "缺漏 BACKUP-09@webkit-mobile",
+    "缺漏 SYNC-03@chromium-desktop",
+    "缺漏 SYNC-03@chromium-mobile",
+    "缺漏 SYNC-03@webkit-mobile",
+    "缺漏 SYNC-10@integration",
+    "缺漏 SYNC-10@chromium-desktop",
+    "缺漏 SYNC-10@chromium-mobile",
+    "缺漏 SYNC-10@webkit-mobile",
+    "缺漏 SYNC-11@integration",
+    "缺漏 SYNC-11@chromium-desktop",
+    "缺漏 SYNC-11@chromium-mobile",
+    "缺漏 SYNC-11@webkit-mobile"
+  ]
+}

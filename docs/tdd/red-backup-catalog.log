@@ -1,0 +1,123 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-catalog.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/backup-catalog.test.ts (5 tests | 5 failed) 2003ms
+   × BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證 605ms
+   × BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變 351ms
+   × BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代 378ms
+   × BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗 332ms
+   × BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留 337ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:24:99
+     22| }
+     23| async function create(auth: Auth, now = auth.now) {
+     24|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     25|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     26| }
+ ❯ tests/workers/backup-catalog.test.ts:50:45
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:24:99
+     22| }
+     23| async function create(auth: Auth, now = auth.now) {
+     24|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     25|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     26| }
+ ❯ tests/workers/backup-catalog.test.ts:69:49
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:24:99
+     22| }
+     23| async function create(auth: Auth, now = auth.now) {
+     24|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     25|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     26| }
+ ❯ tests/workers/backup-catalog.test.ts:96:49
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:24:99
+     22| }
+     23| async function create(auth: Auth, now = auth.now) {
+     24|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     25|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     26| }
+ ❯ tests/workers/backup-catalog.test.ts:113:45
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/workers/backup-catalog.test.ts > BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create tests/workers/backup-catalog.test.ts:24:99
+     22| }
+     23| async function create(auth: Auth, now = auth.now) {
+     24|   const response = await request(auth, '/api/backups', env, 'POST', no…
+       |                                                                                                   ^
+     25|   const backup = await response.json<Catalog>(); expect(backup.status)…
+     26| }
+ ❯ tests/workers/backup-catalog.test.ts:130:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  17:45:20
+   Duration  4.61s (transform 809ms, setup 0ms, import 1.90s, tests 2.00s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

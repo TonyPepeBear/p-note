@@ -1,0 +1,36 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-catalog.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+uncaught exception; source = Uncaught (in promise); stack = Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+ ✓ tests/workers/backup-catalog.test.ts (10 tests) 4431ms
+   ✓ BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證  529ms
+   ✓ BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變  510ms
+   ✓ BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代  399ms
+   ✓ BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗  393ms
+   ✓ BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留  465ms
+   ✓ BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查  439ms
+   ✓ BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始  379ms
+   ✓ BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成  411ms
+   ✓ BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新  383ms
+   ✓ ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔  522ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  17:55:03
+   Duration  7.35s (transform 844ms, setup 0ms, import 1.96s, tests 4.43s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json
