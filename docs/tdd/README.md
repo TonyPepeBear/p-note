@@ -4,7 +4,7 @@
 
 ## 第九階段：覆蓋還原與舊草稿
 
-V4、7.1／7.3 已有完整 Red／Green／Refactor 證據，見 [還原開發](../restore-development.md)。單元 5、Workers 86、相關瀏覽器 15 個結果通過；全套瀏覽器回歸執行中。V3、正式雲端保存故障 UI 與最終 8.1／8.2 仍未勾選，不部署。
+V4、7.1／7.3 已有完整 Red／Green／Refactor 證據，見 [還原開發](../restore-development.md)。[結果](restore-recovery-results.json) 為單元 5、Workers 87、全套瀏覽器 141，共 233 個全部通過；[完整產品追蹤](restore-recovery-product-pending.log) 126／129，剩 SYNC-03 的三個瀏覽器結果。V3、正式雲端保存故障 UI 與最終 8.1／8.2 仍未勾選，不部署。
 
 ## 第六階段：正式離線與重連
 

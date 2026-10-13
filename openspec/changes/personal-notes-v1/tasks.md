@@ -8,7 +8,7 @@ Q／V 編號見 [需求整理](../../../docs/v1-scope.md)，情境 ID、工具�
 
 依 AGENTS.md，規格變更與完成開發後各自自動 commit；不得因 artifacts 齊備而開始 apply。不得勾選未執行的產品任務。
 
-機器證據見 [TDD 結果](../../../docs/tdd/README.md) 與 [還原開發](../../../docs/restore-development.md)：單元 5、全部 Workers 86、還原／草稿相關瀏覽器 15 個結果通過。最新全套瀏覽器與完整產品追蹤執行中；不以相關案例代替最終 8.1／8.2。
+機器證據見 [TDD 結果](../../../docs/tdd/README.md) 與 [還原開發](../../../docs/restore-development.md)：單元 5、Workers 87、全套瀏覽器 141，共 233 個結果通過。完整產品追蹤 126／129，剩 SYNC-03 的三個瀏覽器結果；V3、6.3／6.4 與最終 8.1／8.2 保持未勾選。
 
 ## 1. 產品契約輸入與規格自動檢查
 
