@@ -1,0 +1,61 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/pages.spec.ts --project=webkit-mobile -g PAGE-LOCAL-01
+
+[WebServer] (node:10632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:10701) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 2:53:31 PM [vite] (client) [Unhandled rejection] Error: 測試權限查詢斷線
+[WebServer]  > api src/client/api.ts:2:15
+[WebServer]     1  |  export async function api(path: string, body?: object): Promise<Response> {
+[WebServer]     2  |    return fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b...
+[WebServer]        |                 ^
+[WebServer]     3  |  }
+[WebServer]     4  |  
+[WebServer]  > src/client/main.tsx:71:34
+[WebServer]  > closed src/client/editor.tsx:63:130
+[WebServer] 
+  ✘  1 [webkit-mobile] › tests/e2e/pages.spec.ts:126:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 (7.9s)
+
+
+  1) [webkit-mobile] › tests/e2e/pages.spec.ts:126:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 ──────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "連線失敗，可重試"
+    Received: "登入或頁面權限已失效"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">登入或頁面權限已失效</span>
+           - unexpected value "登入或頁面權限已失效"
+
+
+      149 |     window.probe!.provider.emit('connection-close', [new CloseEvent('close', { code: 4002 })]);
+      150 |   });
+    > 151 |   await expect(page.getByTestId('cloud-status')).toHaveText('連線失敗，可重試');
+          |                                                  ^
+      152 |   expect(errors).toEqual([]);
+      153 | });
+      154 |
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:151:50
+
+    Error Context: test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [webkit-mobile] › tests/e2e/pages.spec.ts:126:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 ───────────

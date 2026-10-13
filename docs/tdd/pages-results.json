@@ -1,0 +1,214 @@
+{
+  "日期": "2026-10-13T07:08:40.961Z",
+  "範圍": "本機頁面與日記；私有資產、備份、完整正式同步及部署另輪",
+  "規格先提交": "a4d7590",
+  "Red追蹤提交": "57c6717",
+  "版本": {
+    "node": "v22.22.3",
+    "betterAuth": "1.7.7",
+    "vitest": "4.1.11",
+    "playwright": "1.64.0",
+    "wrangler": "4.149.0"
+  },
+  "測試": {
+    "單元": 4,
+    "Workers": 33,
+    "瀏覽器": 69,
+    "合計": 106,
+    "失敗": 0,
+    "跳過": 0
+  },
+  "追蹤": {
+    "PAGE": {
+      "必需": 26,
+      "通過": 26
+    },
+    "AUTH": {
+      "必需": 23,
+      "通過": 23
+    },
+    "原型": {
+      "必需": 40,
+      "通過": 40
+    },
+    "完整產品": "未完成，檢查退出碼 1"
+  },
+  "TDD": [
+    {
+      "命令": "npm run test:integration -- tests/workers/pages.test.ts",
+      "報告": "red-pages-integration.log",
+      "退出碼": 1,
+      "原因": "七個頁面功能缺少 API；PAGE-01 既有今日行為直接通過，不計 Red"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/pages.spec.ts --project=chromium-desktop --timeout=6000",
+      "報告": "red-pages-e2e.log",
+      "退出碼": 1,
+      "原因": "六個日期／導覽／垃圾桶／搜尋入口尚未接入 UI"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/pages.spec.ts --project=chromium-desktop -g PAGE-LOCAL-01",
+      "報告": "red-pages-local.log",
+      "退出碼": 1,
+      "原因": "本機保存錯誤被吞掉而繼續導覽"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/pages.spec.ts --project=webkit-mobile -g PAGE-LOCAL-01",
+      "報告": "red-pages-revalidate.log",
+      "退出碼": 1,
+      "原因": "權限重驗斷線發生未處理拒絕，沒有可重試狀態"
+    },
+    {
+      "命令": "npm run test:integration -- tests/workers/pages.test.ts -t 'PAGE-(05|GUARD-01)'",
+      "報告": "red-pages-boundaries.log",
+      "退出碼": 1,
+      "原因": "缺少上層被當作根移動、解除中斷期間列表提前顯示刪除；未選案例不計通過"
+    },
+    {
+      "命令": "npm run test:unit",
+      "報告": "green-pages-unit.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration",
+      "報告": "green-pages-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/pages.spec.ts",
+      "報告": "green-pages-e2e.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration",
+      "報告": "refactor-pages-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e",
+      "報告": "refactor-pages-e2e.log",
+      "退出碼": 0
+    }
+  ],
+  "檢查": [
+    "型別",
+    "Vite build",
+    "Worker types --check",
+    "Worker deploy --dry-run（未部署）",
+    "文件與設定契約",
+    "OpenSpec 嚴格驗證",
+    "git diff --check"
+  ],
+  "限制": [
+    "手機為瀏覽器模擬，未覆蓋原生 OS 鍵盤",
+    "圖片僅固定 R2／引用 fixture，不計 ASSET 驗收",
+    "正式寄信／備份／覆蓋還原世代切換／完整正式離線仍未完成",
+    "沿用單筆 Yjs 更新 512 KiB 與既有編輯器大 chunk 提示"
+  ],
+  "頁面情境": [
+    {
+      "id": "PAGE-01@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-02@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-03@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-04@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-05@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-06@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-07@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-08@integration",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-01@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-03@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-04@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-06@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-07@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-08@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-01@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-03@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-04@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-06@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-07@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-08@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-01@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-03@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-04@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-06@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-07@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "PAGE-08@webkit-mobile",
+      "status": "passed"
+    }
+  ]
+}

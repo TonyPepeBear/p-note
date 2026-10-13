@@ -1,0 +1,10 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs --auth
+
+{
+  "範圍": "登入",
+  "必需結果": 23,
+  "已通過": 23,
+  "未通過": []
+}

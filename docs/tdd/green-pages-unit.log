@@ -1,0 +1,17 @@
+
+> p-note@0.0.0 test:unit
+> vitest run --config vitest.unit.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/unit/environment.test.ts (1 test) 6ms
+ ✓ tests/unit/receipt.test.ts (1 test) 2ms
+ ✓ tests/unit/coverage.test.ts (2 tests) 5ms
+
+ Test Files  3 passed (3)
+      Tests  4 passed (4)
+   Start at  14:50:22
+   Duration  221ms (transform 102ms, setup 0ms, import 144ms, tests 13ms, environment 1ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/unit.json

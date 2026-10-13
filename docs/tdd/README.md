@@ -1,6 +1,28 @@
 # TDD 技術驗證與登入證據
 
-此文件保留前輪本機測試環境、BlockNote、Yjs 持久化與同世代離線重連證據，並追加本輪資料結構／登入 TDD。完整頁面操作、私有圖片、刪除／還原世代切換及 90 天備份仍未完成，OpenSpec change 不封存。
+此文件保留本機技術驗證、資料結構／登入與頁面／日記 TDD 證據。私有圖片、覆蓋還原世代切換、90 天備份與完整正式同步驗收仍未完成，OpenSpec change 不封存。
+
+## 第三階段：頁面與日記
+
+本輪完成 OpenSpec 5.1、5.2 的 PAGE-01～08：今日與日期補寫／月份列表、根筆記／子頁／路徑、標題與合法移動、垃圾桶還原，以及中文標題／正文搜尋。實作範圍、API／migration 與限制見 [頁面開發文件](../pages-development.md)。
+
+[pages-results.json](pages-results.json) 記錄最終 106 個結果全部通過（單元 4、Workers 33、瀏覽器 69），沒有 skip。頁面追蹤 [26／26](pages-coverage.log)、登入 [23／23](pages-auth-coverage.log) 與原型 [40／40](pages-probe-coverage.log) 全部完整；[完整產品檢查](pages-product-coverage-pending.log) 仍因後續功能未完成而退出 1，不封存 change。
+
+| 行為 | 有效 Red | Green／Refactor |
+| --- | --- | --- |
+| 日期、階層、循環、垃圾桶與中文搜尋 API | [red-pages-integration.log](red-pages-integration.log) | [green-pages-integration.log](green-pages-integration.log)、[refactor-pages-integration.log](refactor-pages-integration.log) |
+| 日期、導覽、子頁、垃圾桶與搜尋 UI | [red-pages-e2e.log](red-pages-e2e.log) | [green-pages-e2e.log](green-pages-e2e.log)、[refactor-pages-e2e.log](refactor-pages-e2e.log) |
+| 本機保存失敗必須停止導覽／刪頁 | [red-pages-local.log](red-pages-local.log) | [refactor-pages-e2e.log](refactor-pages-e2e.log) |
+| 權限重驗斷線需捕捉拒絕與保留草稿 | [red-pages-revalidate.log](red-pages-revalidate.log) | [refactor-pages-e2e.log](refactor-pages-e2e.log) |
+| 缺少移動目標與異動中列表不能冒充完成 | [red-pages-boundaries.log](red-pages-boundaries.log) | [refactor-pages-integration.log](refactor-pages-integration.log) |
+
+PAGE-01 的既有今日 API 原本直接通過，只作回歸，不冒充 Red；首次 Workers Red 是其餘七個功能入口缺少。最初瀏覽器 fixture 遺漏 Origin 而被 CSRF 拒絕，該環境錯誤不列證據；補上 Origin 後在固定的舊 UI 基線重取六個操作入口缺少的有效 Red。導覽案例等待實際 frame 導覽完成，避免把上一頁的保存狀態當成新頁面完成；移動選單已改成明確的 label／control 關聯。
+
+故障測試使用真正 D1／SQLite DO／R2：在房間持久暫停與解除階段注入失敗，斷言處理中頁面停止存取、未完成結果不提前進垃圾桶列表、意圖仍存在，再以 abort 重啟並重送同操作，斷言可恢復、正文與圖片引用不變。循環測試併發互移，只能一方成功；搜尋斷言 owner／子樹／世代／檢查點隔離，且不改正文。共用既有 bounded JSON 解析與保存函式，保留錯誤與大小檢查。
+
+型別、Vite build、Worker types 一致性、文件／設定契約、OpenSpec 嚴格驗證與差異空白檢查皆通過。[Worker bundle](pages-worker-build.log) 僅 dry-run，沒有部署。預期注入 RPC／損毀載入錯誤與開發代理 EPIPE 不列成功條件；判定依斷言與退出碼。
+
+PAGE-06 的圖片是固定 R2／Yjs 引用 fixture，沒有完成 ASSET 服務。正式寄信、私有圖片、備份、覆蓋還原世代切換與完整正式離線仍待後續；手機為 Chromium／WebKit 模擬，沿用既有單次更新 512 KiB 與編輯器大 chunk 界線。
 
 ## 第二階段：資料結構與登入
 
