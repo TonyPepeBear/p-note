@@ -6,4 +6,23 @@
 
 完整 [Workers 回歸](tdd/refactor-backup-capture-integration.log) 60 個結果通過；型別、文件契約與差異空白檢查通過。擷取失敗不回傳空文件，也不改原紀錄。測試使用真實本機 D1／SQLite 與 WebSocket、持久故障注入，沒有雲端資料異動。
 
-這些是備份的內部子案例，不能代替 BACKUP-01～09 完整驗收。目前尚未完成成功清單、私有備份 R2、ZIP 匯出、90 天清理、覆蓋還原協調及世代檢視／另存；相關 OpenSpec 任務保持未勾選。未部署。
+這些擷取子案例不能代替 BACKUP-01～09 完整驗收。後續目錄實作見下節；ZIP 匯出、覆蓋還原協調及世代檢視／另存仍未完成，相關 OpenSpec 任務保持未勾選。未部署。
+
+## 私有備份目錄與 90 天清理
+
+新增 [0003 migration](../migrations/0003.sql) 與獨立 `BACKUPS` R2，僅套用本機隔離環境。POST `/api/backups` 建立，GET 同路徑列出狀態與 latest，GET `/api/backups/:id/manifest` 只讀保留期內同 owner 的成功備份。每次備份保存固定頁面 metadata、各篇持久正文、所有已登記原圖、大小與 SHA-256；不匯出登入資料或密鑰。
+
+目錄先記 pending，原圖／副本／清單讀寫及校驗失敗記 failed。成功發布的同一個 D1 SQL 條件重新驗證所有頁面世代與結構操作，不讓 R2 清單寫入期間的世代競爭漏過。成功時間取全部 R2 校驗完成後，封存清單先記擷取時間窗，下載清單再由目錄加入成功時間。failed／pending 不取代 latest success。
+
+每日 UTC `0 19 * * *`（台北 03:00）由持久擁有者帳號執行，不依賴會到期的 session。成功時間滿 90×24 小時到期；清理先記 expiring，拒絕下載半套資料，刪該備份前綴後才移除目錄。中斷可重試；不同備份各有原圖副本，活躍 ASSETS 原檔不永久清理。
+
+| 驗證 | 證據 |
+| --- | --- |
+| 尚無建立 API 的五個有效失敗 | [目錄 Red](tdd/red-backup-catalog.log) |
+| 原子發布競爭與成功時間提早的兩個有效失敗 | [發布 Red](tdd/red-backup-publish.log) |
+| 正文／圖片／副本／清單故障，世代競爭、憑證排除、權限、排程、90 天邊界、時間窗與 ASSET-05 | [Green 10 個案例](tdd/green-backup-catalog.log) |
+| 相關全部 Workers | [Refactor 70 個結果](tdd/refactor-backup-catalog-integration.log) |
+
+初次用 mock 替換 RPC 方法時，測試 runtime 拒絕該 RPC，不能當成中途世代切換證據。已改用真正 SQLite 損毀與 R2 寫入邊界，並明確斷言世代真的改變。發布 Red 的篩選執行只計兩個有效失敗，其他未執行案例不算通過。BACKUP-05／ASSET-05 是補充資料回歸，不冒充已完成所有備份 Red 任務。
+
+待完成 ZIP 串流匯出、完整清單／路徑驗證、覆蓋還原、索引重建及舊裝置檢視／另存，才勾選完整 7.1～7.3 與 V3／V4。應用設定仍使用本機 placeholder 資源 ID；沒有建立雲端 bucket、套用雲端 migration 或部署。
