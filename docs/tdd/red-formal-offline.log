@@ -1,0 +1,115 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/formal-offline.spec.ts --project=chromium-desktop --timeout=9000
+
+[WebServer] (node:33745) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:33787) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (3.5s)
+[WebServer] 4:06:53 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:06:53 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘  2 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (7.1s)
+(node:33820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (6.5s)
+(node:33858) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (2.3s)
+
+
+  1) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      28 |     await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      29 |     await other.evaluate(() => window.probe!.editor.updateBlock('b', { content: '在線修改' })); await saved(other);
+    > 30 |     await page.reload(); await expect(page.getByTestId('ready')).toHaveText('可編輯');
+         |                                                                  ^
+      31 |     expect(JSON.stringify(await blocks(page))).toContain('離線草稿');
+      32 |     await page.context().setOffline(false); await saved(page); await saved(other);
+      33 |     await expect.poll(() => blocks(page)).toEqual(await blocks(other));
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:30:66
+
+    Error Context: test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "尚未下載"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      46 |   expect(JSON.stringify(await blocks(page))).toContain('還在記憶體');
+      47 |   await page.context().setOffline(true); await page.goto('/?page=not-downloaded');
+    > 48 |   await expect(page.getByRole('alert')).toContainText('尚未下載'); await expect(page.getByTestId('ready')).toHaveCount(0);
+         |                                         ^
+      49 | });
+      50 |
+      51 | test('SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代', async ({ page, context }) => {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:48:41
+
+    Error Context: test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 ─
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 
+  2 passed (24.2s)
