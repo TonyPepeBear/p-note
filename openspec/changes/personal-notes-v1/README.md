@@ -1,6 +1,6 @@
 # personal-notes-v1
 
-個人筆記與日記第一版：整理需求、技術決策、待確認事項與 OpenSpec 規格；已完成本機技術驗證，接續資料結構與 Better Auth＋magic link 登入 TDD；以測試寄件匣驗證，暫不部署。
+個人筆記與日記第一版：整理需求、技術決策、待確認事項與 OpenSpec 規格；已完成本機技術驗證、資料結構與 Better Auth＋magic link 登入 TDD；以測試寄件匣驗證，暫不部署。
 
 - [第一版整理與待確認清單](../../../docs/v1-scope.md)
 - [變更提案](proposal.md)

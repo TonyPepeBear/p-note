@@ -1,0 +1,178 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/auth.spec.ts --project=chromium-desktop --timeout=5000
+
+[WebServer] (node:96400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:96447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/auth.spec.ts:32:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 (5.1s)
+(node:96473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/auth.spec.ts:44:1 › AUTH-03：重用與過期連結显示錯誤及重新申請入口 (5.1s)
+(node:96558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/auth.spec.ts:59:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 (5.1s)
+(node:96582) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/auth.spec.ts:71:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不续期 (5.1s)
+(node:96600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [chromium-desktop] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代 (5.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/auth.spec.ts:32:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 ────────────
+
+    Test timeout of 5000ms exceeded.
+
+    Error: locator.fill: Test timeout of 5000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      11 | }
+      12 | async function requestLink(page: Page) {
+    > 13 |   await page.getByLabel('Email').fill('owner@example.test');
+         |                                  ^
+      14 |   await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+      15 |   await expect(page.getByRole('status')).toContainText('查看登入郵件');
+      16 | }
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:13:34)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:33:31
+
+    Error Context: test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/auth.spec.ts:44:1 › AUTH-03：重用與過期連結显示錯誤及重新申請入口 ─────────────────
+
+    Test timeout of 5000ms exceeded.
+
+    Error: locator.fill: Test timeout of 5000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      11 | }
+      12 | async function requestLink(page: Page) {
+    > 13 |   await page.getByLabel('Email').fill('owner@example.test');
+         |                                  ^
+      14 |   await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+      15 |   await expect(page.getByRole('status')).toContainText('查看登入郵件');
+      16 | }
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:13:34)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:45:31
+
+    Error Context: test-results/auth-AUTH-03：重用與過期連結显示錯誤及重新申請入口-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-03：重用與過期連結显示錯誤及重新申請入口-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-03：重用與過期連結显示錯誤及重新申請入口-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/auth.spec.ts:59:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 ──────────────
+
+    Test timeout of 5000ms exceeded.
+
+    Error: locator.fill: Test timeout of 5000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      60 |   const now = Date.now(); await control(request, now, true);
+      61 |   await page.goto('/');
+    > 62 |   await page.getByLabel('Email').fill('owner@example.test');
+         |                                  ^
+      63 |   await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+      64 |   await expect(page.getByRole('alert')).toContainText('稍後重試');
+      65 |   await expect(page.getByRole('status')).not.toContainText('查看登入郵件');
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:62:34
+
+    Error Context: test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/auth.spec.ts:71:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不续期 ───────
+
+    Test timeout of 5000ms exceeded.
+
+    Error: locator.fill: Test timeout of 5000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      11 | }
+      12 | async function requestLink(page: Page) {
+    > 13 |   await page.getByLabel('Email').fill('owner@example.test');
+         |                                  ^
+      14 |   await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+      15 |   await expect(page.getByRole('status')).toContainText('查看登入郵件');
+      16 | }
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:13:34)
+        at login (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:23:31)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:72:3
+
+    Error Context: test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不续期-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不续期-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不续期-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代 ──────────
+
+    Test timeout of 5000ms exceeded.
+
+    Error: locator.fill: Test timeout of 5000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+      11 | }
+      12 | async function requestLink(page: Page) {
+    > 13 |   await page.getByLabel('Email').fill('owner@example.test');
+         |                                  ^
+      14 |   await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+      15 |   await expect(page.getByRole('status')).toContainText('查看登入郵件');
+      16 | }
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:13:34)
+        at login (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:23:31)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:82:56
+
+    Error Context: test-results/auth-AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    [chromium-desktop] › tests/e2e/auth.spec.ts:32:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 ─────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:44:1 › AUTH-03：重用與過期連結显示錯誤及重新申請入口 ──────────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:59:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 ───────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:71:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不续期 ────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期后仍存在，重新登入返回原頁並重驗世代 ───────────

@@ -1,0 +1,41 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/auth.test.ts -t AUTH-08
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/auth.test.ts (11 tests | 1 failed | 10 skipped) 210ms
+   ↓ AUTH-01：擁有者確認後登入；掃描 GET 不消耗連結；今日日記併發唯一
+   ↓ AUTH-02：非允許 Email 不建帳號、不寄信且不洩漏 owner
+   ↓ AUTH-03：10 分鐘邊界過期、重用及併發只建立一個 session
+   ↓ AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流
+   ↓ AUTH-05：固定 30 天不續期，期限前一刻可用、到期拒絕
+   ↓ AUTH-06：到期的更新拒絕，重新登入回原頁並重驗世代
+   ↓ AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間
+   ↓ CONFIG-01：缺值／短密鑰／非法網址拒絕，測試控制入口不在應用 Worker
+   ↓ CLOCK-01：時鐘在建立過程前進仍自同一建立時刻固定到期
+   × AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗 209ms
+   ↓ SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可重建索引且不存 Yjs 正文
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗
+AssertionError: the given combination of arguments (null and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/workers/auth.test.ts:175:45
+    173|   const revoked = await post('/api/logout', {}, oldCookie);
+    174|   expect(revoked.status).toBe(200);
+    175|   expect(revoked.headers.get('set-cookie')).toContain('Max-Age=0');
+       |                                             ^
+    176|   const doc = new Y.Doc(); doc.getText('body').insert(0, '私密');
+    177|   old.socket.send(`__YPS:${JSON.stringify({ type: 'commit', id: 'revok…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  13:55:30
+   Duration  4.42s (transform 1.18s, setup 0ms, import 2.71s, tests 210ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

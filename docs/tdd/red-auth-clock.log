@@ -1,0 +1,48 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/auth.test.ts -t CLOCK-01
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/auth.test.ts (11 tests | 1 failed | 10 skipped) 44ms
+   ↓ AUTH-01：擁有者確認後登入；掃描 GET 不消耗連結；今日日記併發唯一
+   ↓ AUTH-02：非允許 Email 不建帳號、不寄信且不洩漏 owner
+   ↓ AUTH-03：10 分鐘邊界過期、重用及併發只建立一個 session
+   ↓ AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流
+   ↓ AUTH-05：固定 30 天不續期，期限前一刻可用、到期拒絕
+   ↓ AUTH-06：到期的更新拒絕，重新登入回原頁並重驗世代
+   ↓ AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間
+   ↓ CONFIG-01：缺值／短密鑰／非法網址拒絕，測試控制入口不在應用 Worker
+   × CLOCK-01：時鐘在建立過程前進仍自同一建立時刻固定到期 43ms
+   ↓ AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗
+   ↓ SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可重建索引且不存 Yjs 正文
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/auth.test.ts > CLOCK-01：時鐘在建立過程前進仍自同一建立時刻固定到期
+AssertionError: expected 600002 to be 600000 // Object.is equality
+
+- Expected
++ Received
+
+- 600000
++ 600002
+
+ ❯ tests/workers/auth.test.ts:158:85
+    156|   await auth.api.signInMagicLink({ headers: new Headers({ Origin: orig…
+    157|   const verification = await env.DB.prepare('SELECT expiresAt, created…
+    158|   expect(Date.parse(verification!.expiresAt) - Date.parse(verification…
+       |                                                                                     ^
+    159|   const cookie = await login();
+    160|   const session = await (await fetchApp('/api/session', { headers: { C…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  13:54:53
+   Duration  3.12s (transform 963ms, setup 0ms, import 2.20s, tests 44ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

@@ -1,0 +1,30 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/environment.test.ts (3 tests) 92ms
+stderr | tests/workers/sync.test.ts > PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+Error in ProbeRoom:corrupt fetch: Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+
+ ✓ tests/workers/sync.test.ts (10 tests) 423ms
+ ✓ tests/workers/auth.test.ts (11 tests) 922ms
+
+ Test Files  3 passed (3)
+      Tests  24 passed (24)
+   Start at  14:02:15
+   Duration  4.81s (transform 2.93s, setup 0ms, import 9.03s, tests 1.44s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

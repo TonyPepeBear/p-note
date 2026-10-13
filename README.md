@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。目前完成 React＋Vite、BlockNote、Yjs 的本機技術驗證；正式登入、階層／日記資料、私有圖片與備份仍在後續 OpenSpec 任務。
+個人筆記／日記系統。目前完成 React＋Vite、BlockNote、Yjs 本機技術驗證，以及 D1 schema、Better Auth magic link、固定 30 天 session、今日入口與同步權限整合。登入使用本機測試寄件匣；完整階層操作、私有圖片、備份與正式服務仍在後續 OpenSpec 任務。
 
 ## 自動化驗證
 
@@ -17,6 +17,14 @@ npm run validate:probe
 
 `npm run test:spec-coverage` 是完整產品的檢查，目前會因尚未完成而失敗；`npm run test:spec-coverage -- --probe` 只驗收本次技術範圍，不能代替完整產品驗收。
 
+`npm run test:spec-coverage -- --auth` 比對本輪 AUTH-01～08 的 Workers 與三種瀏覽器結果。先執行完整 `npm test`，避免以篩選執行的報告作完整覆蓋。
+
+## 本機登入與今日編輯器
+
+分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。正式寄信尚未接入，應用預設會拒絕寄信；不能當正式私人筆記服務部署。
+
+設定來源、權限邊界與驗證見 [登入開發文件](docs/auth-development.md)。
+
 ## 本機原型
 
 分別啟動兩個終端：
@@ -29,7 +37,7 @@ npm run dev:worker
 npm run dev
 ```
 
-開啟 `http://127.0.0.1:5173/?page=demo`。同一 page 在兩個瀏覽器可同步；已下載的內文可離線刷新與編輯。圖片使用固定 PNG fixture。原型沒有正式登入／所有權檢查，只接受本機網站入口，不提供部署命令。
+開啟 `http://127.0.0.1:5173/probe?page=demo`。同一 page 在兩個瀏覽器可同步；已下載的內文可離線刷新與編輯。圖片使用固定 PNG fixture。原型沒有正式登入／所有權檢查，只接受本機網站入口，不提供部署命令。正式 SYNC 房間使用獨立 namespace，不能由原型路由存取。
 
 目前使用官方 Vitest plugin 內的 Wrangler CLI；y-partyserver 的 Workers types 4 peer 已明確鎖定，執行時與 Env 使用 Wrangler 產生的最新型別。乾淨安裝已用 npm 11.21.0 驗證；npm 10 的可選 peer 解析曾發生內部錯誤，不使用 force 或忽略 peer 檢查。
 

@@ -1,0 +1,192 @@
+{
+  "日期": "2026-10-13T06:01:24.555Z",
+  "範圍": "本機資料結構與登入；不表示完整產品或正式寄信驗收",
+  "規格授權提交": "76d200b",
+  "設定來源與Red追蹤提交": "e06c36b",
+  "版本": {
+    "node": "v22.22.3",
+    "npm安裝": "11.21.0",
+    "betterAuth": "1.7.7",
+    "vitest": "4.1.11",
+    "wrangler": "4.149.0",
+    "playwright": "1.64.0"
+  },
+  "測試": {
+    "單元": 4,
+    "Workers": 24,
+    "瀏覽器": 48,
+    "合計": 76,
+    "失敗": 0,
+    "跳過": 0
+  },
+  "追蹤": {
+    "登入": {
+      "必需": 23,
+      "通過": 23
+    },
+    "原型": {
+      "必需": 40,
+      "通過": 40
+    },
+    "完整產品": "未完成，完整覆蓋命令退出碼 1"
+  },
+  "TDD": [
+    {
+      "命令": "npm run test:integration -- tests/workers/auth.test.ts",
+      "報告": "red-auth.log",
+      "退出碼": 1,
+      "原因": "登入入口與 schema 尚未實作，9 個斷言失敗"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/auth.spec.ts --project=chromium-desktop --timeout=5000",
+      "報告": "red-auth-e2e.log",
+      "退出碼": 1,
+      "原因": "固定的原型 UI 尚未提供 Email 登入，5 個案例缺少登入操作"
+    },
+    {
+      "命令": "npm run test:integration -- tests/workers/auth.test.ts -t CLOCK-01",
+      "報告": "red-auth-clock.log",
+      "退出碼": 1,
+      "原因": "多次取時鐘使 10 分鐘期限多出 2 ms；未選案例不算結果"
+    },
+    {
+      "命令": "npm run test:integration -- tests/workers/auth.test.ts -t AUTH-08",
+      "報告": "red-auth-logout.log",
+      "退出碼": 1,
+      "原因": "撤銷入口未轉傳清除 cookie；未選案例不算結果"
+    },
+    {
+      "命令": "npm run test:unit",
+      "報告": "green-auth-unit.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration",
+      "報告": "green-auth-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e",
+      "報告": "green-auth-e2e.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration",
+      "報告": "refactor-auth-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e",
+      "報告": "refactor-auth-e2e.log",
+      "退出碼": 0
+    }
+  ],
+  "其他檢查": [
+    "型別與 Worker types --check",
+    "Vite build",
+    "Worker deploy --dry-run",
+    "文件／設定契約",
+    "OpenSpec 嚴格驗證",
+    "git diff --check"
+  ],
+  "限制": [
+    "正式 Email 與雲端運作未驗證",
+    "完整頁面／資產／備份／世代切換與離線啟動仍待後續",
+    "手機為瀏覽器模擬，未涵蓋原生 OS 鍵盤",
+    "既有 BlockNote bundle 仍有大 chunk 提示；未加入效能優化"
+  ],
+  "登入情境": [
+    {
+      "id": "AUTH-01@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-02@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-03@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-04@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-05@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-06@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-07@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-08@integration",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-01@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-03@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-04@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-05@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-06@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-01@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-03@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-04@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-05@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-06@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-01@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-03@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-04@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-05@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "AUTH-06@webkit-mobile",
+      "status": "passed"
+    }
+  ]
+}

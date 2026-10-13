@@ -1,0 +1,212 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/auth.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/auth.test.ts (9 tests | 9 failed) 72ms
+   × AUTH-01：擁有者確認後登入；掃描 GET 不消耗連結；今日日記併發唯一 20ms
+   × AUTH-02：非允許 Email 不建帳號、不寄信且不洩漏 owner 5ms
+   × AUTH-03：10 分鐘邊界過期、重用及併發只建立一個 session 16ms
+   × AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流 7ms
+   × AUTH-05：固定 30 天不續期，期限前一刻可用、到期拒絕 4ms
+   × AUTH-06：到期的更新拒絕，重新登入回原頁並重驗世代 6ms
+   × AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間 5ms
+   × AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗 4ms
+   × SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可重建索引且不存 Yjs 正文 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-01：擁有者確認後登入；掃描 GET 不消耗連結；今日日記併發唯一
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ link tests/workers/auth.test.ts:15:86
+     13| async function control(now: number, fail = false) { await post('/__tes…
+     14| async function link(ip = '192.0.2.1') {
+     15|   expect((await post('/api/login', { email: 'owner@example.test' }, ''…
+       |                                                                                      ^
+     16|   const mails = await (await fetchApp('/__test/mailbox')).json<{ url: …
+     17|   return mails.at(-1)!.url;
+ ❯ tests/workers/auth.test.ts:44:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-02：非允許 Email 不建帳號、不寄信且不洩漏 owner
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/auth.test.ts:62:27
+     60| it('AUTH-02：非允許 Email 不建帳號、不寄信且不洩漏 owner', async () => {
+     61|   const response = await post('/api/login', { email: 'stranger@example…
+     62|   expect(response.status).toBe(200);
+       |                           ^
+     63|   expect(await response.text()).not.toContain('owner@example.test');
+     64|   expect(await env.DB.prepare('SELECT count(*) AS n FROM user').first(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-03：10 分鐘邊界過期、重用及併發只建立一個 session
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ link tests/workers/auth.test.ts:15:86
+     13| async function control(now: number, fail = false) { await post('/__tes…
+     14| async function link(ip = '192.0.2.1') {
+     15|   expect((await post('/api/login', { email: 'owner@example.test' }, ''…
+       |                                                                                      ^
+     16|   const mails = await (await fetchApp('/__test/mailbox')).json<{ url: …
+     17|   return mails.at(-1)!.url;
+ ❯ tests/workers/auth.test.ts:71:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ tests/workers/auth.test.ts:85:25
+     83|   const now = Date.now(); await control(now, true);
+     84|   const failed = await post('/api/login', { email: 'owner@example.test…
+     85|   expect(failed.status).toBe(503); expect(await failed.text()).not.toM…
+       |                         ^
+     86|   expect(await (await fetchApp('/__test/mailbox')).json()).toEqual([]);
+     87|   expect(await env.DB.prepare('SELECT count(*) AS n FROM verification'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-05：固定 30 天不續期，期限前一刻可用、到期拒絕
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ link tests/workers/auth.test.ts:15:86
+     13| async function control(now: number, fail = false) { await post('/__tes…
+     14| async function link(ip = '192.0.2.1') {
+     15|   expect((await post('/api/login', { email: 'owner@example.test' }, ''…
+       |                                                                                      ^
+     16|   const mails = await (await fetchApp('/__test/mailbox')).json<{ url: …
+     17|   return mails.at(-1)!.url;
+ ❯ login tests/workers/auth.test.ts:20:23
+ ❯ tests/workers/auth.test.ts:103:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-06：到期的更新拒絕，重新登入回原頁並重驗世代
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ link tests/workers/auth.test.ts:15:86
+     13| async function control(now: number, fail = false) { await post('/__tes…
+     14| async function link(ip = '192.0.2.1') {
+     15|   expect((await post('/api/login', { email: 'owner@example.test' }, ''…
+       |                                                                                      ^
+     16|   const mails = await (await fetchApp('/__test/mailbox')).json<{ url: …
+     17|   return mails.at(-1)!.url;
+ ❯ login tests/workers/auth.test.ts:20:23
+ ❯ tests/workers/auth.test.ts:115:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ tests/workers/auth.test.ts:126:194
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ link tests/workers/auth.test.ts:15:86
+     13| async function control(now: number, fail = false) { await post('/__tes…
+     14| async function link(ip = '192.0.2.1') {
+     15|   expect((await post('/api/login', { email: 'owner@example.test' }, ''…
+       |                                                                                      ^
+     16|   const mails = await (await fetchApp('/__test/mailbox')).json<{ url: …
+     17|   return mails.at(-1)!.url;
+ ❯ login tests/workers/auth.test.ts:20:23
+ ❯ tests/workers/auth.test.ts:138:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  tests/workers/auth.test.ts > SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可重建索引且不存 Yjs 正文
+AssertionError: expected [ Array(3) ] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   "user",
+-   "session",
+-   "account",
+-   "verification",
+-   "pages",
+-   "assets",
+-   "page_search",
++ [
++   "test_control",
++   "test_mailbox",
++   "_cf_METADATA",
+  ]
+
+ ❯ tests/workers/auth.test.ts:162:18
+    160| it('SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可重建索引且不存 Yjs 正文', async () => {
+    161|   const tables = (await env.DB.prepare("SELECT name FROM sqlite_master…
+    162|   expect(tables).toEqual(expect.arrayContaining(['user', 'session', 'a…
+       |                  ^
+    163|   const cookie = await login(); const page = await today(cookie);
+    164|   await env.DB.prepare('UPDATE pages SET deleted_at = ? WHERE id = ?')…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed (9)
+   Start at  13:42:18
+   Duration  1.30s (transform 179ms, setup 0ms, import 354ms, tests 72ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json
