@@ -1,0 +1,166 @@
+{
+  "日期": "2026-10-13T07:49:30.187Z",
+  "範圍": "本機私有圖片 ASSET-01～04、EDIT-03；ASSET-05 依使用者確認留待備份 7.1，沒有部署",
+  "規格先提交": [
+    "58cdaa3",
+    "44df5a5"
+  ],
+  "Red追蹤提交": [
+    "06dc28d",
+    "3fbecec"
+  ],
+  "版本": {
+    "node": "v22.22.3",
+    "blockNote": "0.55.0",
+    "vitest": "4.1.11",
+    "playwright": "1.64.0",
+    "wrangler": "4.149.0"
+  },
+  "測試": {
+    "單元": 4,
+    "Workers": 38,
+    "瀏覽器": 84,
+    "合計": 126,
+    "失敗": 0,
+    "跳過": 0
+  },
+  "追蹤": {
+    "圖片": {
+      "必需": 14,
+      "通過": 14
+    },
+    "頁面": {
+      "必需": 26,
+      "通過": 26
+    },
+    "登入": {
+      "必需": 23,
+      "通過": 23
+    },
+    "原型": {
+      "必需": 40,
+      "通過": 40
+    },
+    "完整產品": "未完成，檢查退出碼 1"
+  },
+  "TDD": [
+    {
+      "命令": "npm run test:integration -- tests/workers/assets.test.ts",
+      "報告": "red-assets-integration.log",
+      "退出碼": 1,
+      "原因": "五個圖片 API／持久引用案例因端點不存在而失敗"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/assets.spec.ts --project=chromium-desktop --timeout=7000",
+      "報告": "red-assets-e2e.log",
+      "退出碼": 1,
+      "原因": "四個圖片 UI 案例缺少選取／上傳入口"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/assets.spec.ts --project=chromium-desktop -g ASSET-INSERT-01",
+      "報告": "red-assets-insert.log",
+      "退出碼": 1,
+      "原因": "原檔成功上傳後插入錯誤被吞掉，沒有錯誤與重試"
+    },
+    {
+      "命令": "npm run test:unit",
+      "報告": "green-assets-unit.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration -- tests/workers/assets.test.ts",
+      "報告": "green-assets-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/assets.spec.ts",
+      "報告": "green-assets-e2e.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:integration",
+      "報告": "refactor-assets-integration.log",
+      "退出碼": 0
+    },
+    {
+      "命令": "npm run test:e2e",
+      "報告": "refactor-assets-e2e.log",
+      "退出碼": 0
+    }
+  ],
+  "檢查": [
+    "型別",
+    "Vite build",
+    "Worker types --check",
+    "Worker deploy --dry-run（未部署）",
+    "文件與設定契約",
+    "OpenSpec 嚴格驗證",
+    "git diff --check"
+  ],
+  "限制": [
+    "ASSET-05 的成功備份副本／清理尚未實作",
+    "伺服器驗證實際容器結構，不做完整像素 codec 解碼；前端另用瀏覽器解碼",
+    "不永久清理未引用原檔；R2 成功而 D1／插入失敗或回應遺失可能留下未引用物件",
+    "手機是瀏覽器模擬，不含原生 OS 相簿選取器",
+    "正式寄信、備份、覆蓋還原世代切換與完整正式同步仍未完成",
+    "沿用單筆 Yjs 更新 512 KiB 與既有編輯器大 chunk 提示"
+  ],
+  "圖片情境": [
+    {
+      "id": "ASSET-01@integration",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-02@integration",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-03@integration",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-04@integration",
+      "status": "passed"
+    },
+    {
+      "id": "EDIT-03@integration",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-02@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-04@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "EDIT-03@chromium-desktop",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-02@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-04@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "EDIT-03@chromium-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-02@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "ASSET-04@webkit-mobile",
+      "status": "passed"
+    },
+    {
+      "id": "EDIT-03@webkit-mobile",
+      "status": "passed"
+    }
+  ]
+}

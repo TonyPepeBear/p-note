@@ -1,6 +1,6 @@
 # 自動化驗證與 TDD 計畫
 
-狀態：技術環境、資料結構／登入（測試寄件匣）與頁面／日記 TDD 已建立；依 AGENTS.md 全部開發驗收自動化。47 個情境是完整產品契約，局部結果不能冒充完整覆蓋。
+狀態：技術環境、資料結構／登入（測試寄件匣）、頁面／日記與私有圖片 TDD 已建立；依 AGENTS.md 全部開發驗收自動化。47 個情境是完整產品契約，局部結果不能冒充完整覆蓋。
 
 ## TDD 流程
 
@@ -65,7 +65,7 @@ Q1、Q2、Q4–Q9 已採預設，Q3 留作接入服務前部署資訊；使用�
 
 ## 自動化命令契約
 
-已建立以下非互動入口；實際結果與 TDD 證據見 [結果](tdd/README.md)。`npm run validate:probe` 串接測試與原型檢查；另執行 `npm run test:spec-coverage -- --auth` 與 `--pages` 比對登入及頁面。--probe 僅檢查技術子案例，--auth 與 --pages 僅檢查相應能力，預設完整產品模式仍應失敗。
+已建立以下非互動入口；實際結果與 TDD 證據見 [結果](tdd/README.md)。`npm run validate:probe` 串接測試與原型檢查；另執行 `npm run test:spec-coverage -- --auth` 、`--pages` 與 `--assets` 比對登入、頁面與私人圖片。--probe 僅檢查技術子案例，--auth／--pages／--assets 僅檢查相應範圍（ASSET-05 依使用者確認留待備份），預設完整產品模式仍應失敗。
 
 | 命令方向 | 預期輸出 |
 | --- | --- |

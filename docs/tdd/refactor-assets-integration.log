@@ -1,0 +1,41 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/environment.test.ts (3 tests) 137ms
+stderr | tests/workers/sync.test.ts > PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+Error in ProbeRoom:corrupt fetch: Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+
+ ✓ tests/workers/sync.test.ts (10 tests) 478ms
+ ✓ tests/workers/auth.test.ts (11 tests) 1118ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:176:84
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試解除中斷
+    at DurableObjectStorage.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:181:63)
+    at DurableObjectStorage.put (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:81:30
+ ✓ tests/workers/pages.test.ts (9 tests) 1599ms
+ ✓ tests/workers/assets.test.ts (5 tests) 2453ms
+   ✓ ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕  2026ms
+
+ Test Files  5 passed (5)
+      Tests  38 passed (38)
+   Start at  15:42:44
+   Duration  7.53s (transform 5.27s, setup 0ms, import 20.89s, tests 5.79s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

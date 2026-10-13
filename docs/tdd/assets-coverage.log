@@ -1,0 +1,10 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs --assets
+
+{
+  "範圍": "私有圖片（ASSET-05 留待備份）",
+  "必需結果": 14,
+  "已通過": 14,
+  "未通過": []
+}

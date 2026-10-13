@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。目前完成 React＋Vite、BlockNote、Yjs 本機技術驗證、資料結構與登入，以及日期補寫／月份列表、階層筆記／標題／移動、垃圾桶與中文標題／內文搜尋。登入使用本機測試寄件匣；私有圖片、備份、完整正式同步驗收與部署仍在後續 OpenSpec 任務。
+個人筆記／日記系統。目前完成 React＋Vite、BlockNote、Yjs 本機技術驗證、資料結構與登入，以及日期補寫／月份列表、階層筆記／標題／移動、垃圾桶與中文標題／內文搜尋、私有圖片上傳／穩定引用。登入使用本機測試寄件匣；備份、完整正式同步驗收與部署仍在後續 OpenSpec 任務。
 
 ## 自動化驗證
 
@@ -20,6 +20,8 @@ npm run validate:probe
 `npm run test:spec-coverage -- --auth` 比對本輪 AUTH-01～08 的 Workers 與三種瀏覽器結果。先執行完整 `npm test`，避免以篩選執行的報告作完整覆蓋。
 
 `npm run test:spec-coverage -- --pages` 比對 PAGE-01～08 的 Workers 與三種瀏覽器結果；頁面、日期、垃圾桶、搜尋及儲存保護詳見 [頁面開發文件](docs/pages-development.md)。
+
+`npm run test:spec-coverage -- --assets` 比對 ASSET-01～04、EDIT-03 的私有圖片結果；ASSET-05 留待備份。上傳限制、權限與原檔保留詳見 [圖片開發文件](docs/assets-development.md)。
 
 ## 本機登入與今日編輯器
 

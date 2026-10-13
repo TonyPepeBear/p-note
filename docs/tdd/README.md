@@ -1,6 +1,24 @@
-# TDD 技術驗證與登入證據
+# TDD 開發與驗證證據
 
-此文件保留本機技術驗證、資料結構／登入與頁面／日記 TDD 證據。私有圖片、覆蓋還原世代切換、90 天備份與完整正式同步驗收仍未完成，OpenSpec change 不封存。
+此文件保留本機技術驗證、資料結構／登入、頁面／日記與私有圖片 TDD 證據。ASSET-05 的成功備份清理、覆蓋還原世代切換、90 天備份與完整正式同步驗收仍未完成，OpenSpec change 不封存。
+
+## 第四階段：私有圖片
+
+本輪完成 OpenSpec 5.3、5.4 的 ASSET-01～04 與 EDIT-03：有界上傳、JPEG／PNG／WebP／GIF 實際容器與 MIME 驗證、私有 R2 原檔、D1 所有權、失敗重試及穩定引用。沿用原表與 binding，沒有新套件／產品 migration／部署。使用者已確認 ASSET-05 留待備份 7.1。API、保留策略與 codec 邊界見 [圖片開發文件](../assets-development.md)。
+
+[assets-results.json](assets-results.json) 記錄 126 個結果全部通過（單元 4、Workers 38、瀏覽器 84），沒有 skip；圖片 [14／14](assets-coverage.log)、PAGE [26／26](assets-pages-coverage.log)、AUTH [23／23](assets-auth-coverage.log) 與原型 [40／40](assets-probe-coverage.log) 全部完整。[完整產品](assets-product-coverage-pending.log) 仍退出 1，不宣稱備份或完整產品已完成。
+
+| 行為 | 有效 Red | Green／Refactor |
+| --- | --- | --- |
+| 私有 API／格式大小／中斷／原檔與持久引用 | [red-assets-integration.log](red-assets-integration.log) | [green-assets-integration.log](green-assets-integration.log)、[refactor-assets-integration.log](refactor-assets-integration.log) |
+| 圖片選取／失敗重試／跨 context 與垃圾桶 | [red-assets-e2e.log](red-assets-e2e.log) | [green-assets-e2e.log](green-assets-e2e.log)、[refactor-assets-e2e.log](refactor-assets-e2e.log) |
+| 上傳成功後區塊插入失敗不能被吞掉 | [red-assets-insert.log](red-assets-insert.log) | [refactor-assets-e2e.log](refactor-assets-e2e.log) |
+
+Workers 使用真實 D1／R2：串流中斷、R2 put 失敗及 D1 索引失敗不回正式引用，重試後原檔位元組／SHA-256 不變。大小測 10 MiB 前一 byte、邊界與超過一 byte；含動畫 GIF／WebP、截斷、PNG CRC、偽造 MIME／內容與 SVG／HEIC。正式 Yjs 引用在 DO abort 後恢復，另一 context／重開仍下載同原檔。瀏覽器原生上傳 callback 也使用私有 API。
+
+第一次 sandbox 無法建立監聽埠，不計 Red，已升權取得 API 404 的有效失敗。WebKit 的 Playwright route 因 Service Worker 未攔到請求，該 fixture 問題不計產品 Red；改用隔離測試 Worker 注入 R2 put 故障，三種 engine 均通過。插入拋錯也保留檔案／錯誤與重試，沒有不存在原檔的正式引用。
+
+型別、[Vite build](assets-client-build.log)、Worker types、[Worker dry-run](assets-worker-build.log)、文件／設定契約、OpenSpec 嚴格驗證與 git diff --check 通過。未部署或執行雲端 migration。原檔不永久清理；伺服器是容器驗證、前端另做像素解碼；手機只用瀏覽器模擬，沒有原生相簿選取器驗收。
 
 ## 第三階段：頁面與日記
 

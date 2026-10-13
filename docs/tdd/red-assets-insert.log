@@ -1,0 +1,49 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/assets.spec.ts --project=chromium-desktop -g ASSET-INSERT-01
+
+[WebServer] (node:24772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:24814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/assets.spec.ts:84:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 (8.4s)
+
+
+  1) [chromium-desktop] › tests/e2e/assets.spec.ts:84:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 ─
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "插入失敗"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      90 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
+      91 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+    > 92 |   await expect(page.getByRole('alert')).toContainText('插入失敗'); expect(await urls(page)).toEqual([]);
+         |                                         ^
+      93 |   await page.getByRole('button', { name: '重試上傳', exact: true }).click();
+      94 |   await expect.poll(() => urls(page)).toHaveLength(1); await saved(page);
+      95 |   expect(await (await page.request.get((await urls(page))[0])).body()).toEqual(file.buffer);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:92:41
+
+    Error Context: test-results/assets-ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/assets.spec.ts:84:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 ──

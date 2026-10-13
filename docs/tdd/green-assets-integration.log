@@ -1,0 +1,18 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/assets.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/assets.test.ts (5 tests) 6575ms
+   ✓ ASSET-01：已知 ID 仍要求登入／所有權，拒絕偽造來源與撤銷 session  618ms
+   ✓ ASSET-02：串流中斷／R2 寫入／D1 索引失敗不回傳正式引用，可重試  1240ms
+   ✓ ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕  4141ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  15:36:47
+   Duration  11.32s (transform 1.66s, setup 0ms, import 3.78s, tests 6.58s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json
