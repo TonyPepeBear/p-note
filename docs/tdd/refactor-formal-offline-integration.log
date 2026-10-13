@@ -1,0 +1,57 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/environment.test.ts (3 tests) 349ms
+ ✓ tests/workers/editor.test.ts (1 test) 551ms
+   ✓ EDIT-02：正式房間保存程式碼語言、縮排與換行，重啟往返沒有執行副作用  550ms
+stderr | tests/workers/sync.test.ts > 技術原型 > PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+Error in ProbeRoom:corrupt fetch: Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+
+ ✓ tests/workers/auth.test.ts (11 tests) 2758ms
+   ✓ AUTH-01：擁有者確認後登入；掃描 GET 不消耗連結；今日日記併發唯一  432ms
+   ✓ AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流  450ms
+   ✓ AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間  439ms
+   ✓ AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗  508ms
+ ✓ tests/workers/sync.test.ts (22 tests) 3438ms
+     ✓ BOUNDARY-01：損毀更新與超限資料不寫入、不污染房間  362ms
+     ✓ SYNC-08：正式斷線保留未送達修改，重連同世代合併在線端與持久確認  308ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:176:84
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試解除中斷
+    at DurableObjectStorage.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:181:63)
+    at DurableObjectStorage.put (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:81:30
+ ✓ tests/workers/pages.test.ts (9 tests) 3760ms
+   ✓ PAGE-01：今日入口沿用已保存日記與世代，不重建正文  526ms
+   ✓ PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確  352ms
+   ✓ PAGE-04：根筆記／子頁可編輯，列表與路徑保留所有權，標題不改世代  327ms
+   ✓ PAGE-05：拒絕自己／子孫／他人／刪除／不存在上層，併發互移不形成循環  511ms
+   ✓ PAGE-06：刪除／還原上層保留正文與 R2，先前單獨刪除子頁不復活且活躍連線停止  522ms
+   ✓ PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他人，索引不改正文  524ms
+   ✓ PAGE-GUARD-01：暫停／解除失敗保留意圖且停止讀寫，重啟後同操作可重試  525ms
+ ✓ tests/workers/assets.test.ts (5 tests) 4481ms
+   ✓ ASSET-01：已知 ID 仍要求登入／所有權，拒絕偽造來源與撤銷 session  509ms
+   ✓ ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕  3498ms
+
+ Test Files  6 passed (6)
+      Tests  51 passed (51)
+   Start at  17:20:11
+   Duration  14.10s (transform 12.57s, setup 0ms, import 49.48s, tests 15.34s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

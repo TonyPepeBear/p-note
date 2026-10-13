@@ -4,6 +4,7 @@ import { Editor, start, type Session } from './editor';
 import type { PageInfo } from '../shared/pages';
 import { api, navigate } from './api';
 import { Navigation } from './navigation';
+import { rememberPage, cachedPage } from './page-cache';
 
 function Login({ confirm = false }: { confirm?: boolean }) {
   const [email, setEmail] = useState('');
@@ -47,15 +48,19 @@ function App() {
     let disposed = false; let opened: Session | undefined;
     void (async () => {
       const id = new URLSearchParams(location.search).get('page');
-      const response = await api(id ? `/api/pages/${encodeURIComponent(id)}` : '/api/today');
-      if (response.status === 401) { setLogin(true); return; }
-      if (!response.ok) {
+      let response: Response | undefined; let localOnly = false;
+      try { response = await api(id ? `/api/pages/${encodeURIComponent(id)}` : '/api/today'); }
+      catch { localOnly = true; }
+      if (response && response.status >= 500) { response = undefined; localOnly = true; }
+      if (response?.status === 401) { setLogin(true); return; }
+      if (response && !response.ok) {
         const failure = await response.json() as { message: string; page?: PageInfo };
         setError(failure.message);
         if (failure.page) { setRecovery(failure.page); history.replaceState(null, '', '/?page=' + failure.page.id); }
         return;
       }
-      const page = await response.json() as PageInfo;
+      const page = response ? await response.json() as PageInfo : cachedPage(id ?? undefined);
+      try { rememberPage(page); } catch { setError('頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存'); }
       const previous = sessionStorage.getItem('p-note-scope');
       if (previous) {
         const old = JSON.parse(previous) as PageInfo;
@@ -71,6 +76,7 @@ function App() {
         const current = await api(`/api/pages/${page.id}`);
         if (disposed) return false;
         if (current.status === 401) { opened?.provider.disconnect(); setLogin(true); setError('登入已到期，請重新登入；本機草稿仍保留'); return false; }
+        if (current.status >= 500) throw new Error('頁面服務暫時不可用');
         if (!current.ok) { opened?.provider.disconnect(); setError('頁面無法存取，本機內容已隔離'); return false; }
         const info = await current.json() as PageInfo;
         if (info.owner_id !== page.owner_id || info.sync_generation !== page.sync_generation) {
@@ -78,10 +84,10 @@ function App() {
         }
         return true;
       };
-      opened = await start([page.owner_id, page.id, page.sync_generation], checkAccess);
+      opened = await start([page.owner_id, page.id, page.sync_generation], checkAccess, localOnly);
       if (disposed) { opened.provider.destroy(); await opened.cache.destroy(); opened.doc.destroy(); return; }
       setSession(opened);
-    })().catch(() => setError('載入失敗，請連線後再試'));
+    })().catch(failure => setError(failure instanceof Error && /尚未下載|本機啟動資源/.test(failure.message) ? failure.message : '載入失敗，請連線後再試'));
     return () => { disposed = true; opened?.provider.destroy(); void opened?.cache.destroy(); opened?.doc.destroy(); };
   }, [confirm]);
   if (confirm) return <main><Login confirm /></main>;

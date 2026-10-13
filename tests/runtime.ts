@@ -8,6 +8,13 @@ export class SyncRoom extends AppSyncRoom {
   protected async now(): Promise<number> {
     return await this.env.DB.prepare('SELECT now FROM test_control WHERE id = 1').first<number>('now') ?? Date.now();
   }
+  async onRequest(request?: Request): Promise<Response> {
+    if (request && new URL(request.url).pathname === '/__test/drop-connections') {
+      for (const connection of this.getConnections()) connection.close(1012, '測試服務重啟');
+      return Response.json({ ok: true });
+    }
+    return super.onRequest();
+  }
 }
 
 async function setup(env: Env) {
@@ -24,6 +31,11 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path === '/__test/drop-connections' && request.method === 'POST') {
+        const { room } = await request.json<{ room: string }>();
+        if (!/^[a-f0-9]{64}$/.test(room)) return new Response('無效測試房間', { status: 400 });
+        return env.SYNC.getByName(room).fetch('http://127.0.0.1/__test/drop-connections');
+      }
       if (path === '/__test/asset-failure' && request.method === 'POST') {
         const { fail } = await request.json<{ fail: boolean }>();
         await env.DB.prepare('INSERT OR REPLACE INTO test_asset_control VALUES (1, ?)').bind(fail ? 1 : 0).run();

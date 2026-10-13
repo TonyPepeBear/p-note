@@ -1,0 +1,45 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/formal-reconnect.spec.ts --project=chromium-desktop -g SYNC-RECONNECT-02
+
+[WebServer] (node:43905) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:43945) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 (7.3s)
+
+
+  1) [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      32 |   const room = await page.evaluate(() => window.probe!.room);
+      33 |   expect((await page.request.post('/__test/drop-connections', { data: { room } })).status()).toBe(200);
+    > 34 |   await expect.poll(()=>page.evaluate(()=>Number(document.documentElement.dataset.revalidations))).toBeGreaterThan(0);
+         |                                                                                                    ^
+      35 |   expect(await page.evaluate(()=>window.probe!.provider.wsconnected)).toBe(false);
+      36 |   await expect(page.getByTestId('cloud-status')).toHaveText('連線失敗，可重試');
+      37 |   await page.evaluate(()=>{const editor=window.probe!.editor;editor.updateBlock(editor.document[0],{content:'等待重驗的本機草稿'});});
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-reconnect.spec.ts:34:100
+
+    Error Context: test-results/formal-reconnect-SYNC-RECO-46f7a-重連先重驗權限；重驗故障期間只保存本機，重試後持久確認-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-reconnect-SYNC-RECO-46f7a-重連先重驗權限；重驗故障期間只保存本機，重試後持久確認-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-reconnect-SYNC-RECO-46f7a-重連先重驗權限；重驗故障期間只保存本機，重試後持久確認-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 

@@ -1,0 +1,149 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/formal-offline.spec.ts
+
+[WebServer] (node:41232) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:41282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (3.0s)
+  ✓   2 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (2.1s)
+[WebServer] 4:44:44 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:44:44 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   3 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (1.6s)
+[WebServer] 4:44:48 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:44:48 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   4 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (2.0s)
+(node:41310) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 4:44:50 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:44:50 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   5 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (2.4s)
+[WebServer] 4:44:53 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:44:53 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   6 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (2.3s)
+  ✓   7 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (1.4s)
+  ✓   8 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (1.8s)
+[WebServer] 4:44:56 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:44:56 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+(node:41328) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (3.0s)
+  ✓  10 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (2.1s)
+  ✓  11 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (1.2s)
+  ✓  12 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (1.5s)
+
+  12 passed (27.9s)
