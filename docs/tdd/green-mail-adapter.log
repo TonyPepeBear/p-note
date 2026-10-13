@@ -1,0 +1,15 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/mail.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/mail.test.ts (4 tests) 199ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  17:29:44
+   Duration  5.87s (transform 1.96s, setup 0ms, import 4.49s, tests 199ms, environment 1ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

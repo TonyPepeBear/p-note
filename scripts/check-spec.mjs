@@ -51,7 +51,8 @@ for (const [name, values] of Object.entries(contracts)) {
 }
 console.log(JSON.stringify({ 文件: files.length, 本地連結: links, 唯一情境: ids.length, 決策契約: '通過' }));
 const appConfig = JSON.parse(await readFile('wrangler.app.jsonc', 'utf8'));
-assert.deepEqual(appConfig.secrets.required, ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET']);
+assert.deepEqual(appConfig.secrets.required, ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET', 'SENDER_EMAIL']);
+assert.deepEqual(appConfig.send_email, [{ name: 'EMAIL' }]);
 assert(!appConfig.vars, '應用設定不得提交私有值');
 assert.equal(appConfig.main, 'src/worker/app.ts');
 const testConfig = JSON.parse(await readFile('wrangler.test.jsonc', 'utf8'));

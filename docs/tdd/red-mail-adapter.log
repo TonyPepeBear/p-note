@@ -1,0 +1,72 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/mail.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/mail.test.ts (4 tests | 3 failed) 157ms
+   × MAIL-01：預設服務以原生 binding 送出可兌換連結與繁體中文純文字／HTML，不回傳憑證 48ms
+   × MAIL-02：原生服務拒絕或未提供接受識別時撤銷連結、回傳一般錯誤且不洩漏密鑰 25ms
+   ✓ MAIL-03：缺少 binding／寄件地址及非法地址不寄信，也不留下可用連結 62ms
+   × MAIL-04：非允許收件人不呼叫 binding，回覆與允許帳號一致 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/mail.test.ts > MAIL-01：預設服務以原生 binding 送出可兌換連結與繁體中文純文字／HTML，不回傳憑證
+AssertionError: expected 503 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 503
+
+ ❯ tests/workers/mail.test.ts:24:27
+     22|   const { send, configured } = mailEnv();
+     23|   const response = await login(configured);
+     24|   expect(response.status).toBe(200);
+       |                           ^
+     25|   expect(send).toHaveBeenCalledTimes(1);
+     26|   const message = send.mock.calls[0][0] as EmailMessageBuilder;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/workers/mail.test.ts > MAIL-02：原生服務拒絕或未提供接受識別時撤銷連結、回傳一般錯誤且不洩漏密鑰
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ tests/workers/mail.test.ts:47:53
+     45|     else send.mockResolvedValue({ messageId: '' });
+     46|     const response = await login(configured);
+     47|     expect(response.status).toBe(503); expect(send).toHaveBeenCalledTi…
+       |                                                     ^
+     48|     expect(await response.text()).not.toMatch(/secret|token|E_SENDER|n…
+     49|     expect(await env.DB.prepare('SELECT count(*) AS n FROM verificatio…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/workers/mail.test.ts > MAIL-04：非允許收件人不呼叫 binding，回覆與允許帳號一致
+AssertionError: expected 503 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 503
+
+ ❯ tests/workers/mail.test.ts:74:24
+     72|   expect(other.status).toBe(200); expect(send).not.toHaveBeenCalled();
+     73|   const owner = await login(configured);
+     74|   expect(owner.status).toBe(200); expect(await other.text()).toBe(awai…
+       |                        ^
+     75|   expect(send).toHaveBeenCalledTimes(1);
+     76| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  17:28:18
+   Duration  3.75s (transform 1.24s, setup 0ms, import 2.86s, tests 157ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

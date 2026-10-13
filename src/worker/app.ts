@@ -7,6 +7,7 @@ import { handlePages, visiblePage, PageError } from './pages';
 import type { PageRow } from '../shared/pages';
 import { body } from './request';
 import { handleAssets } from './assets';
+import { sendLoginMail } from './mail';
 
 export { ProbeRoom, SyncRoom };
 
@@ -15,10 +16,9 @@ export type Services = {
   sendMail: (email: string, url: string) => Promise<void>;
 };
 
-const unavailable: Services = { now: Date.now, sendMail: async () => { throw new Error('尚未設定寄信服務'); } };
 const error = (message: string, status: number) => Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
 
-export async function handle(request: Request, env: Env, services: Services = unavailable): Promise<Response> {
+export async function handle(request: Request, env: Env, services: Services = { now: Date.now, sendMail: (email, url) => sendLoginMail(env, email, url) }): Promise<Response> {
   const url = new URL(request.url); const path = url.pathname;
   if (path === '/health') return new Response('ok');
   if (path === '/login/confirm' && request.method === 'GET') return new Response('請在網站按下確認登入', { headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
