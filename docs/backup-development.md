@@ -20,9 +20,14 @@
 | --- | --- |
 | 尚無建立 API 的五個有效失敗 | [目錄 Red](tdd/red-backup-catalog.log) |
 | 原子發布競爭與成功時間提早的兩個有效失敗 | [發布 Red](tdd/red-backup-publish.log) |
+| 固定備份 API 前基線補取時間窗與圖片清理失敗 | [時間窗／ASSET-05 Red](tdd/red-backup-assets-window.log) |
 | 正文／圖片／副本／清單故障，世代競爭、憑證排除、權限、排程、90 天邊界、時間窗與 ASSET-05 | [Green 10 個案例](tdd/green-backup-catalog.log) |
 | 相關全部 Workers | [Refactor 70 個結果](tdd/refactor-backup-catalog-integration.log) |
 
-初次用 mock 替換 RPC 方法時，測試 runtime 拒絕該 RPC，不能當成中途世代切換證據。已改用真正 SQLite 損毀與 R2 寫入邊界，並明確斷言世代真的改變。發布 Red 的篩選執行只計兩個有效失敗，其他未執行案例不算通過。BACKUP-05／ASSET-05 是補充資料回歸，不冒充已完成所有備份 Red 任務。
+初次用 mock 替換 RPC 方法時，測試 runtime 拒絕該 RPC，不能當成中途世代切換證據。已改用真正 SQLite 損毀與 R2 寫入邊界，並明確斷言世代真的改變。發布 Red 的篩選執行只計兩個有效失敗，其他未執行案例不算通過。BACKUP-05／ASSET-05 先補充資料回歸，再於固定 `8e12e32` 應用入口基線補取兩個 API 404 的有效 Red，finally 還原目前程式；沒有把此子範圍冒充已完成所有備份 Red 任務。
+
+完整 [瀏覽器回歸](tdd/refactor-backup-catalog-e2e.log) 126 個結果通過；[Vite build](tdd/backup-catalog-build.log) 與 [Worker dry-run](tdd/backup-catalog-worker-build.log) 通過，只有本機打包。清理故障亦以 abort 後重試驗證持久意圖。
+
+[完整產品追蹤](tdd/backup-catalog-product-pending.log) 為 104／129，仍退出 1：剩 BACKUP-01、06～09 與 SYNC-03 的 UI、SYNC-10～11，共 8 個情境、25 個必需結果；不以此階段宣稱整版完成。
 
 待完成 ZIP 串流匯出、完整清單／路徑驗證、覆蓋還原、索引重建及舊裝置檢視／另存，才勾選完整 7.1～7.3 與 V3／V4。應用設定仍使用本機 placeholder 資源 ID；沒有建立雲端 bucket、套用雲端 migration 或部署。
