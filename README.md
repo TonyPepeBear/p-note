@@ -25,7 +25,7 @@ npm run validate:probe
 
 ## 本機登入與今日編輯器
 
-分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。正式寄信尚未接入，應用預設會拒絕寄信；不能當正式私人筆記服務部署。
+分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。應用預設已接上原生 Email adapter，詳見 [寄信開發](docs/mail-development.md)；備份／還原與完整驗收仍待完成，尚未部署。
 
 設定來源、權限邊界與驗證見 [登入開發文件](docs/auth-development.md)。
 

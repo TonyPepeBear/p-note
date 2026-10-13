@@ -1,12 +1,12 @@
 # 本機資料結構與登入
 
-本輪建立 Better Auth 1.7.7＋D1、固定 30 天 session、10 分鐘單次 magic link、今日入口與必要同步權限邊界。正式寄信服務與部署仍待接入；資料來源與限制以 [設計](../openspec/changes/personal-notes-v1/design.md) 為準。
+已建立 Better Auth 1.7.7＋D1、固定 30 天 session、10 分鐘單次 magic link、今日入口與必要同步權限邊界。原生寄信 adapter 已接入，實際寄信與部署尚未執行；資料來源與限制以 [設計](../openspec/changes/personal-notes-v1/design.md) 為準。
 
 ## Q3 設定來源
 
 應用 Worker 由 binding 讀取 `OWNER_EMAIL`、`BETTER_AUTH_URL`、`BETTER_AUTH_SECRET`；[wrangler.app.jsonc](../wrangler.app.jsonc) 只列 required 名稱，不提交私有值。日後正式密鑰使用 Wrangler secret；本機私有值置於被 git 忽略的 `.dev.vars`。網址必須為 HTTPS origin；HTTP 只接受 loopback origin。缺值、非法網址或不足 32 字元的密鑰回應 503，不揭露值。
 
-正式擁有者 Email、網站 origin、寄件網域與服務憑證仍未提供。寄信函式透過 Worker 的服務參數注入；應用預設拒絕寄信並清除本次未寄出的驗證憑證，不以假寄信宣稱能部署。寄送等待與故障的 [AUTH-04 測試](../tests/workers/auth.test.ts) 使用測試寄件匣。
+正式擁有者 Email、網站 origin 與寄件網域已記錄在 git 忽略的私人設定。應用預設使用原生 `EMAIL` binding 與 `SENDER_EMAIL`；拒絕／缺值時清除本次未寄出的驗證憑證。詳見 [寄信開發](mail-development.md)。測試仍注入寄件匣，沒有實際寄信或部署。
 
 ## 本機測試入口
 
@@ -46,4 +46,4 @@ npm run check:spec
 
 ## 仍待後續
 
-完整頁面操作、私有資產、備份、世代切換協調及正式離線啟動／重連在後續任務；本輪只接入登入所需的今日入口、已開編輯器草稿與權限重驗。手機為 Chromium／WebKit 模擬，未驗證原生 OS 鍵盤、正式 Email 服務或已部署 Workers。所有驗收仍由自動化斷言完成。
+備份、世代切換協調與完整產品驗收仍在後續任務；頁面、私有圖片與正式離線啟動／重連已完成本機驗證。手機為 Chromium／WebKit 模擬，未驗證原生 OS 鍵盤、實際郵件送達或已部署 Workers。所有驗收仍由自動化斷言完成。

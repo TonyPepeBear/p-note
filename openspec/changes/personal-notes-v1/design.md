@@ -58,7 +58,7 @@ y-partyserver 的 onLoad／onSave 不證明預設廣播順序符合承諾。V2 �
 
 ### 4. 登入與連線
 
-固定登入期限為 30×24 小時、不續期。magic link 單次使用、有效 10 分鐘；同 Email 每 60 秒一次／15 分鐘最多 5 次，同 IP 每 15 分鐘最多 20 次（Q4）。擁有者 Email／寄件設定待 Q3。owner_id 來自伺服器 session，不接受用戶端宣告。
+固定登入期限為 30×24 小時、不續期。magic link 單次使用、有效 10 分鐘；同 Email 每 60 秒一次／15 分鐘最多 5 次，同 IP 每 15 分鐘最多 20 次（Q4）。Q3 擁有者 Email／網站／寄件設定已存私有發布設定；不提交真實值。owner_id 來自伺服器 session，不接受用戶端宣告。
 
 連線建立與維持期間處理 session 到期／撤銷、頁面刪除與世代失效；只在建立 WebSocket 時驗證不足。具體阻擋與關閉機制列入 V2／V3。
 
@@ -142,7 +142,7 @@ IndexedDB 以 owner／page／generation 雜湊名稱隔離。y-indexeddb 9.0.12 
 
 Better Auth 直接使用 D1 binding，固定版本；建立 user／session／account／verification 與 pages／assets／page_search 的 SQL migration，不執行雲端 migration。日記日期在垃圾桶內仍唯一，parent 外鍵必須同 owner。Yjs 內文不放入 D1。
 
-登入只允許 OWNER_EMAIL；BETTER_AUTH_URL 與 BETTER_AUTH_SECRET 由 Worker binding／私有設定提供，缺值即拒絕。測試寄件匣只存在本機測試 Worker，故障／時鐘入口不放在應用 Worker。正式寄信 adapter 留待接入服務，不以假寄信宣稱可部署。
+登入只允許 OWNER_EMAIL；BETTER_AUTH_URL 與 BETTER_AUTH_SECRET 由 Worker binding／私有設定提供，缺值即拒絕。測試寄件匣只存在本機測試 Worker，故障／時鐘入口不放在應用 Worker。正式寄信已以原生 EMAIL binding 與 SENDER_EMAIL 接入，假 binding 自動驗證 payload／錯誤清理，不以本機測試宣稱實際送達或可部署。
 
 magic link 憑證雜湊保存、單次原子消耗、10 分鐘有效；郵件連結先開無副作用確認頁，由使用者按鈕以 POST 兌換，避免掃描 GET 消耗 token。限制 Email／IP 由 D1 原子計數維持，不採程序記憶體。session 固定 30×24 小時、disableSessionRefresh、禁用 cookie session cache。
 
