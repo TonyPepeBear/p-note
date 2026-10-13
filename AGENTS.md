@@ -1,0 +1,9 @@
+- 使用 zh-TW 回覆、撰寫註解、撰寫 spec、git message
+- 本專案目標開發一個類似 notion 的筆記、日記系統
+- 所有的部署都優先使用 cloudflare 服務，並且以有 cloudflare workers paid plan 為主的設計
+- 使用 openspec 開發
+- 使用 TDD 開發流程
+- 使用 spec 開發的流程
+  - 創建、修改 spec 文件後，自動 commit 不需經過 user 同意
+  - 完成開發 spec 後，自動 commit 不需經過 user 同意
+  - 不要創建需要人類驗證的 spec，都使用自動化的方式驗證開發
