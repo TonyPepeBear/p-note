@@ -1,0 +1,111 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/formal-focus.spec.ts
+
+[WebServer] (node:32727) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:32798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (7.0s)
+(node:32821) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (6.3s)
+(node:32850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [webkit-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (7.3s)
+
+
+  1) [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      11 |     const box = element?.closest('p')?.getBoundingClientRect();
+      12 |     return !!box && box.top >= 0 && box.bottom <= innerHeight;
+    > 13 |   })).toBe(true);
+         |       ^
+      14 |   await page.keyboard.insertText('仍可輸入'); await saved(page);
+      15 |   expect(JSON.stringify(await blocks(page))).toContain('鍵盤佔位前仍可輸入');
+      16 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-focus.spec.ts:13:7
+
+    Error Context: test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      11 |     const box = element?.closest('p')?.getBoundingClientRect();
+      12 |     return !!box && box.top >= 0 && box.bottom <= innerHeight;
+    > 13 |   })).toBe(true);
+         |       ^
+      14 |   await page.keyboard.insertText('仍可輸入'); await saved(page);
+      15 |   expect(JSON.stringify(await blocks(page))).toContain('鍵盤佔位前仍可輸入');
+      16 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-focus.spec.ts:13:7
+
+    Error Context: test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      11 |     const box = element?.closest('p')?.getBoundingClientRect();
+      12 |     return !!box && box.top >= 0 && box.bottom <= innerHeight;
+    > 13 |   })).toBe(true);
+         |       ^
+      14 |   await page.keyboard.insertText('仍可輸入'); await saved(page);
+      15 |   expect(JSON.stringify(await blocks(page))).toContain('鍵盤佔位前仍可輸入');
+      16 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-focus.spec.ts:13:7
+
+    Error Context: test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+    [chromium-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+    [webkit-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 

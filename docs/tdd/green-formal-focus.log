@@ -1,0 +1,44 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/formal-focus.spec.ts
+
+[WebServer] (node:33248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:33334) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (2.1s)
+[WebServer] 4:05:17 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:05:17 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+(node:33346) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [chromium-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (1.6s)
+(node:33353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [webkit-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (2.9s)
+
+  3 passed (11.7s)

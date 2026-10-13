@@ -2,6 +2,10 @@
 
 此文件保留本機技術驗證、資料結構／登入、頁面／日記與私有圖片 TDD 證據。ASSET-05 的成功備份清理、覆蓋還原世代切換、90 天備份與完整正式同步驗收仍未完成，OpenSpec change 不封存。
 
+## 第五階段：正式編輯器
+
+OpenSpec 5.5／5.6 已完成。有效 Red／Green／Refactor、72 個相關瀏覽器結果、51 個 Workers 回歸及 EDIT 17／17 追蹤見 [正式編輯器開發](../editor-development.md)。同步／備份／完整產品驗收仍在進行，不封存或部署。
+
 ## 第四階段：私有圖片
 
 本輪完成 OpenSpec 5.3、5.4 的 ASSET-01～04 與 EDIT-03：有界上傳、JPEG／PNG／WebP／GIF 實際容器與 MIME 驗證、私有 R2 原檔、D1 所有權、失敗重試及穩定引用。沿用原表與 binding，沒有新套件／產品 migration／部署。使用者已確認 ASSET-05 留待備份 7.1。API、保留策略與 codec 邊界見 [圖片開發文件](../assets-development.md)。
