@@ -1,9 +1,17 @@
 import { expect, test } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { open, saved, blocks } from './helpers';
+import { open as openProbe, openPrivate, saved, blocks } from './helpers';
 
-test('PROBE-EDIT-01：基本區塊、格式與順序重開後保留', async ({ page }) => {
+for (const formal of [false, true]) {
+const open = formal ? openPrivate : openProbe;
+const prefix = formal ? '' : 'PROBE-';
+test.describe(formal ? '正式頁面' : '技術原型', () => {
+  if (formal) test.beforeEach(async ({ request }) => {
+    await request.post('/__test/reset'); await request.post('/__test/control', { data: { now: Date.now() + 86400000 } });
+  });
+
+test(`${prefix}EDIT-01：基本區塊、格式與順序重開後保留`, async ({ page }) => {
   await open(page);
   await page.evaluate(() => {
     const editor = window.probe!.editor;
@@ -26,7 +34,7 @@ test('PROBE-EDIT-01：基本區塊、格式與順序重開後保留', async ({ p
   await expect(page.locator('a[href="https://example.com"]')).toContainText('連結');
 });
 
-test('PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返', async ({ page }) => {
+test(`${prefix}EDIT-02：程式碼縮排、換行、語言及複製內容往返`, async ({ page }) => {
   await open(page);
   const code = 'function hello() {\n  console.log("你好");\n}\n';
   await page.evaluate(code => {
@@ -45,7 +53,7 @@ test('PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返', a
   expect((await blocks(page))[0].props).toMatchObject({ language: 'javascript' });
 });
 
-test('PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔', async ({ page, context }) => {
+if (!formal) test(`${prefix}EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔`, async ({ page, context }) => {
   const room = await open(page);
   await page.getByRole('button', { name: '插入測試圖片' }).click();
   await saved(page);
@@ -60,7 +68,7 @@ test('PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原�
   await expect(peer.locator('img[src="/fixtures/pixel.png"]')).toBeVisible();
 });
 
-test('PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點', async ({ page }, testInfo) => {
+test(`${prefix}EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點`, async ({ page }, testInfo) => {
   await open(page);
   await page.evaluate(() => {
     const editor = window.probe!.editor;
@@ -86,7 +94,7 @@ test('PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保
   await saved(page);
 });
 
-test('PROBE-EDIT-05：中文 composition、換行與游標在另一端同步', async ({ page, context }) => {
+test(`${prefix}EDIT-05：中文 composition、換行與游標在另一端同步`, async ({ page, context }) => {
   await page.clock.install({ time: new Date('2026-10-13T00:00:00Z') });
   const room = await open(page);
   const peer = await context.newPage();
@@ -121,7 +129,7 @@ test('PROBE-EDIT-05：中文 composition、換行與游標在另一端同步', a
   expect(selection).toEqual({ collapsed: true, offset: 3 });
 });
 
-test('PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存', async ({ page }) => {
+test(`${prefix}SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存`, async ({ page }) => {
   await open(page);
   await saved(page);
   await page.evaluate(() => {
@@ -147,3 +155,6 @@ test('PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存', a
   await page.evaluate(() => window.releaseReceipt!(1));
   await saved(page);
 });
+
+});
+}
