@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Editor, start, type Session } from './editor';
 import type { PageInfo } from '../shared/pages';
-import { api, navigate } from './api';
+import { api, navigate, saveDraft } from './api';
+import { BackupSettings } from './backup-settings';
 import { Navigation } from './navigation';
 import { rememberPage, cachedPage } from './page-cache';
 
@@ -43,6 +44,7 @@ function App() {
   const [login, setLogin] = useState(false);
   const [error, setError] = useState('');
   const confirm = location.pathname === '/login/confirm';
+  const [settings, setSettings] = useState(false);
   useEffect(() => {
     if (confirm) return;
     let disposed = false; let opened: Session | undefined;
@@ -94,7 +96,11 @@ function App() {
   return <>
     {error && <p role="alert">{error}</p>}
     {login && <main><Login /></main>}
-    <div className="workspace">
+    {page && !login && <button hidden={settings} onClick={() => {
+      void saveDraft().then(() => setSettings(true)).catch(failure => setError(failure instanceof Error ? failure.message : '本機儲存失敗'));
+    }}>備份設定</button>}
+    {settings && <BackupSettings close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
+    <div className="workspace" hidden={settings} style={settings ? { display: 'none' } : undefined}>
       {(page || recovery) && <Navigation page={(page ?? recovery)!} changed={setPage} error={setError} />}
       {recovery && <main><button onClick={() => {
         void api(`/api/pages/${recovery.id}/restore`, {}).then(async response => {

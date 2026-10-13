@@ -1,0 +1,123 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/backup.spec.ts
+
+[WebServer] (node:71800) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:71845) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.7s)
+(node:71861) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.3s)
+(node:71874) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.9s)
+
+
+  1) [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '備份設定', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '備份設定', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '備份設定', exact: true })
+
+
+      17 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '原圖.png', mimeType: 'image/png', buffer: Buffer.from(images.png) });
+      18 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+    > 19 |   await expect(page.getByRole('button', { name: '備份設定', exact: true })).toBeVisible();
+         |                                                                         ^
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+      22 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:19:73
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '備份設定', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '備份設定', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '備份設定', exact: true })
+
+
+      17 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '原圖.png', mimeType: 'image/png', buffer: Buffer.from(images.png) });
+      18 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+    > 19 |   await expect(page.getByRole('button', { name: '備份設定', exact: true })).toBeVisible();
+         |                                                                         ^
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+      22 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:19:73
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '備份設定', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '備份設定', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '備份設定', exact: true })
+
+
+      17 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '原圖.png', mimeType: 'image/png', buffer: Buffer.from(images.png) });
+      18 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+    > 19 |   await expect(page.getByRole('button', { name: '備份設定', exact: true })).toBeVisible();
+         |                                                                         ^
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+      22 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:19:73
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+    [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+    [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 ─

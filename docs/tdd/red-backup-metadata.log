@@ -1,0 +1,42 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-export.test.ts -t ZIP-SCHEMA-02
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/backup-export.test.ts (5 tests | 1 failed | 4 skipped) 631ms
+   ↓ BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，排除登入憑證與服務密鑰
+   × ZIP-SCHEMA-02：建立時亦校驗 metadata，不發布无法下載的成功備份 631ms
+   ↓ ZIP-STREAM-01：串流期間副本失效則中止整份下載，不產生可解析的部分 ZIP
+   ↓ ZIP-GUARD-01：下載驗證登入／所有權／保留期，副本毀損時拒絕回傳成功 ZIP
+   ↓ ZIP-SCHEMA-01：即使清單雜湊正確也拒絕路徑穿越、重複頁面、外人資料、循環與憑證欄位
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/backup-export.test.ts > ZIP-SCHEMA-02：建立時亦校驗 metadata，不發布无法下載的成功備份
+AssertionError: expected 201 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 201
+
+ ❯ tests/workers/backup-export.test.ts:47:71
+     45|   const f = await fixture(sockets); const successful = await create(f.…
+     46|   await env.DB.prepare('UPDATE pages SET title = ? WHERE id = ?').bind…
+     47|   expect((await request(f.auth, '/api/backups', env, 'POST')).status).…
+       |                                                                       ^
+     48|   const list = await (await request(f.auth, '/api/backups')).json<{ la…
+     49| }, 20000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  18:55:24
+   Duration  4.34s (transform 1.29s, setup 0ms, import 2.89s, tests 631ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

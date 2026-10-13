@@ -1,0 +1,135 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/backup.spec.ts
+
+[WebServer] (node:72509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:72541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.6s)
+(node:72566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.3s)
+(node:72583) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 6:51:37 PM [vite] ws proxy error:
+[WebServer] Error: read ECONNRESET
+[WebServer]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[WebServer] 6:51:37 PM [vite] ws proxy socket error:
+[WebServer] Error: read ECONNRESET
+[WebServer]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+  ✘  3 [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (7.0s)
+
+
+  1) [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('.tiptap')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('.tiptap') with timeout 5000ms
+      - waiting for locator('.tiptap')
+        14 × locator resolved to <div tabindex="0" role="textbox" translate="no" contenteditable="true" aria-haspopup="listbox" aria-autocomplete="list" class="tiptap ProseMirror bn-editor bn-default-styles placeholder-selector-092165d6-3130-464e-b5fa-6fb7950701cb">…</div>
+           - unexpected value "visible"
+
+
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+    > 22 |   await expect(page.locator('.tiptap')).toBeHidden();
+         |                                         ^
+      23 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+      24 |   const link = page.getByRole('link', { name: '下載 ZIP', exact: true }); await expect(link).toHaveCount(1);
+      25 |   const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:22:41
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('.tiptap')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('.tiptap') with timeout 5000ms
+      - waiting for locator('.tiptap')
+        14 × locator resolved to <div tabindex="0" role="textbox" translate="no" contenteditable="true" aria-haspopup="listbox" aria-autocomplete="list" class="tiptap ProseMirror bn-editor bn-default-styles placeholder-selector-8d6c8fc1-c9cb-4709-bf8a-f0566e4f916e">…</div>
+           - unexpected value "visible"
+
+
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+    > 22 |   await expect(page.locator('.tiptap')).toBeHidden();
+         |                                         ^
+      23 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+      24 |   const link = page.getByRole('link', { name: '下載 ZIP', exact: true }); await expect(link).toHaveCount(1);
+      25 |   const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:22:41
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('.tiptap')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('.tiptap') with timeout 5000ms
+      - waiting for locator('.tiptap')
+        14 × locator resolved to <div tabindex="0" role="textbox" translate="no" contenteditable="true" aria-haspopup="listbox" aria-autocomplete="list" class="tiptap ProseMirror bn-editor bn-default-styles placeholder-selector-44740a3c-a9c1-444e-a52c-23d9698011c9">…</div>
+           - unexpected value "visible"
+
+
+      20 |   await page.getByRole('button', { name: '備份設定', exact: true }).click();
+      21 |   await expect(page.getByRole('heading', { name: '備份設定', exact: true })).toBeVisible();
+    > 22 |   await expect(page.locator('.tiptap')).toBeHidden();
+         |                                         ^
+      23 |   await page.getByRole('button', { name: '建立備份', exact: true }).click();
+      24 |   const link = page.getByRole('link', { name: '下載 ZIP', exact: true }); await expect(link).toHaveCount(1);
+      25 |   const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:22:41
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-desktop] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+    [chromium-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+    [webkit-mobile] › tests/e2e/backup.spec.ts:13:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 ─

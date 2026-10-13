@@ -1,0 +1,78 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/backup-export.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/backup-export.test.ts (3 tests | 3 failed) 1368ms
+   × BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，排除登入憑證與服務密鑰 490ms
+   × ZIP-GUARD-01：下載驗證登入／所有權／保留期，副本毀損時拒絕回傳成功 ZIP 479ms
+   × ZIP-SCHEMA-01：即使清單雜湊正確也拒絕路徑穿越、重複頁面、外人資料、循環與憑證欄位 398ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/backup-export.test.ts > BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，排除登入憑證與服務密鑰
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/backup-export.test.ts:18:27
+     16|   const f = await fixture(sockets); const backup = await create(f.auth…
+     17|   const response = await request(f.auth, `/api/backups/${backup.id}/ex…
+     18|   expect(response.status).toBe(200); expect(response.headers.get('Cont…
+       |                           ^
+     19|   expect(response.headers.get('Cache-Control')).toBe('no-store'); expe…
+     20|   expect(response.headers.get('Content-Disposition')).toContain(backup…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/workers/backup-export.test.ts > ZIP-GUARD-01：下載驗證登入／所有權／保留期，副本毀損時拒絕回傳成功 ZIP
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ tests/workers/backup-export.test.ts:49:48
+     47|   expect((await handle(new Request(origin + path), env)).status).toBe(…
+     48|   await env.BACKUPS.put(`${f.root.owner_id}/${backup.id}/${data.pages[…
+     49|   expect((await request(f.auth, path)).status).toBe(503);
+       |                                                ^
+     50|   await env.DB.prepare('UPDATE backups SET completed_at = ? WHERE id =…
+     51|   expect((await request(f.auth, path)).status).toBe(404);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/workers/backup-export.test.ts > ZIP-SCHEMA-01：即使清單雜湊正確也拒絕路徑穿越、重複頁面、外人資料、循環與憑證欄位
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ tests/workers/backup-export.test.ts:73:80
+     71|     const bytes = new TextEncoder().encode(JSON.stringify(data)); awai…
+     72|     await env.DB.prepare('UPDATE backups SET manifest_checksum = ?, ma…
+     73|     expect((await request(f.auth, `/api/backups/${backup.id}/export`))…
+       |                                                                                ^
+     74|   }
+     75| }, 20000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  18:47:14
+   Duration  4.99s (transform 1.19s, setup 0ms, import 2.89s, tests 1.37s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

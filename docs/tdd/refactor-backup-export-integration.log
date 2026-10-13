@@ -1,0 +1,111 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/editor.test.ts (1 test) 407ms
+   ✓ EDIT-02：正式房間保存程式碼語言、縮排與換行，重啟往返沒有執行副作用  407ms
+ ✓ tests/workers/mail.test.ts (5 tests) 475ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+stderr | tests/workers/sync.test.ts > 技術原型 > PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+Error in ProbeRoom:corrupt fetch: Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:106:37
+uncaught exception; source = Uncaught (in promise); stack = Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+ ✓ tests/workers/backup.test.ts (4 tests) 1185ms
+   ✓ BACKUP-CAPTURE-01：房間擷取只靠持久資料，在 abort 後保留檢查點與時間  359ms
+   ✓ BACKUP-CAPTURE-03：各篇保存檢查點及擷取時間獨立，未送達離線修改不進備份  314ms
+uncaught exception; source = Uncaught (in promise); stack = Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/yjs/dist/yjs.mjs:109:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/backup-helpers.ts:2:1
+ ✓ tests/workers/auth.test.ts (11 tests) 3032ms
+   ✓ AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流  592ms
+   ✓ AUTH-06：到期的更新拒絕，重新登入回原頁並重驗世代  329ms
+   ✓ AUTH-07：私人 API／WebSocket 拒絕未登入與偽造 owner／來源；原型無法路由正式房間  423ms
+   ✓ AUTH-08：撤銷／到期後不能更新或收到有效同伴廣播，休眠後仍重驗  597ms
+ ✓ tests/workers/sync.test.ts (22 tests) 3589ms
+     ✓ BOUNDARY-01：損毀更新與超限資料不寫入、不污染房間  359ms
+     ✓ LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋  323ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:176:84
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+ ✓ tests/workers/environment.test.ts (3 tests) 207ms
+ ✓ tests/workers/backup-export.test.ts (5 tests) 4001ms
+   ✓ BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，排除登入憑證與服務密鑰  858ms
+   ✓ ZIP-SCHEMA-02：建立時亦校驗 metadata，不發布無法下載的成功備份  718ms
+   ✓ ZIP-STREAM-01：串流期間副本失效則中止整份下載，不產生可解析的部分 ZIP  822ms
+   ✓ ZIP-GUARD-01：下載驗證登入／所有權／保留期，副本毀損時拒絕回傳成功 ZIP  832ms
+   ✓ ZIP-SCHEMA-01：即使清單雜湊正確也拒絕路徑穿越、重複頁面、外人資料、循環與憑證欄位  769ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試解除中斷
+    at DurableObjectStorage.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:181:63)
+    at DurableObjectStorage.put (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:81:30
+ ✓ tests/workers/assets.test.ts (5 tests) 4117ms
+   ✓ ASSET-01：已知 ID 仍要求登入／所有權，拒絕偽造來源與撤銷 session  391ms
+   ✓ ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕  3058ms
+ ✓ tests/workers/pages.test.ts (9 tests) 4153ms
+   ✓ PAGE-01：今日入口沿用已保存日記與世代，不重建正文  412ms
+   ✓ PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確  364ms
+   ✓ PAGE-04：根筆記／子頁可編輯，列表與路徑保留所有權，標題不改世代  330ms
+   ✓ PAGE-05：拒絕自己／子孫／他人／刪除／不存在上層，併發互移不形成循環  540ms
+   ✓ PAGE-06：刪除／還原上層保留正文與 R2，先前單獨刪除子頁不復活且活躍連線停止  791ms
+   ✓ PAGE-07：日期在垃圾桶時提供原 ID 還原，重試不另建日記  326ms
+   ✓ PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他人，索引不改正文  429ms
+   ✓ PAGE-GUARD-01：暫停／解除失敗保留意圖且停止讀寫，重啟後同操作可重試  690ms
+ ✓ tests/workers/backup-catalog.test.ts (10 tests) 6564ms
+   ✓ BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證  869ms
+   ✓ BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變  1154ms
+   ✓ BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代  949ms
+   ✓ BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗  699ms
+   ✓ BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留  736ms
+   ✓ BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查  410ms
+   ✓ BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始  427ms
+   ✓ BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成  426ms
+   ✓ BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新  385ms
+   ✓ ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔  509ms
+
+ Test Files  10 passed (10)
+      Tests  75 passed (75)
+   Start at  19:01:45
+   Duration  17.30s (transform 14.83s, setup 0ms, import 82.69s, tests 27.73s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

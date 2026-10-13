@@ -19,7 +19,7 @@ export type Services = {
 
 const error = (message: string, status: number) => Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
 
-export async function handle(request: Request, env: Env, services: Services = { now: Date.now, sendMail: (email, url) => sendLoginMail(env, email, url) }): Promise<Response> {
+export async function handle(request: Request, env: Env, services: Services = { now: Date.now, sendMail: (email, url) => sendLoginMail(env, email, url) }, ctx?: ExecutionContext): Promise<Response> {
   const url = new URL(request.url); const path = url.pathname;
   if (path === '/health') return new Response('ok');
   if (path === '/login/confirm' && request.method === 'GET') return new Response('請在網站按下確認登入', { headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
@@ -72,7 +72,7 @@ export async function handle(request: Request, env: Env, services: Services = { 
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
-    const backupResponse = await handleBackups(request, env, session.user.id, services.now);
+    const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());
     if (assetResponse) return assetResponse;
@@ -95,7 +95,7 @@ export async function handle(request: Request, env: Env, services: Services = { 
 }
 
 export default {
-  fetch: (request: Request, env: Env) => handle(request, env),
+  fetch: (request: Request, env: Env, ctx: ExecutionContext) => handle(request, env, undefined, ctx),
   async scheduled(controller: ScheduledController, env: Env) {
     if (controller.cron !== '0 19 * * *' || !configured(env)) throw new Error('備份排程設定不完整');
     const owner = await env.DB.prepare('SELECT id FROM user WHERE email = ?').bind(env.OWNER_EMAIL.toLowerCase()).first<string>('id');

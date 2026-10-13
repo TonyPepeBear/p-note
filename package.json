@@ -23,6 +23,7 @@
     "@blocknote/core": "0.55.0",
     "@blocknote/mantine": "0.55.0",
     "@blocknote/react": "0.55.0",
+    "@zip.js/zip.js": "2.23.0",
     "better-auth": "1.7.7",
     "lib0": "0.2.119",
     "partyserver": "0.5.10",

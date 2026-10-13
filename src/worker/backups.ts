@@ -3,6 +3,8 @@ import type { PageRow } from '../shared/pages';
 import { IMAGE_LIMIT } from '../shared/image';
 import { roomName } from '../shared/room';
 import { PageError } from './pages';
+import { validateManifest } from './backup-validation';
+import { exportBackup } from './backup-export';
 
 export const BACKUP_RETENTION = 90 * 86400000;
 type StoredBackup = BackupCatalog & { owner_id: string; manifest_checksum: string | null; manifest_size: number | null };
@@ -59,6 +61,7 @@ export async function createBackup(env: Env, owner: string, now: () => number): 
     const file = await writeFile(env, prefix, 'manifest.json', encoded);
     // 目錄只在全部副本與清單校驗後發布；部分物件留待該備份到期清理。
     const completed = now();
+    validateManifest({ ...manifest, completed_at: completed });
     const published = await env.DB.prepare(`UPDATE backups SET status = 'success', completed_at = ?, manifest_checksum = ?, manifest_size = ?
       WHERE id = ? AND owner_id = ? AND status = 'pending'
       AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = backups.owner_id)
@@ -83,7 +86,7 @@ export async function readManifest(env: Env, owner: string, id: string, now: num
   if (!manifest || manifest.format !== 'p-note-backup' || manifest.version !== 1 || manifest.id !== id || manifest.owner?.id !== owner
     || manifest.started_at !== row.started_at || !Number.isSafeInteger(manifest.captured_until)
     || manifest.captured_until < manifest.started_at || manifest.captured_until > row.completed_at! || !Array.isArray(manifest.pages) || !Array.isArray(manifest.assets)) fail();
-  return { ...manifest, completed_at: row.completed_at! };
+  const complete = { ...manifest, completed_at: row.completed_at! }; validateManifest(complete); return complete;
 }
 
 export async function cleanupBackups(env: Env, now: number): Promise<void> {
@@ -101,7 +104,7 @@ export async function cleanupBackups(env: Env, now: number): Promise<void> {
   }
 }
 
-export async function handleBackups(request: Request, env: Env, owner: string, now: () => number): Promise<Response | null> {
+export async function handleBackups(request: Request, env: Env, owner: string, now: () => number, ctx?: ExecutionContext): Promise<Response | null> {
   const path = new URL(request.url).pathname;
   if (path === '/api/backups') {
     if (request.method === 'POST') return Response.json(await createBackup(env, owner, now), { status: 201, headers });
@@ -114,5 +117,7 @@ export async function handleBackups(request: Request, env: Env, owner: string, n
   }
   const match = path.match(/^\/api\/backups\/([\w-]{1,80})\/manifest$/);
   if (match && request.method === 'GET') return Response.json(await readManifest(env, owner, match[1], now()), { headers });
+  const download = path.match(/^\/api\/backups\/([\w-]{1,80})\/export$/);
+  if (download && request.method === 'GET') return exportBackup(env, await readManifest(env, owner, download[1], now()), ctx);
   return null;
 }

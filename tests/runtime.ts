@@ -27,7 +27,7 @@ async function setup(env: Env) {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (!['127.0.0.1', 'localhost'].includes(new URL(request.url).hostname)) return new Response('僅本機測試', { status: 403 });
     await setup(env);
     const path = new URL(request.url).pathname;
@@ -75,6 +75,6 @@ export default {
         if (control?.fail) throw new Error('測試寄信故障');
         await env.DB.prepare('INSERT INTO test_mailbox VALUES (?, ?)').bind(email, url).run();
       },
-    });
+    }, ctx);
   },
 } satisfies ExportedHandler<Env>;

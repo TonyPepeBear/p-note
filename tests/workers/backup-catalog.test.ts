@@ -1,3 +1,4 @@
+import { create, fixture, hash, manifest, request, type Catalog, type Manifest } from './backup-helpers';
 import { env, exports } from 'cloudflare:workers';
 import { abortAllDurableObjects, reset, runInDurableObject } from 'cloudflare:test';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
@@ -8,48 +9,11 @@ import { authenticated, commit, connect, origin } from './helpers';
 import { images } from '../fixtures/images';
 import type { PageRow } from '../../src/shared/pages';
 
-type Auth = Awaited<ReturnType<typeof authenticated>>;
-type File = { path: string; byte_size: number; checksum: string };
-type Manifest = { format: string; version: number; id: string; owner: { id: string }; started_at: number; completed_at: number;
-  pages: { metadata: PageRow; checkpoint: number; captured_at: number; file: File }[];
-  assets: { metadata: { id: string; checksum: string; object_key: string }; file: File }[] };
-type Catalog = { id: string; status: string; started_at: number; completed_at: number | null; error: string | null };
 const sockets: WebSocket[] = [];
-const hash = async (bytes: Uint8Array) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), n => n.toString(16).padStart(2, '0')).join('');
 beforeEach(async () => { await exports.default.fetch(origin + '/health'); await exports.default.fetch(origin + '/__test/reset', { method: 'POST' }); });
 afterEach(async () => { vi.restoreAllMocks(); sockets.splice(0).forEach(socket => socket.close()); await reset(); });
-function request(auth: Auth, path: string, configured = env, method = 'GET', now = auth.now) {
-  return handle(new Request(origin + path, { method, headers: { Origin: origin, Cookie: auth.cookie, ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}) }, ...(method === 'POST' ? { body: '{}' } : {}) }), configured, { now: () => now, sendMail: async () => {} });
-}
-async function create(auth: Auth, now = auth.now) {
-  await auth.post('/__test/control', { now });
-  const response = await request(auth, '/api/backups', env, 'POST', now); expect(response.status).toBe(201);
-  const backup = await response.json<Catalog>(); expect(backup.status).toBe('success'); return backup;
-}
-async function manifest(auth: Auth, id: string, now = auth.now) {
-  const response = await request(auth, `/api/backups/${id}/manifest`, env, 'GET', now); expect(response.status).toBe(200);
-  expect(response.headers.get('Cache-Control')).toBe('no-store'); return response.json<Manifest>();
-}
-async function fixture() {
-  const auth = await authenticated(); const root = await auth.note('中文上層');
-  const child = await auth.result(auth.post('/api/pages', { title: '子頁', parent_id: root.id }));
-  const journal = await auth.today(); const trash = await auth.note('垃圾桶正文');
-  const response = await exports.default.fetch(origin + '/api/assets', { method: 'POST', headers: { Origin: origin, Cookie: auth.cookie, 'Content-Type': 'image/png', 'X-File-Name': encodeURIComponent('原圖.png') }, body: images.png });
-  expect(response.status).toBe(201); const asset = await response.json<{ id: string; url: string; checksum: string }>();
-  const documents = new Map<string, Uint8Array>(); const clients = [];
-  for (const page of [root, child, journal, trash]) {
-    const client = await connect(page, auth.cookie); sockets.push(client.socket); clients.push(client);
-    const doc = new Y.Doc(); const block = new Y.XmlElement('paragraph'); const text = new Y.XmlText(); text.insert(0, page.title + '雲端正文'); block.insert(0, [text]); doc.getXmlFragment('body').insert(0, [block]);
-    if (page.id === root.id) { const image = new Y.XmlElement('image'); image.setAttribute('url', asset.url); doc.getXmlFragment('body').insert(1, [image]); }
-    expect((await commit(client, doc, 'backup-fixture')).type).toBe('persisted'); documents.set(page.id, Y.encodeStateAsUpdate(doc)); doc.destroy();
-  }
-  expect((await auth.post(`/api/pages/${trash.id}/delete`, {})).status).toBe(200);
-  const metadata = (await env.DB.prepare('SELECT * FROM pages WHERE owner_id = ? ORDER BY id').bind(root.owner_id).all<PageRow>()).results;
-  return { auth, root, child, journal, trash, asset, documents, metadata, clients };
-}
-
 it('BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證', async () => {
-  const f = await fixture(); const backup = await create(f.auth); const data = await manifest(f.auth, backup.id);
+  const f = await fixture(sockets); const backup = await create(f.auth); const data = await manifest(f.auth, backup.id);
   expect(data).toMatchObject({ format: 'p-note-backup', version: 1, id: backup.id, owner: { id: f.root.owner_id }, started_at: f.auth.now, completed_at: f.auth.now });
   expect(data.pages.map(item => item.metadata).sort((a, b) => a.id.localeCompare(b.id))).toEqual(f.metadata);
   for (const page of data.pages) {
@@ -68,7 +32,7 @@ it('BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、�
 }, 20000);
 
 it('BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變', async () => {
-  const f = await fixture(); const successful = await create(f.auth);
+  const f = await fixture(sockets); const successful = await create(f.auth);
   const failures = ['document', 'image', 'checksum', 'copy', 'copy-checksum', 'manifest'];
   for (const failure of failures) {
     let configured = env;
@@ -96,7 +60,7 @@ it('BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成�
 }, 20000);
 
 it('BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代', async () => {
-  const f = await fixture(); const successful = await create(f.auth);
+  const f = await fixture(sockets); const successful = await create(f.auth);
   const configured = { ...env, BACKUPS: new Proxy(env.BACKUPS, { get(target, property) {
     if (property === 'put') return async (...args: Parameters<R2Bucket['put']>) => {
       const result = await Reflect.apply(target.put, target, args);
@@ -114,7 +78,7 @@ it('BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不�
 }, 20000);
 
 it('BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗', async () => {
-  const f = await fixture(); const backup = await create(f.auth);
+  const f = await fixture(sockets); const backup = await create(f.auth);
   expect((await handle(new Request(origin + `/api/backups/${backup.id}/manifest`), env)).status).toBe(401);
   expect((await request(f.auth, `/api/backups/${backup.id}/manifest`, env, 'POST')).status).toBe(404);
   const saved = await env.BACKUPS.get(`${f.root.owner_id}/${backup.id}/manifest.json`); expect(saved).not.toBeNull();
@@ -129,7 +93,7 @@ it('BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 
 }, 20000);
 
 it('BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留', async () => {
-  const f = await fixture(); let now = f.auth.now;
+  const f = await fixture(sockets); let now = f.auth.now;
   vi.spyOn(Date, 'now').mockImplementation(() => now);
   const first = await create(f.auth, now); const firstManifest = await manifest(f.auth, first.id, now);
   now += 86400000; await f.auth.post('/__test/control', { now }); const second = await create(f.auth, now);
@@ -152,7 +116,7 @@ it('BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，
 }, 30000);
 
 it('BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查', async () => {
-  const f = await fixture(); const successful = await create(f.auth);
+  const f = await fixture(sockets); const successful = await create(f.auth);
   const configured = { ...env, BACKUPS: new Proxy(env.BACKUPS, { get(target, property) {
     if (property === 'put') return async (...args: Parameters<R2Bucket['put']>) => {
       const result = await Reflect.apply(target.put, target, args);
@@ -168,7 +132,7 @@ it('BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗�
 }, 20000);
 
 it('BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始', async () => {
-  const f = await fixture(); let now = f.auth.now;
+  const f = await fixture(sockets); let now = f.auth.now;
   const configured = { ...env, BACKUPS: new Proxy(env.BACKUPS, { get(target, property) {
     if (property === 'put') return async (...args: Parameters<R2Bucket['put']>) => {
       const result = await Reflect.apply(target.put, target, args);
@@ -186,7 +150,7 @@ it('BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成�
 }, 20000);
 
 it('BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成', async () => {
-  const f = await fixture(); const first = await create(f.auth); const data = await manifest(f.auth, first.id);
+  const f = await fixture(sockets); const first = await create(f.auth); const data = await manifest(f.auth, first.id);
   const second = await create(f.auth, f.auth.now + 86400000);
   vi.spyOn(env.BACKUPS, 'delete').mockRejectedValueOnce(new Error('測試清理中斷'));
   await expect(cleanupBackups(env, f.auth.now + 90 * 86400000)).rejects.toThrow('測試清理中斷');
@@ -200,7 +164,7 @@ it('BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套�
 }, 20000);
 
 it('BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新', async () => {
-  const f = await fixture(); let now = f.auth.now;
+  const f = await fixture(sockets); let now = f.auth.now;
   const offline = new Y.Doc(); Y.applyUpdate(offline, f.documents.get(f.root.id)!);
   const local = new Y.XmlText(); local.insert(0, '僅在離線裝置的修改'); offline.getXmlFragment('body').insert(0, [local]);
   const configured = { ...env, BACKUPS: new Proxy(env.BACKUPS, { get(target, property) {
@@ -225,7 +189,7 @@ it('BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含�
 }, 20000);
 
 it('ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔', async () => {
-  const f = await fixture(); const before = await create(f.auth); const first = await manifest(f.auth, before.id);
+  const f = await fixture(sockets); const before = await create(f.auth); const first = await manifest(f.auth, before.id);
   const doc = new Y.Doc(); Y.applyUpdate(doc, f.documents.get(f.root.id)!); doc.getXmlFragment('body').delete(1, 1);
   expect((await commit(f.clients[0], doc, 'removed-image-reference')).type).toBe('persisted');
   expect(doc.getXmlFragment('body').toString()).not.toContain(f.asset.url); doc.destroy();
