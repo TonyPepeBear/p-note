@@ -1,0 +1,119 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/restore.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/restore.test.ts (5 tests | 5 failed) 2046ms
+   × BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復 465ms
+   × BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活 413ms
+   × BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記 402ms
+   × BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試 385ms
+   × RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件 380ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/restore.test.ts > BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/restore.test.ts:31:117
+     29|   const f = await fixture(sockets); const backup = await create(f.auth…
+     30|   await f.auth.post(`/api/pages/${f.root.id}/title`, { title: '還原前標題' …
+     31|   const response = await request(f.auth, `/api/backups/${backup.id}/re…
+       |                                                                                                                     ^
+     32|   const result = await response.json<{ rollback: string }>(); expect(r…
+     33|   expect((await manifest(f.auth, result.rollback)).pages.find(page => …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/workers/restore.test.ts > BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活
+AssertionError: [{"email":"owner@example.test","ip":"unknown","requested_at":1791976984848}]: expected 429 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 429
+
+ ❯ authenticated tests/workers/helpers.ts:17:113
+     15|   await get('/health'); const now = Date.now() + 86400000; await post(…
+     16|   const requested = await post('/api/login', { email: 'owner@example.t…
+     17|   expect(requested.status, JSON.stringify((await env.DB.prepare('SELEC…
+       |                                                                                                                 ^
+     18|   const mails = await (await get('/__test/mailbox')).json<{ url: strin…
+     19|   const confirmed = await post('/api/confirm', { token: new URL(mails.…
+ ❯ tests/workers/restore.test.ts:42:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/workers/restore.test.ts > BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/restore.test.ts:53:92
+     51|   const f = await fixture(sockets); const backup = await create(f.auth…
+     52|   const old = new Y.Doc(); Y.applyUpdate(old, f.documents.get(f.journa…
+     53|   expect((await request(f.auth, `/api/backups/${backup.id}/restore`, e…
+       |                                                                                            ^
+     54|   await abortAllDurableObjects();
+     55|   const denied = await f.auth.get(`/parties/sync/${f.journal.room}?pag…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/workers/restore.test.ts > BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ tests/workers/restore.test.ts:76:119
+     74|       });
+     75|     }
+     76|     const response = await request(f.auth, `/api/backups/${backup.id}/…
+       |                                                                                                                       ^
+     77|     expect((await f.auth.get(`/api/pages/${f.root.id}`)).status).toBe(…
+     78|     expect(await env.DB.prepare('SELECT count(*) AS n FROM restore_ope…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/workers/restore.test.ts > RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ tests/workers/restore.test.ts:88:92
+     86|   const f = await fixture(sockets); const backup = await create(f.auth…
+     87|   await env.BACKUPS.put(`${f.root.owner_id}/${backup.id}/${data.pages[…
+     88|   expect((await request(f.auth, `/api/backups/${backup.id}/restore`, e…
+       |                                                                                            ^
+     89|   expect((await f.auth.get(`/api/pages/${f.root.id}`)).status).toBe(20…
+     90|   expect((await persisted(f.clients[0])).getXmlFragment('body').toStri…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  19:23:01
+   Duration  4.82s (transform 873ms, setup 0ms, import 2.04s, tests 2.05s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

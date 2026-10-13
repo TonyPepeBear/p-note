@@ -9,8 +9,9 @@ import { body } from './request';
 import { handleAssets } from './assets';
 import { sendLoginMail } from './mail';
 import { cleanupBackups, createBackup, handleBackups } from './backups';
+import { RestoreCoordinator } from './restore';
 
-export { ProbeRoom, SyncRoom };
+export { ProbeRoom, SyncRoom, RestoreCoordinator };
 
 export type Services = {
   now: () => number;
@@ -72,6 +73,7 @@ export async function handle(request: Request, env: Env, services: Services = { 
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
+    if (!path.startsWith('/api/backups') && await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(session.user.id).first()) return error('還原處理中，請重試原備份', 503);
     const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());

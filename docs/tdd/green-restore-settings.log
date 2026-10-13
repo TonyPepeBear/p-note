@@ -1,0 +1,29 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/backup.spec.ts -g BACKUP-08
+
+[WebServer] (node:37341) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:37389) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ✘ [ERROR] Uncaught Error: 測試清空產品儲存 
+[WebServer] 
+[WebServer] 
+  ✓  1 [chromium-desktop] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (2.4s)
+(node:37445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ✘ [ERROR] Uncaught Error: 測試清空產品儲存 
+[WebServer] 
+[WebServer] 
+  ✓  2 [chromium-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (2.4s)
+(node:37455) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ✘ [ERROR] Uncaught Error: 測試清空產品儲存 
+[WebServer] 
+[WebServer] 
+  ✓  3 [webkit-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (3.1s)
+
+  3 passed (11.2s)

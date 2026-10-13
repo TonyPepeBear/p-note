@@ -37,3 +37,22 @@ test('BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖�
   const owner = await (await page.request.get('/api/session')).json(); expect(manifest.owner.id).toBe(owner.user.id);
   await page.getByRole('button', { name: '返回編輯', exact: true }).click(); await expect(page.getByTestId('ready')).toHaveText('可編輯'); await saved(page);
 });
+
+test('BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引', async ({ page }) => {
+  const id = await openPrivate(page);
+  await page.evaluate(() => { const editor = window.probe!.editor; editor.replaceBlocks(editor.document, [{ type: 'paragraph', content: '從完整備份恢復的日記' }]); }); await saved(page);
+  await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '原圖.png', mimeType: 'image/png', buffer: Buffer.from(images.png) });
+  await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+  await page.getByRole('button', { name: '備份設定', exact: true }).click(); await page.getByRole('button', { name: '建立備份', exact: true }).click();
+  await expect(page.getByRole('button', { name: '選擇還原', exact: true })).toHaveCount(1);
+  expect((await page.request.post('/__test/clear-product')).status()).toBe(200);
+  await page.getByRole('button', { name: '選擇還原', exact: true }).click();
+  await page.getByLabel('我知道將以備份覆蓋目前頁面', { exact: true }).check();
+  await page.getByRole('button', { name: '覆蓋還原', exact: true }).click();
+  await expect(page.getByTestId('ready')).toHaveText('可編輯', { timeout: 15000 }); await saved(page);
+  expect(new URL(page.url()).searchParams.get('page')).toBe(id);
+  await expect(page.locator('.tiptap')).toContainText('從完整備份恢復的日記');
+  const image = await page.evaluate(() => window.probe!.editor.document.find(block => block.type === 'image')!);
+  const response = await page.request.get(image.props.url); expect(response.status()).toBe(200); expect(new Uint8Array(await response.body())).toEqual(images.png);
+  const search = await (await page.request.get('/api/search?q=' + encodeURIComponent('完整備份恢復'))).json(); expect(search.map((row: { id: string }) => row.id)).toContain(id);
+});

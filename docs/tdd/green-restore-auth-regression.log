@@ -1,0 +1,20 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/auth.spec.ts -g AUTH-06
+
+[WebServer] (node:43155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:43234) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-desktop] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (3.0s)
+(node:43257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [chromium-mobile] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (2.2s)
+(node:43266) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [webkit-mobile] › tests/e2e/auth.spec.ts:81:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (2.8s)
+
+  3 passed (10.8s)

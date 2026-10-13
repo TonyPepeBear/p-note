@@ -5,6 +5,7 @@ import { roomName } from '../shared/room';
 import { PageError } from './pages';
 import { validateManifest } from './backup-validation';
 import { exportBackup } from './backup-export';
+import { body } from './request';
 
 export const BACKUP_RETENTION = 90 * 86400000;
 type StoredBackup = BackupCatalog & { owner_id: string; manifest_checksum: string | null; manifest_size: number | null };
@@ -29,8 +30,9 @@ export async function readFile(env: Env, prefix: string, file: BackupFile): Prom
   if (await checksum(bytes) !== file.checksum) return fail(); return bytes;
 }
 
-export async function createBackup(env: Env, owner: string, now: () => number): Promise<BackupCatalog> {
-  const id = crypto.randomUUID(); const started = now(); const prefix = `${owner}/${id}/`;
+export async function createBackup(env: Env, owner: string, now: () => number | Promise<number>, restore?: string): Promise<BackupCatalog> {
+  if (await env.DB.prepare("SELECT 1 FROM restore_operations WHERE owner_id = ? AND (id <> ? OR phase <> 'paused')").bind(owner, restore ?? '').first()) fail();
+  const id = crypto.randomUUID(); const started = await now(); const prefix = `${owner}/${id}/`;
   await env.DB.prepare("INSERT INTO backups (id, owner_id, status, started_at) VALUES (?, ?, 'pending', ?)").bind(id, owner, started).run();
   try {
     if (await env.DB.prepare('SELECT 1 FROM page_operations WHERE owner_id = ?').bind(owner).first()) fail();
@@ -56,19 +58,20 @@ export async function createBackup(env: Env, owner: string, now: () => number): 
     const generations = new Map(current.map(page => [page.id, page.sync_generation]));
     if (pages.some(page => generations.get(page.id) !== page.sync_generation)
       || await env.DB.prepare('SELECT 1 FROM page_operations WHERE owner_id = ?').bind(owner).first()) fail();
-    manifest.captured_until = now();
+    manifest.captured_until = await now();
     const encoded = new TextEncoder().encode(JSON.stringify(manifest));
     const file = await writeFile(env, prefix, 'manifest.json', encoded);
     // 目錄只在全部副本與清單校驗後發布；部分物件留待該備份到期清理。
-    const completed = now();
+    const completed = await now();
     validateManifest({ ...manifest, completed_at: completed });
     const published = await env.DB.prepare(`UPDATE backups SET status = 'success', completed_at = ?, manifest_checksum = ?, manifest_size = ?
       WHERE id = ? AND owner_id = ? AND status = 'pending'
       AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = backups.owner_id)
+      AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = backups.owner_id AND (id <> ? OR phase <> 'paused'))
       AND NOT EXISTS (SELECT 1 FROM json_each(?) AS expected LEFT JOIN pages
         ON pages.id = json_extract(expected.value, '$.id') AND pages.owner_id = backups.owner_id
         WHERE pages.id IS NULL OR pages.sync_generation <> json_extract(expected.value, '$.sync_generation'))`)
-      .bind(completed, file.checksum, file.byte_size, id, owner, JSON.stringify(pages.map(page => ({ id: page.id, sync_generation: page.sync_generation })))).run();
+      .bind(completed, file.checksum, file.byte_size, id, owner, restore ?? '', JSON.stringify(pages.map(page => ({ id: page.id, sync_generation: page.sync_generation })))).run();
     if (!published.meta.changes) fail();
     return { id, status: 'success', started_at: started, completed_at: completed, error: null };
   } catch {
@@ -77,8 +80,10 @@ export async function createBackup(env: Env, owner: string, now: () => number): 
   }
 }
 
-export async function readManifest(env: Env, owner: string, id: string, now: number): Promise<BackupManifest> {
-  const row = await env.DB.prepare("SELECT * FROM backups WHERE id = ? AND owner_id = ? AND status = 'success' AND completed_at > ?").bind(id, owner, now - BACKUP_RETENTION).first<StoredBackup>();
+export async function readManifest(env: Env, owner: string, id: string, now: number, operation?: string): Promise<BackupManifest> {
+  const row = await env.DB.prepare(`SELECT * FROM backups WHERE id = ? AND owner_id = ? AND status = 'success'
+    AND (completed_at > ? OR EXISTS (SELECT 1 FROM restore_operations WHERE id = ? AND owner_id = backups.owner_id AND backup_id = backups.id))`)
+    .bind(id, owner, now - BACKUP_RETENTION, operation ?? '').first<StoredBackup>();
   if (!row) throw new PageError(404, '找不到有效成功備份');
   const bytes = await readFile(env, `${owner}/${id}/`, { path: 'manifest.json', byte_size: row.manifest_size!, checksum: row.manifest_checksum! });
   let manifest: Omit<BackupManifest, 'completed_at'>;
@@ -90,11 +95,16 @@ export async function readManifest(env: Env, owner: string, id: string, now: num
 }
 
 export async function cleanupBackups(env: Env, now: number): Promise<void> {
-  const expired = (await env.DB.prepare(`SELECT id, owner_id FROM backups WHERE status = 'expiring'
-    OR (status = 'success' AND completed_at <= ?) OR (status IN ('pending', 'failed') AND started_at <= ?)`)
+  const expired = (await env.DB.prepare(`SELECT id, owner_id FROM backups WHERE (status = 'expiring'
+    OR (status = 'success' AND completed_at <= ?) OR (status IN ('pending', 'failed') AND started_at <= ?))
+    AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE backup_id = backups.id OR rollback_id = backups.id)`)
     .bind(now - BACKUP_RETENTION, now - BACKUP_RETENTION).all<{ id: string; owner_id: string }>()).results;
   for (const row of expired) {
-    await env.DB.prepare("UPDATE backups SET status = 'expiring' WHERE id = ?").bind(row.id).run();
+    const marked = await env.DB.prepare(`UPDATE backups SET status = 'expiring' WHERE id = ?
+      AND (status = 'expiring' OR (status = 'success' AND completed_at <= ?) OR (status IN ('pending', 'failed') AND started_at <= ?))
+      AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE backup_id = backups.id OR rollback_id = backups.id)`)
+      .bind(row.id, now - BACKUP_RETENTION, now - BACKUP_RETENTION).run();
+    if (!marked.meta.changes) continue;
     while (true) {
       const objects = await env.BACKUPS.list({ prefix: `${row.owner_id}/${row.id}/`, limit: 1000 });
       if (!objects.objects.length) break;
@@ -102,6 +112,7 @@ export async function cleanupBackups(env: Env, now: number): Promise<void> {
     }
     await env.DB.prepare("DELETE FROM backups WHERE id = ? AND status = 'expiring'").bind(row.id).run();
   }
+  await env.DB.prepare('DELETE FROM completed_restores WHERE completed_at <= ?').bind(now - BACKUP_RETENTION).run();
 }
 
 export async function handleBackups(request: Request, env: Env, owner: string, now: () => number, ctx?: ExecutionContext): Promise<Response | null> {
@@ -110,14 +121,28 @@ export async function handleBackups(request: Request, env: Env, owner: string, n
     if (request.method === 'POST') return Response.json(await createBackup(env, owner, now), { status: 201, headers });
     if (request.method === 'GET') {
       const backups = (await env.DB.prepare(`SELECT id, status, started_at, completed_at, error FROM backups WHERE owner_id = ?
-        AND (status <> 'success' OR completed_at > ?) ORDER BY COALESCE(completed_at, started_at) DESC, rowid DESC`)
+        AND (status <> 'success' OR completed_at > ? OR EXISTS (SELECT 1 FROM restore_operations WHERE backup_id = backups.id OR rollback_id = backups.id)) ORDER BY COALESCE(completed_at, started_at) DESC, rowid DESC`)
         .bind(owner, now() - BACKUP_RETENTION).all<BackupCatalog>()).results;
-      return Response.json({ backups, latest: backups.find(row => row.status === 'success')?.id ?? null }, { headers });
+      const restore = await env.DB.prepare('SELECT id, backup_id, phase FROM restore_operations WHERE owner_id = ?').bind(owner).first();
+      return Response.json({ backups, latest: backups.find(row => row.status === 'success')?.id ?? null, restore }, { headers });
     }
   }
   const match = path.match(/^\/api\/backups\/([\w-]{1,80})\/manifest$/);
   if (match && request.method === 'GET') return Response.json(await readManifest(env, owner, match[1], now()), { headers });
   const download = path.match(/^\/api\/backups\/([\w-]{1,80})\/export$/);
   if (download && request.method === 'GET') return exportBackup(env, await readManifest(env, owner, download[1], now()), ctx);
+  const restore = path.match(/^\/api\/backups\/([\w-]{1,80})\/restore$/);
+  if (restore && request.method === 'POST') {
+    const data = await body(request);
+    if (data.request_id !== undefined && (typeof data.request_id !== 'string' || !/^[\w-]{1,80}$/.test(data.request_id))) throw new PageError(400, '無效還原請求識別');
+    const operation = await env.DB.prepare('SELECT id, backup_id FROM restore_operations WHERE owner_id = ?').bind(owner).first<{ id: string; backup_id: string }>();
+    if (operation && operation.backup_id !== restore[1]) throw new PageError(409, '另一還原處理中，請重試原備份');
+    if (operation && data.request_id !== undefined && data.request_id !== operation.id) throw new PageError(409, '請重試原還原請求');
+    const id = typeof data.request_id === 'string' ? data.request_id : operation?.id ?? crypto.randomUUID();
+    const completed = await env.DB.prepare('SELECT backup_id FROM completed_restores WHERE id = ? AND owner_id = ?').bind(id, owner).first<{ backup_id: string }>();
+    if (completed && completed.backup_id !== restore[1]) throw new PageError(409, '還原請求識別已用於其他備份');
+    if (!completed) await readManifest(env, owner, restore[1], now(), operation?.id);
+    return Response.json(await env.RESTORES.getByName(owner).run(owner, restore[1], id), { headers });
+  }
   return null;
 }

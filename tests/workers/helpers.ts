@@ -8,11 +8,11 @@ import type { ProbeRoom } from '../../src/worker/index';
 import type { SyncRoom } from '../../src/worker/sync-room';
 
 export const origin = 'http://127.0.0.1:5173';
-export async function authenticated() {
+export async function authenticated(now = Date.now() + 86400000) {
   let cookie = '';
   const get = (path: string) => exports.default.fetch(origin + path, { headers: { Cookie: cookie } });
   const post = (path: string, data: object) => exports.default.fetch(origin + path, { method: 'POST', headers: { Origin: origin, Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-  await get('/health'); const now = Date.now() + 86400000; await post('/__test/control', { now });
+  await get('/health'); await post('/__test/control', { now });
   const requested = await post('/api/login', { email: 'owner@example.test' });
   expect(requested.status, JSON.stringify((await env.DB.prepare('SELECT * FROM auth_requests').all()).results)).toBe(200);
   const mails = await (await get('/__test/mailbox')).json<{ url: string }[]>();

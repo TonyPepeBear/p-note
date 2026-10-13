@@ -61,12 +61,14 @@ test('PAGE-03：日期補寫與月份列表返回原日記，修改標題不改�
 test('PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回', async ({ page, request, isMobile }) => {
   await login(page, request);
   const add = page.getByRole('button', { name: '新增筆記', exact: true });
+  await expect(add).toBeEnabled();
   await go(page, async () => { if (isMobile) await add.tap(); else { await add.focus(); await add.press('Enter'); } });
   await saved(page); const parent = new URL(page.url()).searchParams.get('page')!;
   await page.getByLabel('頁面標題', { exact: true }).fill('我的上層'); await page.getByRole('button', { name: '儲存標題', exact: true }).click();
   await expect(page.getByRole('heading', { name: '筆記 我的上層', exact: true })).toBeVisible();
   await menu(page);
   const childButton = page.getByRole('button', { name: '新增子頁面', exact: true });
+  await expect(childButton).toBeEnabled();
   await go(page, async () => { if (isMobile) await childButton.tap(); else { await childButton.focus(); await childButton.press('Enter'); } });
   await saved(page); const child = new URL(page.url()).searchParams.get('page')!;
   await text(page, '子頁仍可寫正文');

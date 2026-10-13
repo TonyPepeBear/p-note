@@ -1,15 +1,27 @@
-import { handle, ProbeRoom, SyncRoom as AppSyncRoom } from '../src/worker/app';
+import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRestoreCoordinator } from '../src/worker/app';
 import probe from '../src/worker/index';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
+import restoreMigration from '../migrations/0004.sql';
+import { roomName } from '../src/shared/room';
 
 export { ProbeRoom };
+export class RestoreCoordinator extends AppRestoreCoordinator {
+  protected async now(): Promise<number> {
+    return await this.env.DB.prepare('SELECT now FROM test_control WHERE id = 1').first<number>('now') ?? Date.now();
+  }
+}
 export class SyncRoom extends AppSyncRoom {
   protected async now(): Promise<number> {
     return await this.env.DB.prepare('SELECT now FROM test_control WHERE id = 1').first<number>('now') ?? Date.now();
   }
   async onRequest(request?: Request): Promise<Response> {
+    if (request && new URL(request.url).pathname === '/__test/clear-storage') {
+      for (const connection of this.getConnections()) connection.close(1012, '測試清空產品儲存');
+      await this.ctx.storage.deleteAll(); await this.ctx.storage.sync();
+      this.ctx.abort('測試清空產品儲存');
+    }
     if (request && new URL(request.url).pathname === '/__test/drop-connections') {
       for (const connection of this.getConnections()) connection.close(1012, '測試服務重啟');
       return Response.json({ ok: true });
@@ -19,7 +31,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
@@ -32,6 +44,20 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path === '/__test/clear-product' && request.method === 'POST') {
+        const pages = (await env.DB.prepare('SELECT id, owner_id, sync_generation FROM pages').all<{ id: string; owner_id: string; sync_generation: string }>()).results;
+        await env.DB.batch(['page_search', 'pages', 'assets'].map(table => env.DB.prepare(`DELETE FROM ${table}`)));
+        for (const page of pages) {
+          const room = await roomName(page.owner_id, page.id, page.sync_generation);
+          await env.SYNC.getByName(room).fetch('http://127.0.0.1/__test/clear-storage').catch(() => {});
+        }
+        for (;;) {
+          const objects = await env.ASSETS.list({ limit: 1000 });
+          if (!objects.objects.length) break;
+          await env.ASSETS.delete(objects.objects.map(object => object.key));
+        }
+        return Response.json({ ok: true });
+      }
       if (path === '/__test/drop-connections' && request.method === 'POST') {
         const { room } = await request.json<{ room: string }>();
         if (!/^[a-f0-9]{64}$/.test(room)) return new Response('無效測試房間', { status: 400 });

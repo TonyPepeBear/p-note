@@ -1,0 +1,41 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/restore.test.ts -t RESTORE-PIN
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/restore.test.ts (7 tests | 1 failed | 6 skipped) 454ms
+   ↓ BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復
+   ↓ RESTORE-ATOMIC-01：D1 batch 中途插入失敗回滾全部 metadata，不留下部分新世代
+   × RESTORE-PIN-01：到期清理在選取之後才出現還原引用，也不能刪除正在使用的備份 453ms
+   ↓ BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活
+   ↓ BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記
+   ↓ BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試
+   ↓ RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/restore.test.ts > RESTORE-PIN-01：到期清理在選取之後才出現還原引用，也不能刪除正在使用的備份
+AssertionError: expected 'expiring' to be 'success' // Object.is equality
+
+Expected: "success"
+Received: "expiring"
+
+ ❯ tests/workers/restore.test.ts:75:107
+     73|   await cleanupBackups(env, f.auth.now + 90 * 86400000).catch(() => {}…
+     74|   expect(inserted).toBe(true);
+     75|   expect(await env.DB.prepare('SELECT status FROM backups WHERE id = ?…
+       |                                                                                                           ^
+     76|   expect(await env.BACKUPS.get(`${f.root.owner_id}/${backup.id}/manife…
+     77| }, 30000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  19:30:58
+   Duration  3.36s (transform 970ms, setup 0ms, import 2.23s, tests 454ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

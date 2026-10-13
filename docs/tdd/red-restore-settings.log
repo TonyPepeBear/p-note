@@ -1,0 +1,135 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/backup.spec.ts -g BACKUP-08
+
+[WebServer] (node:80955) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:81016) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (6.8s)
+(node:81040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (6.4s)
+(node:81069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 7:41:26 PM [vite] ws proxy error:
+[WebServer] Error: read ECONNRESET
+[WebServer]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[WebServer] 7:41:26 PM [vite] ws proxy socket error:
+[WebServer] Error: read ECONNRESET
+[WebServer]     at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+  ✘  3 [webkit-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (8.0s)
+
+
+  1) [chromium-desktop] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: '選擇還原', exact: true })
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: '選擇還原', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '選擇還原', exact: true })
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      45 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+      46 |   await page.getByRole('button', { name: '備份設定', exact: true }).click(); await page.getByRole('button', { name: '建立備份', exact: true }).click();
+    > 47 |   await expect(page.getByRole('button', { name: '選擇還原', exact: true })).toHaveCount(1);
+         |                                                                         ^
+      48 |   expect((await page.request.post('/__test/clear-product')).status()).toBe(200);
+      49 |   await page.getByRole('button', { name: '選擇還原', exact: true }).click();
+      50 |   await page.getByLabel('我知道將以備份覆蓋目前頁面', { exact: true }).check();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:47:73
+
+    Error Context: test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ─────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: '選擇還原', exact: true })
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: '選擇還原', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '選擇還原', exact: true })
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      45 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+      46 |   await page.getByRole('button', { name: '備份設定', exact: true }).click(); await page.getByRole('button', { name: '建立備份', exact: true }).click();
+    > 47 |   await expect(page.getByRole('button', { name: '選擇還原', exact: true })).toHaveCount(1);
+         |                                                                         ^
+      48 |   expect((await page.request.post('/__test/clear-product')).status()).toBe(200);
+      49 |   await page.getByRole('button', { name: '選擇還原', exact: true }).click();
+      50 |   await page.getByLabel('我知道將以備份覆蓋目前頁面', { exact: true }).check();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:47:73
+
+    Error Context: test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ───────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: '選擇還原', exact: true })
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: '選擇還原', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '選擇還原', exact: true })
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      45 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click(); await expect(page.locator('.bn-block-content[data-content-type="image"]')).toHaveCount(1); await saved(page);
+      46 |   await page.getByRole('button', { name: '備份設定', exact: true }).click(); await page.getByRole('button', { name: '建立備份', exact: true }).click();
+    > 47 |   await expect(page.getByRole('button', { name: '選擇還原', exact: true })).toHaveCount(1);
+         |                                                                         ^
+      48 |   expect((await page.request.post('/__test/clear-product')).status()).toBe(200);
+      49 |   await page.getByRole('button', { name: '選擇還原', exact: true }).click();
+      50 |   await page.getByLabel('我知道將以備份覆蓋目前頁面', { exact: true }).check();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:47:73
+
+    Error Context: test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-desktop] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ─────────
+    [chromium-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ──────────
+    [webkit-mobile] › tests/e2e/backup.spec.ts:41:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 ────────────

@@ -110,6 +110,30 @@ export class SyncRoom extends ProbeRoom {
     this.permissionTail = work.then(() => {}, () => {}); return work;
   }
 
+  async prepare(scope: Scope, data: Uint8Array, checkpoint: number): Promise<void> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(async () => {
+      if (await roomName(scope.owner, scope.page, scope.generation) !== this.name
+        || await this.env.DB.prepare('SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?').bind(scope.page, scope.owner, scope.generation).first()) throw new Error('不能覆寫活躍房間');
+      const candidate = new Y.Doc(); let expected: Uint8Array;
+      try { Y.applyUpdate(candidate, data); expected = Y.encodeStateAsUpdate(candidate); } finally { candidate.destroy(); }
+      const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', expected)), value => value.toString(16).padStart(2, '0')).join('');
+      const previous = await this.ctx.storage.get<string>('prepared-hash');
+      if (previous && previous !== digest) throw new Error('準備世代已有不同內容');
+      this.paused = true; await this.ctx.storage.put('page-paused', true);
+      this.ctx.storage.transactionSync(() => {
+        this.ctx.storage.sql.exec('INSERT OR REPLACE INTO snapshot VALUES (1, ?, ?)', checkpoint, expected);
+        this.ctx.storage.sql.exec('DELETE FROM updates');
+      });
+      await this.ctx.storage.put('scope', scope); await this.ctx.storage.put('prepared-hash', digest); await this.ctx.storage.sync();
+      Y.applyUpdate(this.document, expected);
+      const recovered = await this.onLoad(); try {
+        if (!equal(Y.encodeStateAsUpdate(recovered), expected)) throw new Error('還原正文校驗失敗');
+      } finally { recovered.destroy(); }
+    });
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
   private async index(scope: Scope): Promise<void> {
     if (await roomName(scope.owner, scope.page, scope.generation) !== this.name) return;
     const fragment = this.document.getXmlFragment('body');
@@ -122,3 +146,4 @@ export class SyncRoom extends ProbeRoom {
       .bind(scope.page, scope.owner, plain, plain.slice(0, 160), scope.generation, checkpoint, scope.page, scope.owner, scope.generation).run();
   }
 }
+function equal(a: Uint8Array, b: Uint8Array): boolean { return a.length === b.length && a.every((value, index) => value === b[index]); }

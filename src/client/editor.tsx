@@ -17,7 +17,7 @@ import './style.css';
 
 export type Session = { doc: Y.Doc; cache: IndexeddbPersistence; provider: YProvider; room: string; checkAccess?: () => Promise<boolean> };
 
-export function Editor({ session, title }: { session: Session; title?: string }) {
+export function Editor({ session, title, readOnly = false }: { session: Session; title?: string; readOnly?: boolean }) {
   const { doc, cache, provider, room } = session;
   const [image, setImage] = useState<{ file: File; blockId?: string }>();
   const [uploading, setUploading] = useState(false);
@@ -51,7 +51,7 @@ export function Editor({ session, title }: { session: Session; title?: string })
         await saveLocal(cache);
         if (disposed || current !== revision) return;
         setLocal('本機已儲存');
-        if (provider.wsconnected && provider.synced) {
+        if (!readOnly && provider.wsconnected && provider.synced) {
           latestId = crypto.randomUUID();
           provider.sendMessage(JSON.stringify({ type: 'commit', id: latestId, update: toBase64(Y.encodeStateAsUpdate(doc)) }));
         }
@@ -73,7 +73,7 @@ export function Editor({ session, title }: { session: Session; title?: string })
       retryDelay = Math.min(retryDelay * 2, 30000);
     };
     const online = () => {
-      if (disposed || connecting || !navigator.onLine) return;
+      if (readOnly || disposed || connecting || !navigator.onLine) return;
       clearTimeout(retryTimer); retryTimer = undefined; connecting = true;
       setCloud('同步中');
       void (async () => {
@@ -124,7 +124,7 @@ export function Editor({ session, title }: { session: Session; title?: string })
       document.removeEventListener('visibilitychange', foreground);
       delete window.probe;
     };
-  }, [doc, cache, provider, editor, room]);
+  }, [doc, cache, provider, editor, room, readOnly]);
 
   const currentBlock = () => editor.getTextCursorPosition().block;
   const insert = (type: 'paragraph' | 'image') => {
@@ -151,18 +151,18 @@ export function Editor({ session, title }: { session: Session; title?: string })
     <h1>{title ?? 'p-note 技術驗證'}</h1>
     {!title && <p>本機原型：圖片為固定 fixture，正式資產服務尚未接入。</p>}
     <div className="status" aria-live="polite">
-      <span data-testid="ready">{ready ? '可編輯' : '載入中'}</span>
+      <span data-testid="ready">{ready ? readOnly ? '僅供檢視' : '可編輯' : '載入中'}</span>
       <span data-testid="local-status">{local}</span>
-      <span data-testid="cloud-status">{cloud}</span>
-      <button onClick={() => { if (!provider.wsconnected && navigator.onLine) reconnect.current(); void window.probe?.flush(); }}>重試儲存</button>
+      <span data-testid="cloud-status">{readOnly ? '本機草稿已隔離' : cloud}</span>
+      {!readOnly && <button onClick={() => { if (!provider.wsconnected && navigator.onLine) reconnect.current(); void window.probe?.flush(); }}>重試儲存</button>}
     </div>
-    <details><summary>區塊操作</summary><div className="actions">
+    {!readOnly && <details><summary>區塊操作</summary><div className="actions">
       <button onClick={() => insert('paragraph')}>插入段落</button>
       <button onClick={() => { editor.moveBlocksUp(); editor.focus(); }}>上移區塊</button>
       <button onClick={() => { editor.moveBlocksDown(); editor.focus(); }}>下移區塊</button>
       <button onClick={() => { editor.removeBlocks([currentBlock()]); editor.focus(); }}>刪除區塊</button>
-    </div></details>
-    {title && <section className="image-upload" aria-label="圖片上傳">
+    </div></details>}
+    {title && !readOnly && <section className="image-upload" aria-label="圖片上傳">
       <label htmlFor="image-file">圖片檔案</label>{' '}
       <input id="image-file" type="file" accept={IMAGE_TYPES.join(',')} disabled={uploading} onChange={event => {
         setImage(event.target.files?.[0] ? { file: event.target.files[0] } : undefined); setImageError('');
@@ -181,11 +181,11 @@ export function Editor({ session, title }: { session: Session; title?: string })
         }
       }}>複製程式碼</button>
     </div>
-    <BlockNoteView editor={editor} theme="light" />
+    <BlockNoteView editor={editor} theme="light" editable={!readOnly} />
   </main>;
 }
 
-export async function start(scope?: string[], checkAccess?: Session['checkAccess'], localOnly = false): Promise<Session> {
+export async function start(scope?: string[], checkAccess?: Session['checkAccess'], localOnly = false, isolated = false): Promise<Session> {
   if (!checkAccess && !['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname)) throw new Error('原型只限本機');
   await navigator.serviceWorker.register('/sw.js');
   if (navigator.onLine) {
@@ -212,12 +212,12 @@ export async function start(scope?: string[], checkAccess?: Session['checkAccess
   const downloaded = await cache.get('downloaded');
   // shortcut: y-indexeddb 9.0.12 不回報寫入完成／錯誤；升級前重驗此掛鉤與 saveLocal。
   doc.off('update', cache._storeUpdate);
-  if ((!navigator.onLine || localOnly) && !downloaded) throw new Error('此頁尚未下載，請連線後再開啟');
+  if ((!navigator.onLine || localOnly || isolated) && !downloaded) throw new Error('此頁尚未下載，請連線後再開啟');
   const provider = new YProvider(checkAccess ? location.host : '127.0.0.1:8787', room, doc, {
     party: checkAccess ? 'sync' : 'rooms', connect: false, disableBc: true,
     ...(checkAccess ? { params: { page: scope[1], generation: scope[2] } } : {}),
   });
-  if (navigator.onLine && !localOnly) {
+  if (navigator.onLine && !localOnly && !isolated) {
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => { provider.disconnect(); reject(new Error('同步服務未連線')); }, 10000);
       provider.on('sync', (value: boolean) => { if (value) { clearTimeout(timer); resolve(); } });

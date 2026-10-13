@@ -1,0 +1,16 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/recovery.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/workers/recovery.test.ts (3 tests) 654ms
+   ✓ SYNC-10：被刪除或舊世代草稿另存為新根筆記，原日記與正文不變  331ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  01:30:45
+   Duration  4.25s (transform 1.26s, setup 0ms, import 2.95s, tests 654ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

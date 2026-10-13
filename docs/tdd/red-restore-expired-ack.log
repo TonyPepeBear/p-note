@@ -1,0 +1,46 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/restore.test.ts -t RESTORE-EXPIRED-ACK
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/restore.test.ts (9 tests | 1 failed | 8 skipped) 661ms
+   ↓ BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復
+   ↓ RESTORE-IDEMPOTENT-01：同請求確認遺失後重送不再換世代，也不覆蓋其後已保存的修改
+   ↓ RESTORE-ATOMIC-01：D1 batch 中途插入失敗回滾全部 metadata，不留下部分新世代
+   × RESTORE-EXPIRED-ACK-01：已完成請求的回應遺失，目標備份到期後仍能取得先前結果 661ms
+   ↓ RESTORE-PIN-01：到期清理在選取之後才出現還原引用，也不能刪除正在使用的備份
+   ↓ BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活
+   ↓ BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記
+   ↓ BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試
+   ↓ RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/restore.test.ts > RESTORE-EXPIRED-ACK-01：已完成請求的回應遺失，目標備份到期後仍能取得先前結果
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/restore.test.ts:73:116
+     71|   expect(await env.DB.prepare('SELECT id FROM backups WHERE id = ?').b…
+     72|   await abortAllDurableObjects();
+     73|   const replay = await f.auth.post(`/api/backups/${backup.id}/restore`…
+       |                                                                                                                    ^
+     74|   expect((await (await f.auth.get(`/api/pages/${f.journal.id}`)).json<…
+     75| }, 30000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  01:43:49
+   Duration  3.36s (transform 864ms, setup 0ms, import 2.02s, tests 661ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

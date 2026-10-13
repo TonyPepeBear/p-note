@@ -1,9 +1,11 @@
 import { roomName } from '../shared/room';
 import { today, validDate, type PageRow } from '../shared/pages';
-import { body } from './request';
+import { body, bytes } from './request';
+import * as Y from 'yjs';
 
 export const VISIBLE = `WITH RECURSIVE visible AS (
   SELECT * FROM pages WHERE owner_id = ? AND parent_id IS NULL AND deleted_at IS NULL
+    AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = pages.owner_id)
     AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE page_id = pages.id)
   UNION ALL SELECT child.* FROM pages child JOIN visible parent ON child.parent_id = parent.id AND child.owner_id = parent.owner_id
     WHERE child.deleted_at IS NULL AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE page_id = child.id)
@@ -54,7 +56,7 @@ async function trash(env: Env, owner: string, page: PageRow, action: 'delete' | 
     if ((action === 'delete') === (page.deleted_at !== null)) return json({ ok: true });
     const id = crypto.randomUUID();
     const inserted = await env.DB.batch([
-      env.DB.prepare(`${VISIBLE} INSERT INTO page_operations SELECT ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)
+      env.DB.prepare(`${VISIBLE} INSERT INTO page_operations SELECT ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
         AND EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND ${action === 'delete' ? 'id IN (SELECT id FROM visible)' : 'deleted_at IS NOT NULL AND (parent_id IS NULL OR parent_id IN (SELECT id FROM visible))'})`)
         .bind(owner, id, owner, page.id, action, now, owner, page.id, owner),
       env.DB.prepare(`${TREE} INSERT INTO page_operation_members SELECT ?, id, owner_id, sync_generation FROM subtree WHERE EXISTS (SELECT 1 FROM page_operations WHERE id = ?)`)
@@ -77,12 +79,31 @@ async function trash(env: Env, owner: string, page: PageRow, action: 'delete' | 
 
 export async function handlePages(request: Request, env: Env, owner: string, now: number): Promise<Response | null> {
   const url = new URL(request.url); const path = url.pathname; const db = env.DB;
+  const fork = path.match(/^\/api\/pages\/([\w-]{1,80})\/fork$/);
+  if (fork && request.method === 'POST') {
+    if (request.headers.get('Content-Type') !== 'application/octet-stream') fail(400, '請提供草稿正文');
+    const source = await db.prepare('SELECT owner_id, title FROM pages WHERE id = ?').bind(fork[1]).first<{ owner_id: string; title: string }>();
+    if (source && source.owner_id !== owner) fail(404, '找不到頁面');
+    const doc = new Y.Doc(); let data: Uint8Array;
+    try { Y.applyUpdate(doc, await bytes(request, 512 * 1024)); data = Y.encodeStateAsUpdate(doc); }
+    catch { return fail(400, '草稿內容無效或超過可保存大小；本機內容仍保留'); }
+    finally { doc.destroy(); }
+    const id = crypto.randomUUID(); const generation = crypto.randomUUID();
+    const room = env.SYNC.getByName(await roomName(owner, id, generation));
+    await room.prepare({ owner, page: id, generation }, data, 0); await room.resume();
+    const inserted = await db.prepare(`INSERT INTO pages (id, owner_id, kind, title, sync_generation, created_at, updated_at)
+      SELECT ?, ?, 'note', ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
+      .bind(id, owner, ((source?.title ?? '') + ' 本機草稿').trim().slice(0, 200), generation, now, now, owner).run();
+    if (!inserted.meta.changes) fail(409, '頁面變更處理中，草稿仍保留，請稍後重試');
+    await room.reindex({ owner, page: id, generation });
+    return pageResponse(env, owner, (await db.prepare('SELECT * FROM pages WHERE id = ?').bind(id).first<PageRow>())!);
+  }
   if ((path === '/api/today' && request.method === 'GET') || (path === '/api/journal' && request.method === 'POST')) {
     const date = path === '/api/today' ? today(now) : (await input(request)).date;
     if (typeof date !== 'string' || !validDate(date)) fail(400, '請選擇有效日期');
-    if (await db.prepare('SELECT 1 FROM page_operations WHERE owner_id = ?').bind(owner).first()) fail(409, '頁面變更處理中，請先重試原操作');
+    if (await db.prepare('SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?').bind(owner).first()) fail(409, '頁面變更處理中，請先重試原操作');
     await db.prepare(`INSERT INTO pages (id, owner_id, kind, title, journal_date, sync_generation, created_at, updated_at)
-      SELECT ?, ?, 'journal', ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?) ON CONFLICT(owner_id, journal_date) DO NOTHING`)
+      SELECT ?, ?, 'journal', ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?) ON CONFLICT(owner_id, journal_date) DO NOTHING`)
       .bind(crypto.randomUUID(), owner, date, date, crypto.randomUUID(), now, now, owner).run();
     const page = await db.prepare('SELECT * FROM pages WHERE owner_id = ? AND journal_date = ?').bind(owner, date).first<PageRow>();
     if (!page) fail(409, '頁面變更處理中，請重試');
@@ -91,7 +112,7 @@ export async function handlePages(request: Request, env: Env, owner: string, now
   if (path === '/api/pages' && request.method === 'POST') {
     const data = await input(request); const name = title(data.title); const parentId = parent(data.parent_id); const id = crypto.randomUUID();
     const created = await db.prepare(`${VISIBLE} INSERT INTO pages (id, owner_id, kind, title, parent_id, sync_generation, created_at, updated_at)
-      SELECT ?, ?, 'note', ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)
+      SELECT ?, ?, 'note', ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
       AND (? IS NULL OR ? IN (SELECT id FROM visible WHERE kind = 'note'))`)
       .bind(owner, id, owner, name, parentId, crypto.randomUUID(), now, now, owner, parentId, parentId).run();
     if (!created.meta.changes) fail(409, '上層無效或頁面變更處理中');
@@ -122,14 +143,14 @@ export async function handlePages(request: Request, env: Env, owner: string, now
   if (request.method !== 'POST' || !action) return null;
   if (action === 'delete' || action === 'restore') return trash(env, owner, page!, action, now);
   const data = await input(request); let changed: D1Result;
-  if (action === 'title') changed = await db.prepare(`${VISIBLE} UPDATE pages SET title = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`)
+  if (action === 'title') changed = await db.prepare(`${VISIBLE} UPDATE pages SET title = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
     .bind(owner, title(data.title), now, id, owner, owner).run();
   else {
     if (!('parent_id' in data)) fail(400, '請選擇移動目標；最上層需明確指定');
     const parentId = parent(data.parent_id);
     changed = await db.prepare(`${VISIBLE}, descendants AS (SELECT id FROM pages WHERE id = ? AND owner_id = ? UNION SELECT child.id FROM pages child JOIN descendants ON child.parent_id = descendants.id)
       UPDATE pages SET parent_id = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND kind = 'note' AND id IN (SELECT id FROM visible)
-      AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)
+      AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
       AND (? IS NULL OR (? IN (SELECT id FROM visible WHERE kind = 'note') AND ? NOT IN (SELECT id FROM descendants)))`)
       .bind(owner, id, owner, parentId, now, id, owner, owner, parentId, parentId, parentId).run();
   }

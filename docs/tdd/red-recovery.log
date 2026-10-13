@@ -1,0 +1,234 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/recovery.spec.ts
+
+[WebServer] (node:38465) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:38511) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (7.0s)
+(node:38523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.7s)
+(node:38533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.7s)
+(node:38602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.6s)
+(node:38639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.9s)
+(node:38656) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.6s)
+
+
+  1) [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ─
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ──
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '檢視本機草稿', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '檢視本機草稿', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '檢視本機草稿', exact: true })
+
+
+      21 |     expect(response.status()).toBe(200);
+      22 |     await page.context().setOffline(false);
+    > 23 |     await expect(page.getByRole('button', { name: '檢視本機草稿', exact: true })).toBeVisible();
+         |                                                                             ^
+      24 |     // 刷新後不能只依賴舊分頁的記憶體或 sessionStorage 世代。
+      25 |     await page.evaluate(() => sessionStorage.removeItem('p-note-scope')); await page.reload();
+      26 |     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:23:77
+
+    Error Context: test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ──
+    [chromium-desktop] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+    [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ───
+    [chromium-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+    [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ─────
+    [webkit-mobile] › tests/e2e/recovery.spec.ts:6:54 › SYNC-11／BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 

@@ -1,0 +1,50 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/restore.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+uncaught exception; source = Uncaught (in promise); stack = Error: D1_ERROR: 測試原子切換中斷: SQLITE_CONSTRAINT (extended: SQLITE_CONSTRAINT_TRIGGER)
+    at D1DatabaseSessionAlwaysPrimary._sendOrThrow (cloudflare-internal:d1-api:188:19)
+    at async cloudflare-internal:d1-api:137:19
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:86:7)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:120:150
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:61:77)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:126:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:66:16)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:126:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:87:12)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:126:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:102:10)
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份未完成或校驗失敗，原成功備份保留
+    at fail (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/backups.ts:13:35)
+    at readFile (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/backups.ts:28:57)
+    at RestoreCoordinator.verified (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:25:21)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:46:20)
+ ✓ tests/workers/restore.test.ts (8 tests) 5069ms
+   ✓ BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復  570ms
+   ✓ RESTORE-IDEMPOTENT-01：同請求確認遺失後重送不再換世代，也不覆蓋其後已保存的修改  528ms
+   ✓ RESTORE-ATOMIC-01：D1 batch 中途插入失敗回滾全部 metadata，不留下部分新世代  463ms
+   ✓ RESTORE-PIN-01：到期清理在選取之後才出現還原引用，也不能刪除正在使用的備份  384ms
+   ✓ BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活  456ms
+   ✓ BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記  430ms
+   ✓ BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試  1844ms
+   ✓ RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件  393ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  19:35:52
+   Duration  7.87s (transform 924ms, setup 0ms, import 2.13s, tests 5.07s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

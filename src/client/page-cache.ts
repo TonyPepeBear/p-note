@@ -2,6 +2,7 @@ import type { PageInfo } from '../shared/pages';
 import { today } from '../shared/pages';
 
 export function rememberPage(page: PageInfo) {
+  localStorage.setItem(`p-note:scope:${page.owner_id}:${page.id}:${page.sync_generation}`, JSON.stringify(page));
   localStorage.setItem(`p-note:page:${page.owner_id}:${page.id}`, JSON.stringify(page));
   if (page.kind === 'journal') localStorage.setItem(`p-note:date:${page.owner_id}:${page.journal_date}`, page.id);
   localStorage.setItem('p-note:owner', page.owner_id);

@@ -1,0 +1,48 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/recovery.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/recovery.test.ts (2 tests | 2 failed) 222ms
+   × SYNC-10／SYNC-11：被刪除與舊世代草稿另存為新根筆記，原日記與正文不變 165ms
+   × FORK-GUARD-01：正文無效或發布中斷不能留下空筆記，來源與他人頁面不可變更 56ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/recovery.test.ts > SYNC-10／SYNC-11：被刪除與舊世代草稿另存為新根筆記，原日記與正文不變
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/recovery.test.ts:21:27
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/workers/recovery.test.ts > FORK-GUARD-01：正文無效或發布中斷不能留下空筆記，來源與他人頁面不可變更
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ tests/workers/recovery.test.ts:33:63
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  01:28:20
+   Duration  2.74s (transform 842ms, setup 0ms, import 2.02s, tests 222ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json
