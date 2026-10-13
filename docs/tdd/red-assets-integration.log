@@ -1,0 +1,122 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/assets.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/assets.test.ts (5 tests | 5 failed) 714ms
+   × ASSET-01：已知 ID 仍要求登入／所有權，拒絕偽造來源與撤銷 session 146ms
+   × ASSET-02：串流中斷／R2 寫入／D1 索引失敗不回傳正式引用，可重試 133ms
+   × ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕 137ms
+   × ASSET-04：垃圾桶／還原與移除引用保留相同原檔及穩定 ID 114ms
+   × EDIT-03：真正 Yjs 持久引用重啟後仍為同一原檔，第二讀取不依賴短期 URL 184ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/assets.test.ts > ASSET-01：已知 ID 仍要求登入／所有權，拒絕偽造來源與撤銷 session
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ upload tests/workers/assets.test.ts:19:27
+     17| async function upload(bytes = images.png, mime = 'image/png', name?: s…
+     18|   const response = await app('/api/assets', uploadRequest(bytes, mime,…
+     19|   expect(response.status).toBe(201); return response.json<Asset>();
+       |                           ^
+     20| }
+     21| async function hash(bytes: ArrayBuffer | Uint8Array) { return Array.fr…
+ ❯ tests/workers/assets.test.ts:32:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/workers/assets.test.ts > ASSET-02：串流中斷／R2 寫入／D1 索引失敗不回傳正式引用，可重試
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ tests/workers/assets.test.ts:52:61
+     50|   const broken = new ReadableStream<Uint8Array>({ start(controller) { …
+     51|   const interrupted = new Request(uploadRequest(), { body: broken });
+     52|   expect((await handle(interrupted, env, services)).status).toBe(400);
+       |                                                             ^
+     53|   const put = vi.spyOn(env.ASSETS, 'put').mockRejectedValueOnce(new Er…
+     54|   const failed = await handle(uploadRequest(), env, services); expect(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/workers/assets.test.ts > ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ upload tests/workers/assets.test.ts:19:27
+     17| async function upload(bytes = images.png, mime = 'image/png', name?: s…
+     18|   const response = await app('/api/assets', uploadRequest(bytes, mime,…
+     19|   expect(response.status).toBe(201); return response.json<Asset>();
+       |                           ^
+     20| }
+     21| async function hash(bytes: ArrayBuffer | Uint8Array) { return Array.fr…
+ ❯ tests/workers/assets.test.ts:81:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/workers/assets.test.ts > ASSET-04：垃圾桶／還原與移除引用保留相同原檔及穩定 ID
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ upload tests/workers/assets.test.ts:19:27
+     17| async function upload(bytes = images.png, mime = 'image/png', name?: s…
+     18|   const response = await app('/api/assets', uploadRequest(bytes, mime,…
+     19|   expect(response.status).toBe(201); return response.json<Asset>();
+       |                           ^
+     20| }
+     21| async function hash(bytes: ArrayBuffer | Uint8Array) { return Array.fr…
+ ❯ tests/workers/assets.test.ts:104:105
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/workers/assets.test.ts > EDIT-03：真正 Yjs 持久引用重啟後仍為同一原檔，第二讀取不依賴短期 URL
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ upload tests/workers/assets.test.ts:19:27
+     17| async function upload(bytes = images.png, mime = 'image/png', name?: s…
+     18|   const response = await app('/api/assets', uploadRequest(bytes, mime,…
+     19|   expect(response.status).toBe(201); return response.json<Asset>();
+       |                           ^
+     20| }
+     21| async function hash(bytes: ArrayBuffer | Uint8Array) { return Array.fr…
+ ❯ tests/workers/assets.test.ts:115:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  15:33:14
+   Duration  9.30s (transform 2.70s, setup 0ms, import 6.21s, tests 714ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

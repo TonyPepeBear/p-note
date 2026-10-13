@@ -1,0 +1,142 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/assets.spec.ts --project=chromium-desktop --timeout=7000
+
+[WebServer] (node:21322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:21359) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/assets.spec.ts:21:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 (7.1s)
+(node:21419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/assets.spec.ts:33:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 (7.1s)
+(node:21469) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/assets.spec.ts:44:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 (7.1s)
+(node:21542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/assets.spec.ts:58:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API (7.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/assets.spec.ts:21:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 ───────
+
+    Test timeout of 7000ms exceeded.
+
+    Error: locator.setInputFiles: Test timeout of 7000ms exceeded.
+    Call log:
+      - waiting for getByLabel('圖片檔案', { exact: true })
+
+
+      22 |   await login(page, request);
+      23 |   await page.route('**/api/assets', route => route.abort('failed'));
+    > 24 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
+         |   ^
+      25 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+      26 |   await expect(page.getByRole('alert')).toContainText('上傳失敗'); expect(await urls(page)).toEqual([]);
+      27 |   await expect(page.getByRole('button', { name: '重試上傳', exact: true })).toBeVisible();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:24:3
+
+    Error Context: test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/assets.spec.ts:33:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 ───────────
+
+    Test timeout of 7000ms exceeded.
+
+    Error: locator.setInputFiles: Test timeout of 7000ms exceeded.
+    Call log:
+      - waiting for getByLabel('圖片檔案', { exact: true })
+
+
+      12 | const urls = (page: Page) => page.evaluate(() => window.probe!.editor.document.flatMap(block => block.type === 'image' && block.props.url ? [block.props.url] : []));
+      13 | async function insert(page: Page) {
+    > 14 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
+         |   ^
+      15 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+      16 |   await expect.poll(() => urls(page)).toHaveLength(1); await saved(page);
+      17 |   return (await urls(page))[0];
+        at insert (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:14:3)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:34:43
+
+    Error Context: test-results/assets-ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/assets.spec.ts:44:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 ───
+
+    Test timeout of 7000ms exceeded.
+
+    Error: locator.setInputFiles: Test timeout of 7000ms exceeded.
+    Call log:
+      - waiting for getByLabel('圖片檔案', { exact: true })
+
+
+      12 | const urls = (page: Page) => page.evaluate(() => window.probe!.editor.document.flatMap(block => block.type === 'image' && block.props.url ? [block.props.url] : []));
+      13 | async function insert(page: Page) {
+    > 14 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
+         |   ^
+      15 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+      16 |   await expect.poll(() => urls(page)).toHaveLength(1); await saved(page);
+      17 |   return (await urls(page))[0];
+        at insert (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:14:3)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:45:43
+
+    Error Context: test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/assets.spec.ts:58:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API 
+
+    Test timeout of 7000ms exceeded.
+
+    Error: locator.setInputFiles: Test timeout of 7000ms exceeded.
+    Call log:
+      - waiting for getByLabel('圖片檔案', { exact: true })
+
+
+      58 | test('ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API', async ({ page, request }) => {
+      59 |   await login(page, request);
+    > 60 |   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '偽造.png', mimeType: 'image/png', buffer: Buffer.from('<svg/>') });
+         |   ^
+      61 |   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+      62 |   await expect(page.getByRole('alert')).toContainText('圖片'); expect(await urls(page)).toEqual([]);
+      63 |   await page.evaluate(async base64 => {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:60:3
+
+    Error Context: test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium-desktop] › tests/e2e/assets.spec.ts:21:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 ────────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:33:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 ────────────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:44:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 ────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:58:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API 
