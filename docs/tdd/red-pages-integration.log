@@ -1,0 +1,131 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/pages.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/pages.test.ts (8 tests | 7 failed) 477ms
+   ✓ PAGE-01：今日入口沿用已保存日記與世代，不重建正文 153ms
+   × PAGE-02：併發建立同日期取得同一日記與房間 49ms
+   × PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確 79ms
+   × PAGE-04：根筆記／子頁可編輯，列表與路徑保留所有權，標題不改世代 36ms
+   × PAGE-05：拒絕自己／子孫／他人／刪除／不存在上層，併發互移不形成循環 35ms
+   × PAGE-06：刪除／還原上層保留正文與 R2，先前單獨刪除子頁不復活且活躍連線停止 53ms
+   × PAGE-07：日期在垃圾桶時提供原 ID 還原，重試不另建日記 36ms
+   × PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他人，索引不改正文 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-02：併發建立同日期取得同一日記與房間
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:58:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:65:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-04：根筆記／子頁可編輯，列表與路徑保留所有權，標題不改世代
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:80:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-05：拒絕自己／子孫／他人／刪除／不存在上層，併發互移不形成循環
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:93:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-06：刪除／還原上層保留正文與 R2，先前單獨刪除子頁不復活且活躍連線停止
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:108:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-07：日期在垃圾桶時提供原 ID 還原，重試不另建日記
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:129:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他人，索引不改正文
+AssertionError: Not found: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ result tests/workers/pages.test.ts:14:139
+
+ ❯ tests/workers/pages.test.ts:140:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 1 passed (8)
+   Start at  14:28:26
+   Duration  5.97s (transform 1.01s, setup 0ms, import 2.21s, tests 477ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

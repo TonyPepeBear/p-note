@@ -1,0 +1,205 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/pages.spec.ts --project=chromium-desktop --timeout=6000
+
+[WebServer] (node:7775) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:8186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/pages.spec.ts:29:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 (6.0s)
+(node:8253) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/pages.spec.ts:39:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 (6.1s)
+(node:8293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/pages.spec.ts:56:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 (6.1s)
+(node:8319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/pages.spec.ts:74:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 (6.3s)
+(node:8353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [chromium-desktop] › tests/e2e/pages.spec.ts:95:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 (6.1s)
+(node:8396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 [chromium-desktop] › tests/e2e/pages.spec.ts:107:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 (6.3s)
+
+
+  1) [chromium-desktop] › tests/e2e/pages.spec.ts:29:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 ──────────────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.click: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '今天', exact: true })
+
+
+      30 |   await login(page, request); const id = new URL(page.url()).searchParams.get('page');
+      31 |   await text(page, '今天的原內容');
+    > 32 |   await page.getByRole('button', { name: '今天', exact: true }).click();
+         |                                                               ^
+      33 |   await expect(page.locator('.tiptap')).toContainText('今天的原內容');
+      34 |   expect(new URL(page.url()).searchParams.get('page')).toBe(id);
+      35 |   const journals = await (await page.request.get('/api/journals')).json() as PageInfo[];
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:32:63
+
+    Error Context: test-results/pages-PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/pages.spec.ts:39:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 ───────────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.fill: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByLabel('日記日期', { exact: true })
+
+
+      39 | test('PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期', async ({ page, request }) => {
+      40 |   await login(page, request);
+    > 41 |   await page.getByLabel('日記日期', { exact: true }).fill('2024-02-29');
+         |                                                  ^
+      42 |   await page.getByRole('button', { name: '開啟日期日記', exact: true }).click();
+      43 |   await saved(page); const original = new URL(page.url()).searchParams.get('page');
+      44 |   await text(page, '補寫二月的日記');
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:41:50
+
+    Error Context: test-results/pages-PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/pages.spec.ts:56:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 ─────────────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.focus: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '新增筆記', exact: true })
+
+
+      57 |   await login(page, request);
+      58 |   const add = page.getByRole('button', { name: '新增筆記', exact: true });
+    > 59 |   if (isMobile) await add.tap(); else { await add.focus(); await add.press('Enter'); }
+         |                                                   ^
+      60 |   await saved(page); const parent = new URL(page.url()).searchParams.get('page')!;
+      61 |   await page.getByLabel('頁面標題', { exact: true }).fill('我的上層'); await page.getByRole('button', { name: '儲存標題', exact: true }).click();
+      62 |   await menu(page);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:59:51
+
+    Error Context: test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/pages.spec.ts:74:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 ──────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.click: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByText('頁面操作', { exact: true })
+
+
+      22 |   await saved(page);
+      23 | }
+    > 24 | async function menu(page: Page) { await page.getByText('頁面操作', { exact: true }).click(); }
+         |                                                                                 ^
+      25 | test.beforeEach(async ({ request }) => {
+      26 |   await request.post('/__test/reset'); await request.post('/__test/control', { data: { now: Date.now() + 86400000 } });
+      27 | });
+        at menu (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:24:81)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:82:42
+
+    Error Context: test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/pages.spec.ts:95:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 ────────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.fill: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByLabel('日記日期', { exact: true })
+
+
+       95 | test('PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變', async ({ page, request }) => {
+       96 |   await login(page, request);
+    >  97 |   await page.getByLabel('日記日期', { exact: true }).fill('2024-01-01'); await page.getByRole('button', { name: '開啟日期日記', exact: true }).click();
+          |                                                  ^
+       98 |   await saved(page); const id = new URL(page.url()).searchParams.get('page')!; await text(page, '原日記內容');
+       99 |   await menu(page); await page.getByRole('button', { name: '移到垃圾桶', exact: true }).click();
+      100 |   await page.getByLabel('日記日期', { exact: true }).fill('2024-01-01'); await page.getByRole('button', { name: '開啟日期日記', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:97:50
+
+    Error Context: test-results/pages-PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與-ID-不變-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與-ID-不變-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與-ID-不變-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-desktop] › tests/e2e/pages.spec.ts:107:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 ──────────────
+
+    Test timeout of 6000ms exceeded.
+
+    Error: locator.fill: Test timeout of 6000ms exceeded.
+    Call log:
+      - waiting for getByLabel('搜尋文字', { exact: true })
+
+
+      110 |   await page.request.post(`/api/pages/${parent.id}/delete`, { headers: { Origin: 'http://127.0.0.1:5173' }, data: {} });
+      111 |   await expect.poll(async () => (await (await page.request.get('/api/search?q=' + encodeURIComponent('中文內容'))).json() as PageInfo[]).map(item => item.id)).toEqual([target.id]);
+    > 112 |   await page.getByLabel('搜尋文字', { exact: true }).fill('中文內容'); await page.getByRole('button', { name: '搜尋', exact: true }).click();
+          |                                                  ^
+      113 |   const results = page.getByRole('region', { name: '搜尋結果' });
+      114 |   await expect(results.getByRole('link')).toHaveCount(1);
+      115 |   await results.getByRole('link', { name: '搜尋目標', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:112:50
+
+    Error Context: test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium-desktop] › tests/e2e/pages.spec.ts:29:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 ───────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:39:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 ────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:56:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 ──────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:74:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 ───────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:95:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 ─────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:107:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 ───────────────
