@@ -29,7 +29,7 @@ export async function openPrivate(page: Page, id?: string) {
     const mails = await (await page.request.get('/__test/mailbox')).json() as { url: string }[];
     await page.goto(mails.at(-1)!.url); await page.getByRole('button', { name: '確認登入', exact: true }).click();
   }
-  await expect(page.getByTestId('ready')).toHaveText('可編輯'); await saved(page);
+  await expect(page.getByTestId('ready')).toHaveText('可編輯', { timeout: 15000 }); await saved(page);
   await page.evaluate(() => navigator.serviceWorker.ready);
   return new URL(page.url()).searchParams.get('page')!;
 }

@@ -4,6 +4,8 @@ import { runInDurableObject } from 'cloudflare:test';
 import * as Y from 'yjs';
 import { toBase64 } from 'lib0/buffer';
 import type { PageInfo } from '../../src/shared/pages';
+import type { ProbeRoom } from '../../src/worker/index';
+import type { SyncRoom } from '../../src/worker/sync-room';
 
 export const origin = 'http://127.0.0.1:5173';
 export async function authenticated() {
@@ -11,7 +13,8 @@ export async function authenticated() {
   const get = (path: string) => exports.default.fetch(origin + path, { headers: { Cookie: cookie } });
   const post = (path: string, data: object) => exports.default.fetch(origin + path, { method: 'POST', headers: { Origin: origin, Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
   await get('/health'); const now = Date.now() + 86400000; await post('/__test/control', { now });
-  expect((await post('/api/login', { email: 'owner@example.test' })).status).toBe(200);
+  const requested = await post('/api/login', { email: 'owner@example.test' });
+  expect(requested.status, JSON.stringify((await env.DB.prepare('SELECT * FROM auth_requests').all()).results)).toBe(200);
   const mails = await (await get('/__test/mailbox')).json<{ url: string }[]>();
   const confirmed = await post('/api/confirm', { token: new URL(mails.at(-1)!.url).searchParams.get('token') });
   expect(confirmed.status).toBe(200); cookie = confirmed.headers.get('set-cookie')!.split(';')[0];
@@ -34,8 +37,9 @@ export async function commit(client: Awaited<ReturnType<typeof connect>>, doc: Y
     expect(raw).toBeDefined(); reply = JSON.parse((raw as string).slice(6));
   }); return reply!;
 }
-export async function persisted(client: Awaited<ReturnType<typeof connect>>) {
-  const bytes = await runInDurableObject(client.stub, async instance => {
+export async function persisted(client: { stub: ReturnType<typeof env.ROOMS.getByName> | ReturnType<typeof env.SYNC.getByName> }) {
+  const bytes = await runInDurableObject<ProbeRoom | SyncRoom, Uint8Array>(env.SYNC.getByName(client.stub.id.name!), async (instance, state) => {
+    await instance.setName(state.id.name!);
     const doc = await instance.onLoad(); try { return Y.encodeStateAsUpdate(doc); } finally { doc.destroy(); }
   });
   const doc = new Y.Doc(); Y.applyUpdate(doc, bytes); return doc;

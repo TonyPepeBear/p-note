@@ -77,6 +77,9 @@ export function Editor({ session, title }: { session: Session; title?: string })
       }
     };
     const foreground = () => { if (document.visibilityState === 'visible' && navigator.onLine && session.checkAccess) online(); };
+    const resized = () => requestAnimationFrame(() => {
+      if (!disposed && editor.prosemirrorView.hasFocus()) editor.prosemirrorView.dispatch(editor.prosemirrorView.state.tr.scrollIntoView());
+    });
     doc.on('update', update);
     provider.on('sync', synced);
     provider.on('custom-message', receipt);
@@ -84,6 +87,8 @@ export function Editor({ session, title }: { session: Session; title?: string })
     window.addEventListener('offline', offline);
     window.addEventListener('online', online);
     window.addEventListener('focus', foreground);
+    window.addEventListener('resize', resized);
+    window.visualViewport?.addEventListener('resize', resized);
     document.addEventListener('visibilitychange', foreground);
     window.probe = { editor, doc, provider, cache, flush, localState: () => readLocal(cache), room };
     setReady(true);
@@ -97,6 +102,8 @@ export function Editor({ session, title }: { session: Session; title?: string })
       window.removeEventListener('offline', offline);
       window.removeEventListener('online', online);
       window.removeEventListener('focus', foreground);
+      window.removeEventListener('resize', resized);
+      window.visualViewport?.removeEventListener('resize', resized);
       document.removeEventListener('visibilitychange', foreground);
       delete window.probe;
     };
@@ -147,8 +154,8 @@ export function Editor({ session, title }: { session: Session; title?: string })
       <p>{IMAGE_RULE}，保留原圖不壓縮。</p>
       {imageError && <p role="alert">{imageError}</p>}
     </section>}
-    {!title && <div className="actions">
-      <button onClick={() => insert('image')}>插入測試圖片</button>
+    <div className="actions">
+      {!title && <button onClick={() => insert('image')}>插入測試圖片</button>}
       <button onClick={() => {
         const block = currentBlock();
         if (block.type === 'codeBlock') {
@@ -156,13 +163,13 @@ export function Editor({ session, title }: { session: Session; title?: string })
           void navigator.clipboard.writeText(code).catch(() => setCloud('複製失敗'));
         }
       }}>複製程式碼</button>
-    </div>}
+    </div>
     <BlockNoteView editor={editor} theme="light" />
   </main>;
 }
 
 export async function start(scope?: string[], checkAccess?: Session['checkAccess']): Promise<Session> {
-  if (!['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname)) throw new Error('原型只限本機');
+  if (!checkAccess && !['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname)) throw new Error('原型只限本機');
   await navigator.serviceWorker.register('/sw.js');
   const params = new URLSearchParams(location.search);
   scope ??= ['owner', 'page', 'generation'].map((name, index) => params.get(name) ?? ['owner', 'default', 'g1'][index]);
