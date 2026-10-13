@@ -2,6 +2,10 @@
 
 此文件保留本機技術驗證、資料結構／登入、頁面／日記與私有圖片 TDD 證據。ASSET-05 的成功備份清理、覆蓋還原世代切換、90 天備份與完整正式同步驗收仍未完成，OpenSpec change 不封存。
 
+## 第六階段：正式離線與重連
+
+OpenSpec 6.1／6.2 已完成。有效 Red／Green／Refactor、本機索引邊界、退避與每次權限重驗、182 個完整回歸結果見 [正式離線開發](../offline-development.md)。世代復原介面與備份／還原仍在進行。
+
 ## 第五階段：正式編輯器
 
 OpenSpec 5.5／5.6 已完成。有效 Red／Green／Refactor、72 個相關瀏覽器結果、51 個 Workers 回歸及 EDIT 17／17 追蹤見 [正式編輯器開發](../editor-development.md)。同步／備份／完整產品驗收仍在進行，不封存或部署。
