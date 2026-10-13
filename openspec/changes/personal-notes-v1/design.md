@@ -162,4 +162,4 @@ magic link 憑證雜湊保存、單次原子消耗、10 分鐘有效；郵件連
 
 沿用 assets 表與私有 ASSETS R2，不新增套件／雲端資源、不部署。POST /api/assets 接收有界原始檔案串流及編碼檔名；驗證實際檔案結構與 MIME／大小後，以不可覆寫的隨機 ID 寫入 R2，最後寫入 D1 索引。任何階段失敗均不回傳正式引用；跨儲存中斷留下的未引用物件保留，不做永久清理。GET /api/assets/:id 每次以 session owner 驗證索引，再讀原檔；使用 no-store／nosniff，不交给公開 bucket 或短期 URL。
 
-BlockNote uploadFile 與可觸控／鍵盤操作的圖片選取入口共用上傳函式。只有成功後插入穩定 /api/assets/:id；失敗保留所選檔案及重試按鈕，不改正文。圖片刪除、頁面垃圾桶／還原均不刪原檔。備份清理 ASSET-05 的階段歸屬待釐清，不以圖片保留 fixture 宣稱備份已完成。
+BlockNote uploadFile 與可觸控／鍵盤操作的圖片選取入口共用上傳函式。只有成功後插入穩定 /api/assets/:id；失敗保留所選檔案及重試按鈕，不改正文。圖片刪除、頁面垃圾桶／還原均不刪原檔。使用者已確認備份清理 ASSET-05 留待 7.1，不以圖片保留 fixture 宣稱備份已完成。
