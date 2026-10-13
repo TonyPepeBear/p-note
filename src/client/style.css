@@ -1,0 +1,10 @@
+body { margin: 0; color: #243042; background: #f8fafc; font-family: system-ui, sans-serif; }
+main { max-width: 900px; margin: auto; padding: 16px; }
+h1 { font-size: 1.4rem; }
+.status, .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+button, summary { min-height: 44px; cursor: pointer; }
+button { padding: 8px 12px; border: 1px solid #94a3b8; border-radius: 6px; background: white; }
+summary { display: list-item; padding: 8px; }
+.bn-container { background: white; padding: 12px 0; border-radius: 8px; }
+.bn-editor { padding-inline: 24px !important; }
+@media (max-width: 600px) { main { padding: 8px; } .bn-editor { padding-inline: 16px !important; } }

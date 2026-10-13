@@ -23,10 +23,10 @@
 | 決策 | 狀態與界線 |
 | --- | --- |
 | React＋Vite | 已選定；TypeScript 為開發語言 |
-| BlockNote | 優先評估，尚未完成手機、中文輸入與同步驗證 |
+| BlockNote | 0.55.0 已通過本機自動化技術驗證，採用為第一版編輯器；原生 OS 與正式服務仍在後續範圍 |
 | Better Auth＋magic link | 已選定方向，不使用 Cloudflare Access |
 | Yjs | 已納入第一版，不再以整篇 JSON 版本衝突作為內文同步主方案 |
-| Durable Objects＋y-partyserver | 已選定同步後端方向，持久化掛鉤與確認訊息仍待驗證 |
+| Durable Objects＋y-partyserver | 已選定同步後端方向，保存適配、確認、重啟及整理已通過本機測試；正式權限／世代操作仍待完成 |
 | Cloudflare | 專案要求優先使用 Cloudflare，以 Workers Paid plan 為前提 |
 | 開發與驗收 | 依新 AGENTS.md 使用 TDD、全自動驗收、規格修改及開發完成後自動提交 |
 
@@ -95,7 +95,11 @@
 
 工具方向為 Vitest、Cloudflare 官方 Workers 整合及 Playwright。人工檢視、實際手機操作、人工收信與手動還原都不作為驗收門檻；手機模擬與中文事件的覆蓋限制明確記錄，不能宣稱等於原生 OS 輸入法。
 
-詳細契約見 [自動化驗證計畫](automated-validation.md)。規格修改後與完成開發後各自自動提交相關檔案；先提交確認後規格，再進行已授權的技術驗證。
+詳細契約見 [自動化驗證計畫](automated-validation.md)。規格修改後與完成開發後各自自動提交相關檔案；先提交確認後規格，再完成已授權的技術驗證。
+
+## 本次技術驗證結果
+
+已完成 49 個自動化結果（單元 4、Workers 12、桌面／手機 E2E 33），原型追蹤要求的 40 個結果全部通過。BlockNote 採用、持久確認／重啟／整理與已下載內文離線刷新重連已有證據。正式 47 個產品情境尚未完成；V3、V4 仍未執行。詳見 [TDD 結果與限制](tdd/README.md)。
 
 ## 暫不規劃
 

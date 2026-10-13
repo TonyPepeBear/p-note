@@ -1,0 +1,41 @@
+
+> p-note@0.0.0 test:unit
+> vitest run --config vitest.unit.config.ts
+
+
+ RUN  v5.0.4 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/unit/environment.test.ts (1 test) 2ms
+ ❯ tests/unit/coverage.test.ts (1 test | 1 failed) 3ms
+   × ENV-05：未執行、缺漏、重複、skip／todo／失敗不能算覆蓋 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/coverage.test.ts > ENV-05：未執行、缺漏、重複、skip／todo／失敗不能算覆蓋
+AssertionError: expected [] to deeply equal [ '缺漏 SYNC-02' ]
+
+- Expected
++ Received
+
+- [
+-   "缺漏 SYNC-02",
+- ]
++ []
+
+ ❯ tests/unit/coverage.test.ts:5:42
+      3|
+      4| it('ENV-05：未執行、缺漏、重複、skip／todo／失敗不能算覆蓋', () => {
+      5|   expect(checkCoverage(['SYNC-02'], [])).toEqual(['缺漏 SYNC-02']);
+       |                                          ^
+      6|   for (const status of ['skipped', 'pending', 'todo', 'failed']) {
+      7|     expect(checkCoverage(['SYNC-02'], [{ id: 'SYNC-02', status }])).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:18:13
+   Duration  72ms (transform 46%, import 25%, tests 17%, worker 11%)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/unit.json

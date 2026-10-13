@@ -1,0 +1,177 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/editor.spec.ts --project chromium-desktop
+
+[WebServer] (node:74535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:74583) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/editor.spec.ts:23:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (398ms)
+(node:74593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/editor.spec.ts:46:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (215ms)
+(node:74598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/editor.spec.ts:65:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (228ms)
+(node:74605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/editor.spec.ts:80:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (177ms)
+(node:74610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [chromium-desktop] › tests/e2e/editor.spec.ts:106:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (186ms)
+
+
+  1) [chromium-desktop] › tests/e2e/editor.spec.ts:23:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 ────────────
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+       5 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+       6 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    >  7 |   expect(await page.locator('.tiptap[contenteditable="true"]').count(), '須建立真正 BlockNote 編輯器').toBe(1);
+         |                                                                                                ^
+       8 |   await page.evaluate(() => navigator.serviceWorker.ready);
+       9 |   await page.reload();
+      10 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:7:96)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:24:3
+
+    Error Context: test-results/editor-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/editor.spec.ts:46:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 ─────────
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+       5 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+       6 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    >  7 |   expect(await page.locator('.tiptap[contenteditable="true"]').count(), '須建立真正 BlockNote 編輯器').toBe(1);
+         |                                                                                                ^
+       8 |   await page.evaluate(() => navigator.serviceWorker.ready);
+       9 |   await page.reload();
+      10 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:7:96)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:47:3
+
+    Error Context: test-results/editor-PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/editor.spec.ts:65:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 ───────
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+       5 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+       6 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    >  7 |   expect(await page.locator('.tiptap[contenteditable="true"]').count(), '須建立真正 BlockNote 編輯器').toBe(1);
+         |                                                                                                ^
+       8 |   await page.evaluate(() => navigator.serviceWorker.ready);
+       9 |   await page.reload();
+      10 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:7:96)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:66:16
+
+    Error Context: test-results/editor-PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/editor.spec.ts:80:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+       5 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+       6 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    >  7 |   expect(await page.locator('.tiptap[contenteditable="true"]').count(), '須建立真正 BlockNote 編輯器').toBe(1);
+         |                                                                                                ^
+       8 |   await page.evaluate(() => navigator.serviceWorker.ready);
+       9 |   await page.reload();
+      10 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:7:96)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:81:3
+
+    Error Context: test-results/editor-PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/editor.spec.ts:106:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+       5 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+       6 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    >  7 |   expect(await page.locator('.tiptap[contenteditable="true"]').count(), '須建立真正 BlockNote 編輯器').toBe(1);
+         |                                                                                                ^
+       8 |   await page.evaluate(() => navigator.serviceWorker.ready);
+       9 |   await page.reload();
+      10 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:7:96)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:107:16
+
+    Error Context: test-results/editor-PROBE-EDIT-05：中文-composition、換行與游標在另一端同步-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-PROBE-EDIT-05：中文-composition、換行與游標在另一端同步-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-PROBE-EDIT-05：中文-composition、換行與游標在另一端同步-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    [chromium-desktop] › tests/e2e/editor.spec.ts:23:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 ─────────────
+    [chromium-desktop] › tests/e2e/editor.spec.ts:46:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 ──────────
+    [chromium-desktop] › tests/e2e/editor.spec.ts:65:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 ────────
+    [chromium-desktop] › tests/e2e/editor.spec.ts:80:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 
+    [chromium-desktop] › tests/e2e/editor.spec.ts:106:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 ─

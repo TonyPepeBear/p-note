@@ -1,0 +1,3 @@
+# 保留工具原始輸出，供日誌雜湊及型別重產比對。
+docs/tdd/*.log -whitespace
+worker-configuration.d.ts -whitespace

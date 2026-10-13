@@ -4,7 +4,7 @@
 
 ## Context
 
-專案尚無應用程式碼；本次為提交規格初始化本機 Git，未建立雲端資源。動機與能力範圍見 proposal.md。已確認 React＋Vite、Better Auth＋magic link、Yjs、Durable Objects＋y-partyserver；BlockNote 尚待評估。Cloudflare Workers Paid plan 是設計前提，備份保留 90 天。
+已建立本機技術原型與測試環境，未建立雲端資源或部署。動機與能力範圍見 proposal.md。已確認 React＋Vite、Better Auth＋magic link、Yjs、Durable Objects＋y-partyserver；BlockNote 0.55.0 已通過此次自動化技術驗證。Cloudflare Workers Paid plan 是設計前提，備份保留 90 天。
 
 ## Goals / Non-Goals
 
@@ -52,7 +52,7 @@ Yjs 取代整篇 JSON 版本衝突提案。整篇樂觀鎖較簡單，但不符�
 
 快照整理以固定檢查點為界，原子保存快照與移除已包含紀錄，未包含的新更新保留。成功保存但回應遺失時，重送／重複更新仍能完成確認。
 
-y-partyserver 的 onLoad／onSave 不證明預設廣播順序符合承諾。V2 必須驗證掛鉤、確認識別、同時更新、休眠／喚醒、重啟與整理。若無法達成，修訂適配或設計，不降低已保存語意。
+y-partyserver 的 onLoad／onSave 不證明預設廣播順序符合承諾。V2 已在本機驗證掛鉤、確認識別、同時更新、休眠／喚醒、重啟與整理。若無法達成，修訂適配或設計，不降低已保存語意。
 
 首版提案不只依靠延後全量快照，避免已廣播但未保存的區間。採更新紀錄後再整理，整理門檻依實測決定。
 
@@ -107,6 +107,14 @@ y-partyserver 的 onLoad／onSave 不證明預設廣播順序符合承諾。V2 �
 Q1–Q9 是產品契約與部署輸入，輸入確定後由機器驗證完整性與一致性；V1–V4 全部透過自動化測試。未決值保留草案，不以測試報告代替產品選擇。完整 spec ID 與測試結果比對不得把 skip／todo／未執行算通過。
 
 規格修改與完成開發後各自自動 commit。本次先提交規格，接著建立自動化環境與技術驗證；只完成此次範圍的任務，不宣稱完整產品驗收。
+
+### 10. 已驗證的本機適配
+
+原型在 YServer.onMessage 先解析原生 Yjs sync step 2／update 或含提交 ID 的完整狀態，候選文件驗證通過才寫入 SQLite；等待 storage.sync 後確認並交回套件廣播。更新與快照用 SQLite 表保存，整理交易只刪已含檢查點以前的紀錄，最高檢查點同時考慮快照與更新表。原生廣播基線、純刪除、寫入失敗、重送、abort、eviction、整理中斷及損毀載入均有自動化證據。
+
+IndexedDB 以 owner／page／generation 雜湊名稱隔離。y-indexeddb 9.0.12 未回報逐筆交易完成與寫入失敗，因此保留載入，停止其預設更新寫入，改由明確交易合併舊快取與保存完整狀態。原型掛鉤固定版本並在升級前重驗。關閉 BroadcastChannel，避免以分頁直接交換掩蓋服務保存故障；離線刷新另用靜態 Service Worker 快取。
+
+原型尚未有正式 session、資料所有權或世代切換；只接受本機入口，不能據此把正式 AUTH／ASSET／BACKUP 算通過。具體結果、版本、TDD 證據與限制見 [技術驗證](../../../docs/tdd/README.md)。
 
 ## Risks / Trade-offs
 

@@ -1,0 +1,49 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/sync.test.ts -t PROBE-CHECKPOINT
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/sync.test.ts (10 tests | 1 failed | 9 skipped) 32ms
+   ↓ PROBE-SYNC-02：確認遺失後重送仍可確認，正文不重複
+   ↓ PROBE-SYNC-03：寫入失敗不確認、不廣播、不污染房間，可重試
+   ↓ PROBE-SYNC-04：每筆確認指向自己的提交，新修改有不同確認
+   ↓ PROBE-SYNC-05：純刪除的 state vector 不變，仍持久確認並可重啟恢復
+   ↓ PROBE-SYNC-06：確認後 abort 與休眠／喚醒只靠持久狀態恢復
+   ↓ PROBE-SYNC-07：快照整理交易中斷會回滾，後續更新重啟後仍存在
+   ↓ PROBE-ORDER-01：原生 Yjs 更新在傳給其他端之前已寫入 SQLite
+   ↓ PROBE-BOUNDARY-01：損毀更新與超限資料不寫入、不污染房間
+   ↓ PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+   × PROBE-CHECKPOINT-01：沒有新更新時重複整理不倒退持久檢查點 31ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-CHECKPOINT-01：沒有新更新時重複整理不倒退持久檢查點
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/workers/sync.test.ts:200:90
+    198|     expect((await env.ROOMS.getByName(client.name).fetch('http://127.0…
+    199|     await runInDurableObject(client.stub, (_instance, state) => {
+    200|       expect(state.storage.sql.exec('SELECT checkpoint FROM snapshot')…
+       |                                                                                          ^
+    201|     });
+    202|   }
+ ❯ maybeHandleRunRequest Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24
+ ❯ DurableObject.Wrapper.fetch Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 skipped (10)
+   Start at  12:45:08
+   Duration  941ms (transform 137ms, setup 0ms, import 263ms, tests 32ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

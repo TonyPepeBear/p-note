@@ -1,0 +1,155 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/sync.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+console warning; message = An event handler returned a value of type "number" that will be ignored. Event handlers should not have a return value.
+ ❯ tests/workers/sync.test.ts (7 tests | 7 failed) 1134ms
+   × PROBE-SYNC-02：確認遺失後重送仍可確認，正文不重複 23ms
+   × PROBE-SYNC-03：寫入失敗不確認、不廣播、不污染房間，可重試 21ms
+   × PROBE-SYNC-04：每筆確認指向自己的提交，新修改有不同確認 30ms
+   × PROBE-SYNC-05：純刪除的 state vector 不變，仍持久確認並可重啟恢復 15ms
+   × PROBE-SYNC-06：確認後 abort 與休眠／喚醒只靠持久狀態恢復 15ms
+   × PROBE-SYNC-07：快照整理交易中斷會回滾，後續更新重啟後仍存在 18ms
+   × PROBE-ORDER-01：原生 Yjs 更新在傳給其他端之前已寫入 SQLite 1010ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-02：確認遺失後重送仍可確認，正文不重複
+AssertionError: expected 'unsupported' to be 'persisted' // Object.is equality
+
+Expected: "persisted"
+Received: "unsupported"
+
+ ❯ tests/workers/sync.test.ts:55:22
+     53|   doc.getText('body').insert(0, '重送');
+     54|   const first = await commit(client, doc, 'edit-1');
+     55|   expect(first.type).toBe('persisted');
+       |                      ^
+     56|   const second = await commit(client, doc, 'edit-1');
+     57|   expect(second).toMatchObject({ type: 'persisted', id: 'edit-1' });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-03：寫入失敗不確認、不廣播、不污染房間，可重試
+AssertionError: expected 'unsupported' to be 'error' // Object.is equality
+
+Expected: "error"
+Received: "unsupported"
+
+ ❯ tests/workers/sync.test.ts:71:23
+     69|   doc.getText('body').insert(0, '仍在本機');
+     70|   const failed = await commit(client, doc, 'failed');
+     71|   expect(failed.type).toBe('error');
+       |                       ^
+     72|   expect(peer.messages.filter(m => typeof m === 'string')).toEqual([]);
+     73|   expect((await persisted(client)).getText('body').toString()).toBe(''…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-04：每筆確認指向自己的提交，新修改有不同確認
+AssertionError: expected { type: 'unsupported' } to match object { type: 'persisted', id: 'first' }
+
+- Expected
++ Received
+
+  {
+-   "id": "first",
+-   "type": "persisted",
++   "type": "unsupported",
+  }
+
+ ❯ tests/workers/sync.test.ts:85:17
+     83|   doc.getText('body').insert(3, '第二筆');
+     84|   const second = await commit(client, doc, 'second');
+     85|   expect(first).toMatchObject({ type: 'persisted', id: 'first' });
+       |                 ^
+     86|   expect(second).toMatchObject({ type: 'persisted', id: 'second' });
+     87|   expect(second.checkpoint).toBeGreaterThan(first.checkpoint);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-05：純刪除的 state vector 不變，仍持久確認並可重啟恢復
+AssertionError: expected 'unsupported' to be 'persisted' // Object.is equality
+
+Expected: "persisted"
+Received: "unsupported"
+
+ ❯ tests/workers/sync.test.ts:94:54
+     92|   const doc = new Y.Doc();
+     93|   doc.getText('body').insert(0, '刪除這些字');
+     94|   expect((await commit(client, doc, 'insert')).type).toBe('persisted');
+       |                                                      ^
+     95|   const vector = Y.encodeStateVector(doc);
+     96|   doc.getText('body').delete(0, 5);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-06：確認後 abort 與休眠／喚醒只靠持久狀態恢復
+AssertionError: expected 'unsupported' to be 'persisted' // Object.is equality
+
+Expected: "persisted"
+Received: "unsupported"
+
+ ❯ tests/workers/sync.test.ts:107:62
+    105|   const doc = new Y.Doc();
+    106|   doc.getText('body').insert(0, '已持久保存');
+    107|   expect((await commit(client, doc, 'before-restart')).type).toBe('per…
+       |                                                              ^
+    108|   doc.destroy();
+    109|   await abortAllDurableObjects();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-SYNC-07：快照整理交易中斷會回滾，後續更新重啟後仍存在
+AssertionError: expected 'unsupported' to be 'persisted' // Object.is equality
+
+Expected: "persisted"
+Received: "unsupported"
+
+ ❯ tests/workers/sync.test.ts:124:54
+    122|   const doc = new Y.Doc();
+    123|   doc.getText('body').insert(0, '整理前');
+    124|   expect((await commit(client, doc, 'before')).type).toBe('persisted');
+       |                                                      ^
+    125|   await runInDurableObject(client.stub, (_instance, state) => {
+    126|     const exec = state.storage.sql.exec.bind(state.storage.sql);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/workers/sync.test.ts > PROBE-ORDER-01：原生 Yjs 更新在傳給其他端之前已寫入 SQLite
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/workers/sync.test.ts:152:111
+    150|   syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(doc));
+    151|   client.socket.send(encoding.toUint8Array(encoder));
+    152|   await vi.waitFor(() => expect(peer.messages.some(m => typeof m !== '…
+       |                                                                                                               ^
+    153|   await runInDurableObject(client.stub, (_instance, state) => {
+    154|     expect(state.storage.sql.exec("SELECT count(*) AS n FROM sqlite_ma…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  12:24:14
+   Duration  2.10s (transform 122ms, setup 0ms, import 248ms, tests 1.13s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

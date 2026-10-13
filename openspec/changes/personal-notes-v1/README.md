@@ -9,9 +9,9 @@
 - [後續任務](tasks.md)
 - [TDD 與全自動驗證計畫](../../../docs/automated-validation.md)
 
-依新的 AGENTS.md 採 TDD；所有情境與任務都以自動化驗證，規格更新與完成開發後自動提交。此次先提交確認後規格，再開始上述技術驗證。
+依新的 AGENTS.md 採 TDD；所有情境與任務都以自動化驗證，規格更新與完成開發後自動提交。已先提交確認後規格（d632447），再完成上述技術驗證。
 
-OpenSpec 驗證與 artifact 狀態只檢查文件，不表示使用者已接受所有草案行為或授權 apply。任務依實際報告更新；本 change 尚未實作或封存成正式能力規格。
+OpenSpec 驗證與 artifact 狀態只檢查文件，不表示使用者已接受所有草案行為或授權 apply。任務依實際報告更新；本 change 已有本機原型，但完整產品尚未完成，不封存成正式能力規格。
 
 ## 能力規格
 
@@ -21,3 +21,5 @@ OpenSpec 驗證與 artifact 狀態只檢查文件，不表示使用者已接受�
 - [即時同步](specs/realtime-sync/spec.md)
 - [私有圖片](specs/private-assets/spec.md)
 - [備份與還原](specs/backup-restore/spec.md)
+
+- [本次技術結果與 TDD 證據](../../../docs/tdd/README.md)

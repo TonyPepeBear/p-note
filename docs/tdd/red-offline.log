@@ -1,0 +1,188 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/offline.spec.ts --project chromium-desktop
+
+[WebServer] (node:74896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:74948) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/offline.spec.ts:5:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (5.4s)
+(node:74964) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/offline.spec.ts:32:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (5.2s)
+(node:74974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/offline.spec.ts:68:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (5.2s)
+(node:74986) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/offline.spec.ts:93:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (5.2s)
+
+
+  1) [chromium-desktop] › tests/e2e/offline.spec.ts:5:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 ─────
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 須建立真正 BlockNote 編輯器 locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at helpers.ts:6
+
+      4 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+      5 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    > 6 |   await expect(page.locator('.tiptap[contenteditable="true"]'), '須建立真正 BlockNote 編輯器').toHaveCount(1);
+        |                                                                                        ^
+      7 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      8 |   await page.reload();
+      9 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:6:88)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/offline.spec.ts:6:16
+
+    Error Context: test-results/offline-PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/offline-PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/offline-PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/offline.spec.ts:32:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 須建立真正 BlockNote 編輯器 locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at helpers.ts:6
+
+      4 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+      5 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    > 6 |   await expect(page.locator('.tiptap[contenteditable="true"]'), '須建立真正 BlockNote 編輯器').toHaveCount(1);
+        |                                                                                        ^
+      7 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      8 |   await page.reload();
+      9 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:6:88)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/offline.spec.ts:33:16
+
+    Error Context: test-results/offline-PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/offline-PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/offline-PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/offline.spec.ts:68:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 須建立真正 BlockNote 編輯器 locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at helpers.ts:6
+
+      4 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+      5 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    > 6 |   await expect(page.locator('.tiptap[contenteditable="true"]'), '須建立真正 BlockNote 編輯器').toHaveCount(1);
+        |                                                                                        ^
+      7 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      8 |   await page.reload();
+      9 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:6:88)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/offline.spec.ts:69:16
+
+    Error Context: test-results/offline-PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB-寫入失敗不宣稱已本機保存-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/offline-PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB-寫入失敗不宣稱已本機保存-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/offline-PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB-寫入失敗不宣稱已本機保存-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/offline.spec.ts:93:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 ─
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 須建立真正 BlockNote 編輯器 locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at helpers.ts:6
+
+      4 | export async function open(page: Page, room = randomUUID(), owner = 'owner', generation = 'g1') {
+      5 |   await page.goto(`/?page=${room}&owner=${owner}&generation=${generation}`);
+    > 6 |   await expect(page.locator('.tiptap[contenteditable="true"]'), '須建立真正 BlockNote 編輯器').toHaveCount(1);
+        |                                                                                        ^
+      7 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      8 |   await page.reload();
+      9 |   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:6:88)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/offline.spec.ts:94:16
+
+    Error Context: test-results/offline-PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同-owner／世代快取隔離-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/offline-PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同-owner／世代快取隔離-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/offline-PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同-owner／世代快取隔離-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium-desktop] › tests/e2e/offline.spec.ts:5:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 ──────
+    [chromium-desktop] › tests/e2e/offline.spec.ts:32:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 ─
+    [chromium-desktop] › tests/e2e/offline.spec.ts:68:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 
+    [chromium-desktop] › tests/e2e/offline.spec.ts:93:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 ──

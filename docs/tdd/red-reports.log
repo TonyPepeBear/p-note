@@ -1,0 +1,46 @@
+
+> p-note@0.0.0 test:unit
+> vitest run --config vitest.unit.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/unit/environment.test.ts (1 test) 2ms
+ ✓ tests/unit/receipt.test.ts (1 test) 1ms
+ ❯ tests/unit/coverage.test.ts (2 tests | 1 failed) 6ms
+   ✓ ENV-05：未執行、缺漏、重複、skip／todo／失敗不能算覆蓋 1ms
+   × ENV-06：實際報告解析保留環境、失敗及未執行狀態 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/coverage.test.ts > ENV-06：實際報告解析保留環境、失敗及未執行狀態
+AssertionError: expected [] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "id": "PROBE-SYNC-02@integration",
+-     "status": "failed",
+-   },
+- ]
++ []
+
+ ❯ tests/unit/coverage.test.ts:19:6
+     17| it('ENV-06：實際報告解析保留環境、失敗及未執行狀態', () => {
+     18|   expect(reportCases({ testResults: [{ assertionResults: [{ title: 'PR…
+     19|     .toEqual([{ id: 'PROBE-SYNC-02@integration', status: 'failed' }]);
+       |      ^
+     20|   expect(reportCases({ suites: [{ specs: [{ title: 'PROBE-EDIT-01：編輯',…
+     21|     .toEqual([{ id: 'PROBE-EDIT-01@webkit-mobile', status: 'skipped' }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 3 passed (4)
+   Start at  12:33:34
+   Duration  103ms (transform 45ms, setup 0ms, import 61ms, tests 9ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/unit.json

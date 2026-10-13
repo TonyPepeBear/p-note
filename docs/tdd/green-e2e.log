@@ -1,0 +1,50 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test
+
+[WebServer] (node:79119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 33 tests using 1 worker
+
+(node:79173) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/editor.spec.ts:6:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (1.3s)
+  ✓   2 [chromium-desktop] › tests/e2e/editor.spec.ts:29:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (1.0s)
+  ✓   3 [chromium-desktop] › tests/e2e/editor.spec.ts:48:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (1.9s)
+  ✓   4 [chromium-desktop] › tests/e2e/editor.spec.ts:63:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (924ms)
+  ✓   5 [chromium-desktop] › tests/e2e/editor.spec.ts:89:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (1.6s)
+  ✓   6 [chromium-desktop] › tests/e2e/editor.spec.ts:124:1 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (737ms)
+  ✓   7 [chromium-desktop] › tests/e2e/environment.spec.ts:3:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (312ms)
+  ✓   8 [chromium-desktop] › tests/e2e/offline.spec.ts:6:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (1.8s)
+  ✓   9 [chromium-desktop] › tests/e2e/offline.spec.ts:33:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (2.1s)
+  ✓  10 [chromium-desktop] › tests/e2e/offline.spec.ts:75:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (1.4s)
+  ✓  11 [chromium-desktop] › tests/e2e/offline.spec.ts:100:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (2.7s)
+(node:79255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [chromium-mobile] › tests/e2e/editor.spec.ts:6:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (988ms)
+  ✓  13 [chromium-mobile] › tests/e2e/editor.spec.ts:29:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (998ms)
+  ✓  14 [chromium-mobile] › tests/e2e/editor.spec.ts:48:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (1.6s)
+  ✓  15 [chromium-mobile] › tests/e2e/editor.spec.ts:63:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (934ms)
+  ✓  16 [chromium-mobile] › tests/e2e/editor.spec.ts:89:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (1.5s)
+  ✓  17 [chromium-mobile] › tests/e2e/editor.spec.ts:124:1 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (711ms)
+  ✓  18 [chromium-mobile] › tests/e2e/environment.spec.ts:3:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (316ms)
+  ✓  19 [chromium-mobile] › tests/e2e/offline.spec.ts:6:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (1.8s)
+  ✓  20 [chromium-mobile] › tests/e2e/offline.spec.ts:33:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (2.2s)
+  ✓  21 [chromium-mobile] › tests/e2e/offline.spec.ts:75:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (1.6s)
+  ✓  22 [chromium-mobile] › tests/e2e/offline.spec.ts:100:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (2.8s)
+(node:79309) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [webkit-mobile] › tests/e2e/editor.spec.ts:6:1 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (903ms)
+  ✓  24 [webkit-mobile] › tests/e2e/editor.spec.ts:29:1 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (731ms)
+  ✓  25 [webkit-mobile] › tests/e2e/editor.spec.ts:48:1 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (1.2s)
+  ✓  26 [webkit-mobile] › tests/e2e/editor.spec.ts:63:1 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (638ms)
+  ✓  27 [webkit-mobile] › tests/e2e/editor.spec.ts:89:1 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (1.1s)
+  ✓  28 [webkit-mobile] › tests/e2e/editor.spec.ts:124:1 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (689ms)
+  ✓  29 [webkit-mobile] › tests/e2e/environment.spec.ts:3:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (301ms)
+  ✓  30 [webkit-mobile] › tests/e2e/offline.spec.ts:6:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (1.1s)
+  ✓  31 [webkit-mobile] › tests/e2e/offline.spec.ts:33:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (1.2s)
+  ✓  32 [webkit-mobile] › tests/e2e/offline.spec.ts:75:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (954ms)
+  ✓  33 [webkit-mobile] › tests/e2e/offline.spec.ts:100:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (1.9s)
+
+  33 passed (44.6s)
