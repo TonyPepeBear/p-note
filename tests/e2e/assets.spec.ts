@@ -20,12 +20,12 @@ test.beforeEach(async ({ request }) => { await request.post('/__test/reset'); aw
 
 test('ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用', async ({ page, request }) => {
   await login(page, request);
-  await page.route('**/api/assets', route => route.abort('failed'));
+  await request.post('/__test/asset-failure', { data: { fail: true } });
   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
-  await expect(page.getByRole('alert')).toContainText('上傳失敗'); expect(await urls(page)).toEqual([]);
+  await expect(page.getByRole('alert')).toContainText('請稍後重試'); expect(await urls(page)).toEqual([]);
   await expect(page.getByRole('button', { name: '重試上傳', exact: true })).toBeVisible();
-  await page.unroute('**/api/assets'); await page.getByRole('button', { name: '重試上傳', exact: true }).click();
+  await request.post('/__test/asset-failure', { data: { fail: false } }); await page.getByRole('button', { name: '重試上傳', exact: true }).click();
   await expect.poll(() => urls(page)).toHaveLength(1); await saved(page);
   expect(await (await page.request.get((await urls(page))[0])).body()).toEqual(file.buffer);
 });
@@ -60,6 +60,9 @@ test('ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿�
   await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '偽造.png', mimeType: 'image/png', buffer: Buffer.from('<svg/>') });
   await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('圖片'); expect(await urls(page)).toEqual([]);
+  await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '超限.png', mimeType: 'image/png', buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
+  await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('10 MiB'); expect(await urls(page)).toEqual([]);
   await page.evaluate(async base64 => {
     const file = new File([Uint8Array.from(atob(base64), c => c.charCodeAt(0))], '原生上傳.png', { type: 'image/png' });
     const editor = window.probe!.editor; const url = await editor.uploadFile!(file);
@@ -67,4 +70,27 @@ test('ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿�
     editor.insertBlocks([{ type: 'image', props: { url, name: file.name, showPreview: true } }], editor.document[0], 'after');
   }, file.buffer.toString('base64'));
   await saved(page); expect((await urls(page))[0]).toMatch(/^\/api\/assets\//);
+  const known = new Set(await urls(page));
+  for (const [format, bytes] of Object.entries(images).filter(([format]) => format !== 'png')) {
+    await page.getByLabel('圖片檔案', { exact: true }).setInputFiles({ name: '原圖.' + format, mimeType: 'image/' + format, buffer: Buffer.from(bytes) });
+    const before = (await urls(page)).length;
+    await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+    await expect.poll(async () => (await urls(page)).length).toBe(before + 1); await saved(page);
+    const url = (await urls(page)).find(url => !known.has(url))!;
+    known.add(url); expect(await (await page.request.get(url)).body()).toEqual(Buffer.from(bytes));
+  }
+});
+
+test('ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功', async ({ page, request }) => {
+  await login(page, request);
+  await page.evaluate(() => {
+    const editor = window.probe!.editor; const insert = editor.insertBlocks.bind(editor); let fail = true;
+    editor.insertBlocks = (...args) => { if (fail) { fail = false; throw new Error('測試區塊插入失敗'); } return insert(...args); };
+  });
+  await page.getByLabel('圖片檔案', { exact: true }).setInputFiles(file);
+  await page.getByRole('button', { name: '上傳圖片', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('插入失敗'); expect(await urls(page)).toEqual([]);
+  await page.getByRole('button', { name: '重試上傳', exact: true }).click();
+  await expect.poll(() => urls(page)).toHaveLength(1); await saved(page);
+  expect(await (await page.request.get((await urls(page))[0])).body()).toEqual(file.buffer);
 });

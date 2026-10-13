@@ -3,6 +3,7 @@ import { reset, abortAllDurableObjects, runInDurableObject } from 'cloudflare:te
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import { handle } from '../../src/worker/app';
 import { images } from '../fixtures/images';
+import { animatedImages } from '../fixtures/animated-images';
 import * as Y from 'yjs';
 import { toBase64 } from 'lib0/buffer';
 
@@ -77,7 +78,7 @@ function sizedPng(size: number): Uint8Array {
   return data;
 }
 it('ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕', async () => {
-  for (const [format, bytes] of Object.entries(images)) {
+  for (const [format, bytes] of [...Object.entries(images), ...Object.entries(animatedImages)]) {
     const asset = await upload(bytes, 'image/' + format, '原圖.' + format);
     expect(asset.checksum).toBe(await hash(bytes)); expect(asset.byte_size).toBe(bytes.length);
     expect(new Uint8Array(await (await get(asset.url)).arrayBuffer())).toEqual(bytes);
@@ -90,7 +91,7 @@ it('ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SV
     [sizedPng(limit + 1), 'image/png'], [new Uint8Array(), 'image/png'],
     [images.png, 'image/jpeg'], [new TextEncoder().encode('<svg><script>alert(1)</script></svg>'), 'image/png'],
     [new TextEncoder().encode('0000ftypheic'), 'image/heic'], [corrupted, 'image/png'],
-    ...Object.entries(images).map(([format, bytes]): [Uint8Array, string] => [bytes.subarray(0, bytes.length - 8), 'image/' + format]),
+    ...[...Object.entries(images), ...Object.entries(animatedImages)].map(([format, bytes]): [Uint8Array, string] => [bytes.subarray(0, bytes.length - 8), 'image/' + format]),
     [new Uint8Array([0x89,80,78,71,13,10,26,10]), 'image/png'],
   ];
   for (const [bytes, mime] of invalid) {

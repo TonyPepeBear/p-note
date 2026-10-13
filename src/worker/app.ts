@@ -6,6 +6,7 @@ import { roomName } from '../shared/room';
 import { handlePages, visiblePage, PageError } from './pages';
 import type { PageRow } from '../shared/pages';
 import { body } from './request';
+import { handleAssets } from './assets';
 
 export { ProbeRoom, SyncRoom };
 
@@ -70,6 +71,8 @@ export async function handle(request: Request, env: Env, services: Services = un
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
+    const assetResponse = await handleAssets(request, env, session.user.id, services.now());
+    if (assetResponse) return assetResponse;
     const pageResponse = await handlePages(request, env, session.user.id, services.now());
     if (pageResponse) return pageResponse;
     if (path.startsWith('/parties/sync/')) {

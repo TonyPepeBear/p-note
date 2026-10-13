@@ -9,6 +9,8 @@ import { toBase64 } from 'lib0/buffer';
 import { saveLocal, readLocal } from './cache';
 import { isCurrentReceipt } from '../shared/receipt';
 import { roomName } from '../shared/room';
+import { IMAGE_TYPES, IMAGE_RULE } from '../shared/image';
+import { uploadImage } from './assets';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import './style.css';
@@ -17,8 +19,17 @@ export type Session = { doc: Y.Doc; cache: IndexeddbPersistence; provider: YProv
 
 export function Editor({ session, title }: { session: Session; title?: string }) {
   const { doc, cache, provider, room } = session;
+  const [image, setImage] = useState<{ file: File; blockId?: string }>();
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
   const editor = useCreateBlockNote(withCollaboration({
     collaboration: { fragment: doc.getXmlFragment('body'), provider, user: { name: '本機測試', color: '#2563eb' } },
+    ...(title ? { uploadFile: async (file: File, blockId?: string) => {
+      setImage({ file, blockId }); setUploading(true); setImageError('');
+      try { const url = await uploadImage(file); setImage(undefined); return url; }
+      catch (failure) { setImageError(failure instanceof Error ? failure.message : '圖片上傳失敗，請重試'); throw failure; }
+      finally { setUploading(false); }
+    } } : {}),
   }));
   const [local, setLocal] = useState('本機儲存中');
   const [cloud, setCloud] = useState('同步中');
@@ -99,6 +110,19 @@ export function Editor({ session, title }: { session: Session; title?: string })
     editor.setTextCursorPosition(block, 'start');
     editor.focus();
   };
+  const upload = async () => {
+    if (!image || uploading) return;
+    try {
+      const anchor = currentBlock();
+      const url = await editor.uploadFile!(image.file, image.blockId);
+      if (typeof url !== 'string') return;
+      const block = image.blockId && editor.getBlock(image.blockId);
+      if (block) editor.updateBlock(block, { type: 'image', props: { url, name: image.file.name, showPreview: true } });
+      else editor.insertBlocks([{ type: 'image', props: { url, name: image.file.name, showPreview: true } }], editor.getBlock(anchor.id) ?? editor.document[0], 'after');
+    } catch (failure) {
+      setImage(image); setImageError(failure instanceof Error ? failure.message : '圖片插入失敗，請重試');
+    }
+  };
   return <main>
     <h1>{title ?? 'p-note 技術驗證'}</h1>
     {!title && <p>本機原型：圖片為固定 fixture，正式資產服務尚未接入。</p>}
@@ -114,6 +138,15 @@ export function Editor({ session, title }: { session: Session; title?: string })
       <button onClick={() => { editor.moveBlocksDown(); editor.focus(); }}>下移區塊</button>
       <button onClick={() => { editor.removeBlocks([currentBlock()]); editor.focus(); }}>刪除區塊</button>
     </div></details>
+    {title && <section className="image-upload" aria-label="圖片上傳">
+      <label htmlFor="image-file">圖片檔案</label>{' '}
+      <input id="image-file" type="file" accept={IMAGE_TYPES.join(',')} disabled={uploading} onChange={event => {
+        setImage(event.target.files?.[0] ? { file: event.target.files[0] } : undefined); setImageError('');
+      }} />
+      <button disabled={!image || uploading} onClick={() => { void upload(); }}>{uploading ? '圖片上傳中' : imageError ? '重試上傳' : '上傳圖片'}</button>
+      <p>{IMAGE_RULE}，保留原圖不壓縮。</p>
+      {imageError && <p role="alert">{imageError}</p>}
+    </section>}
     {!title && <div className="actions">
       <button onClick={() => insert('image')}>插入測試圖片</button>
       <button onClick={() => {

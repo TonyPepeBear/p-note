@@ -15,6 +15,7 @@ async function setup(env: Env) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
+  await env.DB.exec('CREATE TABLE IF NOT EXISTS test_asset_control (id INTEGER PRIMARY KEY, fail INTEGER)');
 }
 
 export default {
@@ -23,6 +24,11 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path === '/__test/asset-failure' && request.method === 'POST') {
+        const { fail } = await request.json<{ fail: boolean }>();
+        await env.DB.prepare('INSERT OR REPLACE INTO test_asset_control VALUES (1, ?)').bind(fail ? 1 : 0).run();
+        return Response.json({ ok: true });
+      }
       if (path.startsWith('/__test/assets/')) {
         const key = path.slice('/__test/assets/'.length);
         if (request.method === 'POST') { await env.ASSETS.put(key, await request.arrayBuffer()); return Response.json({ ok: true }); }
@@ -44,7 +50,13 @@ export default {
     }
     if (path.startsWith('/parties/rooms/') || path === '/health') return probe.fetch(request, env);
     const control = await env.DB.prepare('SELECT now, fail FROM test_control WHERE id = 1').first<{ now: number; fail: number }>();
-    return handle(request, { ...env, OWNER_EMAIL: 'owner@example.test', BETTER_AUTH_URL: 'http://127.0.0.1:5173', BETTER_AUTH_SECRET: 'test-only-secret-with-at-least-32-characters' }, {
+    const failAsset = await env.DB.prepare('SELECT fail FROM test_asset_control WHERE id = 1').first<number>('fail');
+    const assets = failAsset ? new Proxy(env.ASSETS, { get(target, key) {
+      if (key === 'put') return async () => { throw new Error('測試 R2 寫入故障'); };
+      const value = Reflect.get(target, key, target);
+      return typeof value === 'function' ? value.bind(target) : value;
+    } }) : env.ASSETS;
+    return handle(request, { ...env, ASSETS: assets, OWNER_EMAIL: 'owner@example.test', BETTER_AUTH_URL: 'http://127.0.0.1:5173', BETTER_AUTH_SECRET: 'test-only-secret-with-at-least-32-characters' }, {
       now: () => control?.now ?? Date.now(),
       sendMail: async (email, url) => {
         if (control?.fail) throw new Error('測試寄信故障');
