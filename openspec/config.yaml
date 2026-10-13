@@ -9,7 +9,7 @@ context: |
   docs/v1-scope.md 區分已確認決策、設計提案與待確認事項。
   依 AGENTS.md 使用 TDD；全部開發驗收自動化，規格修改與開發完成後自動提交相關檔案。
   docs/automated-validation.md 定義 Red／Green／Refactor、情境 ID、工具與驗證限制。
-  已完成本機 BlockNote／Yjs 技術驗證；本輪授權資料結構、Better Auth＋magic link、固定 30 天 session 與測試寄件匣 TDD。暫不部署，頁面完整操作、私有資產與備份另輪實作。
+  已完成本機 BlockNote／Yjs 與資料結構／登入 TDD；本輪授權頁面與日記 5.1、5.2，含日期補寫、階層、標題、垃圾桶、中文搜尋及必要的刪除連線隔離。全部採 OpenSpec／TDD，完成後自動提交，暫不部署。私有資產與備份另輪實作。
 
 rules:
   specs:
