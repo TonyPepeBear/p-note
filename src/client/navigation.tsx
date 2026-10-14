@@ -117,7 +117,13 @@ export function Navigation({
   };
   useEffect(() => {
     void refresh().catch(() => error("無法載入頁面列表，請重新整理"));
-  }, []);
+    const ancestors = new Set(page.ancestors?.map((item) => item.id));
+    setCollapsed((items) => items.filter((id) => !ancestors.has(id)));
+    setPanel("");
+    setNavOpen(false);
+    setDate(page.journal_date ?? today(Date.now()));
+    setMonth((page.journal_date ?? today(Date.now())).slice(0, 7));
+  }, [page.id]);
   useEffect(() => {
     setTitle(page.title);
     setParent(page.parent_id ?? "");

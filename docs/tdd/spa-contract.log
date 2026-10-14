@@ -1,0 +1,7 @@
+
+> p-note@0.0.0 check:spec
+> node scripts/check-spec.mjs
+
+{"文件":52,"本地連結":368,"唯一情境":77,"決策契約":"通過"}
+登入設定來源與本機測試隔離契約：通過
+exit 0

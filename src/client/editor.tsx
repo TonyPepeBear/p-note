@@ -739,6 +739,40 @@ export function Editor({
   );
 }
 
+let booting: Promise<void> | undefined;
+
+function boot() {
+  booting ??= (async () => {
+    await navigator.serviceWorker.register("/sw.js");
+    if (navigator.onLine) {
+      const registration = await navigator.serviceWorker.ready;
+      const urls = performance
+        .getEntriesByType("resource")
+        .map((entry) => entry.name);
+      await new Promise<void>((resolve, reject) => {
+        const channel = new MessageChannel();
+        const timer = setTimeout(() => {
+          channel.port1.close();
+          reject(new Error("本機啟動資源下載失敗，請重試"));
+        }, 10000);
+        channel.port1.onmessage = (event) => {
+          clearTimeout(timer);
+          channel.port1.close();
+          if (event.data?.ok) resolve();
+          else reject(new Error("本機啟動資源下載失敗，請重試"));
+        };
+        registration.active!.postMessage({ type: "cache-resources", urls }, [
+          channel.port2,
+        ]);
+      });
+    }
+  })().catch((failure) => {
+    booting = undefined;
+    throw failure;
+  });
+  return booting;
+}
+
 export async function start(
   scope?: string[],
   checkAccess?: Session["checkAccess"],
@@ -750,29 +784,7 @@ export async function start(
     !["127.0.0.1", "localhost", "[::1]"].includes(location.hostname)
   )
     throw new Error("原型只限本機");
-  await navigator.serviceWorker.register("/sw.js");
-  if (navigator.onLine) {
-    const registration = await navigator.serviceWorker.ready;
-    const urls = performance
-      .getEntriesByType("resource")
-      .map((entry) => entry.name);
-    await new Promise<void>((resolve, reject) => {
-      const channel = new MessageChannel();
-      const timer = setTimeout(() => {
-        channel.port1.close();
-        reject(new Error("本機啟動資源下載失敗，請重試"));
-      }, 10000);
-      channel.port1.onmessage = (event) => {
-        clearTimeout(timer);
-        channel.port1.close();
-        if (event.data?.ok) resolve();
-        else reject(new Error("本機啟動資源下載失敗，請重試"));
-      };
-      registration.active!.postMessage({ type: "cache-resources", urls }, [
-        channel.port2,
-      ]);
-    });
-  }
+  await boot();
   const params = new URLSearchParams(location.search);
   scope ??= ["owner", "page", "generation"].map(
     (name, index) => params.get(name) ?? ["owner", "default", "g1"][index],
