@@ -11,7 +11,7 @@ export function checkCoverage(required, actual) {
 export function reportCases(report, environment) {
   const cases = [];
   const add = (title, status, context) => {
-    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI)-\d{2})[：:]/)?.[1];
+    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX)-\d{2})[：:]/)?.[1];
     if (id) cases.push({ id: `${id}@${context}`, status });
   };
   if (Array.isArray(report.testResults)) {
@@ -37,6 +37,7 @@ async function main() {
   const assets = process.argv.includes('--assets');
   const editor = process.argv.includes('--editor');
   const ui = process.argv.includes('--ui');
+  const ux = process.argv.includes('--ux');
   const projects = ['chromium-desktop', 'chromium-mobile', 'webkit-mobile'];
   let required = [];
   if (auth) {
@@ -49,7 +50,7 @@ async function main() {
       required.push(...projects.map(project => `${id}@${project}`));
     }
   } else {
-    const dir = ui ? 'openspec/changes/redesign-mantine-workspace/specs' : 'openspec/changes/personal-notes-v1/specs';
+    const dir = ux ? 'openspec/changes/polish-workspace-usability/specs' : ui ? 'openspec/changes/redesign-mantine-workspace/specs' : 'openspec/changes/personal-notes-v1/specs';
     for (const name of await readdir(dir)) {
       const text = await readFile(`${dir}/${name}/spec.md`, 'utf8');
       for (const match of text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g)) {
@@ -70,7 +71,7 @@ async function main() {
     actual.push(...reportCases(report, environment));
   }
   const failures = checkCoverage(required, actual);
-  console.log(JSON.stringify({ 範圍: ui ? 'Mantine 介面' : auth ? '登入' : probe ? '技術原型' : pages ? '頁面與日記' : assets ? '私有圖片（ASSET-05 留待備份）' : editor ? '正式編輯器' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
+  console.log(JSON.stringify({ 範圍: ux ? '工作區可用性' : ui ? 'Mantine 介面' : auth ? '登入' : probe ? '技術原型' : pages ? '頁面與日記' : assets ? '私有圖片（ASSET-05 留待備份）' : editor ? '正式編輯器' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
   if (failures.length) process.exitCode = 1;
 }
 

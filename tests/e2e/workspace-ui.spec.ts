@@ -159,9 +159,9 @@ test("UI-04：頁面操作有明確範圍，移到垃圾桶可取消", async ({ 
   ).toBeVisible();
   await page.getByLabel("頁面標題", { exact: true }).fill("介面驗證日記");
   await page.getByRole("button", { name: "儲存標題", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "日記 介面驗證日記", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue(
+    "介面驗證日記",
+  );
   await page.getByRole("button", { name: "頁面操作", exact: true }).click();
   await page.getByRole("button", { name: "移到垃圾桶", exact: true }).click();
   const dialog = page.getByRole("dialog", {

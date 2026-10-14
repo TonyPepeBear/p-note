@@ -1,0 +1,1591 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 45 tests using 1 worker
+
+  ✘   1 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (5.9s)
+  ✘   2 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (5.8s)
+[WebServer] 2:03:10 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 2:03:10 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘   3 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (5.9s)
+  ✘   4 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (20.1s)
+  ✘   5 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (812ms)
+  ✘   6 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 (5.5s)
+  ✘   7 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (6.4s)
+  ✘   8 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (5.6s)
+  ✘   9 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 (5.7s)
+  -  10 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫
+  ✘  11 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 (5.9s)
+  ✘  12 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (6.0s)
+  ✘  13 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 (5.7s)
+  ✘  14 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (5.9s)
+  ✘  15 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA (218ms)
+  ✘  16 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (5.7s)
+  ✘  17 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (5.7s)
+  ✘  18 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (5.9s)
+  ✘  19 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (20.1s)
+  ✘  20 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (1.3s)
+  ✘  21 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 (5.7s)
+  ✘  22 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (6.4s)
+  ✘  23 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (5.6s)
+  ✘  24 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 (6.2s)
+  ✘  25 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 (589ms)
+  ✘  26 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 (6.0s)
+  ✘  27 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (6.0s)
+  ✘  28 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 (6.1s)
+  ✘  29 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (5.8s)
+  ✘  30 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA (240ms)
+  ✘  31 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (6.6s)
+  ✘  32 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (6.0s)
+  ✘  33 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (6.1s)
+[WebServer] 2:06:39 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 2:06:39 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘  34 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (20.1s)
+  ✘  35 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (1.6s)
+  ✘  36 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 (5.9s)
+  ✘  37 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (6.6s)
+  ✘  38 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (5.9s)
+  ✘  39 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 (6.5s)
+  ✘  40 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 (1.2s)
+  ✘  41 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 (6.2s)
+  ✘  42 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (6.2s)
+  ✘  43 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 (6.4s)
+  ✘  44 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (6.1s)
+  ✘  45 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA (412ms)
+
+
+  1) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ───
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('save-announcer')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('save-announcer') with timeout 5000ms
+      - waiting for getByTestId('save-announcer')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      46 | test("UX-01：連續輸入時保存狀態列不跳動、不出現重試", async ({ page }) => {
+      47 |   await openPrivate(page);
+    > 48 |   await expect(page.getByTestId("save-announcer")).toHaveCount(1);
+         |                                                    ^
+      49 |   await page.evaluate(() => {
+      50 |     const target = document.querySelector(".save-status")!;
+      51 |     const live = document.querySelector("[data-testid=save-announcer]")!;
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:48:52
+
+    Error Context: test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ─────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.cloud-indicator')
+    Expected: "failed"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.cloud-indicator') with timeout 5000ms
+      - waiting for locator('.cloud-indicator')
+        14 × locator resolved to <div class="cloud-indicator m_4081bf90 mantine-Group-root">…</div>
+           - unexpected value "null"
+
+
+      107 |       }),
+      108 |     );
+    > 109 |     await expect(indicator).toHaveAttribute("data-state", "failed");
+          |                             ^
+      110 |     await expect(retry).toBeVisible();
+      111 |     await control(false);
+      112 |     await retry.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:109:29
+
+    Error Context: test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByLabel('文件標題', { exact: true })
+    Expected: "原始標題"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      137 |   await openPage(page, id);
+      138 |   const input = titleInput(page);
+    > 139 |   await expect(input).toHaveValue("原始標題");
+          |                       ^
+      140 |   await expect(page.locator(".document-heading")).toContainText("筆記");
+      141 |   await input.click();
+      142 |   await input.fill("取消的名稱");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:139:23
+
+    Error Context: test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ───
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.fill: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      168 |   await openPage(page, id);
+      169 |   const input = titleInput(page);
+    > 170 |   await input.fill("");
+          |               ^
+      171 |   await page.locator(".tiptap").click();
+      172 |   await expect(input).toHaveValue("保留的標題");
+      173 |   await expect(page.getByRole("alert")).toContainText("標題");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:170:15
+
+    Error Context: test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "未命名"
+    Received: "新增筆記"
+
+      201 |   const parent = new URL(page.url()).searchParams.get("page")!;
+      202 |   expect(new URL(page.url()).searchParams.get("new")).toBeNull();
+    > 203 |   expect(await apiTitle(page, parent)).toBe("未命名");
+          |                                        ^
+      204 |   const input = titleInput(page);
+      205 |   await expect(input).toBeFocused();
+      206 |   expect(
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:203:40
+
+    Error Context: test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('menu', { name: '區塊操作' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('menu', { name: '區塊操作' }) with timeout 5000ms
+      - waiting for getByRole('menu', { name: '區塊操作' })
+
+
+      251 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+      252 |   const surface = page.locator(".writing-surface");
+    > 253 |   await expect(menu).toBeVisible();
+          |                      ^
+      254 |   await expect(surface).toHaveAttribute("data-active-block", "d");
+      255 |   const up = page.getByRole("menuitem", { name: "上移區塊", exact: true });
+      256 |   for (let i = 0; i < 3; i++) {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:253:22
+
+    Error Context: test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ───
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('menuitem', { name: '複製程式碼' })
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" getByRole('menuitem', { name: '複製程式碼' }) with timeout 5000ms
+      - waiting for getByRole('menuitem', { name: '複製程式碼' })
+
+
+      280 |   await page.getByRole("button", { name: "區塊操作", exact: true }).click();
+      281 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+    > 282 |   await expect(page.getByRole("menuitem", { name: "複製程式碼" })).toBeDisabled();
+          |                                                               ^
+      283 |   await expect(menu).toContainText("游標放在程式碼區塊");
+      284 |   await page.getByRole("menuitem", { name: "刪除區塊", exact: true }).click();
+      285 |   await expect(menu).toBeHidden();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:282:63
+
+    Error Context: test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ───
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('body')
+    Expected pattern: not /PERSONAL NOTE|DAILY JOURNAL/
+    Received string: "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" locator('body') with timeout 5000ms
+      - waiting for locator('body')
+        14 × locator resolved to <body>…</body>
+           - unexpected value "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+
+
+      303 | }) => {
+      304 |   const id = await openPrivate(page);
+    > 305 |   await expect(page.locator("body")).not.toContainText(
+          |                                          ^
+      306 |     /PERSONAL NOTE|DAILY JOURNAL/,
+      307 |   );
+      308 |   await page.evaluate(() =>
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:305:42
+
+    Error Context: test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true }) with timeout 5000ms
+      - waiting for getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+
+
+      382 |   const list = page.getByRole("region", { name: "月份日記" });
+      383 |   for (const date of dates)
+    > 384 |     await expect(list.getByRole("link", { name: date, exact: true })).toBeVisible();
+          |                                                                       ^
+      385 |   for (const text of await list.getByRole("link").allTextContents()) {
+      386 |     const date = text.match(/\d{4}-\d{2}-\d{2}/)![0];
+      387 |     expect(text.split(date).length - 1).toBe(1);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:384:71
+
+    Error Context: test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ─────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+    Expected: "true"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+
+
+      411 |   await expect(link("第三層")).toBeVisible();
+      412 |   const collapse = tree.getByRole("button", { name: "收合 第一層", exact: true });
+    > 413 |   await expect(collapse).toHaveAttribute("aria-expanded", "true");
+          |                          ^
+      414 |   await collapse.click();
+      415 |   await expect(
+      416 |     tree.getByRole("button", { name: "展開 第一層", exact: true }),
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:413:26
+
+    Error Context: test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+
+
+      445 |   await expect(
+      446 |     path.getByRole("button", { name: "筆記列表", exact: true }),
+    > 447 |   ).toBeVisible();
+          |     ^
+      448 |   await openPageActions(page);
+      449 |   const options = await page
+      450 |     .getByLabel("移動至上層", { exact: true })
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:447:5
+
+    Error Context: test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ──────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+    Expected: "還原"
+    Received: "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+        13 × locator resolved to <button type="button" data-size="sm" data-variant="light" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button>
+           - unexpected value "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+
+
+      479 |   const dialog = page.getByRole("dialog", { name: "垃圾桶", exact: true });
+      480 |   const restore = dialog.getByRole("button", { name: "還原 " + longTitle });
+    > 481 |   await expect(restore).toHaveText("還原");
+          |                         ^
+      482 |   expect(
+      483 |     await dialog
+      484 |       .locator(".mantine-Modal-body")
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:481:25
+
+    Error Context: test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.backup-card').nth(2)
+    Expected: "true"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.backup-card').nth(2) with timeout 5000ms
+      - waiting for locator('.backup-card').nth(2)
+        14 × locator resolved to <div data-with-border="true" class="backup-card m_1b7284a3 mantine-Paper-root">…</div>
+           - unexpected value "null"
+
+
+      516 |   });
+      517 |   await choose.nth(2).click();
+    > 518 |   await expect(page.locator(".backup-card").nth(2)).toHaveAttribute(
+          |                                                     ^
+      519 |     "aria-current",
+      520 |     "true",
+      521 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:518:53
+
+    Error Context: test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ───
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 5
+
+    - Array []
+    + Array [
+    +   "私人工作區 · 自動保存 · 隨時續寫 3.14",
+    +   "僅限已設定的擁有者登入 3.32",
+    +   "一個屬於你的，安靜寫作的地方。 3.14",
+    + ]
+
+      595 |   await page.goto("/");
+      596 |   await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+    > 597 |   expect(await contrastFailures(page)).toEqual([]);
+          |                                        ^
+      598 |   await openPrivate(page);
+      599 |   await showNavigation(page);
+      600 |   expect(await contrastFailures(page)).toEqual([]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:597:40
+
+    Error Context: test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ───
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('save-announcer')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('save-announcer') with timeout 5000ms
+      - waiting for getByTestId('save-announcer')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      46 | test("UX-01：連續輸入時保存狀態列不跳動、不出現重試", async ({ page }) => {
+      47 |   await openPrivate(page);
+    > 48 |   await expect(page.getByTestId("save-announcer")).toHaveCount(1);
+         |                                                    ^
+      49 |   await page.evaluate(() => {
+      50 |     const target = document.querySelector(".save-status")!;
+      51 |     const live = document.querySelector("[data-testid=save-announcer]")!;
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:48:52
+
+    Error Context: test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ─────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.cloud-indicator')
+    Expected: "failed"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.cloud-indicator') with timeout 5000ms
+      - waiting for locator('.cloud-indicator')
+        14 × locator resolved to <div class="cloud-indicator m_4081bf90 mantine-Group-root">…</div>
+           - unexpected value "null"
+
+
+      107 |       }),
+      108 |     );
+    > 109 |     await expect(indicator).toHaveAttribute("data-state", "failed");
+          |                             ^
+      110 |     await expect(retry).toBeVisible();
+      111 |     await control(false);
+      112 |     await retry.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:109:29
+
+    Error Context: test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByLabel('文件標題', { exact: true })
+    Expected: "原始標題"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      137 |   await openPage(page, id);
+      138 |   const input = titleInput(page);
+    > 139 |   await expect(input).toHaveValue("原始標題");
+          |                       ^
+      140 |   await expect(page.locator(".document-heading")).toContainText("筆記");
+      141 |   await input.click();
+      142 |   await input.fill("取消的名稱");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:139:23
+
+    Error Context: test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ───
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.fill: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      168 |   await openPage(page, id);
+      169 |   const input = titleInput(page);
+    > 170 |   await input.fill("");
+          |               ^
+      171 |   await page.locator(".tiptap").click();
+      172 |   await expect(input).toHaveValue("保留的標題");
+      173 |   await expect(page.getByRole("alert")).toContainText("標題");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:170:15
+
+    Error Context: test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "未命名"
+    Received: "新增筆記"
+
+      201 |   const parent = new URL(page.url()).searchParams.get("page")!;
+      202 |   expect(new URL(page.url()).searchParams.get("new")).toBeNull();
+    > 203 |   expect(await apiTitle(page, parent)).toBe("未命名");
+          |                                        ^
+      204 |   const input = titleInput(page);
+      205 |   await expect(input).toBeFocused();
+      206 |   expect(
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:203:40
+
+    Error Context: test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('menu', { name: '區塊操作' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('menu', { name: '區塊操作' }) with timeout 5000ms
+      - waiting for getByRole('menu', { name: '區塊操作' })
+
+
+      251 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+      252 |   const surface = page.locator(".writing-surface");
+    > 253 |   await expect(menu).toBeVisible();
+          |                      ^
+      254 |   await expect(surface).toHaveAttribute("data-active-block", "d");
+      255 |   const up = page.getByRole("menuitem", { name: "上移區塊", exact: true });
+      256 |   for (let i = 0; i < 3; i++) {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:253:22
+
+    Error Context: test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ───
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('menuitem', { name: '複製程式碼' })
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" getByRole('menuitem', { name: '複製程式碼' }) with timeout 5000ms
+      - waiting for getByRole('menuitem', { name: '複製程式碼' })
+
+
+      280 |   await page.getByRole("button", { name: "區塊操作", exact: true }).click();
+      281 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+    > 282 |   await expect(page.getByRole("menuitem", { name: "複製程式碼" })).toBeDisabled();
+          |                                                               ^
+      283 |   await expect(menu).toContainText("游標放在程式碼區塊");
+      284 |   await page.getByRole("menuitem", { name: "刪除區塊", exact: true }).click();
+      285 |   await expect(menu).toBeHidden();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:282:63
+
+    Error Context: test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ───
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('body')
+    Expected pattern: not /PERSONAL NOTE|DAILY JOURNAL/
+    Received string: "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" locator('body') with timeout 5000ms
+      - waiting for locator('body')
+        14 × locator resolved to <body>…</body>
+           - unexpected value "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+
+
+      303 | }) => {
+      304 |   const id = await openPrivate(page);
+    > 305 |   await expect(page.locator("body")).not.toContainText(
+          |                                          ^
+      306 |     /PERSONAL NOTE|DAILY JOURNAL/,
+      307 |   );
+      308 |   await page.evaluate(() =>
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:305:42
+
+    Error Context: test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true }) with timeout 5000ms
+      - waiting for getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+
+
+      382 |   const list = page.getByRole("region", { name: "月份日記" });
+      383 |   for (const date of dates)
+    > 384 |     await expect(list.getByRole("link", { name: date, exact: true })).toBeVisible();
+          |                                                                       ^
+      385 |   for (const text of await list.getByRole("link").allTextContents()) {
+      386 |     const date = text.match(/\d{4}-\d{2}-\d{2}/)![0];
+      387 |     expect(text.split(date).length - 1).toBe(1);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:384:71
+
+    Error Context: test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 ────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 365.40000000000003
+    Received:   407.890625
+
+      394 |   await openPrivate(page);
+      395 |   const box = (await page.locator(".tiptap").boundingBox())!;
+    > 396 |   expect(box.y).toBeLessThan(812 * 0.45);
+          |                 ^
+      397 |   await expect(page.locator("body")).not.toContainText(
+      398 |     /留一頁給今天|從一個想法開始|你的私人筆記空間/,
+      399 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:396:17
+
+    Error Context: test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ──────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+    Expected: "true"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+
+
+      411 |   await expect(link("第三層")).toBeVisible();
+      412 |   const collapse = tree.getByRole("button", { name: "收合 第一層", exact: true });
+    > 413 |   await expect(collapse).toHaveAttribute("aria-expanded", "true");
+          |                          ^
+      414 |   await collapse.click();
+      415 |   await expect(
+      416 |     tree.getByRole("button", { name: "展開 第一層", exact: true }),
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:413:26
+
+    Error Context: test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+
+
+      445 |   await expect(
+      446 |     path.getByRole("button", { name: "筆記列表", exact: true }),
+    > 447 |   ).toBeVisible();
+          |     ^
+      448 |   await openPageActions(page);
+      449 |   const options = await page
+      450 |     .getByLabel("移動至上層", { exact: true })
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:447:5
+
+    Error Context: test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ───────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+    Expected: "還原"
+    Received: "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+        13 × locator resolved to <button type="button" data-size="sm" data-variant="light" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button>
+           - unexpected value "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+
+
+      479 |   const dialog = page.getByRole("dialog", { name: "垃圾桶", exact: true });
+      480 |   const restore = dialog.getByRole("button", { name: "還原 " + longTitle });
+    > 481 |   await expect(restore).toHaveText("還原");
+          |                         ^
+      482 |   expect(
+      483 |     await dialog
+      484 |       .locator(".mantine-Modal-body")
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:481:25
+
+    Error Context: test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.backup-card').nth(2)
+    Expected: "true"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.backup-card').nth(2) with timeout 5000ms
+      - waiting for locator('.backup-card').nth(2)
+        14 × locator resolved to <div data-with-border="true" class="backup-card m_1b7284a3 mantine-Paper-root">…</div>
+           - unexpected value "null"
+
+
+      516 |   });
+      517 |   await choose.nth(2).click();
+    > 518 |   await expect(page.locator(".backup-card").nth(2)).toHaveAttribute(
+          |                                                     ^
+      519 |     "aria-current",
+      520 |     "true",
+      521 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:518:53
+
+    Error Context: test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "僅限已設定的擁有者登入 3.32",
+    +   "一個屬於你的，安靜寫作的地方。 3.14",
+    + ]
+
+      595 |   await page.goto("/");
+      596 |   await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+    > 597 |   expect(await contrastFailures(page)).toEqual([]);
+          |                                        ^
+      598 |   await openPrivate(page);
+      599 |   await showNavigation(page);
+      600 |   expect(await contrastFailures(page)).toEqual([]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:597:40
+
+    Error Context: test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ─────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('save-announcer')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('save-announcer') with timeout 5000ms
+      - waiting for getByTestId('save-announcer')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      46 | test("UX-01：連續輸入時保存狀態列不跳動、不出現重試", async ({ page }) => {
+      47 |   await openPrivate(page);
+    > 48 |   await expect(page.getByTestId("save-announcer")).toHaveCount(1);
+         |                                                    ^
+      49 |   await page.evaluate(() => {
+      50 |     const target = document.querySelector(".save-status")!;
+      51 |     const live = document.querySelector("[data-testid=save-announcer]")!;
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:48:52
+
+    Error Context: test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-01：連續輸入時保存狀態列不跳動、不出現重試-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ───────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.cloud-indicator')
+    Expected: "failed"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.cloud-indicator') with timeout 5000ms
+      - waiting for locator('.cloud-indicator')
+        14 × locator resolved to <div class="cloud-indicator m_4081bf90 mantine-Group-root">…</div>
+           - unexpected value "null"
+
+
+      107 |       }),
+      108 |     );
+    > 109 |     await expect(indicator).toHaveAttribute("data-state", "failed");
+          |                             ^
+      110 |     await expect(retry).toBeVisible();
+      111 |     await control(false);
+      112 |     await retry.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:109:29
+
+    Error Context: test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-02：雲端失敗與離線顯示非成功圖示與重試-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByLabel('文件標題', { exact: true })
+    Expected: "原始標題"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      137 |   await openPage(page, id);
+      138 |   const input = titleInput(page);
+    > 139 |   await expect(input).toHaveValue("原始標題");
+          |                       ^
+      140 |   await expect(page.locator(".document-heading")).toContainText("筆記");
+      141 |   await input.click();
+      142 |   await input.fill("取消的名稱");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:139:23
+
+    Error Context: test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-03：標題可直接編輯，Enter-保存、Escape-取消-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ─────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.fill: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      168 |   await openPage(page, id);
+      169 |   const input = titleInput(page);
+    > 170 |   await input.fill("");
+          |               ^
+      171 |   await page.locator(".tiptap").click();
+      172 |   await expect(input).toHaveValue("保留的標題");
+      173 |   await expect(page.getByRole("alert")).toContainText("標題");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:170:15
+
+    Error Context: test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-04：空白、過長或失敗的標題恢復原值並說明-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "未命名"
+    Received: "新增筆記"
+
+      201 |   const parent = new URL(page.url()).searchParams.get("page")!;
+      202 |   expect(new URL(page.url()).searchParams.get("new")).toBeNull();
+    > 203 |   expect(await apiTitle(page, parent)).toBe("未命名");
+          |                                        ^
+      204 |   const input = titleInput(page);
+      205 |   await expect(input).toBeFocused();
+      206 |   expect(
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:203:40
+
+    Error Context: test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-05：新筆記與子頁面以未命名建立並可立即輸入標題-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  35) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('menu', { name: '區塊操作' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('menu', { name: '區塊操作' }) with timeout 5000ms
+      - waiting for getByRole('menu', { name: '區塊操作' })
+
+
+      251 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+      252 |   const surface = page.locator(".writing-surface");
+    > 253 |   await expect(menu).toBeVisible();
+          |                      ^
+      254 |   await expect(surface).toHaveAttribute("data-active-block", "d");
+      255 |   const up = page.getByRole("menuitem", { name: "上移區塊", exact: true });
+      256 |   for (let i = 0; i < 3; i++) {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:253:22
+
+    Error Context: test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-06：區塊選單可連續上移並標示目前區塊-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  36) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ─────
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('menuitem', { name: '複製程式碼' })
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" getByRole('menuitem', { name: '複製程式碼' }) with timeout 5000ms
+      - waiting for getByRole('menuitem', { name: '複製程式碼' })
+
+
+      280 |   await page.getByRole("button", { name: "區塊操作", exact: true }).click();
+      281 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+    > 282 |   await expect(page.getByRole("menuitem", { name: "複製程式碼" })).toBeDisabled();
+          |                                                               ^
+      283 |   await expect(menu).toContainText("游標放在程式碼區塊");
+      284 |   await page.getByRole("menuitem", { name: "刪除區塊", exact: true }).click();
+      285 |   await expect(menu).toBeHidden();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:282:63
+
+    Error Context: test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-07：刪除區塊可復原，非程式碼區塊停用複製-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  37) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ─────
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('body')
+    Expected pattern: not /PERSONAL NOTE|DAILY JOURNAL/
+    Received string: "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" locator('body') with timeout 5000ms
+      - waiting for locator('body')
+        14 × locator resolved to <body>…</body>
+           - unexpected value "p-note你的私人筆記空間搜尋筆記備份設定我的空間今天日記新增筆記筆記0留一頁給新的想法點選「新增筆記」開始。垃圾桶登出只有你能存取的私人工作區日記2026-10-15頁面操作DAILY JOURNAL日記 2026-10-15留一頁給今天，寫下想記住的事。可編輯本機已儲存雲端已儲存插入圖片區塊操作輸入 / 新增區塊
+    
+    "
+
+
+      303 | }) => {
+      304 |   const id = await openPrivate(page);
+    > 305 |   await expect(page.locator("body")).not.toContainText(
+          |                                          ^
+      306 |     /PERSONAL NOTE|DAILY JOURNAL/,
+      307 |   );
+      308 |   await page.evaluate(() =>
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:305:42
+
+    Error Context: test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-08：隔離與錯誤提示使用易懂文字並正確分隔-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  38) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true }) with timeout 5000ms
+      - waiting for getByRole('region', { name: '月份日記' }).getByRole('link', { name: '2026-10-01', exact: true })
+
+
+      382 |   const list = page.getByRole("region", { name: "月份日記" });
+      383 |   for (const date of dates)
+    > 384 |     await expect(list.getByRole("link", { name: date, exact: true })).toBeVisible();
+          |                                                                       ^
+      385 |   for (const text of await list.getByRole("link").allTextContents()) {
+      386 |     const date = text.match(/\d{4}-\d{2}-\d{2}/)![0];
+      387 |     expect(text.split(date).length - 1).toBe(1);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:384:71
+
+    Error Context: test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-09：日記面板立即列出當月且日期不重複-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  39) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 ──────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 365.40000000000003
+    Received:   407.890625
+
+      394 |   await openPrivate(page);
+      395 |   const box = (await page.locator(".tiptap").boundingBox())!;
+    > 396 |   expect(box.y).toBeLessThan(812 * 0.45);
+          |                 ^
+      397 |   await expect(page.locator("body")).not.toContainText(
+      398 |     /留一頁給今天|從一個想法開始|你的私人筆記空間/,
+      399 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:396:17
+
+    Error Context: test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-10：手機首屏上半部即可開始書寫-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  40) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ────────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+    Expected: "true"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '筆記頁面' }).getByRole('button', { name: '收合 第一層', exact: true })
+
+
+      411 |   await expect(link("第三層")).toBeVisible();
+      412 |   const collapse = tree.getByRole("button", { name: "收合 第一層", exact: true });
+    > 413 |   await expect(collapse).toHaveAttribute("aria-expanded", "true");
+          |                          ^
+      414 |   await collapse.click();
+      415 |   await expect(
+      416 |     tree.getByRole("button", { name: "展開 第一層", exact: true }),
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:413:26
+
+    Error Context: test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-11：頁面樹可收合並在重新整理後保留-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  41) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '頁面路徑' }).getByRole('button', { name: '筆記列表', exact: true })
+
+
+      445 |   await expect(
+      446 |     path.getByRole("button", { name: "筆記列表", exact: true }),
+    > 447 |   ).toBeVisible();
+          |     ^
+      448 |   await openPageActions(page);
+      449 |   const options = await page
+      450 |     .getByLabel("移動至上層", { exact: true })
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:447:5
+
+    Error Context: test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-12：移動選項依階層並排除子孫，Ctrl-Meta-K-開啟搜尋-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+    Expected: "還原"
+    Received: "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' }) with timeout 5000ms
+      - waiting for getByRole('dialog', { name: '垃圾桶', exact: true }).getByRole('button', { name: '還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題' })
+        14 × locator resolved to <button type="button" data-size="sm" data-variant="light" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button>
+           - unexpected value "還原 很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題很長的標題"
+
+
+      479 |   const dialog = page.getByRole("dialog", { name: "垃圾桶", exact: true });
+      480 |   const restore = dialog.getByRole("button", { name: "還原 " + longTitle });
+    > 481 |   await expect(restore).toHaveText("還原");
+          |                         ^
+      482 |   expect(
+      483 |     await dialog
+      484 |       .locator(".mantine-Modal-body")
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:481:25
+
+    Error Context: test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-13：長標題還原不溢出並有明確回饋-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  43) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.backup-card').nth(2)
+    Expected: "true"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.backup-card').nth(2) with timeout 5000ms
+      - waiting for locator('.backup-card').nth(2)
+        14 × locator resolved to <div data-with-border="true" class="backup-card m_1b7284a3 mantine-Paper-root">…</div>
+           - unexpected value "null"
+
+
+      516 |   });
+      517 |   await choose.nth(2).click();
+    > 518 |   await expect(page.locator(".backup-card").nth(2)).toHaveAttribute(
+          |                                                     ^
+      519 |     "aria-current",
+      520 |     "true",
+      521 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:518:53
+
+    Error Context: test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  44) [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ──────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "僅限已設定的擁有者登入 3.32",
+    +   "一個屬於你的，安靜寫作的地方。 3.14",
+    + ]
+
+      595 |   await page.goto("/");
+      596 |   await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+    > 597 |   expect(await contrastFailures(page)).toEqual([]);
+          |                                        ^
+      598 |   await openPrivate(page);
+      599 |   await showNavigation(page);
+      600 |   expect(await contrastFailures(page)).toEqual([]);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-usability.spec.ts:597:40
+
+    Error Context: test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-usability-UX-15：小字輔助文字對比達-WCAG-AA-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  44 failed
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ──────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 ─
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ──────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ──────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ───────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ────────
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+    [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ─────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ─────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ───────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ─────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 ──
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ───────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ─────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ─────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ───────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 ──────────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ────────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ─────────
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+    [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ──────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:46:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 ───────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:95:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 ─────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:134:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:165:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 ───────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:192:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 ────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:242:1 › UX-06：區塊選單可連續上移並標示目前區塊 ─────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:274:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 ───────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:300:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 ───────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:369:1 › UX-09：日記面板立即列出當月且日期不重複 ─────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:391:1 › UX-10：手機首屏上半部即可開始書寫 ────────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:402:1 › UX-11：頁面樹可收合並在重新整理後保留 ──────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:463:1 › UX-13：長標題還原不溢出並有明確回饋 ───────────
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:502:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 
+    [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:593:1 › UX-15：小字輔助文字對比達 WCAG AA ────────
+  1 skipped

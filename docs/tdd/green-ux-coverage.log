@@ -1,0 +1,15 @@
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ✓ tests/unit/service-worker.test.ts (1 test) 2ms
+ ✓ tests/unit/environment.test.ts (1 test) 3ms
+ ✓ tests/unit/coverage.test.ts (2 tests) 2ms
+ ✓ tests/unit/receipt.test.ts (1 test) 2ms
+ ✓ tests/unit/page-cache.test.ts (1 test) 2ms
+
+ Test Files  5 passed (5)
+      Tests  6 passed (6)
+   Start at  14:01:45
+   Duration  106ms (transform 80ms, setup 0ms, import 110ms, tests 12ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/unit.json

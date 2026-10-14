@@ -55,7 +55,8 @@ test("AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器", asyn
     ),
   ).toEqual([]);
   await page.getByRole("button", { name: "確認登入", exact: true }).click();
-  await expect(page.getByRole("heading", { name: /^日記/ })).toBeVisible();
+  await expect(page.getByLabel("文件標題", { exact: true })).toBeVisible();
+  await expect(page.locator(".document-heading")).toContainText("日記");
   await saved(page);
   expect(new URL(page.url()).searchParams.get("page")).toBeTruthy();
   expect(

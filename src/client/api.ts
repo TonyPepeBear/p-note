@@ -9,9 +9,9 @@ export async function saveDraft(): Promise<void> {
   }
 }
 
-export async function navigate(id?: string): Promise<void> {
+export async function navigate(id?: string, fresh = false): Promise<void> {
   await saveDraft();
-  location.assign(id ? '/?page=' + encodeURIComponent(id) : '/');
+  location.assign(id ? '/?page=' + encodeURIComponent(id) + (fresh ? '&new=1' : '') : '/');
 }
 import { saveLocal } from './cache';
 

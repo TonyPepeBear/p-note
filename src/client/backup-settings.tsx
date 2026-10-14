@@ -20,7 +20,7 @@ import {
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { Brand } from "./ui";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import type { BackupCatalog } from "../shared/backup";
 
@@ -39,6 +39,14 @@ export function BackupSettings({
   const [acknowledged, setAcknowledged] = useState(false);
   const [operation, setOperation] = useState<{ backup: string; id: string }>();
   const [interrupted, setInterrupted] = useState(false);
+  const confirmation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (selected)
+      confirmation.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+  }, [selected]);
   const load = async () => {
     const response = await api("/api/backups");
     if (response.status === 401) unauthorized();
@@ -142,7 +150,7 @@ export function BackupSettings({
       </Group>
       <div className="backup-heading">
         <Badge variant="light" color="teal">
-          DATA & BACKUP
+          資料與備份
         </Badge>
         <Group justify="space-between" align="end" mt="md">
           <div>
@@ -210,6 +218,7 @@ export function BackupSettings({
               p="lg"
               radius="lg"
               className="backup-card"
+              aria-current={selected === backup.id ? "true" : undefined}
               key={backup.id}
             >
               <Group justify="space-between" align="start">
@@ -279,6 +288,7 @@ export function BackupSettings({
       )}
       {selected && (
         <Paper
+          ref={confirmation}
           component="section"
           aria-label="覆蓋還原確認"
           withBorder
@@ -293,7 +303,7 @@ export function BackupSettings({
                 還原這份備份
               </Title>
               <Text c="dimmed" size="sm" mt="sm" lh={1.8}>
-                還原會覆蓋目前所有頁面、日記與階層。開始前會備份目前的雲端內容；其他分頁的本機草稿會保留並隔離。
+                還原會覆蓋目前所有頁面、日記與階層。開始前會備份目前的雲端內容；其他分頁尚未上傳的修改會另外保留。
               </Text>
             </div>
             <Divider />
@@ -303,16 +313,28 @@ export function BackupSettings({
               disabled={busy}
               onChange={(event) => setAcknowledged(event.target.checked)}
             />
-            <Button
-              color="orange.9"
-              disabled={busy || !acknowledged}
-              loading={busy}
-              onClick={() => {
-                void restore();
-              }}
-            >
-              {busy ? "還原處理中" : "覆蓋還原"}
-            </Button>
+            <Group justify="flex-end">
+              <Button
+                variant="default"
+                disabled={busy || interrupted}
+                onClick={() => {
+                  setSelected("");
+                  setAcknowledged(false);
+                }}
+              >
+                取消還原
+              </Button>
+              <Button
+                color="orange.9"
+                disabled={busy || !acknowledged}
+                loading={busy}
+                onClick={() => {
+                  void restore();
+                }}
+              >
+                {busy ? "還原處理中" : "覆蓋還原"}
+              </Button>
+            </Group>
           </Stack>
         </Paper>
       )}

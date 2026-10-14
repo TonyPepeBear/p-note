@@ -1,4 +1,10 @@
-import { createTheme, Group, Text, ThemeIcon } from "@mantine/core";
+import {
+  createTheme,
+  Group,
+  Text,
+  ThemeIcon,
+  type CSSVariablesResolver,
+} from "@mantine/core";
 import { IconNotebook } from "@tabler/icons-react";
 
 export const theme = createTheme({
@@ -43,6 +49,13 @@ export const theme = createTheme({
       },
     },
   },
+});
+
+// Mantine 預設 dimmed（gray.6）在淺底小字只有約 3.3:1，未達 WCAG AA。
+export const resolver: CSSVariablesResolver = () => ({
+  variables: {},
+  light: { "--mantine-color-dimmed": "#5c6862" },
+  dark: {},
 });
 
 export function Brand() {

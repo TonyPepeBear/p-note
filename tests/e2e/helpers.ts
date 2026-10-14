@@ -101,24 +101,19 @@ export async function openImageUpload(page: Page) {
 }
 
 export async function copyCode(page: Page) {
-  const trigger = page.getByRole("button", { name: "區塊操作", exact: true });
-  if (
-    new URL(page.url()).pathname !== "/probe" &&
-    (await trigger.getAttribute("aria-expanded")) !== "true"
-  )
-    await trigger.click();
-  await page.getByRole("button", { name: "複製程式碼", exact: true }).click();
-  await expect(
-    page.getByRole("dialog", { name: "區塊操作", exact: true }),
-  ).toBeHidden();
+  if (new URL(page.url()).pathname === "/probe") {
+    await page.getByRole("button", { name: "複製程式碼", exact: true }).click();
+    return;
+  }
+  await blockAction(page, "複製程式碼");
 }
 
 export async function blockAction(page: Page, label: string) {
   const trigger = page.getByRole("button", { name: "區塊操作", exact: true });
   if ((await trigger.getAttribute("aria-expanded")) !== "true")
     await trigger.click();
-  await page.getByRole("button", { name: label, exact: true }).click();
-  await expect(
-    page.getByRole("dialog", { name: "區塊操作", exact: true }),
-  ).toBeHidden();
+  await page.getByRole("menuitem", { name: label, exact: true }).click();
+  const menu = page.getByRole("menu", { name: "區塊操作" });
+  if (await menu.isVisible()) await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
 }

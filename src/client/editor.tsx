@@ -2,19 +2,23 @@ import {
   Alert,
   Badge,
   Button,
-  Divider,
   Group,
+  Menu,
   Modal,
   Paper,
   Stack,
   Text,
   FileInput,
   Title,
+  VisuallyHidden,
 } from "@mantine/core";
 import {
   IconArrowDown,
   IconArrowUp,
   IconCloudCheck,
+  IconCloudOff,
+  IconCloudUpload,
+  IconCloudX,
   IconCode,
   IconFileText,
   IconPhoto,
@@ -23,7 +27,7 @@ import {
   IconTrash,
   IconChevronDown,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
@@ -49,13 +53,121 @@ export type Session = {
   checkAccess?: () => Promise<boolean>;
 };
 
+const cloudStates = {
+  saved: { icon: IconCloudCheck, color: "teal.8" },
+  syncing: { icon: IconCloudUpload, color: "dimmed" },
+  offline: { icon: IconCloudOff, color: "orange.9" },
+  failed: { icon: IconCloudX, color: "red.8" },
+  local: { icon: IconCloudOff, color: "dimmed" },
+};
+
+function cloudState(text: string, readOnly: boolean) {
+  if (readOnly) return "local";
+  if (text === "雲端已儲存") return "saved";
+  if (text === "同步中") return "syncing";
+  return text.startsWith("離線") ? "offline" : "failed";
+}
+
+function DocumentTitle({
+  title,
+  rename,
+  focus,
+  done,
+}: {
+  title: string;
+  rename?: (title: string) => Promise<void>;
+  focus: boolean;
+  done: () => void;
+}) {
+  const [value, setValue] = useState(title);
+  const [error, setError] = useState("");
+  const input = useRef<HTMLTextAreaElement>(null);
+  const cancelled = useRef(false);
+  useEffect(() => setValue(title), [title]);
+  useEffect(() => {
+    if (!focus) return;
+    input.current?.focus();
+    input.current?.select();
+  }, [focus]);
+  useLayoutEffect(() => {
+    const element = input.current;
+    if (!element) return;
+    element.style.height = "auto";
+    element.style.height = element.scrollHeight + "px";
+  }, [value]);
+  const commit = async () => {
+    if (cancelled.current) {
+      cancelled.current = false;
+      return;
+    }
+    const next = value.trim();
+    if (!rename || next === title) {
+      setValue(title);
+      return;
+    }
+    if (!next || next.length > 200) {
+      setValue(title);
+      setError(next ? "標題最多 200 個字元" : "標題不能空白");
+      return;
+    }
+    setError("");
+    try {
+      await rename(next);
+    } catch (failure) {
+      setValue(title);
+      setError(
+        failure instanceof Error ? failure.message : "標題保存失敗，請重試",
+      );
+    }
+  };
+  return (
+    <>
+      <Title order={1} mt="xs">
+        <textarea
+          ref={input}
+          className="title-input"
+          aria-label="文件標題"
+          rows={1}
+          value={value}
+          readOnly={!rename}
+          onChange={(event) => setValue(event.target.value)}
+          onBlur={() => void commit()}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+              event.preventDefault();
+              done();
+            }
+            if (event.key === "Escape") {
+              cancelled.current = true;
+              setValue(title);
+              setError("");
+              event.currentTarget.blur();
+            }
+          }}
+        />
+      </Title>
+      {error && (
+        <Alert color="red" role="alert" mt="xs">
+          {error}
+        </Alert>
+      )}
+    </>
+  );
+}
+
 export function Editor({
   session,
   title,
+  kind = "note",
+  rename,
+  focusTitle = false,
   readOnly = false,
 }: {
   session: Session;
   title?: string;
+  kind?: "note" | "journal";
+  rename?: (title: string) => Promise<void>;
+  focusTitle?: boolean;
   readOnly?: boolean;
 }) {
   const { doc, cache, provider, room } = session;
@@ -65,6 +177,10 @@ export function Editor({
   const [copyError, setCopyError] = useState("");
   const [imageOpen, setImageOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [activeBlock, setActiveBlock] = useState<{
+    id: string;
+    code: boolean;
+  }>();
   const editor = useCreateBlockNote(
     withCollaboration({
       dictionary: zhTW,
@@ -164,7 +280,7 @@ export function Editor({
         )
           setCloud("雲端儲存失敗，可重試");
       } catch {
-        setCloud("確認格式錯誤");
+        setCloud("雲端回應異常，可重試");
       }
     };
     const offline = () => {
@@ -196,6 +312,19 @@ export function Editor({
         }
         if (disposed) return;
         blocked = false;
+        const stale = provider.ws;
+        if (stale && stale.readyState >= WebSocket.CLOSING) {
+          // 斷網時 close 握手無法完成，舊連線卡在 CLOSING 而 provider 仍視為已連線，connect() 會直接略過。
+          // 攔下它遲到的 close，避免 provider 清掉新連線。
+          stale.addEventListener(
+            "close",
+            (event) => event.stopImmediatePropagation(),
+            { capture: true },
+          );
+          provider.ws = null;
+          provider.wsconnected = false;
+          provider.synced = false;
+        }
         await provider.connect();
       })()
         .catch(() => {
@@ -275,6 +404,17 @@ export function Editor({
   }, [doc, cache, provider, editor, room, readOnly]);
 
   const currentBlock = () => editor.getTextCursorPosition().block;
+  const state = cloudState(cloud, readOnly);
+  const CloudIcon = cloudStates[state].icon;
+  const retry =
+    !readOnly &&
+    (state === "failed" || state === "offline" || local.includes("失敗"));
+  const [announced, setAnnounced] = useState("");
+  useEffect(() => {
+    if (local.includes("失敗")) setAnnounced(local);
+    else if (state !== "syncing")
+      setAnnounced(readOnly ? "僅保留在本機" : cloud);
+  }, [cloud, local, state, readOnly]);
   const insert = (type: "paragraph" | "image") => {
     const [block] = editor.insertBlocks(
       [
@@ -342,96 +482,41 @@ export function Editor({
       setCopyError("複製失敗，請手動選取程式碼複製");
     }
   };
-  const tools = (
-    <Stack gap={6}>
-      <Button
-        variant="subtle"
-        color="dark"
-        leftSection={<IconPlus size={17} />}
-        onClick={() => {
-          setToolsOpen(false);
-          insert("paragraph");
-        }}
-      >
-        插入段落
-      </Button>
-      <Button
-        variant="subtle"
-        color="dark"
-        leftSection={<IconArrowUp size={17} />}
-        onClick={() => {
-          setToolsOpen(false);
-          editor.moveBlocksUp();
-          editor.focus();
-        }}
-      >
-        上移區塊
-      </Button>
-      <Button
-        variant="subtle"
-        color="dark"
-        leftSection={<IconArrowDown size={17} />}
-        onClick={() => {
-          setToolsOpen(false);
-          editor.moveBlocksDown();
-          editor.focus();
-        }}
-      >
-        下移區塊
-      </Button>
-      {title && (
-        <Button
-          variant="subtle"
-          color="dark"
-          leftSection={<IconCode size={17} />}
-          onClick={() => {
-            setToolsOpen(false);
-            void copy();
-          }}
-        >
-          複製程式碼
-        </Button>
-      )}
-      <Divider />
-      <Button
-        variant="subtle"
-        color="red"
-        leftSection={<IconTrash size={17} />}
-        onClick={() => {
-          setToolsOpen(false);
-          editor.removeBlocks([currentBlock()]);
-          editor.focus();
-        }}
-      >
-        刪除區塊
-      </Button>
-    </Stack>
-  );
   return (
     <section className="editor-document">
       <div className="document-heading">
-        <Badge
-          variant="light"
-          color={title?.startsWith("日記 ") ? "teal" : "gray"}
-          size="sm"
-        >
-          {title?.startsWith("日記 ") ? "DAILY JOURNAL" : "PERSONAL NOTE"}
-        </Badge>
-        <Title order={1} mt="md">
-          {title ?? "p-note 技術驗證"}
-        </Title>
-        <Text c="dimmed" mt={8} size="sm">
-          {title?.startsWith("日記 ")
-            ? "留一頁給今天，寫下想記住的事。"
-            : "從一個想法開始，慢慢寫成一份筆記。"}
-        </Text>
+        {title === undefined ? (
+          <Title order={1}>p-note 技術驗證</Title>
+        ) : (
+          <>
+            <Badge
+              variant="light"
+              color={kind === "journal" ? "teal" : "gray"}
+              size="sm"
+            >
+              {kind === "journal" ? "日記" : "筆記"}
+            </Badge>
+            <DocumentTitle
+              title={title}
+              rename={readOnly ? undefined : rename}
+              focus={focusTitle}
+              done={() => {
+                editor.setTextCursorPosition(editor.document[0], "start");
+                editor.focus();
+              }}
+            />
+          </>
+        )}
       </div>
       {!title && (
         <Text size="sm">
           本機原型：圖片為固定 fixture，正式資產服務尚未接入。
         </Text>
       )}
-      <Group className="save-status" gap="sm" aria-live="polite" wrap="wrap">
+      <Group className="save-status" gap="sm" wrap="wrap">
+        <VisuallyHidden data-testid="save-announcer" aria-live="polite">
+          {announced}
+        </VisuallyHidden>
         <Badge color={readOnly ? "gray" : "teal"} variant="dot">
           <span data-testid="ready">
             {ready ? (readOnly ? "僅供檢視" : "可編輯") : "載入中"}
@@ -443,20 +528,15 @@ export function Editor({
         <Group
           gap={5}
           className="cloud-indicator"
-          c={
-            cloud.includes("失敗")
-              ? "red"
-              : cloud.startsWith("離線")
-                ? "orange"
-                : "teal.8"
-          }
+          data-state={state}
+          c={cloudStates[state].color}
         >
-          <IconCloudCheck size={15} />
+          <CloudIcon size={15} />
           <Text size="xs" data-testid="cloud-status">
-            {readOnly ? "本機草稿已隔離" : cloud}
+            {readOnly ? "僅保留在本機" : cloud}
           </Text>
         </Group>
-        {!readOnly && (cloud !== "雲端已儲存" || local.includes("失敗")) && (
+        {retry && (
           <Button
             variant="subtle"
             size="compact-sm"
@@ -492,29 +572,84 @@ export function Editor({
                 插入測試圖片
               </Button>
             )}
-            <Button
-              variant="subtle"
-              color="dark"
-              leftSection={<IconFileText size={17} />}
-              rightSection={<IconChevronDown size={14} />}
-              aria-haspopup="dialog"
-              aria-expanded={toolsOpen}
-              onClick={() => setToolsOpen((value) => !value)}
-            >
-              區塊操作
-            </Button>
-            <Modal
+            <Menu
               opened={toolsOpen}
-              onClose={() => setToolsOpen(false)}
-              title="區塊操作"
-              size={280}
-              centered
-              returnFocus={false}
+              onChange={(opened) => {
+                if (opened) {
+                  const block = currentBlock();
+                  setActiveBlock({
+                    id: block.id,
+                    code: block.type === "codeBlock",
+                  });
+                }
+                setToolsOpen(opened);
+              }}
               onExitTransitionEnd={() => editor.focus()}
-              closeButtonProps={{ "aria-label": "關閉區塊操作" }}
+              returnFocus={false}
+              position="bottom-start"
+              width={240}
+              // 手機鍵盤彈出時可視高度很小，選單需翻轉並限高捲動，否則項目會落在畫面外。
+              middlewares={{ flip: true, shift: true, size: true }}
             >
-              {tools}
-            </Modal>
+              <Menu.Target>
+                <Button
+                  variant="subtle"
+                  color="dark"
+                  leftSection={<IconFileText size={17} />}
+                  rightSection={<IconChevronDown size={14} />}
+                >
+                  區塊操作
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown className="block-menu">
+                <Menu.Item
+                  leftSection={<IconPlus size={17} />}
+                  onClick={() => insert("paragraph")}
+                >
+                  插入段落
+                </Menu.Item>
+                <Menu.Item
+                  closeMenuOnClick={false}
+                  leftSection={<IconArrowUp size={17} />}
+                  onClick={() => editor.moveBlocksUp()}
+                >
+                  上移區塊
+                </Menu.Item>
+                <Menu.Item
+                  closeMenuOnClick={false}
+                  leftSection={<IconArrowDown size={17} />}
+                  onClick={() => editor.moveBlocksDown()}
+                >
+                  下移區塊
+                </Menu.Item>
+                {title !== undefined && (
+                  <>
+                    <Menu.Item
+                      leftSection={<IconCode size={17} />}
+                      disabled={!activeBlock?.code}
+                      onClick={() => {
+                        void copy();
+                      }}
+                    >
+                      複製程式碼
+                    </Menu.Item>
+                    {!activeBlock?.code && (
+                      <Text size="xs" c="dimmed" px="sm" pb={6}>
+                        請先將游標放在程式碼區塊內
+                      </Text>
+                    )}
+                  </>
+                )}
+                <Menu.Divider />
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconTrash size={17} />}
+                  onClick={() => editor.removeBlocks([currentBlock()])}
+                >
+                  刪除區塊
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
             {!title && (
               <Button
                 variant="subtle"
@@ -536,7 +671,13 @@ export function Editor({
           {copyError}
         </Alert>
       )}
-      <div className="writing-surface">
+      {toolsOpen && activeBlock && (
+        <style>{`.writing-surface .bn-block-outer[data-id="${CSS.escape(activeBlock.id)}"] > .bn-block > .bn-block-content { outline: 2px solid var(--mantine-color-teal-3); outline-offset: 2px; border-radius: 6px; }`}</style>
+      )}
+      <div
+        className="writing-surface"
+        data-active-block={toolsOpen ? activeBlock?.id : undefined}
+      >
         <BlockNoteView editor={editor} theme="light" editable={!readOnly} />
       </div>
       {title && !readOnly && (

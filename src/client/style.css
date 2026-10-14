@@ -8,7 +8,7 @@ body {
   margin: 0;
 }
 .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.7px;
 }
@@ -78,7 +78,7 @@ body {
   border-top: 1px solid #e0e5dc;
 }
 .sidebar-empty {
-  color: #6f7d72;
+  color: #4f5d53;
   background: #e9ede5;
   text-align: center;
 }
@@ -92,6 +92,19 @@ body {
   background: #dce9df;
   font-weight: 650;
 }
+.note-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.note-row-spacer {
+  flex: none;
+  width: 28px;
+}
+.note-row .note-link {
+  flex: 1;
+  min-width: 0;
+}
 .note-link .mantine-NavLink-label {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -100,15 +113,10 @@ body {
 .note-link .mantine-NavLink-body {
   min-width: 0;
 }
-.header-caption {
-  margin-left: 18px;
-  padding-left: 22px;
-  border-left: 1px solid #e7ebe4;
-}
 .header-search {
   width: 240px;
   justify-content: start;
-  color: #768077;
+  color: #5c6862;
   font-weight: 400;
 }
 .document-shell {
@@ -134,6 +142,37 @@ body {
 }
 .document-heading {
   margin-bottom: 18px;
+}
+.title-input {
+  display: block;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+  border-radius: 6px;
+}
+.title-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--mantine-color-teal-2);
+}
+.block-menu {
+  overflow-y: auto;
+}
+.trash-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.backup-card[aria-current="true"] {
+  border-color: var(--mantine-color-orange-6);
+  box-shadow: 0 0 0 1px var(--mantine-color-orange-6);
 }
 .save-status {
   margin-bottom: 24px;
@@ -237,7 +276,6 @@ body {
   .login-footer {
     margin-top: 24px;
   }
-  .header-caption,
   .header-search .mantine-Button-label > span,
   .header-backup .mantine-Button-label > span,
   .editor-shortcut {
@@ -247,6 +285,8 @@ body {
   .header-backup {
     width: 44px;
     padding: 0;
+    border-color: transparent;
+    background: transparent;
   }
   .header-search .mantine-Button-section,
   .header-backup .mantine-Button-section {
@@ -256,7 +296,7 @@ body {
     padding: 14px 20px 72px;
   }
   .document-path {
-    margin-bottom: 22px;
+    margin-bottom: 10px;
   }
   .document-path .mantine-Button-label {
     display: none;
@@ -269,14 +309,14 @@ body {
   }
   .save-status {
     gap: 7px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
   .editor-toolbar {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
   .writing-surface {
     margin-inline: -8px;
-    padding: 20px 0;
+    padding: 14px 0;
     border-radius: 12px;
     min-height: 420px;
   }

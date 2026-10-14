@@ -31,6 +31,7 @@ import {
   IconArrowRight,
   IconCalendar,
   IconCalendarEvent,
+  IconChevronDown,
   IconChevronRight,
   IconDots,
   IconFileText,
@@ -76,7 +77,39 @@ export function Navigation({
   const [searched, setSearched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState("");
+  const [notice, setNotice] = useState("");
+  const [collapsed, setCollapsed] = useState<string[]>(() => {
+    const ancestors = new Set(page.ancestors?.map((item) => item.id));
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem("p-note-collapsed") ?? "[]",
+      ) as string[];
+      return stored.filter((id) => !ancestors.has(id));
+    } catch {
+      return [];
+    }
+  });
   const trigger = useRef<HTMLElement | null>(null);
+  const toggle = (id: string) =>
+    setCollapsed((items) => {
+      const next = items.includes(id)
+        ? items.filter((item) => item !== id)
+        : [...items, id];
+      localStorage.setItem("p-note-collapsed", JSON.stringify(next));
+      return next;
+    });
+  const loadTrash = async () => {
+    const response = await api("/api/trash");
+    if (!response.ok) throw new Error("無法載入垃圾桶，請重試");
+    setTrash((await response.json()) as PageRow[]);
+  };
+  const loadMonth = async (value: string) => {
+    const response = await api(
+      "/api/journals?month=" + encodeURIComponent(value),
+    );
+    if (!response.ok) throw new Error("無效月份");
+    setJournals((await response.json()) as PageRow[]);
+  };
   const refresh = async () => {
     const response = await api("/api/pages");
     if (!response.ok) throw new Error("無法載入頁面列表");
@@ -88,7 +121,26 @@ export function Navigation({
   useEffect(() => {
     setTitle(page.title);
     setParent(page.parent_id ?? "");
+    setPages((items) =>
+      items.map((item) =>
+        item.id === page.id
+          ? { ...item, title: page.title, parent_id: page.parent_id }
+          : item,
+      ),
+    );
   }, [page.title, page.parent_id]);
+  useEffect(() => {
+    const search = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k")
+        return;
+      // 捕獲階段攔截，避免編輯器把 Mod+K 當成插入連結。
+      event.preventDefault();
+      event.stopPropagation();
+      open("search");
+    };
+    window.addEventListener("keydown", search, true);
+    return () => window.removeEventListener("keydown", search, true);
+  }, []);
   const run = async (work: () => Promise<void>) => {
     setBusy(true);
     setFailure("");
@@ -138,25 +190,63 @@ export function Navigation({
     setPanel(name);
     setNavOpen(false);
     setFailure("");
+    setNotice("");
   };
+  const notesUnder = (parentId: string | null) =>
+    pages.filter((item) => item.kind === "note" && item.parent_id === parentId);
   const tree = (parentId: string | null, depth = 0): ReactNode =>
-    pages
-      .filter((item) => item.kind === "note" && item.parent_id === parentId)
-      .map((item) => (
+    notesUnder(parentId).map((item) => {
+      const nested = notesUnder(item.id).length > 0;
+      const closed = collapsed.includes(item.id);
+      return (
         <Box key={item.id} pl={depth ? 16 : 0}>
-          <NavLink
-            component="a"
-            href={"/?page=" + item.id}
-            label={item.title}
-            leftSection={<IconFileText size={18} />}
-            active={item.id === page.id}
-            aria-current={item.id === page.id ? "page" : undefined}
-            onClick={(event) => link(event, item.id)}
-            className="note-link"
-          />
-          {tree(item.id, depth + 1)}
+          <div className="note-row">
+            {nested ? (
+              <ActionIcon
+                size={28}
+                color="gray"
+                aria-label={(closed ? "展開 " : "收合 ") + item.title}
+                aria-expanded={!closed}
+                onClick={() => toggle(item.id)}
+              >
+                {closed ? (
+                  <IconChevronRight size={15} />
+                ) : (
+                  <IconChevronDown size={15} />
+                )}
+              </ActionIcon>
+            ) : (
+              <span className="note-row-spacer" />
+            )}
+            <NavLink
+              component="a"
+              href={"/?page=" + item.id}
+              label={item.title}
+              leftSection={<IconFileText size={18} />}
+              active={item.id === page.id}
+              aria-current={item.id === page.id ? "page" : undefined}
+              onClick={(event) => link(event, item.id)}
+              className="note-link"
+            />
+          </div>
+          {!closed && tree(item.id, depth + 1)}
         </Box>
-      ));
+      );
+    });
+  const parents = (
+    parentId: string | null,
+    depth = 0,
+  ): { value: string; label: string }[] =>
+    notesUnder(parentId)
+      .filter((item) => item.id !== page.id)
+      .flatMap((item) => [
+        { value: item.id, label: "　".repeat(depth) + item.title },
+        ...parents(item.id, depth + 1),
+      ]);
+  const openJournals = (target: HTMLElement) => {
+    open("journals", target);
+    void run(() => loadMonth(month));
+  };
   const sidebar = (
     <div className="sidebar-content">
       <div>
@@ -179,7 +269,7 @@ export function Navigation({
             component="button"
             label="日記"
             leftSection={<IconCalendar size={20} />}
-            onClick={(event) => open("journals", event.currentTarget)}
+            onClick={(event) => openJournals(event.currentTarget)}
           />
           <Button
             variant="light"
@@ -190,10 +280,10 @@ export function Navigation({
             onClick={() => {
               void run(async () => {
                 const note = await request("/api/pages", {
-                  title: "新增筆記",
+                  title: "未命名",
                   parent_id: null,
                 });
-                if (note) await navigate(note.id);
+                if (note) await navigate(note.id, true);
               });
             }}
           >
@@ -234,11 +324,7 @@ export function Navigation({
           leftSection={<IconTrash size={18} />}
           onClick={() => {
             open("trash");
-            void run(async () => {
-              const response = await api("/api/trash");
-              if (!response.ok) throw new Error("無法載入垃圾桶");
-              setTrash((await response.json()) as PageRow[]);
-            });
+            void run(loadTrash);
           }}
         />
         <NavLink
@@ -296,9 +382,6 @@ export function Navigation({
               <IconMenu2 size={23} />
             </ActionIcon>
             <Brand />
-            <Text className="header-caption" size="sm" c="dimmed">
-              你的私人筆記空間
-            </Text>
           </Group>
           <Group gap={8} wrap="nowrap">
             <Button
@@ -345,12 +428,29 @@ export function Navigation({
           >
             <nav aria-label="頁面路徑">
               <Breadcrumbs separator={<IconChevronRight size={13} />}>
+                <Anchor
+                  component="button"
+                  size="sm"
+                  c="dimmed"
+                  aria-label={page.kind === "journal" ? "日記回顧" : "筆記列表"}
+                  onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                    if (page.kind === "journal")
+                      openJournals(event.currentTarget);
+                    else if (matchMedia("(max-width: 47.99em)").matches)
+                      setNavOpen(true);
+                    else
+                      document
+                        .querySelector<HTMLElement>(
+                          '.workspace-sidebar [aria-current="page"]',
+                        )
+                        ?.focus();
+                  }}
+                >
+                  {page.kind === "journal" ? "日記" : "筆記"}
+                </Anchor>
                 {page.ancestors?.map((item) => (
                   <span key={item.id}>{pageLink(item)}</span>
                 ))}
-                <Text size="sm" c="dimmed">
-                  {page.kind === "journal" ? "日記" : "筆記"}
-                </Text>
                 <Text size="sm" truncate maw={220}>
                   {page.title}
                 </Text>
@@ -414,7 +514,7 @@ export function Navigation({
               >
                 <Stack gap="sm">
                   <TextInput
-                    autoFocus
+                    data-autofocus
                     type="search"
                     label="搜尋文字"
                     placeholder="輸入關鍵字…"
@@ -488,13 +588,7 @@ export function Navigation({
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
-                  void run(async () => {
-                    const response = await api(
-                      "/api/journals?month=" + encodeURIComponent(month),
-                    );
-                    if (!response.ok) throw new Error("無效月份");
-                    setJournals((await response.json()) as PageRow[]);
-                  });
+                  void run(() => loadMonth(month));
                 }}
               >
                 <Group align="end">
@@ -515,7 +609,12 @@ export function Navigation({
                 <Stack gap={8}>
                   {journals.map((item) => (
                     <Paper key={item.id} p="sm" withBorder>
-                      {pageLink(item, item.journal_date + " " + item.title)}
+                      {pageLink(
+                        item,
+                        item.title === item.journal_date
+                          ? item.title
+                          : item.journal_date + " " + item.title,
+                      )}
                     </Paper>
                   ))}
                 </Stack>
@@ -527,6 +626,11 @@ export function Navigation({
               <Text size="sm" c="dimmed" mb="lg">
                 移除的頁面仍保留在這裡，可以隨時還原。
               </Text>
+              {notice && (
+                <Alert color="teal" role="status" mb="lg">
+                  {notice}
+                </Alert>
+              )}
               {!trash.length && (
                 <Stack align="center" gap="xs" py="xl">
                   <IconTrash size={36} stroke={1.3} />
@@ -542,23 +646,24 @@ export function Navigation({
                 {trash.map((item) => (
                   <Paper withBorder p="md" key={item.id}>
                     <Group justify="space-between" wrap="nowrap">
-                      <Text lineClamp={2}>{item.title}</Text>
+                      <Text lineClamp={2} className="trash-title">
+                        {item.title}
+                      </Text>
                       <Button
                         variant="light"
                         disabled={busy}
+                        aria-label={"還原 " + item.title}
                         onClick={() => {
+                          setNotice("");
                           void run(async () => {
                             await request(`/api/pages/${item.id}/restore`, {});
+                            setNotice(`已還原「${item.title}」`);
                             await refresh();
-                            setTrash(
-                              (await (
-                                await api("/api/trash")
-                              ).json()) as PageRow[],
-                            );
+                            await loadTrash();
                           });
                         }}
                       >
-                        還原 {item.title}
+                        還原
                       </Button>
                     </Group>
                   </Paper>
@@ -609,10 +714,10 @@ export function Navigation({
                     onClick={() => {
                       void run(async () => {
                         const child = await request("/api/pages", {
-                          title: "新增子頁面",
+                          title: "未命名",
                           parent_id: page.id,
                         });
-                        if (child) await navigate(child.id);
+                        if (child) await navigate(child.id, true);
                       });
                     }}
                   >
@@ -637,18 +742,7 @@ export function Navigation({
                         label="移動至上層"
                         value={parent}
                         onChange={(event) => setParent(event.target.value)}
-                        data={[
-                          { value: "", label: "最上層" },
-                          ...pages
-                            .filter(
-                              (item) =>
-                                item.kind === "note" && item.id !== page.id,
-                            )
-                            .map((item) => ({
-                              value: item.id,
-                              label: item.title,
-                            })),
-                        ]}
+                        data={[{ value: "", label: "最上層" }, ...parents(null)]}
                       />
                       <Button variant="light" type="submit" loading={busy}>
                         移動頁面

@@ -108,9 +108,9 @@ test("PAGE-03：日期補寫與月份列表返回原日記，修改標題不改�
   await menu(page);
   await page.getByLabel("頁面標題", { exact: true }).fill("閏日補寫");
   await page.getByRole("button", { name: "儲存標題", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "日記 閏日補寫", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue(
+    "閏日補寫",
+  );
   await showNavigation(page);
   await go(page, () =>
     page.getByRole("button", { name: "今天", exact: true }).click(),
@@ -148,9 +148,12 @@ test("PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回"
   await menu(page);
   await page.getByLabel("頁面標題", { exact: true }).fill("我的上層");
   await page.getByRole("button", { name: "儲存標題", exact: true }).click();
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue(
+    "我的上層",
+  );
   await expect(
-    page.getByRole("heading", { name: "筆記 我的上層", exact: true }),
-  ).toBeVisible();
+    page.getByRole("dialog", { name: "頁面操作", exact: true }),
+  ).toBeHidden();
   await menu(page);
   const childButton = page.getByRole("button", {
     name: "新增子頁面",
@@ -182,7 +185,7 @@ test("PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回"
   await go(page, () =>
     page
       .getByRole("navigation", { name: "筆記頁面" })
-      .getByRole("link", { name: "新增子頁面", exact: true })
+      .getByRole("link", { name: "未命名", exact: true })
       .click(),
   );
   await expect(page.locator(".tiptap")).toContainText("子頁仍可寫正文");

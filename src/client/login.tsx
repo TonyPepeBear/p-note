@@ -172,7 +172,7 @@ export function Login({
           <Brand />
           <div className="intro-copy">
             <Text className="eyebrow" c="teal.8">
-              PRIVATE NOTES & JOURNAL
+              私人筆記與日記
             </Text>
             <h1>
               給想法一個家，

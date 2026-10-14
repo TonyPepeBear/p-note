@@ -10,7 +10,7 @@ import {
   Loader,
 } from "@mantine/core";
 import "@mantine/core/styles.css";
-import { theme, Brand } from "./ui";
+import { theme, resolver, Brand } from "./ui";
 import { Login } from "./login";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -38,6 +38,17 @@ function App() {
   const [error, setError] = useState("");
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
+  const [fresh] = useState(
+    () => new URLSearchParams(location.search).get("new") === "1",
+  );
+  const [draftDismissed, setDraftDismissed] = useState(false);
+  useEffect(() => {
+    document.title = page ? page.title + " · p-note" : "p-note";
+    if (page)
+      setDraftDismissed(
+        sessionStorage.getItem("p-note-draft-dismissed") === page.id,
+      );
+  }, [page?.id, page?.title]);
   useEffect(() => {
     if (confirm) return;
     let disposed = false;
@@ -129,7 +140,7 @@ function App() {
         accepted !== page.id &&
         accepted !== "restored"
       ) {
-        setError("頁面世代已變更，本機內容已隔離");
+        setError("這頁已在其他地方更新，你的本機修改已另外保留");
         await isolate(old, page);
         return;
       }
@@ -161,7 +172,7 @@ function App() {
         if (current.status >= 500) throw new Error("頁面服務暫時不可用");
         if (!current.ok) {
           opened?.provider.disconnect();
-          setError("頁面無法存取，本機內容已隔離");
+          setError("這頁目前無法存取，你的本機修改已另外保留");
           setIsolated({ page });
           const failure = (await current.json()) as { page?: PageInfo };
           if (failure.page) setRecovery(failure.page);
@@ -173,7 +184,7 @@ function App() {
           info.sync_generation !== page.sync_generation
         ) {
           opened?.provider.disconnect();
-          setError("頁面世代或權限已變更，本機內容已隔離");
+          setError("這頁已在其他地方更新或無法存取，你的本機修改已另外保留");
           if (info.owner_id === page.owner_id)
             setIsolated({ page, current: info });
           return false;
@@ -236,6 +247,16 @@ function App() {
     }
   };
   if (login && !session) return <Login />;
+  const rename = async (title: string) => {
+    if (!page) return;
+    const response = await api(`/api/pages/${page.id}/title`, { title });
+    const value = (await response.json().catch(() => ({}))) as PageInfo & {
+      message?: string;
+    };
+    if (response.status === 401) setLogin(true);
+    if (!response.ok) throw new Error(value.message ?? "標題保存失敗，請重試");
+    setPage(value);
+  };
   const content = (
     <>
       {login && (
@@ -244,11 +265,18 @@ function App() {
         </div>
       )}
       {error && (
-        <Alert color="red" role="alert" mb="lg">
+        <Alert
+          color="red"
+          role="alert"
+          mb="lg"
+          withCloseButton
+          closeButtonLabel="關閉提示"
+          onClose={() => setError("")}
+        >
           {error}
         </Alert>
       )}
-      {!isolated && page && versions.length > 0 && (
+      {!isolated && page && versions.length > 0 && !draftDismissed && (
         <Paper
           component="section"
           aria-label="保留的本機草稿"
@@ -288,6 +316,16 @@ function App() {
               >
                 檢視舊版本
               </Button>
+              <Button
+                variant="subtle"
+                color="gray"
+                onClick={() => {
+                  sessionStorage.setItem("p-note-draft-dismissed", page.id);
+                  setDraftDismissed(true);
+                }}
+              >
+                稍後再說
+              </Button>
             </Group>
           </Stack>
         </Paper>
@@ -295,11 +333,11 @@ function App() {
       {isolated && (
         <Paper withBorder p="lg" mb="lg">
           <Stack>
-            <Text fw={600}>本機草稿已隔離</Text>
+            <Text fw={600}>本機修改已另外保留</Text>
             <Text size="sm" c="dimmed">
               {isolated.current
-                ? "目前版本：" + isolated.current.title
-                : "原頁面無法編輯，請還原或另存。"}
+                ? "目前版本：" + isolated.current.title + "。"
+                : "原頁面目前無法編輯，可以還原或另存。"}
               你的草稿還在，請選擇下一步。
             </Text>
             <Group>
@@ -336,29 +374,40 @@ function App() {
         </Paper>
       )}
       {recovery && (
-        <Button
-          mb="lg"
-          onClick={() => {
-            void api("/api/pages/" + recovery.id + "/restore", {})
-              .then(async (response) => {
-                if (!response.ok) {
-                  setError(
-                    ((await response.json()) as { message: string }).message,
-                  );
-                  return;
-                }
-                await navigate(recovery.id);
-              })
-              .catch(() => setError("還原失敗，請重試"));
-          }}
-        >
-          還原此頁
-        </Button>
+        <Paper withBorder p="lg" mb="lg">
+          <Stack gap="sm" align="flex-start">
+            <Text fw={600}>這頁在垃圾桶中</Text>
+            <Text size="sm" c="dimmed">
+              還原「{recovery.title}」後即可繼續編輯。
+            </Text>
+            <Button
+              onClick={() => {
+                void api("/api/pages/" + recovery.id + "/restore", {})
+                  .then(async (response) => {
+                    if (!response.ok) {
+                      setError(
+                        ((await response.json()) as { message: string })
+                          .message,
+                      );
+                      return;
+                    }
+                    await navigate(recovery.id);
+                  })
+                  .catch(() => setError("還原失敗，請重試"));
+              }}
+            >
+              還原此頁
+            </Button>
+          </Stack>
+        </Paper>
       )}
       {session && page && (!isolated || viewDraft) ? (
         <Editor
           session={session}
-          title={(page.kind === "journal" ? "日記 " : "筆記 ") + page.title}
+          title={page.title}
+          kind={page.kind}
+          rename={rename}
+          focusTitle={fresh}
           readOnly={login || !!isolated}
         />
       ) : (
@@ -411,7 +460,11 @@ function App() {
 const root = createRoot(document.getElementById("root")!);
 const render = (node: React.ReactNode) =>
   root.render(
-    <MantineProvider theme={theme} forceColorScheme="light">
+    <MantineProvider
+      theme={theme}
+      cssVariablesResolver={resolver}
+      forceColorScheme="light"
+    >
       {node}
     </MantineProvider>,
   );
