@@ -22,4 +22,4 @@
 
 - [x] 4.1 執行 `npm run check`、`npm run build` 與完整 `npm run test:e2e` 三瀏覽器驗收，確認既有登入、離線、還原隔離與 UX-16～22 回歸通過；記錄未執行／失敗不得標為完成。
 - [x] 4.2 執行 `openspec validate local-first-page-navigation --strict`、`git diff --check`，以自動文件檢查比對 UX-20～22、LFN-01～07 情境與實際報告，確認 TDD 文件命令、退出碼及結果完整。
-- [ ] 4.3 實作驗收通過後依專案 Cloudflare 部署流程部署，執行自動 smoke 驗證並記錄部署版本；自動提交相關實作與報告，以 `git show --stat` 確認提交範圍。此項只在使用者後續啟動 apply 後執行。
+- [x] 4.3 實作驗收通過後依專案 Cloudflare 部署流程部署，執行自動 smoke 驗證並記錄部署版本；自動提交相關實作與報告，以 `git show --stat` 確認提交範圍。此項只在使用者後續啟動 apply 後執行。

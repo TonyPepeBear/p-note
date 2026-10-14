@@ -1,0 +1,7 @@
+本機建置入口：assets/index-tO6vjbS_.js
+正式入口：assets/index-tO6vjbS_.js
+GET /api/today（未登入）：401
+GET /api/pages/x（未登入）：401
+POST /__test/reset：404
+入口 JS 含已知登出標記：1
+首次查詢曾讀到前一版入口 index-ClPuJjMt.js，約 30 秒內邊緣快取更新為新版。

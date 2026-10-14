@@ -77,3 +77,9 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 [首次驗收](tdd/api-production-first-results.json)因 Wrangler `--json` 前仍輸出上傳進度，腳本誤判 SQL 成功輸出為解析錯誤；修正驗證腳本後重跑通過，未改動部署程式。首次清理欄位為誤判，最後遠端查詢已確認沒有留下測試憑證。使用方法見 [API 文件](api.md)。
 
 本功能分支與提交保留於獨立 worktree，未回寫主工作區；下次從其他分支發布前須先合入本分支，以免移除已上線功能。
+
+## 已下載頁面本機優先導覽發布：2026-10-14
+
+依專案流程發布程式提交 `4ba7a6a`（[TDD 報告](tdd/local-first-page-navigation.md)，三瀏覽器 291 個通過），正式 Worker 版本為 `017df0d7-c063-4ae6-bbab-71cf2b1d9389`，見 [部署紀錄](tdd/lfn-production-deploy.log)。發布前正式版本為 `81abdcc4-d8fb-416e-9eda-c9ec46d07e21`（API key），本提交已包含。只改前端，沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；[雲端設定](tdd/lfn-release-cloud.log)（以即時 [secret 名稱](tdd/lfn-production-secrets.json)比對）、[建置](tdd/lfn-release-build.log)與[預檢](tdd/lfn-release-dry-run.log)通過。
+
+[正式 smoke](tdd/lfn-production-smoke.log)：入口 module script 與本機建置相同、未登入頁面 API 回 401、測試入口 404。未執行需實際郵件登入的 `npm run test:production`，驗收以本機完整回歸為準。
