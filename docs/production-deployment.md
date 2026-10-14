@@ -6,11 +6,11 @@
 
 [正式部署 workflow](../.github/workflows/deploy-production.yml) 在推送 `master` 時執行，也可從 [Actions](https://github.com/TonyPepeBear/p-note/actions/workflows/deploy-production.yml) 手動選擇 `master` 重跑。其他分支不會發布正式站。
 
-流程依序執行型別、正式設定、建置、dry-run、D1 migrations、部署與公開入口檢查，任一步驟失敗即停止。依使用者要求聚焦部署，不將既有產品完整 E2E 綁進每次自動發布；部署成功不代表產品完整回歸通過。發布使用同一 concurrency 群組，不中斷執行中的流程。失敗可在 run 中查看原因，修正後重跑；不自動回滾 D1，新增 migration 須保持向前相容。
+流程依序執行型別、正式設定、建置、dry-run、D1 migrations 與部署，任一步驟失敗即停止。依使用者要求聚焦部署，不將既有產品完整 E2E 綁進每次自動發布；部署成功不代表產品完整回歸通過。發布使用同一 concurrency 群組，不中斷執行中的流程。失敗可在 run 中查看原因，修正後重跑；不自動回滾 D1，新增 migration 須保持向前相容。
 
 唯一額外憑證為 [GitHub Actions Secrets](https://github.com/TonyPepeBear/p-note/settings/secrets/actions) 的 `CLOUDFLARE_API_TOKEN`。使用專用、限正式帳號與網域的 API token，需可發布 Workers、執行 D1 migrations 及讀取綁定 R2；自訂網域設定另需 Workers Routes、Zone Read 與 SSL and Certificates 權限。以實際部署錯誤確認必要的寄信等綁定權限，避免直接給全帳號管理權。Account ID 已由正式設定提供。憑證僅注入遠端發布步驟；缺少即停止，不將本機 OAuth、秘密檔或擁有者信箱搬到 CI。既有五個 Worker secrets 保留在 Cloudflare。
 
-[公開 smoke](../scripts/check-deployment.mjs) 以有效 HTTPS 確認正式首頁 script 與本次 `dist/index.html` 一致、JS 可下載、未登入 `/api/pages` 回 401，測試入口回 404。它不讀取私人筆記、不寄登入郵件，也不代表重新驗證正式登入與同步。可在本機建置後執行 `node scripts/check-deployment.mjs`；不符即退出非零。
+依使用者要求，自動發布在 Cloudflare 發布命令成功後結束，以 workflow 的資料遷移與發布結果判定成功。不再自動存取正式首頁、比對建置資源或探測私人／測試入口。過往 smoke 腳本與驗證紀錄保留作歷史參考。
 
 設定及驗證狀態見 [本次紀錄](tdd/github-actions-production.md)。
 
