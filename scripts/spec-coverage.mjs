@@ -12,7 +12,7 @@ export function checkCoverage(required, actual) {
 export function reportCases(report, environment) {
   const cases = [];
   const add = (title, status, context) => {
-    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN|DB)-\d{2})[：:]/)?.[1];
+    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN|DB|LINK)-\d{2})[：:]/)?.[1];
     if (id) cases.push({ id: `${id}@${context}`, status, title });
   };
   if (Array.isArray(report.testResults)) {
@@ -41,6 +41,7 @@ async function main() {
   const ui = process.argv.includes('--ui');
   const ux = process.argv.includes('--ux');
   const databases = process.argv.includes('--databases');
+  const links = process.argv.includes('--links');
   const projects = ['chromium-desktop', 'chromium-mobile', 'webkit-mobile'];
   let required = [];
   if (auth) {
@@ -53,7 +54,7 @@ async function main() {
       required.push(...projects.map(project => `${id}@${project}`));
     }
   } else {
-    const capabilities = databases ? ['note-databases', 'backup-restore'] : ux ? ['workspace-usability'] : ui ? ['workspace-experience']
+    const capabilities = links ? ['note-links'] : databases ? ['note-databases', 'backup-restore'] : ux ? ['workspace-usability'] : ui ? ['workspace-experience']
       : ['personal-auth', 'pages-and-journal', 'block-editing', 'realtime-sync', 'private-assets', 'backup-restore'];
     const active = (await readdir('openspec/changes')).filter(name => name !== 'archive');
     for (const name of capabilities) {
@@ -78,7 +79,7 @@ async function main() {
     actual.push(...reportCases(report, environment));
   }
   const failures = checkCoverage(required, actual);
-  console.log(JSON.stringify({ 範圍: databases ? '筆記資料庫' : ux ? '工作區可用性' : ui ? 'Mantine 介面' : auth ? '登入' : probe ? '技術原型' : pages ? '頁面與日記' : assets ? '私有圖片（ASSET-05 留待備份）' : editor ? '正式編輯器' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
+  console.log(JSON.stringify({ 範圍: links ? '筆記連結' : databases ? '筆記資料庫' : ux ? '工作區可用性' : ui ? 'Mantine 介面' : auth ? '登入' : probe ? '技術原型' : pages ? '頁面與日記' : assets ? '私有圖片（ASSET-05 留待備份）' : editor ? '正式編輯器' : '完整產品', 必需結果: required.length, 已通過: required.length - failures.length, 未通過: failures }, null, 2));
   if (failures.length) process.exitCode = 1;
 }
 

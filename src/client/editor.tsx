@@ -44,6 +44,7 @@ import { uploadImage } from "./assets";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
+import { NoteLinkSuggestions, followNoteLink } from './note-links';
 
 export type Session = {
   doc: Y.Doc;
@@ -162,6 +163,7 @@ export function Editor({
   rename,
   focusTitle = false,
   readOnly = false,
+  ownerId,
 }: {
   session: Session;
   title?: string;
@@ -169,12 +171,14 @@ export function Editor({
   rename?: (title: string) => Promise<void>;
   focusTitle?: boolean;
   readOnly?: boolean;
+  ownerId?: string;
 }) {
   const { doc, cache, provider, room } = session;
   const [image, setImage] = useState<{ file: File; blockId?: string }>();
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState("");
   const [copyError, setCopyError] = useState("");
+  const [linkError, setLinkError] = useState('');
   const [imageOpen, setImageOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [activeBlock, setActiveBlock] = useState<{
@@ -671,14 +675,18 @@ export function Editor({
           {copyError}
         </Alert>
       )}
+      {linkError && <Alert color="red" role="alert" my="md">{linkError}</Alert>}
       {toolsOpen && activeBlock && (
         <style>{`.writing-surface .bn-block-outer[data-id="${CSS.escape(activeBlock.id)}"] > .bn-block > .bn-block-content { outline: 2px solid var(--mantine-color-teal-3); outline-offset: 2px; border-radius: 6px; }`}</style>
       )}
       <div
         className="writing-surface"
         data-active-block={toolsOpen ? activeBlock?.id : undefined}
+        onClickCapture={event => followNoteLink(event, setLinkError)}
       >
-        <BlockNoteView editor={editor} theme="light" editable={!readOnly} />
+        <BlockNoteView editor={editor} theme="light" editable={!readOnly}>
+          {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
+        </BlockNoteView>
       </div>
       {title && !readOnly && (
         <Modal

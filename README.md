@@ -65,3 +65,4 @@ npm run dev
 
 - [個人 API key 與 JSON 內容介面](docs/api.md)
 - [筆記資料庫、自訂欄位與儲存檢視](docs/note-databases.md)
+- [筆記連結與反向連結](docs/note-links.md)

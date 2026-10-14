@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { Editor, start, type Session } from "./editor";
+import { Backlinks } from './note-links';
 import type { PageInfo } from "../shared/pages";
 import { api, navigate, saveDraft, signedOut } from "./api";
 import { BackupSettings } from "./backup-settings";
@@ -518,18 +519,20 @@ function App() {
         </Paper>
       )}
       {(session || page?.database_config) && page && (!isolated || viewDraft) ? (
-        page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated} /> : <>
+        <>{page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated} /> : <>
         <NoteProperties key={page.id} page={page} readOnly={login || !!isolated} />
         <Editor
           key={session!.room}
           session={session!}
+          ownerId={page.owner_id}
           title={page.title}
           kind={page.kind}
           rename={rename}
           focusTitle={route.fresh}
           readOnly={login || !!isolated}
         />
-        </>
+        </>}
+        {!login && !isolated && <Backlinks key={page.id + page.sync_generation} id={page.id} />}</>
       ) : (
         !error && (
           <Stack align="center" py={80}>

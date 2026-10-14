@@ -119,6 +119,14 @@ export async function handlePages(request: Request, env: Env, owner: string, now
     return pageResponse(env, owner, (await db.prepare('SELECT * FROM pages WHERE id = ?').bind(id).first<PageRow>())!);
   }
   if (request.method === 'GET') {
+    const backlinks = path.match(/^\/api\/pages\/([\w-]{1,80})\/backlinks$/);
+    if (backlinks) {
+      if (!await visiblePage(db, owner, backlinks[1])) fail(404, '找不到頁面');
+      return json((await db.prepare(`${VISIBLE} SELECT p.id, p.title, p.kind, p.journal_date FROM visible p
+        JOIN page_search s ON s.page_id = p.id AND s.owner_id = p.owner_id AND s.indexed_generation = p.sync_generation
+        WHERE p.id <> ? AND EXISTS (SELECT 1 FROM json_each(s.linked_pages) WHERE value = ?)
+        ORDER BY p.updated_at DESC, p.id`).bind(owner, backlinks[1], backlinks[1]).all()).results);
+    }
     if (path === '/api/pages') return json((await db.prepare(`${VISIBLE} SELECT * FROM visible ORDER BY created_at, id`).bind(owner).all<PageRow>()).results);
     if (path === '/api/trash') return json((await db.prepare('SELECT * FROM pages WHERE owner_id = ? AND deleted_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE page_id = pages.id) ORDER BY deleted_at DESC, id').bind(owner).all<PageRow>()).results);
     if (path === '/api/journals') {

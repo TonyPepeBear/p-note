@@ -163,7 +163,7 @@ it('PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他�
   const stamp = new Date().toISOString();
   await env.DB.prepare('INSERT INTO user VALUES (?, ?, ?, 1, NULL, ?, ?)').bind('other-owner', '他人', 'other@example.test', stamp, stamp).run();
   await env.DB.prepare("INSERT INTO pages (id, owner_id, kind, title, sync_generation, created_at, updated_at) VALUES ('foreign', 'other-owner', 'note', '中文標題', 'g1', 0, 0)").run();
-  await env.DB.prepare("INSERT INTO page_search VALUES ('foreign', 'other-owner', '中文正文', '中文', 'g1', 100)").run();
+  await env.DB.prepare("INSERT INTO page_search (page_id, owner_id, plain_text, summary, indexed_generation, indexed_checkpoint) VALUES ('foreign', 'other-owner', '中文正文', '中文', 'g1', 100)").run();
   expect(await search('中文')).toEqual([title.id, body.id].sort());
   await runInDurableObject(client.stub, instance => expect(instance.document.getXmlFragment('body').toString()).toBe(doc.getXmlFragment('body').toString()));
   const checkpoint = await env.DB.prepare('SELECT indexed_checkpoint FROM page_search WHERE page_id = ?').bind(body.id).first<number>('indexed_checkpoint');
