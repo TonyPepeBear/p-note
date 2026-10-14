@@ -89,8 +89,32 @@ body {
 }
 .sidebar-content .mantine-NavLink-root[data-active] {
   color: #12624e;
-  background: #dce9df;
+  background: var(--p-note-selected-bg);
   font-weight: 650;
+}
+/* 有語意色的項目由 Mantine inline 變數覆蓋中性預設。 */
+.mantine-Menu-item {
+  --menu-item-hover: var(--p-note-hover-bg);
+}
+/* 滑鼠與觸控共用狀態色；停用項目不顯示可操作回饋。 */
+@media (hover: hover) {
+  .sidebar-content .mantine-NavLink-root:hover:where(:not(:disabled, [data-disabled])) {
+    background: var(--p-note-hover-bg);
+  }
+  .sidebar-content .mantine-NavLink-root[data-active]:hover:where(:not(:disabled, [data-disabled])) {
+    background: var(--p-note-selected-hover-bg);
+  }
+  .mantine-CloseButton-root:hover:where(:not(:disabled, [data-disabled])) {
+    background: var(--p-note-hover-bg);
+  }
+}
+@media (hover: none) {
+  .sidebar-content .mantine-NavLink-root:active:where(:not(:disabled, [data-disabled])) {
+    background: var(--p-note-hover-bg);
+  }
+  .sidebar-content .mantine-NavLink-root[data-active]:active:where(:not(:disabled, [data-disabled])) {
+    background: var(--p-note-selected-hover-bg);
+  }
 }
 .note-row {
   display: flex;
@@ -191,6 +215,13 @@ body {
   min-height: 400px;
   padding: 30px 0;
   box-shadow: 0 2px 10px #22392c03;
+}
+/* 同時套用編輯器與浮動 portal，保留 BlockNote 原本的 light 主題流程。 */
+.bn-mantine[data-mantine-color-scheme="light"] {
+  --bn-colors-hovered-background: var(--p-note-hover-bg);
+  --bn-colors-hovered-text: var(--p-note-interactive-text);
+  --bn-colors-selected-background: var(--p-note-selected-bg);
+  --bn-colors-selected-text: #12624e;
 }
 .writing-surface .bn-container {
   background: transparent;

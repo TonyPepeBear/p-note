@@ -28,7 +28,7 @@ export function ApiKeySettings({ close, unauthorized }: { close: () => void; una
   useEffect(() => { void load().catch(() => setError('無法載入 API key，請重試')).finally(() => setLoading(false)); }, []);
   return <Container size="sm" py="xl" component="main">
     <Stack gap="lg">
-      <Button variant="subtle" leftSection={<IconArrowLeft size={18} />} onClick={close} style={{ alignSelf: 'flex-start' }}>返回筆記</Button>
+      <Button variant="subtle" color="gray" leftSection={<IconArrowLeft size={18} />} onClick={close} style={{ alignSelf: 'flex-start' }}>返回筆記</Button>
       <div><Title order={1}>設定</Title><Text c="dimmed" mt="xs">管理自己的 API key，讓程式連接你的筆記與日記。</Text></div>
       {error && <Alert color="red" role="alert" title="操作未完成">{error}<Button variant="subtle" disabled={busy} onClick={() => void run(load)}>重新載入</Button></Alert>}
       {notice && <Text role="status" c="teal">{notice}</Text>}
