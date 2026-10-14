@@ -5,5 +5,5 @@
 - 使用 TDD 開發流程
 - 使用 spec 開發的流程
   - 創建、修改 spec 文件後，自動 commit 不需經過 user 同意
-  - 完成開發 spec 後，自動 commit 不需經過 user 同意
+  - 完成開發 spec 後，自動部署、commit 不需經過 user 同意
   - 不要創建需要人類驗證的 spec，都使用自動化的方式驗證開發
