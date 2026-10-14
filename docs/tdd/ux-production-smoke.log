@@ -1,0 +1,8 @@
+DEPLOY-02：正式 HTTPS、建置、私人 API 與測試入口斷言通過
+HTTP 401 /api/today
+MAIL_REQUESTED：2026-10-14T06:50:07.343Z
+等待 Gmail 自動查詢對應郵件，再以忽略的 0600 檔提供登入 token
+DEPLOY-03 失敗：未取得本次實際送達郵件
+頁面錯誤：[]
+Service Worker：{"registrations":[],"resources":["/assets/index-C2CeULHc.js","/assets/index-C8lf9LED.css","/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920","/cdn-cgi/rum","/assets/inter-v12-latin-800-Bdy4lAMa.woff2","/assets/inter-v12-latin-regular-YtgfLPRn.woff2","/assets/inter-v12-latin-700-Bj1B9WKG.woff2","/assets/inter-v12-latin-600-BvOeHRLc.woff2","/api/login"]}
+exit 1

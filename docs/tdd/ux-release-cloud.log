@@ -1,0 +1,6 @@
+
+> p-note@0.0.0 check:production
+> node scripts/check-production.mjs --cloud
+
+DEPLOY-01：正式設定、資源隔離、網域與密鑰未追蹤斷言通過
+DEPLOY-01：雲端 bindings、secret 類型、私人 R2 與正式網域紀錄斷言通過

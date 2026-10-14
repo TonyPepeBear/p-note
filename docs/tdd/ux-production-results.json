@@ -1,0 +1,21 @@
+{
+  "startedAt": "2026-10-14T06:50:00.107Z",
+  "origin": "https://note.tonypepe.com",
+  "checks": {
+    "DEPLOY-02": {
+      "tls": true,
+      "builtAssets": true,
+      "privateApi": true,
+      "testRoutesBlocked": true
+    },
+    "UI-PRODUCTION": {
+      "mantineLogin": true,
+      "noOverflow": true,
+      "screenshot": "docs/screenshots/ui/production-login-ux.png"
+    }
+  },
+  "mailRequestedAt": "2026-10-14T06:50:07.343Z",
+  "failedPhase": "DEPLOY-03",
+  "completedAt": "2026-10-14T06:53:09.778Z",
+  "passed": false
+}

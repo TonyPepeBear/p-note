@@ -51,3 +51,9 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 [正式驗證結果](tdd/ui-production-results.json)及 [執行紀錄](tdd/ui-production-smoke.log)顯示新版 Mantine 登入、HTTPS／私人 API／測試入口、實際郵件、一次性登入、兩個獨立 context 雙向 wss 保存及全新 context 載入全部通過，驗證筆記已移入垃圾桶。[郵件驗證](tdd/ui-production-mail.json)顯示 SPF、DKIM 與 DMARC 通過；[正式登入畫面](screenshots/ui/production-login.png)保存實際渲染結果。
 
 本機完整 UI 回歸仍待完成，歷史失敗與高負載證據保留於 [介面改版驗收](ui-redesign.md)；本次上線成功不代表該驗收已完成。
+
+## 工作區可用性修正發布：2026-10-14
+
+依使用者部署指示發布程式提交 `e82c35b`（[可用性修正](ux-polish.md)，本機完整回歸 213 個通過），正式 Worker 版本為 `0aec1a7b-b791-4f0f-8385-f2e1126e0203`，見 [部署紀錄](tdd/ux-production-deploy.log)。沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；發布前 [雲端設定](tdd/ux-release-cloud.log)、[建置](tdd/ux-release-build.log) 與 [預檢](tdd/ux-release-dry-run.log) 通過。
+
+[正式驗證結果](tdd/ux-production-results.json)與 [執行紀錄](tdd/ux-production-smoke.log)：DEPLOY-02（HTTPS、新版建置資源、私人 API、測試入口封鎖）與新版登入畫面無溢出通過，[正式登入截圖](screenshots/ui/production-login-ux.png)。DEPLOY-03／04 未完成：本次可用的 Gmail 連接器不是擁有者信箱，無法讀取實際登入郵件，腳本在三分鐘後判定未取得郵件；登入、雙向 wss 保存與全新 context 載入尚待以擁有者信箱重跑 `npm run test:production -- --ui`。上一版的正式證據保留於 `ui-production-*`，未被本次結果覆蓋。
