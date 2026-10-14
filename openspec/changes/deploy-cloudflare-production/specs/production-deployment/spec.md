@@ -25,7 +25,7 @@
 系統 SHALL 將登入郵件送達已設定擁有者，透過同正式網域的確認操作建立登入狀態；兩個獨立瀏覽器 SHALL 在 wss 連線同步正文，且全新瀏覽器載入後保留雲端確認過的正文。
 
 #### Scenario: DEPLOY-03 真實郵件登入
-- **自動化驗證**: `DEPLOY-03`；Gmail 與 Playwright 斷言時間窗内郵件、同網域連結、確認登入及一次性兌換。
+- **自動化驗證**: `DEPLOY-03`；Gmail 與 Playwright 斷言時間窗內郵件、同網域連結、確認登入及一次性兌換。
 - **WHEN** Playwright 申請擁有者登入連結，Gmail API 讀取對應寄件者與時間窗的實際郵件，再由 Playwright 執行確認登入
 - **THEN** 郵件包含同正式 origin 的確認路徑，僅 GET 不兌換，確認成功後私人頁面可編輯；驗證紀錄不儲存登入 token 與 cookie
 

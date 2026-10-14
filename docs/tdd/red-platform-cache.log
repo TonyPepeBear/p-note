@@ -1,0 +1,42 @@
+
+> p-note@0.0.0 test:unit
+> vitest run --config vitest.unit.config.ts tests/unit/service-worker.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/unit/service-worker.test.ts (1 test | 1 failed) 7ms
+   × CACHE-PLATFORM-01：POST 分析紀錄不能轉成 GET 啟動快取並阻擋編輯器 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/service-worker.test.ts > CACHE-PLATFORM-01：POST 分析紀錄不能轉成 GET 啟動快取並阻擋編輯器
+AssertionError: expected [ Object{ ok: false } ] to deeply equal [ { ok: true } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "ok": true,
++     "ok": false,
+    },
+  ]
+
+ ❯ tests/unit/service-worker.test.ts:23:19
+     21|   ] }, ports: [{ postMessage: (value: unknown) => replies.push(value) …
+     22|   await work;
+     23|   expect(replies).toEqual([{ ok: true }]);
+       |                   ^
+     24|   expect(downloaded).toEqual([origin + '/assets/app.js']);
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  11:28:45
+   Duration  115ms (transform 13ms, setup 0ms, import 20ms, tests 7ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/unit.json

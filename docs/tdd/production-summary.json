@@ -1,0 +1,22 @@
+{
+  "versionId": "bbcc5e44-64ea-4a8f-8388-682a653d0b26",
+  "deploymentScenarios": 4,
+  "passedDeploymentScenarios": 4,
+  "unitResults": 6,
+  "buildSmokeResults": 2,
+  "browserRegressionResults": 24,
+  "credentialsPersisted": false,
+  "passed": true,
+  "hashes": {
+    "production-results.json": "0f491fcaf1c36bb6272ad039d8609d212138610f81adedc1ff0f3a5c1b357c92",
+    "production-mail.json": "e5ca58744d46943d357116ff4bbd7cb52f2822564eedc8970beda071b14eed92",
+    "production-cloud.json": "fcda869aa90566cd3ebdc8e3ba327fa662bb6455d46b88bd8b0bc2c30a4b08eb",
+    "production-r2.json": "96858cac3412661a4b69715f13df77e19cd41d2cd843cabc248350867c26c616",
+    "production-smoke.log": "8313930ff4aa06442ccdca02155d013678dfc64dd4c2ea19e15cf09b93241260",
+    "production-config-final.log": "57f2f0004fc9f6aedf19e4d112f51a2b1cfaf5fbc7a461c5fd30d516539de79c",
+    "production-fixed-deploy.log": "50bde920ef72e734b57d1be5c1c40246e2166700fe70a915159d7567b0b4f323",
+    "green-platform-cache.log": "53e37df95a466ac6fe8bb4c4c2c1e4bdcb4dffd0bd85e88bf74a7c149782ef7d",
+    "green-platform-build.log": "cb743cb6a77eb526182041b6bc552d917513e54b0100a14d397d66e101ec6a86",
+    "production-cache-regression.log": "b6bfe2ec31069e244607f9497f6ecdb3f00e08b687d933455406580ddee7ffa3"
+  }
+}

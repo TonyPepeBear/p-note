@@ -1,6 +1,6 @@
 const SHELL_CACHE = 'p-note-shell-v3';
 const cacheable = url => ['http:', 'https:'].includes(url.protocol) && url.origin === self.location.origin
-  && !['/api/', '/__test/', '/parties/', '/login/'].some(path => url.pathname.startsWith(path));
+  && !['/api/', '/__test/', '/parties/', '/login/', '/cdn-cgi/'].some(path => url.pathname.startsWith(path));
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.add('/')).then(() => self.skipWaiting()));
 });

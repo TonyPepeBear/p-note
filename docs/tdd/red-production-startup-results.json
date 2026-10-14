@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-14T03:26:41.598Z",
+  "origin": "https://note.tonypepe.com",
+  "checks": {
+    "DEPLOY-02": {
+      "tls": true,
+      "builtAssets": true,
+      "privateApi": true,
+      "testRoutesBlocked": true
+    }
+  },
+  "mailRequestedAt": "2026-10-14T03:26:48.943Z",
+  "failedPhase": "DEPLOY-03",
+  "completedAt": "2026-10-14T03:27:47.205Z",
+  "passed": false
+}

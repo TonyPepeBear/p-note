@@ -18,6 +18,8 @@
     "worker:types": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js types --config wrangler.app.jsonc",
     "test:probe": "npm test && npm run test:spec-coverage -- --probe",
     "check:spec": "node scripts/check-spec.mjs",
+    "check:production": "node scripts/check-production.mjs",
+    "test:production": "node scripts/test-production.mjs",
     "validate:probe": "npm run test:probe && npm run check && npm run build && npm run check:spec"
   },
   "dependencies": {

@@ -1,0 +1,76 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.150.0)
+───────────────────────────────────────────────
+Resource location: remote 
+
+Migrations to be applied:
+┌──────────┐
+│ name     │
+├──────────┤
+│ 0001.sql │
+├──────────┤
+│ 0002.sql │
+├──────────┤
+│ 0003.sql │
+├──────────┤
+│ 0004.sql │
+└──────────┘
+? About to apply 4 migration(s)
+Your database may not be available to serve requests during the migration, continue?
+🤖 Using fallback value in non-interactive context: yes
+🌀 Executing on remote database p-note-production (5a1ead73-a776-4e75-824c-387e0f9bd5c6):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 15 commands in 3.03ms
+┌──────────┬────────┐
+│ name     │ status │
+├──────────┼────────┤
+│ 0001.sql │ ✅     │
+├──────────┼────────┤
+│ 0002.sql │ 🕒️    │
+├──────────┼────────┤
+│ 0003.sql │ 🕒️    │
+├──────────┼────────┤
+│ 0004.sql │ 🕒️    │
+└──────────┴────────┘
+🌀 Executing on remote database p-note-production (5a1ead73-a776-4e75-824c-387e0f9bd5c6):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 0.64ms
+┌──────────┬────────┐
+│ name     │ status │
+├──────────┼────────┤
+│ 0001.sql │ ✅     │
+├──────────┼────────┤
+│ 0002.sql │ ✅     │
+├──────────┼────────┤
+│ 0003.sql │ 🕒️    │
+├──────────┼────────┤
+│ 0004.sql │ 🕒️    │
+└──────────┴────────┘
+🌀 Executing on remote database p-note-production (5a1ead73-a776-4e75-824c-387e0f9bd5c6):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 3 commands in 0.40ms
+┌──────────┬────────┐
+│ name     │ status │
+├──────────┼────────┤
+│ 0001.sql │ ✅     │
+├──────────┼────────┤
+│ 0002.sql │ ✅     │
+├──────────┼────────┤
+│ 0003.sql │ ✅     │
+├──────────┼────────┤
+│ 0004.sql │ 🕒️    │
+└──────────┴────────┘
+🌀 Executing on remote database p-note-production (5a1ead73-a776-4e75-824c-387e0f9bd5c6):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 0.68ms
+┌──────────┬────────┐
+│ name     │ status │
+├──────────┼────────┤
+│ 0001.sql │ ✅     │
+├──────────┼────────┤
+│ 0002.sql │ ✅     │
+├──────────┼────────┤
+│ 0003.sql │ ✅     │
+├──────────┼────────┤
+│ 0004.sql │ ✅     │
+└──────────┴────────┘

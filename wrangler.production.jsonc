@@ -1,0 +1,103 @@
+{
+  "$schema": "./node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/config-schema.json",
+  "name": "p-note-production",
+  "main": "src/worker/app.ts",
+  "assets": {
+    "directory": "./dist",
+    "binding": "STATIC",
+    "run_worker_first": true
+  },
+  "compatibility_date": "2026-10-13",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true
+  },
+  "secrets": {
+    "required": [
+      "OWNER_EMAIL",
+      "BETTER_AUTH_URL",
+      "BETTER_AUTH_SECRET",
+      "SENDER_EMAIL"
+    ]
+  },
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 19 * * *"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOMS",
+        "class_name": "ProbeRoom"
+      },
+      {
+        "name": "SYNC",
+        "class_name": "SyncRoom"
+      },
+      {
+        "name": "RESTORES",
+        "class_name": "RestoreCoordinator"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "ProbeRoom",
+        "SyncRoom"
+      ]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": [
+        "RestoreCoordinator"
+      ]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "p-note-production",
+      "database_id": "5a1ead73-a776-4e75-824c-387e0f9bd5c6",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ASSETS",
+      "bucket_name": "p-note-production-assets"
+    },
+    {
+      "binding": "BACKUPS",
+      "bucket_name": "p-note-production-backups"
+    }
+  ],
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.sql"
+      ],
+      "fallthrough": true
+    }
+  ],
+  "account_id": "1db38a9bdb2d1b51b647a83a8fe53fdc",
+  "routes": [
+    {
+      "pattern": "note.tonypepe.com",
+      "custom_domain": true
+    }
+  ]
+}

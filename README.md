@@ -31,7 +31,7 @@ git diff --check
 
 ## 本機登入與今日編輯器
 
-分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。應用預設已接上原生 Email adapter，詳見 [寄信開發](docs/mail-development.md)，沒有寄送實際郵件或部署。
+分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。本機測試不寄真實郵件；正式服務使用原生 Email adapter，發布設定與實際寄信驗證見 [正式部署](docs/production-deployment.md)。
 
 設定來源、權限邊界與驗證見 [登入開發文件](docs/auth-development.md)。
 
@@ -55,5 +55,6 @@ npm run dev
 
 - [第一版需求與決策](docs/v1-scope.md)
 - [部署前完成、驗證與發布設定](docs/predeployment.md)
+- [正式 Cloudflare 發布與驗證](docs/production-deployment.md)
 - [OpenSpec 任務](openspec/changes/personal-notes-v1/tasks.md)
 - [技術驗證結果與 TDD 證據](docs/tdd/README.md)

@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "checkedAt": "2026-10-14T03:30:56.021Z",
+  "r2": {
+    "p-note-production-assets": { "managedPublicEnabled": false, "customDomains": 0 },
+    "p-note-production-backups": { "managedPublicEnabled": false, "customDomains": 0 }
+  }
+}

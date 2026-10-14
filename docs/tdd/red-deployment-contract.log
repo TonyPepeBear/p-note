@@ -1,0 +1,22 @@
+
+> p-note@0.0.0 check:spec
+> node scripts/check-spec.mjs
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: openspec/changes/deploy-cloudflare-production/specs/production-deployment/spec.md: 情境缺驗證方法
+
+0 !== 4
+
+    at file:///Users/tony.cheng/TonyPepe/project/p-note/scripts/check-spec.mjs:28:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 4,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.3

@@ -1,0 +1,48 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.150.0)
+───────────────────────────────────────────────
+Generating project types...
+
+interface __BaseEnv_Env {
+	ASSETS: R2Bucket;
+	BACKUPS: R2Bucket;
+	DB: D1Database;
+	EMAIL: SendEmail;
+	STATIC: Fetcher;
+	OWNER_EMAIL: string;
+	BETTER_AUTH_URL: string;
+	BETTER_AUTH_SECRET: string;
+	SENDER_EMAIL: string;
+	ROOMS: DurableObjectNamespace<import("../src/worker/app").ProbeRoom>;
+	SYNC: DurableObjectNamespace<import("../src/worker/app").SyncRoom>;
+	RESTORES: DurableObjectNamespace<import("../src/worker/app").RestoreCoordinator>;
+}
+declare namespace Cloudflare {
+	interface GlobalProps {
+		mainModule: typeof import("../src/worker/app");
+		durableNamespaces: "ProbeRoom" | "SyncRoom" | "RestoreCoordinator";
+	}
+	interface Env extends __BaseEnv_Env {}
+}
+interface Env extends __BaseEnv_Env {}
+type StringifyValues<EnvType extends Record<string, unknown>> = {
+	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
+};
+declare namespace NodeJS {
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "OWNER_EMAIL" | "BETTER_AUTH_URL" | "BETTER_AUTH_SECRET" | "SENDER_EMAIL">> {}
+}
+declare module "*.sql" {
+	const value: string;
+	export default value;
+}
+Generating runtime types...
+
+Runtime types generated.
+
+
+✨ Types written to .wrangler/production-env.d.ts
+
+📖 Read about runtime types
+https://developers.cloudflare.com/workers/languages/typescript/#generate-types
+📣 Remember to rerun 'wrangler types' after you change your wrangler.jsonc file.
+

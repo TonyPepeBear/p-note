@@ -1,0 +1,119 @@
+{
+  "settings": {
+    "success": true,
+    "errors": [],
+    "bindings": [
+      {
+        "name": "ASSETS",
+        "type": "r2_bucket",
+        "bucket_name": "p-note-production-assets"
+      },
+      {
+        "name": "BACKUPS",
+        "type": "r2_bucket",
+        "bucket_name": "p-note-production-backups"
+      },
+      {
+        "name": "BETTER_AUTH_SECRET",
+        "type": "secret_text"
+      },
+      {
+        "name": "BETTER_AUTH_URL",
+        "type": "secret_text"
+      },
+      {
+        "name": "DB",
+        "type": "d1",
+        "id": "5a1ead73-a776-4e75-824c-387e0f9bd5c6"
+      },
+      {
+        "name": "EMAIL",
+        "type": "send_email"
+      },
+      {
+        "name": "OWNER_EMAIL",
+        "type": "secret_text"
+      },
+      {
+        "name": "RESTORES",
+        "type": "durable_object_namespace",
+        "class_name": "RestoreCoordinator"
+      },
+      {
+        "name": "ROOMS",
+        "type": "durable_object_namespace",
+        "class_name": "ProbeRoom"
+      },
+      {
+        "name": "SENDER_EMAIL",
+        "type": "secret_text"
+      },
+      {
+        "name": "STATIC",
+        "type": "assets"
+      },
+      {
+        "name": "SYNC",
+        "type": "durable_object_namespace",
+        "class_name": "SyncRoom"
+      }
+    ],
+    "observability": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "redact_query_string": true,
+      "logs": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "persist": true,
+        "invocation_logs": true
+      },
+      "traces": {
+        "enabled": false,
+        "persist": true,
+        "head_sampling_rate": 1
+      }
+    }
+  },
+  "secrets": {
+    "result": [
+      {
+        "name": "BETTER_AUTH_SECRET",
+        "type": "secret_text"
+      },
+      {
+        "name": "BETTER_AUTH_URL",
+        "type": "secret_text"
+      },
+      {
+        "name": "OWNER_EMAIL",
+        "type": "secret_text"
+      },
+      {
+        "name": "SENDER_EMAIL",
+        "type": "secret_text"
+      }
+    ],
+    "success": true,
+    "errors": [],
+    "messages": [],
+    "status": 200
+  },
+  "domain": {
+    "success": true,
+    "result": [
+      {
+        "id": "c25e4f5034915aa3ed8c68d2ef96ed235013c706",
+        "zone_id": "f78bc8c1f7c2823dacad1b07099b1285",
+        "zone_name": "tonypepe.com",
+        "hostname": "note.tonypepe.com",
+        "service": "p-note-production",
+        "environment": "production",
+        "cert_id": "283c7635-a892-4cf6-86f5-15730e42a242",
+        "previews_enabled": false,
+        "enabled": true
+      }
+    ]
+  },
+  "checkedAt": "2026-10-14T03:34:16.144Z"
+}

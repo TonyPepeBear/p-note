@@ -1,0 +1,18 @@
+DEPLOY-02：正式 HTTPS、建置、私人 API 與測試入口斷言通過
+HTTP 401 /api/today
+MAIL_REQUESTED：2026-10-14T03:26:48.943Z
+等待 Gmail 自動查詢對應郵件，再以忽略的 0600 檔提供登入 token
+登入後私人 session HTTP 200
+DEPLOY-03 失敗：expect(locator).toHaveText(expected) failed
+
+Locator: getByTestId('ready')
+Expected: "可編輯"
+Timeout: 30000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toHaveText" getByTestId('ready') with timeout 30000ms
+  - waiting for getByTestId('ready')
+
+頁面錯誤：["本機啟動資源下載失敗，請重試"]
+Service Worker：{"registrations":[{"active":"activated"}],"resources":["/assets/index-B_UGNwId.css","/assets/index-Q4tstRDc.js","/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920","/cdn-cgi/rum","/api/today","/api/pages"]}

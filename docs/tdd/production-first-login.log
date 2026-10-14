@@ -1,0 +1,16 @@
+DEPLOY-02：正式 HTTPS、建置、私人 API 與測試入口斷言通過
+MAIL_REQUESTED：2026-10-14T03:21:17.672Z
+等待 Gmail 自動查詢對應郵件，再以忽略的 0600 檔提供登入 token
+DEPLOY-03 失敗：expect(locator).toHaveText(expected) failed
+
+Locator: getByTestId('ready')
+Expected: "可編輯"
+Timeout: 30000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toHaveText" getByTestId('ready') with timeout 30000ms
+  - waiting for getByTestId('ready')
+    - waiting for "https://note.tonypepe.com/" navigation to finish...
+    - navigated to "https://note.tonypepe.com/"
+

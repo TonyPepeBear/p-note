@@ -1,0 +1,9 @@
+DEPLOY-02：正式 HTTPS、建置、私人 API 與測試入口斷言通過
+HTTP 401 /api/today
+MAIL_REQUESTED：2026-10-14T03:30:57.872Z
+等待 Gmail 自動查詢對應郵件，再以忽略的 0600 檔提供登入 token
+登入後私人 session HTTP 200
+WebSocket 路徑：/parties/sync/c009703403ec5215b81adcf21aa422dd396d2f351ce3015ddbca237e12ee1e98
+DEPLOY-03：實際郵件送達、確認登入與一次性兌換通過
+DEPLOY-04：兩個獨立瀏覽器雙向 wss 同步、雲端保存與全新載入通過
+專用驗證筆記已移入垃圾桶
