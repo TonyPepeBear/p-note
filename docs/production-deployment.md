@@ -12,7 +12,7 @@
 | 備份 cron | `0 19 * * *`，台北每日 03:00 |
 | Custom Domain | `note.tonypepe.com`，由 Cloudflare 管理 DNS／TLS |
 
-私人發布輸入只在 git 忽略的 `.dev.vars.release`，四個設定以 Cloudflare `secret_text` 上傳；版本控制與報告不含密鑰、登入 token 或 session cookie。平台紀錄已啟用 query string 遮蔽。資源與 secret 名稱證據見 [雲端設定](tdd/production-cloud.json)、[私人 R2](tdd/production-r2.json)。
+私人發布輸入只在 git 忽略的 `.dev.vars.release`，最初四個設定以 Cloudflare `secret_text` 上傳；本次另由忽略的 0600 `.env.api-key-secrets.json` 新增 `API_KEY_ENCRYPTION_SECRET`，目前共五個 secrets；版本控制與報告不含密鑰、登入 token 或 session cookie。平台紀錄已啟用 query string 遮蔽。資源與 secret 名稱證據見 [雲端設定](tdd/production-cloud.json)、[私人 R2](tdd/production-r2.json)。
 
 ## 發布與重跑
 
@@ -20,7 +20,7 @@ CLI 使用固定版本的既有 Wrangler。登入若遇到 localhost 回呼問�
 
 ```sh
 node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js login --device --scopes account:read user:read workers:write workers_scripts:write workers_routes:write d1:write zone:read ssl_certs:write email_sending:write
-npm run check:production -- --cloud
+npm run check:production -- --cloud --secrets-report=docs/tdd/api-production-secrets.json
 npm run check
 npm run test:build
 node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js d1 migrations apply p-note-production --config wrangler.production.jsonc --remote
@@ -63,3 +63,17 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 依使用者部署指示發布程式提交 `752076e`（[站內換頁](spa-navigation.md)、[本機優先開啟](local-first-open.md)，本機完整回歸 234 個通過），正式 Worker 版本為 `8b781f4f-8c25-44fc-8b4d-18cc1d2e4c0a`，見 [部署紀錄](tdd/spa-production-deploy.log)。沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；發布前 [雲端設定](tdd/spa-release-cloud.log)、[建置](tdd/spa-release-build.log) 與 [預檢](tdd/spa-release-dry-run.log) 通過。
 
 發布後確認正式入口提供的 module script 與本機建置相同（[`index-DncQOMWj.js`](tdd/spa-production-entry.log)）。依使用者指示，本次不執行正式登入、寄信與同步驗證，驗收以本機完整回歸為準。
+
+## 個人 API key 發布：2026-10-14
+
+於獨立 `codex/api-key-settings` worktree 完成規格與 TDD，並合入另一 agent 已提交的站內換頁、本機優先與封存紀錄；未修改主工作區或取用其未提交程式。發布程式提交 `986d838`，正式 Worker 版本為 `81abdcc4-d8fb-416e-9eda-c9ec46d07e21`，見 [發布紀錄](tdd/api-production-deploy.log)。發布前核對當時正式版本為已整合的 `8b781f4f-8c25-44fc-8b4d-18cc1d2e4c0a`。
+
+[唯一資料遷移](tdd/api-production-migrations.log)新增 `api_keys`；新增加密 secret 並保留原四個 secrets，[名稱與類型](tdd/api-production-secrets.json)、[設定檢查](tdd/api-production-config.log)通過。設定檢查的 bindings／網域／R2 使用既有設定證據，secret 名稱為本次重新讀取。[最終部署預檢](tdd/api-merged-dry-run.log)通過。
+
+整合後 [240 個瀏覽器測試](tdd/api-merged-e2e.log)、[2 個 HTTPS smoke](tdd/api-merged-smoke.log)通過；本輪另有 101 個 Workers 與 6 個單元測試，詳見 [開發驗收](api-key-development.md)。
+
+[正式結果](tdd/api-production-results.json)與 [執行紀錄](tdd/api-production-smoke.log)驗證正式 JS 與本機 build 一致、未登入拒絕、key 建立／重複顯示／撤銷、正文讀寫／搜尋／ETag 衝突、範圍限制、Chromium 正文及設定頁。使用管理員建立的十分鐘 session，不重新驗證寄信登入；[正式畫面](screenshots/ui/production-api-settings.png)已隱藏 key。[清理查詢](tdd/api-production-cleanup.json)確認臨時 session、key、未刪除測試頁皆為零，測試筆記已依產品流程移入垃圾桶。
+
+[首次驗收](tdd/api-production-first-results.json)因 Wrangler `--json` 前仍輸出上傳進度，腳本誤判 SQL 成功輸出為解析錯誤；修正驗證腳本後重跑通過，未改動部署程式。首次清理欄位為誤判，最後遠端查詢已確認沒有留下測試憑證。使用方法見 [API 文件](api.md)。
+
+本功能分支與提交保留於獨立 worktree，未回寫主工作區；下次從其他分支發布前須先合入本分支，以免移除已上線功能。

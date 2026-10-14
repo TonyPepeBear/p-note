@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-10-14T08:04:20.392Z",
+  "checks": {
+    "public": true,
+    "keyManagement": true,
+    "content": true,
+    "browserSettingsAndContent": true,
+    "revocation": true,
+    "cleanup": true
+  },
+  "authentication": "管理員建立的 10 分鐘專用 session；本次不驗證郵件登入"
+}

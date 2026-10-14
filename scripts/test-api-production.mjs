@@ -12,7 +12,7 @@ const sqlPath = '.env.api-smoke.sql';
 const quote = v => "'" + String(v).replaceAll("'", "''") + "'";
 function sql(text) {
   writeFileSync(sqlPath, text, { mode: 0o600 });
-  try { return JSON.parse(execFileSync(process.execPath, [wrangler, 'd1', 'execute', 'p-note-production', '--config', 'wrangler.production.jsonc', '--remote', '--file', sqlPath, '--json'], { encoding: 'utf8', stdio: ['ignore','pipe','pipe'] })); }
+  try { return execFileSync(process.execPath, [wrangler, 'd1', 'execute', 'p-note-production', '--config', 'wrangler.production.jsonc', '--remote', '--file', sqlPath, '--json'], { encoding: 'utf8', stdio: ['ignore','pipe','pipe'] }); }
   catch { throw new Error('正式測試資料操作失敗（敏感輸出已隱藏）'); }
   finally { unlinkSync(sqlPath); }
 }

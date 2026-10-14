@@ -1,0 +1,9 @@
+{
+  "startedAt": "2026-10-14T08:02:50.841Z",
+  "checks": {
+    "public": true,
+    "cleanup": false
+  },
+  "authentication": "管理員建立的 10 分鐘專用 session；本次不驗證郵件登入",
+  "error": "正式測試資料操作失敗（敏感輸出已隱藏）"
+}
