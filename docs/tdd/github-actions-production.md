@@ -37,3 +37,11 @@ GitHub Actions 已啟用，帳號有 repository 管理權。Cloudflare 連接器
 正式 Worker 版本為 `f4b29957-c395-4aae-9215-a11733378e7c`。最小證據：`migrationExecuted: true`、`smokePassed: true`。報告不保存平台原始回應或憑證值。後續純紀錄提交使用 `[skip ci]` 避免相同程式重複發布。
 
 公開 smoke 只驗證 HTTPS、建置 script、私人 API 與測試入口限制，不涵蓋正式寄信或登入後同步；上述完整產品回歸失敗仍保留，未宣稱已修正。
+
+## 規格同步與封存
+
+2026-10-14 再次查詢上述成功執行，確認 deploy job 的型別、正式設定、建置、預檢、遷移、發布與 HTTPS smoke 步驟皆為 `success`。本輪 GitHub 整合無權列出 Actions secrets（403），不重新設定憑證；secret 名稱沿用先前查詢證據，實際發布成功另由 run 步驟確認。
+
+全部任務已完成，透過 OpenSpec 將 CICD-01～03 合入 [production-deployment 主規格](../../openspec/specs/production-deployment/spec.md)，並封存至 [2026-10-14-github-actions-production](../../openspec/changes/archive/2026-10-14-github-actions-production/tasks.md)。change 與 11 份主規格嚴格驗證通過，文件連結與 105 個唯一情境契約通過；`openspec list --json` 的 changes 為空。
+
+本次只同步及封存文件，依 AGENTS.md 使用 `[skip ci]` 與 PR 合併流程，不重新部署。同步最新規則前已啟動的產品回歸於 Workers 階段停止，不列為本次驗收證據；既有回歸失敗的紀錄與限制保留。
