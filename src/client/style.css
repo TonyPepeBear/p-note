@@ -351,3 +351,5 @@ body {
   .properties-grid { grid-template-columns: 1fr; }
   .database-page > .mantine-Group-root { max-width: 100%; }
 }
+.note-link-option { width: 100%; text-align: left; padding: 10px; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; min-height: 44px; }
+.note-link-option[aria-selected="true"], .note-link-option:hover { background: var(--mantine-color-teal-0); }

@@ -3,6 +3,7 @@ import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRe
 import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
+import linksMigration from '../migrations/0007_note_links.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
@@ -53,6 +54,9 @@ async function setup(env: Env) {
     for (const sql of databaseMigration.split(';').map(s => s.trim()).filter(Boolean)) await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_asset_control (id INTEGER PRIMARY KEY, fail INTEGER)');
+  if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('page_search') WHERE name = 'linked_pages'").first()) {
+    await env.DB.prepare(linksMigration.trim().replace(/;$/, '')).run();
+  }
 }
 
 export default {

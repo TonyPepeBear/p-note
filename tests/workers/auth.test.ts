@@ -206,5 +206,5 @@ it('SCHEMA-01：擁有者外鍵、日記（含垃圾桶）唯一、資產／可�
   await env.DB.prepare("INSERT INTO pages (id, owner_id, kind, title, sync_generation, created_at, updated_at) VALUES ('parent', 'other', 'note', '上層', 'g1', 0, 0)").run();
   await expect(env.DB.prepare("INSERT INTO pages (id, owner_id, kind, title, parent_id, sync_generation, created_at, updated_at) VALUES (?, ?, 'note', '子頁', 'parent', 'g1', 0, 0)").bind('child', page.owner_id).run()).rejects.toThrow(/FOREIGN KEY/);
   await expect(env.DB.prepare("INSERT INTO assets VALUES ('image', 'missing-owner', 'object', 'image.png', 'image/png', 1, 'hash', 0)").run()).rejects.toThrow(/FOREIGN KEY/);
-  await expect(env.DB.prepare("INSERT INTO page_search VALUES (?, 'other', '文字', '摘要', 'g1', 1)").bind(page.id).run()).rejects.toThrow(/FOREIGN KEY/);
+  await expect(env.DB.prepare("INSERT INTO page_search (page_id, owner_id, plain_text, summary, indexed_generation, indexed_checkpoint) VALUES (?, 'other', '文字', '摘要', 'g1', 1)").bind(page.id).run()).rejects.toThrow(/FOREIGN KEY/);
 });

@@ -11,11 +11,11 @@ export function hasMetadataDrafts(): boolean {
   return [...metadataDrafts].some(entry => entry.dirty());
 }
 
-export async function api(path: string, body?: object): Promise<Response> {
-  const response = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' });
+export async function api(path: string, body?: object, signal?: AbortSignal): Promise<Response> {
+  const response = await fetch(path, { ...(body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' as const }), ...(signal ? { signal } : {}) });
   try {
     if (response.status === 401 || (path === '/api/logout' && response.ok)) localStorage.setItem(SIGNED_OUT, '1');
-    else if (response.ok && !body && /^\/api\/(pages\/|today)/.test(path)) localStorage.removeItem(SIGNED_OUT);
+    else if (response.ok && !body && /^\/api\/(pages\/[\w-]+$|today(?:\?|$))/.test(path)) localStorage.removeItem(SIGNED_OUT);
   } catch { /* 無法記錄時仍以伺服器回應為準。 */ }
   return response;
 }

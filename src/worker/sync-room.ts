@@ -5,6 +5,7 @@ import { ProbeRoom } from './index';
 import { VISIBLE } from './pages';
 import { roomName } from '../shared/room';
 import * as Y from 'yjs';
+import { noteLinkId } from '../shared/note-links';
 
 type Permission = { session: string; owner: string; page: string; generation: string; allowed: boolean };
 type Scope = Pick<Permission, 'owner' | 'page' | 'generation'>;
@@ -188,13 +189,20 @@ export class SyncRoom extends ProbeRoom {
     if (modified !== undefined) await this.env.DB.prepare('UPDATE pages SET updated_at = MAX(updated_at, ?) WHERE id = ? AND owner_id = ? AND sync_generation = ?')
       .bind(modified, scope.page, scope.owner, scope.generation).run();
     const fragment = this.document.getXmlFragment('body');
+    const linked = new Set<string>();
+    for (const node of fragment.createTreeWalker(node => node instanceof Y.XmlText)) {
+      for (const part of (node as Y.XmlText).toDelta()) {
+        const id = noteLinkId(part.attributes?.link?.href);
+        if (id) linked.add(id);
+      }
+    }
     const plain = Array.from(fragment.createTreeWalker(node => node instanceof Y.XmlText))
       .map(node => (node as Y.XmlText).toDelta().map((part: { insert: unknown }) => typeof part.insert === 'string' ? part.insert : '').join('')).join('\n').normalize('NFC');
     const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
-    await this.env.DB.prepare(`INSERT INTO page_search SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?)
-      ON CONFLICT(page_id) DO UPDATE SET plain_text = excluded.plain_text, summary = excluded.summary, indexed_generation = excluded.indexed_generation, indexed_checkpoint = excluded.indexed_checkpoint
+    await this.env.DB.prepare(`INSERT INTO page_search (page_id, owner_id, plain_text, summary, indexed_generation, indexed_checkpoint, linked_pages) SELECT ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?)
+      ON CONFLICT(page_id) DO UPDATE SET plain_text = excluded.plain_text, summary = excluded.summary, indexed_generation = excluded.indexed_generation, indexed_checkpoint = excluded.indexed_checkpoint, linked_pages = excluded.linked_pages
       WHERE excluded.indexed_generation <> page_search.indexed_generation OR excluded.indexed_checkpoint >= page_search.indexed_checkpoint`)
-      .bind(scope.page, scope.owner, plain, plain.slice(0, 160), scope.generation, checkpoint, scope.page, scope.owner, scope.generation).run();
+      .bind(scope.page, scope.owner, plain, plain.slice(0, 160), scope.generation, checkpoint, JSON.stringify([...linked].sort()), scope.page, scope.owner, scope.generation).run();
   }
 }
 function equal(a: Uint8Array, b: Uint8Array): boolean { return a.length === b.length && a.every((value, index) => value === b[index]); }
