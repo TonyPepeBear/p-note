@@ -480,7 +480,10 @@ export function Navigation({
       <Modal
         returnFocus={false}
         onExitTransitionEnd={() => {
-          if (!panel)
+          // 站內換頁後新頁面可能已取得焦點（例如新頁標題），只在焦點無處可去時才還原。
+          const settled =
+            document.activeElement && document.activeElement !== document.body;
+          if (!panel && !settled)
             (trigger.current?.isConnected
               ? trigger.current
               : document.querySelector<HTMLButtonElement>(

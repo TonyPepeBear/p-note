@@ -59,5 +59,6 @@ npm run dev
 - [Mantine 介面重設、實際畫面與驗收](docs/ui-redesign.md)
 - [工作區可用性修正與驗收](docs/ux-polish.md)
 - [站內換頁與驗收](docs/spa-navigation.md)
+- [本機優先開啟與驗收](docs/local-first-open.md)
 - [OpenSpec 任務](openspec/changes/archive/2026-10-14-personal-notes-v1/tasks.md)
 - [技術驗證結果與 TDD 證據](docs/tdd/README.md)

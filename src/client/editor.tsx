@@ -237,7 +237,7 @@ export function Editor({
           ? "離線，待同步"
           : blocked
             ? "登入或頁面權限已失效"
-            : session.checkAccess && !provider.shouldConnect
+            : session.checkAccess && !provider.shouldConnect && !connecting
               ? "連線失敗，可重試"
               : "同步中",
       );
@@ -382,9 +382,9 @@ export function Editor({
     };
     reconnect.current = online;
     setReady(true);
-    void flush();
     if (navigator.onLine && session.checkAccess && !provider.shouldConnect)
       online();
+    void flush();
     return () => {
       disposed = true;
       clearTimeout(retryTimer);
@@ -817,7 +817,8 @@ export async function start(
         : {}),
     },
   );
-  if (navigator.onLine && !localOnly && !isolated) {
+  // 已下載的正式頁面先以本機內容開啟，同步交給 Editor 在背景連線。
+  if (navigator.onLine && !localOnly && !isolated && !(downloaded && checkAccess)) {
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         provider.disconnect();
