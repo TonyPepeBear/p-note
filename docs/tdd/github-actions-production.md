@@ -28,6 +28,12 @@ GitHub Actions 已啟用，帳號有 repository 管理權。Cloudflare 連接器
 
 程式提交 `517e05e` 推送 `master` 自動觸發 [首次執行](https://github.com/TonyPepeBear/p-note/actions/runs/38555268728)。GitHub runner 通過套件／瀏覽器安裝、型別、正式設定、單元及 Workers 整合檢查；E2E 執行到約第 284 個情境時，已出現 API key 設定與日記月份的 WebKit 逾時，為取得紀錄而取消，未進入正式遷移或部署。完整產品回歸未通過；本機針對性重跑亦曾重現，延長時間不能視為已修正。
 
-使用者要求聚焦部署後，流程收斂為型別、正式設定、建置、dry-run、D1 migrations、部署及公開 HTTPS smoke，不再將完整產品 E2E 綁入每次發布。沒有修改產品或既有測試斷言。收斂後部署契約與實際發布結果另於完成後補記。
+使用者要求聚焦部署後，流程收斂為型別、正式設定、建置、dry-run、D1 migrations、部署及公開 HTTPS smoke，不再將完整產品 E2E 綁入每次發布。沒有修改產品或既有測試斷言。收斂後的 3 個部署契約測試通過，actionlint 與規格文件檢查通過。
 
-尚未宣稱實際 Actions 發布成功。公開 smoke 只驗證 HTTPS、建置 script、私人 API 與測試入口限制，不涵蓋正式寄信或登入後同步。
+## 實際發布成功
+
+提交 `435a695` 推送 `master` 自動觸發 [成功執行](https://github.com/TonyPepeBear/p-note/actions/runs/38558648192)，run 與 deploy job 的結論皆為 `success`。型別、正式設定、建置、dry-run、D1 migrations、Worker 發布及正式 HTTPS smoke 全部通過。
+
+正式 Worker 版本為 `f4b29957-c395-4aae-9215-a11733378e7c`。最小證據：`migrationExecuted: true`、`smokePassed: true`。報告不保存平台原始回應或憑證值。後續純紀錄提交使用 `[skip ci]` 避免相同程式重複發布。
+
+公開 smoke 只驗證 HTTPS、建置 script、私人 API 與測試入口限制，不涵蓋正式寄信或登入後同步；上述完整產品回歸失敗仍保留，未宣稱已修正。
