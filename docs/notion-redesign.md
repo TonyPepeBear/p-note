@@ -1,6 +1,6 @@
 # Notion 工作區全面重做
 
-本次以 Notion 的中性色、緊湊側欄、無框文件、資料庫檢視及輕量浮層為介面基準，涵蓋所有既有使用者畫面。規格見 [proposal](../openspec/changes/rebuild-notion-workspace/proposal.md)、[設計決策](../openspec/changes/rebuild-notion-workspace/design.md)及 [UI-01～10 驗收情境](../openspec/changes/rebuild-notion-workspace/specs/workspace-experience/spec.md)。
+本次以 Notion 的中性色、緊湊側欄、無框文件、資料庫檢視及輕量浮層為介面基準，涵蓋所有既有使用者畫面。規格見 [proposal](../openspec/changes/archive/2026-10-14-rebuild-notion-workspace/proposal.md)、[設計決策](../openspec/changes/archive/2026-10-14-rebuild-notion-workspace/design.md)及 [UI-01～10 驗收情境](../openspec/changes/archive/2026-10-14-rebuild-notion-workspace/specs/workspace-experience/spec.md)。
 
 ## 畫面範圍
 
@@ -32,35 +32,50 @@
 
 測試使用合成筆記與 `owner@example.test`；登入憑證及 API key 由隔離測試環境建立，不讀取正式筆記、真實收件者或正式憑證，也不將測試憑證寫入文件。幾何與互動斷言是自動驗收條件，截圖是開發檢查證據。
 
+## 畫面紀錄
+
+以下皆為隔離測試資料，沒有正式筆記或憑證：
+
+| 畫面 | 紀錄 |
+| --- | --- |
+| 桌面文件 | [工作區](screenshots/notion/workspace-desktop.png) |
+| 桌面資料庫 | [檢視與工具列](screenshots/notion/database-desktop.png) |
+| 設定 | [API key 空狀態](screenshots/notion/settings-desktop.png) |
+| 手機文件 | [工作區](screenshots/notion/workspace-mobile.png) |
+| 手機資料庫 | [觸控工具列](screenshots/notion/database-mobile.png) |
+| 手機安裝說明 | [安裝浮層](screenshots/notion/install-mobile.png) |
+
 ## 執行與結果
 
-所有 E2E 服務由主代理集中啟動，避免同一 checkout 共用測試資料時相互覆寫。相關 Red／Green 使用 Chromium desktop，最終回歸使用 `chromium-desktop`、`chromium-mobile` 與 `webkit-mobile`。
-
-2026-10-14：主代理在隔離舊版 checkout 執行兩個 Chromium desktop Red，兩個案例均因預期產品缺口失敗：工作區沒有「收合側邊欄」按鈕，備份頁沒有「筆記頁面」導覽。沒有將服務錯誤、瀏覽器安裝或環境失敗視為有效 Red。
-
-新增的六個流程及既有 [互動色測試](../tests/e2e/hover-colors.spec.ts) 共同覆蓋本次改版；互動色測試改用新版 aria-current 語義，保留 hover、觸控、對比、停用與鍵盤焦點要求。
-
-新版首輪相關 Chromium desktop 測試為 46 個通過、4 個失敗。失敗涉及 hover 一致性、危險操作對比、登入主操作 44px 及輔助文字對比；修正後四個案例重跑 4／4 通過。後續新增的 `BACKUP-UI-LOCK-01` 與 `KEY-03` 桌面案例 2／2 通過。
-
-目前已完成的其他驗證：
+2026-10-14 完成驗收。所有 E2E 由同一組服務集中執行，三個專案為 `chromium-desktop`、`chromium-mobile` 與 `webkit-mobile`；手機是瀏覽器模擬環境，範圍同 [自動化驗證文件](automated-validation.md)。
 
 | 驗證 | 實際結果 |
 | --- | --- |
-| 單元測試 | 6／6 通過 |
-| Workers 整合測試 | 19 個測試檔，共 107／107 通過 |
-| 型別檢查 `npm run check` | 通過 |
-| 文件與規格契約 `npm run check:spec` | 通過 |
-| 正式設定預檢 `npm run check:production` | 通過；此項是設定預檢，不代表已發布 |
+| 單元測試 | 5 個測試檔，8／8 通過 |
+| Workers 整合測試 | 17 個測試檔，107／107 通過 |
+| 最後一輪完整 E2E | 410／411 通過；WebKit `PAGE-04` 耗盡案例總時限，於後續集中回歸通過 |
+| 最後集中回歸 | 36／36 通過，涵蓋 PWA、手機焦點、資料庫、備份鎖定及 `PAGE-04`；補強安裝說明動畫斷言後，該流程再跑三環境 3／3 通過 |
+| 每個情境／瀏覽器的最後結果 | 414／414 通過；含新增的三個 `PWA-UI-01` 執行，並非單輪執行 414 個案例 |
+| 真實建置 HTTPS smoke | 2／2 通過：登入、wss 保存、離線刷新與分析請求不阻擋編輯 |
+| 型別、文件契約與正式設定預檢 | `check`、`check:spec`、`check:production` 通過 |
+| 規格覆蓋 | 完整產品、UI、UX、資料庫、連結與 PWA 均通過 |
 
-首輪三個 Playwright 專案的完整回歸共 387 個案例，378 個通過、9 個失敗。失敗保留如下，不以先前局部通過結果替代完整驗收：
+完整回歸原始報告保存在被 Git 忽略的 `reports/e2e-full.json`，最後集中回歸為 `reports/e2e-focused.json`，安裝說明的最後驗證為 `reports/e2e-install.json`。覆蓋率使用 `reports/e2e.json`：依檔案、情境階層／標題與瀏覽器保留最後一次**實際執行**結果，並記錄三個來源報告的 SHA-256；沒有將重複案例相加、改寫來源報告或隱藏先前失敗。414 個不同結果中沒有未執行、略過或尚未修復的失敗。
 
-| 失敗範圍 | 數量 | 原因與目前處理狀態 |
-| --- | --- | --- |
-| `UX-16`，三個瀏覽器專案 | 3 | 測試仍尋找已移除的 AppShell header；已改為「頁面路徑」導覽語義，原有不重新載入及單一同步連線斷言保留，待重跑。 |
-| Chromium mobile 的 `BACKUP-UI-LOCK-01`、`DB-01`、`PAGE-04` | 3 | 手機 breadcrumb 隱藏了返回與祖先頁面入口；已修正入口呈現，待重跑。 |
-| WebKit mobile 的 `LINK-01` | 1 | 筆記連結搜尋的鍵盤選取與舊結果存在競態，正在修正。 |
-| WebKit mobile 的 `PAGE-03`、`PAGE-06` | 2 | 多步流程達到 20 秒案例總時限，正在分析各步耗時及完成狀態，尚未判定通過。 |
+### Red／Green 與修復紀錄
 
-修正後將再次執行完整三專案回歸。目前完整 E2E 驗收尚未通過，最終建置、驗收及發布結果待實際完成後補入；各輪結果分開記錄，不將局部重跑加總為完整成功。
+- 在隔離舊版 checkout 執行兩個 Red，分別因沒有「收合側邊欄」與備份設定沒有「筆記頁面」導覽而失敗；新版相同流程通過。
+- 首輪相關桌面測試 46 個通過、4 個失敗；修正 hover 一致性、危險操作對比、登入主操作 44px 及輔助文字對比，四個案例重跑通過。還原鎖定與設定背景登入失效兩個新增案例也通過。
+- 第一輪完整回歸為 378／387；修正手機返回入口、筆記連結載入期間的舊結果選取，將舊 AppShell 選擇器改為導覽語義。`PAGE-03`、`PAGE-04`、`PAGE-06` 的長流程總時限改為 45 秒，保留每步 5 秒及全部原斷言。
+- 新增 `LINK-01` 延遲搜尋測試，確認 Enter 不會插入上一批結果；原連結測試直接斷言實際目標 ID。
+- 新增 `PWA-UI-01` 抓到關閉說明後焦點未恢復，以及選擇同一份日記後抽屜未關閉；已修正最上層 Escape 處理、明確焦點恢復及同頁導覽關閉。明確設定安裝說明的浮層順序，加入實際點擊「知道了」與等動畫完成的斷言，避免 DOM 可見卻無法點擊或截到透明首幀，最後三環境均通過。
+- 整合上游 PWA 後，舊 watch 程序未重新讀取建置設定，造成未登入離線頁缺資源；重新啟動服務後完整回歸與最後集中回歸均通過，沒有因此修改 Service Worker 產品邏輯。
+- 中間一次 Chromium 真實更新測試在 5 秒內未收到重新載入，未能重現；獨立連跑三次及最後三環境回歸均通過。保留該次失敗紀錄，未據此變更更新控制器或放寬該斷言。
 
-完成實作與驗證後，合併前先封存 OpenSpec change、同步主規格並提交；合併後確認 master workflow 的資料遷移與發布結果，發布成功後結束。
+最後集中回歸命令：
+
+```sh
+npm run test:e2e -- tests/e2e/pwa.spec.ts tests/e2e/databases.spec.ts tests/e2e/notion-redesign.spec.ts tests/e2e/backup.spec.ts tests/e2e/pages.spec.ts --grep 'PWA-|DB-08|UI-05|BACKUP-UI-LOCK|PAGE-04'
+```
+
+合併前封存 OpenSpec 並同步主規格。合併後由 master workflow 執行資料遷移與發布，發布結果以對應的 GitHub Actions 為準；不額外執行正式網站 HTTP 檢查。

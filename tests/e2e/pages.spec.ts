@@ -135,6 +135,8 @@ test("PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回"
   request,
   isMobile,
 }) => {
+  // 多次建立、改名、切換與移動頁面共用總時間；每步斷言仍維持 5 秒。
+  test.setTimeout(45_000);
   await login(page, request);
   await showNavigation(page);
   const add = page.getByRole("button", { name: "新增筆記", exact: true });

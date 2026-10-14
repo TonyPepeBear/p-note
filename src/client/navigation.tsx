@@ -33,6 +33,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
   const [results, setResults] = useState<PageInfo[]>([]);
   const [panel, setPanel] = useState("");
   const [navOpen, setNavOpen] = useState(false);
+  const [pwaHelpOpen, setPwaHelpOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem("p-note-sidebar-collapsed") === "true"; }
     catch { return false; }
@@ -144,6 +145,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     }
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
+    setNavOpen(false);
     void run(() => navigate(id));
   };
   const pageLink = (item: PageRow, label = item.title) => (
@@ -198,7 +200,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
         <IconSearch size={18} /><span>搜尋</span><kbd aria-hidden="true">⌘ K</kbd>
       </button>
       <button className="pn-nav-item" disabled={navigationLocked} data-active={!settingsView && page.kind === "journal" && page.journal_date === today(Date.now()) || undefined}
-        onClick={() => void run(() => navigate())}><IconCalendarEvent size={18} /><span>今天</span></button>
+        onClick={() => { setNavOpen(false); void run(() => navigate()); }}><IconCalendarEvent size={18} /><span>今天</span></button>
       <button className="pn-nav-item" disabled={navigationLocked} onClick={(event) => openJournals(event.currentTarget)}>
         <IconCalendar size={18} /><span>日記</span>
       </button>
@@ -215,7 +217,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
       })}><IconDatabase size={18} /><span>新增資料庫</span></button>
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
-      <PwaControls disabled={navigationLocked} />
+      <PwaControls disabled={navigationLocked} onHelpOpenChange={setPwaHelpOpen} />
       <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "api" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); settings(); }}>
         <IconSettings size={17} /><span>設定</span>
       </button>
@@ -237,6 +239,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
   return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
     <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
     <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
+      trapFocus={!pwaHelpOpen} closeOnEscape={!pwaHelpOpen}
       closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
       {sidebar}
     </Drawer>

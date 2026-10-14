@@ -199,7 +199,7 @@ test("BACKUP-UI-LOCK-01：還原失敗後鎖定導覽，保留原備份並以相
     await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
     await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
     await showNavigation(page);
-    for (const name of ["設定", "今天", "登出"])
+    for (const name of ["設定", "今天", "登出", "安裝 p-note"])
       await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
     const close = page.getByRole("button", { name: "關閉導覽", exact: true });
     if (await close.isVisible()) await close.click();

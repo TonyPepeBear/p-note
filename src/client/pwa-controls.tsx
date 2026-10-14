@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Modal, Stack, Text, Title } from "@mantine/core";
 import { IconDeviceDesktop, IconDeviceMobile, IconDownload, IconRefresh } from "@tabler/icons-react";
 import { applyPwaUpdate, installPwa, standalone, updateAvailable } from "./pwa";
 import "./pwa-controls.css";
 
-export function PwaControls({ disabled = false }: { disabled?: boolean }) {
+export function PwaControls({
+  disabled = false,
+  onHelpOpenChange,
+}: {
+  disabled?: boolean;
+  onHelpOpenChange?: (open: boolean) => void;
+}) {
   const [, refresh] = useState(0);
   const [help, setHelp] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<"install" | "update" | null>(null);
+  const installButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const change = () => refresh((value) => value + 1);
@@ -27,6 +34,12 @@ export function PwaControls({ disabled = false }: { disabled?: boolean }) {
     if (disabled) setHelp(false);
   }, [disabled]);
 
+  const helpOpened = help && !disabled;
+  useEffect(() => {
+    onHelpOpenChange?.(helpOpened);
+  }, [helpOpened, onHelpOpenChange]);
+  useEffect(() => () => onHelpOpenChange?.(false), [onHelpOpenChange]);
+
   const canInstall = !standalone();
   const canUpdate = updateAvailable();
   if (!canInstall && !canUpdate && !error && !help) return null;
@@ -35,6 +48,7 @@ export function PwaControls({ disabled = false }: { disabled?: boolean }) {
     <div className="pwa-controls">
       {canInstall && (
         <Button
+          ref={installButton}
           className="pwa-control"
           variant="subtle"
           color="gray"
@@ -78,9 +92,12 @@ export function PwaControls({ disabled = false }: { disabled?: boolean }) {
       )}
       {error && <Alert className="pwa-error" role="alert" color="red">{error}</Alert>}
       <Modal
-        opened={help && !disabled}
+        opened={helpOpened}
         onClose={() => setHelp(false)}
+        returnFocus={false}
+        onExitTransitionEnd={() => installButton.current?.focus()}
         title="安裝 p-note"
+        zIndex={300}
         size={440}
         centered
         padding={20}

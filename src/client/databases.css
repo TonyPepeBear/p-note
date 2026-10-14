@@ -218,10 +218,10 @@
   .database-page .database-view-picker select { width: 44px; height: 44px; min-height: 44px; }
   .database-page .database-view-picker .mantine-NativeSelect-section { width: 44px; }
   .database-page .database-search { flex: 1 1 90px; max-width: none; min-width: 90px; margin: 0; }
-  .database-page .database-search input { height: 44px; min-height: 44px; font-size: 13px; }
+  .database-page .database-search input { height: 44px; min-height: 44px; font-size: 16px; }
   .database-page .database-table td { height: 44px; }
   .database-page .property-input .mantine-Input-input,
-  .note-properties .property-input .mantine-Input-input { height: 44px; min-height: 44px; }
+  .note-properties .property-input .mantine-Input-input { height: 44px; min-height: 44px; font-size: 16px; }
   .database-page .property-input .mantine-MultiSelect-input,
   .note-properties .property-input .mantine-MultiSelect-input { height: auto; }
   .database-page .database-open-row { width: 44px; height: 44px; opacity: 1; }
@@ -236,6 +236,7 @@
   .database-dialog .database-dialog-body { padding: 16px 16px 0; }
   .database-dialog .mantine-Input-input,
   .database-dialog .mantine-Button-root { height: 44px; min-height: 44px; }
+  .database-dialog .mantine-Input-input { font-size: 16px; }
   .database-dialog .database-icon-button { width: 44px; min-width: 44px; }
   .database-dialog .database-field-editor-main { grid-template-columns: 16px minmax(0, 1fr); gap: 8px; }
   .database-dialog .database-field-editor-main > .mantine-NativeSelect-root { grid-column: 2; }
