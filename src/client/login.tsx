@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PwaControls } from './pwa-controls';
 import {
   Alert,
   Button,
@@ -195,6 +196,7 @@ export function Login({
       <Text className="login-footer" size="xs" c="dimmed">
         一個屬於你的，安靜寫作的地方。
       </Text>
+      <div style={{ margin: '12px auto 0' }}><PwaControls /></div>
     </main>
   );
 }

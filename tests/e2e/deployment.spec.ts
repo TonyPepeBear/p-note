@@ -47,6 +47,9 @@ test('CICD-03：部署 smoke 拒絕舊版建置與錯誤的私人入口狀態', 
     if (req.url === '/') { res.setHeader('content-type', 'text/html'); res.end(`<script type="module" src="${script}"></script>`); }
     else if (req.url === '/api/pages') { res.writeHead(privateStatus); res.end(); }
     else if (req.url === '/assets/index-current.js') { res.setHeader('content-type', 'application/javascript'); res.end('export {};'); }
+    else if (req.url === '/manifest.webmanifest') { res.setHeader('content-type', 'application/manifest+json'); res.end(readFileSync('public/manifest.webmanifest')); }
+    else if (req.url?.startsWith('/icons/')) { res.setHeader('content-type', 'image/png'); res.end(readFileSync('public' + req.url)); }
+    else if (req.url === '/sw.js') { res.setHeader('content-type', 'application/javascript'); res.end('const precache = ["/assets/index-current.js"];'); }
     else { res.writeHead(testStatus); res.end(); }
   });
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
