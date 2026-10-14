@@ -8,6 +8,10 @@
 
 新增有效 Red：舊草稿入口 [red-old-draft-access](red-old-draft-access.log)、Worker 靜態入口 [red-static-worker](red-static-worker.log)、HTTPS 誤用 ws [red-build-smoke](red-build-smoke.log)、正文更新時間 [red-body-updated-time](red-body-updated-time.log)、自動整理 [red-auto-compaction](red-auto-compaction.log)、複製污染保存狀態 [red-copy-feedback](red-copy-feedback.log)。Green 與全部回歸見上述最終報告；自動整理量測見 [green-auto-compaction](green-auto-compaction.log)。
 
+## 已下載頁面本機優先導覽
+
+已下載頁面不等版本查詢與頁面資訊即可切換、編輯並保存本機，背景驗證失敗時保留草稿；三瀏覽器 291 個通過。Red／Green／Refactor 與驗收見 [TDD 報告](local-first-page-navigation.md)。
+
 ## E2E 平行隔離
 
 Red：舊設定以 4 個 worker 執行 Chromium 桌面，共用測試 Worker 的 reset／時鐘互相干擾，80 個中 27 個失敗 [red-e2e-parallel](red-e2e-parallel.log)。Green：每個 worker 獨立一組服務，完整三瀏覽器 240 個全部通過 [green-e2e-parallel](green-e2e-parallel.log)，耗時由約 529 秒降到 241～251 秒；重用常駐服務時第一個測試在 0.4 秒內開始。6／8 個 worker 因本機資源飽和反而變慢並出現逾時（294 秒 2 失敗、428 秒 41 失敗），預設維持 4。

@@ -46,6 +46,8 @@ test('SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，�
     const original=window.fetch;
     window.fetch=(input,init)=>String(input).startsWith('/api/pages/') ? Promise.resolve(Response.json({message:'登入已失效'},{status:401})) : original(input,init);
   });
+  // 未知失效時先以本機開啟，背景驗證拒絕後停止編輯；已知失效後再開不讀快取。
+  await page.reload(); await expect(page.getByLabel('Email',{exact:true})).toBeVisible(); await expect(page.locator('.tiptap[contenteditable="true"]')).toHaveCount(0);
   await page.reload(); await expect(page.getByLabel('Email',{exact:true})).toBeVisible(); await expect(page.getByTestId('ready')).toHaveCount(0);
 });
 

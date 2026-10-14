@@ -1,18 +1,19 @@
-/** @param {string[]} required @param {{id:string,status:string}[]} actual */
+/** @param {string[]} required @param {{id:string,status:string,title?:string}[]} actual */
 export function checkCoverage(required, actual) {
   return required.flatMap(id => {
     const matches = actual.filter(item => item.id === id);
     if (!matches.length) return [`缺漏 ${id}`];
-    if (matches.length > 1) return [`重複 ${id}`];
-    return matches[0].status === 'passed' ? [] : [`${id} ${matches[0].status}`];
+    // 同 ID 不同標題是同一情境的參數化案例，須全部通過；標題相同才是重複計算。
+    if (matches.length > 1 && new Set(matches.map(item => item.title)).size < matches.length) return [`重複 ${id}`];
+    return matches.filter(item => item.status !== 'passed').map(item => `${id} ${item.status}`);
   });
 }
 
 export function reportCases(report, environment) {
   const cases = [];
   const add = (title, status, context) => {
-    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX)-\d{2})[：:]/)?.[1];
-    if (id) cases.push({ id: `${id}@${context}`, status });
+    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN)-\d{2})[：:]/)?.[1];
+    if (id) cases.push({ id: `${id}@${context}`, status, title });
   };
   if (Array.isArray(report.testResults)) {
     for (const file of report.testResults) for (const test of file.assertionResults) add(test.title, test.status, environment);

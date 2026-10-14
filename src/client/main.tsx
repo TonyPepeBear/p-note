@@ -18,7 +18,7 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { Editor, start, type Session } from "./editor";
 import type { PageInfo } from "../shared/pages";
-import { api, navigate, saveDraft } from "./api";
+import { api, navigate, saveDraft, signedOut } from "./api";
 import { BackupSettings } from "./backup-settings";
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
@@ -64,11 +64,15 @@ function App() {
     };
     const popped = (event: PopStateEvent) =>
       go(false, (event.state as { scrollY?: number } | null)?.scrollY ?? 0);
+    const failed = (event: Event) =>
+      setError((event as CustomEvent<string>).detail);
     addEventListener("p-note:navigate", pushed);
     addEventListener("popstate", popped);
+    addEventListener("p-note:error", failed);
     return () => {
       removeEventListener("p-note:navigate", pushed);
       removeEventListener("popstate", popped);
+      removeEventListener("p-note:error", failed);
     };
   }, []);
   const [draftDismissed, setDraftDismissed] = useState(false);
@@ -115,8 +119,126 @@ function App() {
       }
       setSession(opened);
     };
+    const open = async (page: PageInfo, localOnly: boolean) => {
+      const old = localPage(page.id, page.owner_id);
+      const accepted = sessionStorage.getItem("p-note-load-current");
+      if (
+        old &&
+        old.sync_generation !== page.sync_generation &&
+        accepted !== page.id &&
+        accepted !== "restored"
+      ) {
+        setError("這頁已在其他地方更新，你的本機修改已另外保留");
+        await isolate(old, page);
+        return;
+      }
+      sessionStorage.removeItem("p-note-load-current");
+      try {
+        rememberPage(page);
+        const previousVersions = cachedVersions(page);
+        setVersions(previousVersions);
+        setDraftVersion(previousVersions[0]?.sync_generation ?? "");
+      } catch {
+        setError("頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存");
+      }
+      history.replaceState(history.state, "", `/?page=${page.id}`);
+      sessionStorage.setItem(
+        "p-note-return-url",
+        location.pathname + location.search,
+      );
+      sessionStorage.setItem("p-note-scope", JSON.stringify(page));
+      setPage(page);
+      // 停止同步前先寫入本機，保存失敗也不卸載 doc，畫面上的字仍可另存。
+      const keep = async (message: string) => {
+        opened?.provider.disconnect();
+        try {
+          if (opened) await saveLocal(opened.cache);
+          setError(message);
+        } catch {
+          setError("本機儲存失敗，草稿仍在畫面上，請先不要關閉頁面");
+        }
+      };
+      const checkAccess = async () => {
+        const current = await api(`/api/pages/${page.id}`);
+        if (disposed) return false;
+        if (current.status === 401) {
+          await keep("登入已到期，請重新登入；本機草稿仍保留");
+          if (!disposed) setLogin(true);
+          return false;
+        }
+        if (current.status >= 500) throw new Error("頁面服務暫時不可用");
+        if (!current.ok) {
+          const failure = (await current.json().catch(() => ({}))) as {
+            message?: string;
+            page?: PageInfo;
+          };
+          await keep(
+            failure.message ?? "這頁目前無法存取，你的本機修改已另外保留",
+          );
+          if (disposed) return false;
+          setIsolated({ page });
+          if (failure.page) setRecovery(failure.page);
+          return false;
+        }
+        const info = (await current.json()) as PageInfo;
+        if (disposed) return false;
+        if (
+          info.owner_id !== page.owner_id ||
+          info.sync_generation !== page.sync_generation
+        ) {
+          await keep("這頁已在其他地方更新或無法存取，你的本機修改已另外保留");
+          if (disposed) return false;
+          setIsolated({
+            page,
+            current: info.owner_id === page.owner_id ? info : undefined,
+          });
+          return false;
+        }
+        try {
+          rememberPage(info);
+        } catch {
+          /* 頁面資訊仍以伺服器回應更新畫面。 */
+        }
+        setPage(info);
+        return true;
+      };
+      opened = await start(
+        [page.owner_id, page.id, page.sync_generation],
+        checkAccess,
+        localOnly,
+      );
+      if (disposed) {
+        opened.provider.destroy();
+        await opened.cache.destroy();
+        opened.doc.destroy();
+        return;
+      }
+      setSession(opened);
+    };
     void (async () => {
-      const id = new URLSearchParams(location.search).get("page");
+      const params = new URLSearchParams(location.search);
+      const id = params.get("page");
+      // 已下載頁面先以本機內容開啟，登入、權限與版本交給 Editor 連線前背景驗證。
+      if (
+        !params.get("draft") &&
+        !sessionStorage.getItem("p-note-load-current") &&
+        !signedOut()
+      ) {
+        let local: PageInfo | undefined;
+        try {
+          local = cachedPage(id ?? undefined);
+        } catch {
+          /* 沒有可用索引時走雲端載入。 */
+        }
+        if (local) {
+          try {
+            await open(local, true);
+            return;
+          } catch {
+            if (disposed) return;
+          }
+        }
+      }
       let response: Response | undefined;
       let localOnly = false;
       try {
@@ -163,7 +285,7 @@ function App() {
         ? ((await response.json()) as PageInfo)
         : cachedPage(id ?? undefined);
       if (disposed) return;
-      const draft = new URLSearchParams(location.search).get("draft");
+      const draft = params.get("draft");
       if (draft) {
         const version = cachedVersions(page).find(
           (item) => item.sync_generation === draft,
@@ -172,77 +294,7 @@ function App() {
         await isolate(version, page);
         return;
       }
-      const old = localPage(page.id, page.owner_id);
-      const accepted = sessionStorage.getItem("p-note-load-current");
-      if (
-        old &&
-        old.sync_generation !== page.sync_generation &&
-        accepted !== page.id &&
-        accepted !== "restored"
-      ) {
-        setError("這頁已在其他地方更新，你的本機修改已另外保留");
-        await isolate(old, page);
-        return;
-      }
-      sessionStorage.removeItem("p-note-load-current");
-      try {
-        rememberPage(page);
-        const previousVersions = cachedVersions(page);
-        setVersions(previousVersions);
-        setDraftVersion(previousVersions[0]?.sync_generation ?? "");
-      } catch {
-        setError("頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存");
-      }
-      history.replaceState(history.state, "", `/?page=${page.id}`);
-      sessionStorage.setItem(
-        "p-note-return-url",
-        location.pathname + location.search,
-      );
-      sessionStorage.setItem("p-note-scope", JSON.stringify(page));
-      setPage(page);
-      const checkAccess = async () => {
-        const current = await api(`/api/pages/${page.id}`);
-        if (disposed) return false;
-        if (current.status === 401) {
-          opened?.provider.disconnect();
-          setLogin(true);
-          setError("登入已到期，請重新登入；本機草稿仍保留");
-          return false;
-        }
-        if (current.status >= 500) throw new Error("頁面服務暫時不可用");
-        if (!current.ok) {
-          opened?.provider.disconnect();
-          setError("這頁目前無法存取，你的本機修改已另外保留");
-          setIsolated({ page });
-          const failure = (await current.json()) as { page?: PageInfo };
-          if (failure.page) setRecovery(failure.page);
-          return false;
-        }
-        const info = (await current.json()) as PageInfo;
-        if (
-          info.owner_id !== page.owner_id ||
-          info.sync_generation !== page.sync_generation
-        ) {
-          opened?.provider.disconnect();
-          setError("這頁已在其他地方更新或無法存取，你的本機修改已另外保留");
-          if (info.owner_id === page.owner_id)
-            setIsolated({ page, current: info });
-          return false;
-        }
-        return true;
-      };
-      opened = await start(
-        [page.owner_id, page.id, page.sync_generation],
-        checkAccess,
-        localOnly,
-      );
-      if (disposed) {
-        opened.provider.destroy();
-        await opened.cache.destroy();
-        opened.doc.destroy();
-        return;
-      }
-      setSession(opened);
+      await open(page, localOnly);
     })().catch((failure) => {
       if (disposed) return;
       setError(

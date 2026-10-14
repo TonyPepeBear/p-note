@@ -1,5 +1,14 @@
 import { test, expect, type Page } from "@playwright/test";
-import { openPrivate, saved, showNavigation } from "./helpers";
+import {
+  openPrivate,
+  saved,
+  showNavigation,
+  gate,
+  setRule,
+  release,
+  heldCount,
+  trackSockets,
+} from "./helpers";
 import { origin } from "./ports";
 
 const headers = { Origin: origin };
@@ -35,28 +44,6 @@ async function setText(page: Page, ...paragraphs: string[]) {
     );
   }, paragraphs);
   await saved(page);
-}
-
-// 在頁面內記錄同步連線，直接以 readyState 判斷目前文件仍開著幾條。
-async function trackSockets(page: Page) {
-  await page.addInitScript(() => {
-    const sockets: WebSocket[] = [];
-    (window as unknown as { syncSockets: WebSocket[] }).syncSockets = sockets;
-    const Native = window.WebSocket;
-    window.WebSocket = class extends Native {
-      constructor(url: string | URL, protocols?: string | string[]) {
-        super(url, protocols);
-        if (String(url).includes("/parties/")) sockets.push(this);
-      }
-    };
-  });
-  return () =>
-    page.evaluate(
-      () =>
-        (window as unknown as { syncSockets: WebSocket[] }).syncSockets.filter(
-          (socket) => socket.readyState < WebSocket.CLOSING,
-        ).length,
-    );
 }
 
 // 測試用記憶體標記：整頁重新載入後會消失。
@@ -195,49 +182,118 @@ test("UX-19：輸入後立即換頁，修改保留並保存到雲端", async ({
   }
 });
 
-test("UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換", async ({
+const VERSION = "^/$";
+const PAGE_API = "^/api/pages/[^/?]+$";
+
+async function addText(page: Page, text: string) {
+  await page.evaluate((text) => {
+    const editor = window.probe!.editor;
+    editor.insertBlocks(
+      [{ type: "paragraph", content: text }],
+      editor.document.at(-1)!,
+      "after",
+    );
+  }, text);
+  await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+}
+
+test("UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換", async ({
   page,
 }) => {
   await openPrivate(page);
   const a = await createNote(page, "甲頁");
   const b = await createNote(page, "乙頁");
+  await openPage(page, b);
+  await setText(page, "乙的內容");
   await openPage(page, a);
-  await page.evaluate(() => {
-    const original = window.fetch;
-    window.fetch = async (input, init) => {
-      const url = new URL(
-        input instanceof Request ? input.url : String(input),
-        location.href,
-      );
-      const response = await original(input, init);
-      if (url.pathname !== "/") return response;
-      const html = (await response.text()).replace(
-        /src="[^"]*\/(index|main)[^"]*"/,
-        'src="/assets/index-NEWBUILD.js"',
-      );
-      return new Response(html, {
-        headers: { "Content-Type": "text/html" },
-      });
-    };
-  });
+  await gate(page, [{ pattern: VERSION, hold: true, result: "newbuild" }]);
   await mark(page);
   await clickNote(page, "乙頁");
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+  expect(await heldCount(page, VERSION)).toBeGreaterThan(0);
+  await addText(page, "新版查詢期間的字");
+  await release(page, VERSION);
+  await expect.poll(() => marked(page).catch(() => true)).toBe(false);
   await arrive(page, b, "乙頁");
-  expect(await marked(page)).toBe(false);
-  await page.evaluate(() => {
-    const original = window.fetch;
-    window.fetch = (input, init) => {
-      const url = new URL(
-        input instanceof Request ? input.url : String(input),
-        location.href,
-      );
-      return url.pathname === "/"
-        ? Promise.reject(new TypeError("離線"))
-        : original(input, init);
-    };
-  });
+  await expect(page.locator(".tiptap")).toContainText("新版查詢期間的字");
+  await gate(page, [{ pattern: VERSION, result: "reject" }]);
   await mark(page);
   await clickNote(page, "甲頁");
   await arrive(page, a, "甲頁");
   expect(await marked(page)).toBe(true);
+});
+
+test("LFN-01：新版載入前本機保存失敗時保留畫面不重新載入", async ({ page }) => {
+  await openPrivate(page);
+  const a = await createNote(page, "甲頁");
+  const b = await createNote(page, "乙頁");
+  await openPage(page, b);
+  await openPage(page, a);
+  await gate(page, [{ pattern: VERSION, hold: true, result: "newbuild" }]);
+  await mark(page);
+  await clickNote(page, "乙頁");
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+  await addText(page, "保存失敗前的字");
+  await page.evaluate(() => {
+    IDBDatabase.prototype.transaction = function () {
+      throw new DOMException("測試容量不足", "QuotaExceededError");
+    };
+  });
+  await release(page, VERSION);
+  await expect(page.getByRole("alert").first()).toContainText("本機儲存失敗");
+  await page.waitForTimeout(500);
+  expect(await marked(page)).toBe(true);
+  await expect(page.locator(".tiptap")).toContainText("保存失敗前的字");
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+});
+
+test("LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面", async ({ page }) => {
+  const sockets = await trackSockets(page);
+  await openPrivate(page);
+  const a = await createNote(page, "甲頁");
+  const b = await createNote(page, "乙頁");
+  await openPage(page, a);
+  await setText(page, "甲的內容");
+  await openPage(page, b);
+  await setText(page, "乙的內容");
+  await gate(page, [
+    { pattern: VERSION, hold: true, result: "newbuild" },
+    { pattern: PAGE_API, hold: true },
+  ]);
+  await page.evaluate(
+    async ([a, b]) => {
+      for (const id of [a, b, a, b]) {
+        document.querySelector<HTMLAnchorElement>(`a.note-link[href="/?page=${id}"]`)!.click();
+        await new Promise((resolve) => setTimeout(resolve, 30));
+      }
+    },
+    [a, b],
+  );
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+  await expect(page.locator(".tiptap")).toContainText("乙的內容");
+  expect(await heldCount(page, `^/api/pages/${b}$`)).toBeGreaterThan(0);
+  await setRule(page, { pattern: `^/api/pages/${a}$`, result: 401 });
+  await release(page, `^/api/pages/${b}$`);
+  await saved(page);
+  await release(page, PAGE_API);
+  await page.waitForTimeout(500);
+  await expect(page.getByLabel("Email", { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+  expect(new URL(page.url()).searchParams.get("page")).toBe(b);
+  expect(await sockets()).toBeLessThanOrEqual(1);
+  await addText(page, "乙的新字");
+  await saved(page);
+  await mark(page);
+  await release(page, VERSION);
+  await expect.poll(() => marked(page).catch(() => true)).toBe(false);
+  await arrive(page, b, "乙頁");
+  await expect(page.locator(".tiptap")).toContainText("乙的新字");
+  await expect.poll(sockets).toBe(1);
+  await openPage(page, a);
+  await expect(page.locator(".tiptap")).toContainText("甲的內容");
+  await expect(page.locator(".tiptap")).not.toContainText("乙的新字");
 });

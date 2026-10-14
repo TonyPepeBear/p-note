@@ -117,3 +117,103 @@ export async function blockAction(page: Page, label: string) {
   if (await menu.isVisible()) await page.keyboard.press("Escape");
   await expect(menu).toBeHidden();
 }
+
+type GateRule = {
+  pattern: string;
+  hold?: boolean;
+  result?: "pass" | "reject" | "newbuild" | number | { json: object };
+};
+
+// 在頁面內包住 fetch：可把符合路徑的請求攔住、改成失敗或替換回應，並在測試中逐一釋放。
+function installGate(initial: GateRule[]) {
+  const w = window as unknown as {
+    gate?: {
+      rules: GateRule[];
+      held: { path: string; go: () => void }[];
+    };
+  };
+  if (w.gate) {
+    w.gate.rules = initial;
+    return;
+  }
+  const gate = (w.gate = { rules: initial, held: [] as { path: string; go: () => void }[] });
+  const original = window.fetch;
+  window.fetch = async (input, init) => {
+    const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+    const method = init?.method ?? (input instanceof Request ? input.method : "GET");
+    const path = url.pathname + url.search;
+    const match = () => method === "GET" ? [...gate.rules].reverse().find((rule) => new RegExp(rule.pattern).test(path)) : undefined;
+    const held = !!match()?.hold;
+    if (held) await new Promise<void>((go) => gate.held.push({ path, go }));
+    const result = match()?.result ?? "pass";
+    if (result === "reject") throw new TypeError("測試網路中斷");
+    if (typeof result === "number")
+      return Response.json({ message: "測試錯誤" }, { status: result });
+    // 攔住的請求改為慢但成功的回應，不受呼叫端原本的逾時中止。
+    const response = await original(input, held ? { ...init, signal: undefined } : init);
+    if (result === "newbuild")
+      return new Response(
+        (await response.text()).replace(/src="[^"]*\/(index|main)[^"]*"/, 'src="/assets/index-NEWBUILD.js"'),
+        { headers: { "Content-Type": "text/html" } },
+      );
+    if (typeof result === "object") {
+      const body = { ...((await response.json()) as object), ...result.json };
+      return Response.json(body, { status: response.status });
+    }
+    return response;
+  };
+}
+
+export async function gate(page: Page, rules: GateRule[], beforeLoad = false) {
+  if (beforeLoad) await page.addInitScript(installGate, rules);
+  else await page.evaluate(installGate, rules);
+}
+
+export async function setRule(page: Page, rule: GateRule) {
+  await page.evaluate((rule) => {
+    (window as unknown as { gate: { rules: GateRule[] } }).gate.rules.push(rule);
+  }, rule);
+}
+
+export async function release(page: Page, pattern: string) {
+  await page.evaluate((pattern) => {
+    const gate = (window as unknown as {
+      gate: { rules: GateRule[]; held: { path: string; go: () => void }[] };
+    }).gate;
+    const re = new RegExp(pattern);
+    for (const rule of gate.rules) if (rule.pattern === pattern) rule.hold = false;
+    for (const item of gate.held.filter((item) => re.test(item.path))) item.go();
+    gate.held = gate.held.filter((item) => !re.test(item.path));
+  }, pattern);
+}
+
+export const heldCount = (page: Page, pattern: string) =>
+  page.evaluate(
+    (pattern) =>
+      (window as unknown as { gate: { held: { path: string }[] } }).gate.held.filter((item) =>
+        new RegExp(pattern).test(item.path),
+      ).length,
+    pattern,
+  );
+
+// 在頁面內記錄同步連線，直接以 readyState 判斷目前文件仍開著幾條。
+export async function trackSockets(page: Page) {
+  await page.addInitScript(() => {
+    const sockets: WebSocket[] = [];
+    (window as unknown as { syncSockets: WebSocket[] }).syncSockets = sockets;
+    const Native = window.WebSocket;
+    window.WebSocket = class extends Native {
+      constructor(url: string | URL, protocols?: string | string[]) {
+        super(url, protocols);
+        if (String(url).includes("/parties/")) sockets.push(this);
+      }
+    };
+  });
+  return () =>
+    page.evaluate(
+      () =>
+        (window as unknown as { syncSockets: WebSocket[] }).syncSockets.filter(
+          (socket) => socket.readyState < WebSocket.CLOSING,
+        ).length,
+    );
+}

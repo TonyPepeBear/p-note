@@ -1,0 +1,5 @@
+
+> p-note@0.0.0 check
+> tsc --noEmit && tsc --noEmit -p tests/tsconfig.json
+
+exit=0

@@ -1,0 +1,479 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/local-first.spec.ts tests/e2e/spa-navigation.spec.ts
+
+
+Running 24 tests using 2 workers
+
+  ✓   1 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (2.8s)
+  ✓   3 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (1.4s)
+  ✓   2 [chromium-desktop] › tests/e2e/local-first.spec.ts:67:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (6.4s)
+  ✓   4 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (2.3s)
+  ✓   6 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (1.6s)
+  ✓   5 [chromium-desktop] › tests/e2e/local-first.spec.ts:112:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (4.3s)
+  ✘   7 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 (7.4s)
+  ✘   8 [chromium-desktop] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 (7.1s)
+  ✘   9 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 (9.9s)
+  ✘  10 [chromium-desktop] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 (8.9s)
+  ✓  11 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:252:1 › LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面 (3.2s)
+  ✘  12 [chromium-desktop] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 (6.4s)
+  ✓  13 [chromium-desktop] › tests/e2e/local-first.spec.ts:308:3 › LFN-04：缺少正文的快取不冒充可用文件 (2.6s)
+  ✓  14 [chromium-desktop] › tests/e2e/local-first.spec.ts:308:3 › LFN-04：損毀索引的快取不冒充可用文件 (2.3s)
+  ✓  15 [chromium-desktop] › tests/e2e/local-first.spec.ts:308:3 › LFN-04：不同擁有者的快取不冒充可用文件 (2.5s)
+  ✓  16 [chromium-desktop] › tests/e2e/local-first.spec.ts:351:1 › LFN-04：已知登出後不以本機快取繞過登入 (4.1s)
+  ✘  17 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 (6.1s)
+  ✘  18 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 (6.2s)
+  ✘  19 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 (6.2s)
+  ✘  20 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 (6.2s)
+  ✘  21 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 (6.6s)
+  ✘  22 [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 (6.4s)
+  ✘  23 [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 (7.9s)
+  ✘  24 [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 (8.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 500
+    Received:   5000.400000095367
+
+      230 |     return performance.now() - started;
+      231 |   }, b);
+    > 232 |   expect(elapsed).toBeLessThan(500);
+          |                   ^
+      233 |   await addText(page, "驗證前寫下的字");
+      234 |   await expect(page.getByTestId("cloud-status")).toHaveText("同步中");
+      235 |   await page.waitForTimeout(3000);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:232:19
+
+    Error Context: test-results/local-first-LFN-02：網路請求未回應時，已下載頁面-500-毫秒內切換並可寫入本機-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-02：網路請求未回應時，已下載頁面-500-毫秒內切換並可寫入本機-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-02：網路請求未回應時，已下載頁面-500-毫秒內切換並可寫入本機-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 ───
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByLabel('文件標題', { exact: true })
+    Expected: "長頁"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+
+
+      265 |   await setRule(page, { pattern: PAGE_API, hold: true });
+      266 |   await page.goBack();
+    > 267 |   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("長頁");
+          |                                                          ^
+      268 |   await expect(page.getByTestId("ready")).toHaveText("可編輯");
+      269 |   await expect(page.locator(".tiptap")).toContainText("第 80 段");
+      270 |   await expect
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:267:58
+
+    Error Context: test-results/local-first-LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      293 |   await gate(page, [{ pattern: "^/api/today", hold: true }], true);
+      294 |   await page.goto("/");
+    > 295 |   await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                           ^
+      296 |   await expect(page.locator(".tiptap")).toContainText("今天的日記");
+      297 |   expect(await heldCount(page, "^/api/today")).toBeGreaterThan(0);
+      298 |   await page.clock.setSystemTime(Date.now() + 86400000);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:295:43
+
+    Error Context: test-results/local-first-LFN-03：今天入口只在有今天的本機日記時直接開啟-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-03：今天入口只在有今天的本機日記時直接開啟-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-03：今天入口只在有今天的本機日記時直接開啟-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在登入到期時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在登入到期時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在登入到期時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 ───────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在刪頁時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在刪頁時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在刪頁時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 ────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在還原版本時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在還原版本時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在還原版本時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 ────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 5000ms
+      - waiting for getByTestId('ready')
+
+
+      380 |     await gate(page, [{ pattern: PAGE_API, hold: true }], true);
+      381 |     await page.reload();
+    > 382 |     await expect(page.getByTestId("ready")).toHaveText("可編輯");
+          |                                             ^
+      383 |     await addText(page, "驗證期間的新字");
+      384 |     if (reason === "登入到期")
+      385 |       expect((await page.request.post("/api/logout", { headers, data: {} })).ok()).toBe(true);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:382:45
+
+    Error Context: test-results/local-first-LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 ────────
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByLabel('文件標題', { exact: true })
+    Expected: "遠端新標題"
+    Received: "暫時失敗頁"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+        14 × locator resolved to <textarea rows="1" aria-label="文件標題" class="title-input">暫時失敗頁</textarea>
+           - unexpected value "暫時失敗頁"
+
+
+      459 |     await setRule(page, { pattern: PAGE_API, result: "pass" });
+      460 |     await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存", { timeout: 15000 });
+    > 461 |     await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("遠端新標題");
+          |                                                            ^
+      462 |     expect(
+      463 |       await page.evaluate(() => {
+      464 |         const element = document.querySelector(".tiptap") as HTMLElement & { marker?: number };
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:461:60
+
+    Error Context: test-results/local-first-LFN-06：背景驗證斷線-後恢復，原編輯器完成同步-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-06：背景驗證斷線-後恢復，原編輯器完成同步-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-06：背景驗證斷線-後恢復，原編輯器完成同步-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 ──────
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByLabel('文件標題', { exact: true })
+    Expected: "遠端新標題"
+    Received: "暫時失敗頁"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+        14 × locator resolved to <textarea rows="1" aria-label="文件標題" class="title-input">暫時失敗頁</textarea>
+           - unexpected value "暫時失敗頁"
+
+
+      459 |     await setRule(page, { pattern: PAGE_API, result: "pass" });
+      460 |     await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存", { timeout: 15000 });
+    > 461 |     await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("遠端新標題");
+          |                                                            ^
+      462 |     expect(
+      463 |       await page.evaluate(() => {
+      464 |         const element = document.querySelector(".tiptap") as HTMLElement & { marker?: number };
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:461:60
+
+    Error Context: test-results/local-first-LFN-06：背景驗證-500-後恢復，原編輯器完成同步-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-LFN-06：背景驗證-500-後恢復，原編輯器完成同步-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-LFN-06：背景驗證-500-後恢復，原編輯器完成同步-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByLabel('文件標題', { exact: true })
+    Expected: "乙頁"
+    Received: "甲頁"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+        14 × locator resolved to <textarea rows="1" aria-label="文件標題" class="title-input">甲頁</textarea>
+           - unexpected value "甲頁"
+
+
+      210 |   await mark(page);
+      211 |   await clickNote(page, "乙頁");
+    > 212 |   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+          |                                                          ^
+      213 |   await expect(page.getByTestId("ready")).toHaveText("可編輯");
+      214 |   expect(await heldCount(page, VERSION)).toBeGreaterThan(0);
+      215 |   await addText(page, "新版查詢期間的字");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:212:58
+
+    Error Context: test-results/spa-navigation-UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 ───
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  getByLabel('文件標題', { exact: true })
+    Expected: "乙頁"
+    Received: "甲頁"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('文件標題', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('文件標題', { exact: true })
+        14 × locator resolved to <textarea rows="1" aria-label="文件標題" class="title-input">甲頁</textarea>
+           - unexpected value "甲頁"
+
+
+      234 |   await mark(page);
+      235 |   await clickNote(page, "乙頁");
+    > 236 |   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("乙頁");
+          |                                                          ^
+      237 |   await expect(page.getByTestId("ready")).toHaveText("可編輯");
+      238 |   await addText(page, "保存失敗前的字");
+      239 |   await page.evaluate(() => {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:236:58
+
+    Error Context: test-results/spa-navigation-LFN-01：新版載入前本機保存失敗時保留畫面不重新載入-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-LFN-01：新版載入前本機保存失敗時保留畫面不重新載入-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-LFN-01：新版載入前本機保存失敗時保留畫面不重新載入-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13 failed
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 ────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 ──────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 ──────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 ────────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 ──────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 ─────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 ──────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:370:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 ─────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 ──────────
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:435:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 ────────
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 ─────
+  11 passed (1.7m)
+exit=1

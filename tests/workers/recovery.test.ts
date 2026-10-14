@@ -51,3 +51,19 @@ it('FORK-GUARD-01：正文無效或發布中斷不能留下空筆記，來源與
   expect(await env.DB.prepare('SELECT count(*) AS n FROM pages').first('n')).toBe(2);
   await env.DB.exec('DROP TRIGGER fail_fork');
 });
+for (const reason of ['logout', 'delete', 'restore'] as const) it(`LFN-05：背景驗證可分辨${reason === 'logout' ? '登入到期' : reason === 'delete' ? '刪頁' : '還原版本'}，舊世代同步仍被拒絕`, async () => {
+  const auth = await authenticated(); const page = await auth.today();
+  if (reason === 'logout') await auth.post('/api/logout', {});
+  if (reason === 'delete') await auth.post(`/api/pages/${page.id}/delete`, {});
+  if (reason === 'restore') {
+    const backup = await (await auth.post('/api/backups', {})).json<{ id: string }>();
+    expect((await auth.post(`/api/backups/${backup.id}/restore`, {})).status).toBe(200);
+  }
+  await abortAllDurableObjects();
+  const current = await auth.get(`/api/pages/${page.id}`);
+  expect(current.status).toBe({ logout: 401, delete: 409, restore: 200 }[reason]);
+  if (reason === 'delete') expect((await current.json<{ page?: PageInfo }>()).page?.id).toBe(page.id);
+  if (reason === 'restore') expect((await current.json<PageInfo>()).sync_generation).not.toBe(page.sync_generation);
+  const denied = await auth.get(`/parties/sync/${page.room}?page=${page.id}&generation=${page.sync_generation}`);
+  expect(denied.status).toBeGreaterThanOrEqual(400);
+});
