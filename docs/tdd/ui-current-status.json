@@ -1,9 +1,7 @@
 {
   "change": "redesign-mantine-workspace",
-  "implementedTasks": 6,
   "totalTasks": 8,
-  "release": "pending",
-  "passed": false,
+  "release": "deployed",
   "results": {
     "unit": 6,
     "workers": 92,
@@ -22,5 +20,22 @@
       "log": "ui-built-workflows.log"
     }
   },
-  "blocker": "本機持續高負載，完整瀏覽器驗收與正式發布驗證尚未完成"
+  "completedTasks": 7,
+  "allAcceptanceComplete": false,
+  "pendingTasks": [
+    "4.1 完整本機回歸與情境覆蓋"
+  ],
+  "deployment": {
+    "versionId": "56d44ed5-bf03-4942-afe9-55b2a1929392",
+    "uiCommit": "af44c33",
+    "completedAt": "2026-10-14T05:36:30.037Z",
+    "productionVerificationPassed": true,
+    "checks": [
+      "DEPLOY-02",
+      "UI-PRODUCTION",
+      "DEPLOY-03",
+      "DEPLOY-04"
+    ],
+    "testNoteMovedToTrash": true
+  }
 }

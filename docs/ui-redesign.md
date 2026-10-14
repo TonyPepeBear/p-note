@@ -26,11 +26,13 @@
 
 ## 目前驗收與發布狀態
 
-2026-10-14：介面實作任務 6／8 完成，完整驗收與正式發布仍待完成。6 個單元、92 個 Workers 測試及 2 個真實 HTTPS 建置情境通過；[第四次全套回歸](tdd/ui-fourth-full-e2e.log)為 158／168 通過。後段系統負載升到 140～174，Safari 出現 10 個未通過情境；[匿名系統統計](tdd/ui-environment.log)保存負載與記憶體資料，不記錄其他程序或使用者內容。
+2026-10-14：任務 7／8 完成，Mantine 改版已部署至 [note.tonypepe.com](https://note.tonypepe.com)，完整本機驗收仍待完成。6 個單元、92 個 Workers 測試及 2 個真實 HTTPS 建置情境通過；[第四次全套回歸](tdd/ui-fourth-full-e2e.log)為 158／168 通過。後段系統負載升到 140～174，Safari 出現 10 個未通過情境；[匿名系統統計](tdd/ui-environment.log)保存負載與記憶體資料，不記錄其他程序或使用者內容。
 
 E2E 改以正式 `dist` 與 Vite preview 執行，沿用相同 API／WebSocket 測試後端、三種瀏覽器、20 秒整體逾時、5 秒斷言及零重試，驗收直接覆蓋將上線的產物。[正式建置流程試跑](tdd/ui-built-workflows.log)的 JSON 報告為 16 個通過、4 個失敗、7 個未完成，並有中止錯誤；因持續高負載而中止，不將這次中止視為成功。[狀態摘要](tdd/ui-current-status.json)列出實際結果。
 
-本次 Mantine 改版尚未更新正式站。待環境穩定後，重新完成全套、產品與 UI 情境覆蓋、正式發布，以及 `npm run test:production -- --ui` 的實際寄信／登入／同步與正式登入截圖。後者另存 UI 結果，保留上一版發布證據。
+依使用者本次明確部署指示，發布 UI 程式提交 `af44c33`，Cloudflare 版本為 `56d44ed5-bf03-4942-afe9-55b2a1929392`，見 [發布紀錄](tdd/ui-production-deploy.log)。建置、型別、文件契約及發布預檢通過；`npm run test:production -- --ui` 已驗證正式 HTTPS、私人 API／測試入口、新版 Mantine 登入畫面無溢出、實際郵件送達、一次性登入、雙向 wss 保存及全新 context 載入。專用驗證筆記已正常移入垃圾桶。
+
+證據為 [正式結果](tdd/ui-production-results.json)、[執行紀錄](tdd/ui-production-smoke.log)、[郵件來源與 SPF／DKIM／DMARC](tdd/ui-production-mail.json)及 [正式登入截圖](screenshots/ui/production-login.png)。保留上一版發布證據，不保存郵件本文、登入 token 或 session cookie。待環境穩定後，仍需重新完成全套、產品與 UI 情境覆蓋；正式驗證通過不代表本機全套驗收完成。
 
 以下是真實瀏覽器截圖；範例筆記只寫在本機隔離測試資料庫，不是假 UI 圖，也不是使用者正式內容。每輪測試從相同儲存、登入與操作開始。開發過程檢視桌面與手機、登入／主頁／面板／備份的實際畫面，不以「測試通過」代替視覺檢查。
 

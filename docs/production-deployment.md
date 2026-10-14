@@ -43,3 +43,11 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 首次 HTTPS 檢查碰到 DNS／TLS 生效中的短暫連線錯誤，見 [初次結果](tdd/production-first-tls-results.json)，後續未略過正式憑證驗證。正式驗證只編輯唯一標記的專用筆記，完成後透過正常垃圾桶流程清理；登入首頁可能建立當日日記，不修改當日日記正文。
 
 本輪不宣稱每日排程已經歷實際隔夜執行或長期負載驗證。備份、圖片與還原功能的本機故障驗收仍見 [部署前證據](predeployment.md)，本輪正式驗收範圍以部署、登入寄信與同步為主。
+
+## Mantine 介面發布：2026-10-14
+
+依使用者部署指示發布程式提交 `af44c33`，正式 Worker 版本為 `56d44ed5-bf03-4942-afe9-55b2a1929392`，見 [部署紀錄](tdd/ui-production-deploy.log)。沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移。
+
+[正式驗證結果](tdd/ui-production-results.json)及 [執行紀錄](tdd/ui-production-smoke.log)顯示新版 Mantine 登入、HTTPS／私人 API／測試入口、實際郵件、一次性登入、兩個獨立 context 雙向 wss 保存及全新 context 載入全部通過，驗證筆記已移入垃圾桶。[郵件驗證](tdd/ui-production-mail.json)顯示 SPF、DKIM 與 DMARC 通過；[正式登入畫面](screenshots/ui/production-login.png)保存實際渲染結果。
+
+本機完整 UI 回歸仍待完成，歷史失敗與高負載證據保留於 [介面改版驗收](ui-redesign.md)；本次上線成功不代表該驗收已完成。

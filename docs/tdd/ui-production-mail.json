@@ -1,0 +1,12 @@
+{
+  "messageId": "1a138e72bc22d0cf",
+  "receivedAt": "2026-10-14T05:33:54.000Z",
+  "requestedAt": "2026-10-14T05:33:54.136Z",
+  "from": "p-note <noreply@tonypepe.com>",
+  "to": "redacted@example.invalid",
+  "subject": "登入 p-note",
+  "spf": true,
+  "dkim": true,
+  "dmarc": true,
+  "sameOrigin": true
+}

@@ -1,0 +1,33 @@
+{
+  "startedAt": "2026-10-14T05:33:45.023Z",
+  "origin": "https://note.tonypepe.com",
+  "checks": {
+    "DEPLOY-02": {
+      "tls": true,
+      "builtAssets": true,
+      "privateApi": true,
+      "testRoutesBlocked": true
+    },
+    "UI-PRODUCTION": {
+      "mantineLogin": true,
+      "noOverflow": true,
+      "screenshot": "docs/screenshots/ui/production-login.png"
+    },
+    "DEPLOY-03": {
+      "deliveredMail": true,
+      "getDoesNotRedeem": true,
+      "login": true,
+      "singleUse": true
+    },
+    "DEPLOY-04": {
+      "independentContexts": true,
+      "wss": true,
+      "bidirectional": true,
+      "freshLoad": true
+    }
+  },
+  "mailRequestedAt": "2026-10-14T05:33:54.136Z",
+  "testNoteMovedToTrash": true,
+  "completedAt": "2026-10-14T05:36:30.037Z",
+  "passed": true
+}
