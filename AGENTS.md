@@ -3,6 +3,9 @@
 - 所有的部署都優先使用 cloudflare 服務，並且以有 cloudflare workers paid plan 為主的設計
 - 使用 openspec 開發
 - 使用 TDD 開發流程
+  - Red／Green／Refactor 迴圈只跑相關的 E2E spec 與 Chromium 桌面：`npm run test:e2e:fast -- tests/e2e/<相關>.spec.ts`（可加 `--last-failed`），可先常駐 `npm run test:e2e:serve`
+  - 完整三瀏覽器 `npm run test:e2e` 留到 change 驗收時執行
+  - 其他 worktree 同時跑 E2E 時設定不同的 `E2E_PORT_OFFSET`（例如 100）
 - 使用 spec 開發的流程
   - 創建、修改 spec 文件後，自動 commit 不需經過 user 同意
   - 完成開發 spec 後，自動部署、commit 不需經過 user 同意

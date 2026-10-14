@@ -77,6 +77,20 @@ Q1、Q2、Q4–Q9 已採預設，Q3 留作接入服務前部署資訊；使用�
 
 CI 依相同入口執行相關測試，收集 TDD 報告與情境對照。初次 Red 必須保留，即使後續重試通過也不能隱藏最初失敗。
 
+## E2E 執行與加速
+
+每個 Playwright worker 使用自己的一組 preview＋測試 Worker（port 與 `.wrangler/test-state-i` 各自獨立），`/__test/reset`、時鐘與故障注入不會互相干擾。port 公式集中在 [ports.ts](../tests/e2e/ports.ts)，服務由 [e2e-servers.mjs](../scripts/e2e-servers.mjs) 啟動。
+
+| 用途 | 命令 |
+| --- | --- |
+| TDD Red／Green 迴圈 | `npm run test:e2e:fast -- tests/e2e/<相關>.spec.ts`；也可加 `--last-failed`、`--only-changed` |
+| 常駐服務（省去每輪建置與啟動） | 另開終端機執行 `npm run test:e2e:serve`，前端變更自動重建 |
+| 驗收 | `npm run test:e2e`，三個瀏覽器專案完整執行 |
+
+- `E2E_WORKERS`（預設 4）決定服務組數與 Playwright worker 數；常駐服務的組數須不少於執行時的 worker 數。
+- `E2E_PORT_OFFSET` 讓其他 worktree 使用不同 port（含建置 smoke），避免重用到別人的服務。
+- 非 CI 環境會重用已就緒的服務（就緒訊號在 5172＋位移）；CI 每次自行啟動。
+
 ## 官方參考
 
 - [Vitest](https://vitest.dev/guide/)

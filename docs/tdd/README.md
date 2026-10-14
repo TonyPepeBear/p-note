@@ -8,6 +8,10 @@
 
 新增有效 Red：舊草稿入口 [red-old-draft-access](red-old-draft-access.log)、Worker 靜態入口 [red-static-worker](red-static-worker.log)、HTTPS 誤用 ws [red-build-smoke](red-build-smoke.log)、正文更新時間 [red-body-updated-time](red-body-updated-time.log)、自動整理 [red-auto-compaction](red-auto-compaction.log)、複製污染保存狀態 [red-copy-feedback](red-copy-feedback.log)。Green 與全部回歸見上述最終報告；自動整理量測見 [green-auto-compaction](green-auto-compaction.log)。
 
+## E2E 平行隔離
+
+Red：舊設定以 4 個 worker 執行 Chromium 桌面，共用測試 Worker 的 reset／時鐘互相干擾，80 個中 27 個失敗 [red-e2e-parallel](red-e2e-parallel.log)。Green：每個 worker 獨立一組服務，完整三瀏覽器 240 個全部通過 [green-e2e-parallel](green-e2e-parallel.log)，耗時由約 529 秒降到 241～251 秒；重用常駐服務時第一個測試在 0.4 秒內開始。6／8 個 worker 因本機資源飽和反而變慢並出現逾時（294 秒 2 失敗、428 秒 41 失敗），預設維持 4。
+
 ## 第九階段：覆蓋還原與舊草稿
 
 V4、7.1／7.3 已有完整 Red／Green／Refactor 證據，見 [還原開發](../restore-development.md)。[結果](restore-recovery-results.json) 為單元 5、Workers 87、全套瀏覽器 141，共 233 個全部通過；[完整產品追蹤](restore-recovery-product-pending.log) 126／129，剩 SYNC-03 的三個瀏覽器結果。V3、正式雲端保存故障 UI 與最終 8.1／8.2 仍未勾選，不部署。

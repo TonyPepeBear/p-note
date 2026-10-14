@@ -56,4 +56,4 @@ D1 migration `0005_api_keys.sql` 只新增憑證表。Key 以 SHA-256 驗證摘�
 
 產品備份與 ZIP 不含 API key 或加密密鑰；內容還原不復活撤銷 key。資料庫及 secret 需由平台的權限和備份機制保護。
 
-使用 `node scripts/test-isolated.mjs` 在專用 worktree 執行完整 E2E，使用 5273／8887；`node scripts/test-isolated.mjs --smoke` 使用 5284。腳本暫改測試埠、結束還原，不可與同 worktree 的另一場 E2E 同跑。
+在其他 worktree 同時執行 E2E 或建置 smoke 時設定 `E2E_PORT_OFFSET`（例如 100，即 5273／8887／5284 起算），避免與這裡的測試服務互相重用；詳見 [自動化驗證](automated-validation.md#e2e-執行與加速)。

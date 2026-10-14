@@ -5,8 +5,8 @@ import {
   type APIRequestContext,
 } from "@playwright/test";
 import { saved } from "./helpers";
+import { origin } from "./ports";
 
-const origin = "http://127.0.0.1:5173";
 async function control(request: APIRequestContext, now: number, fail = false) {
   expect(
     (await request.post("/__test/control", { data: { now, fail } })).ok(),

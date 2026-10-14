@@ -1,21 +1,20 @@
 import { defineConfig, devices } from '@playwright/test';
+import { origin, readyPort, workers } from './tests/e2e/ports';
 
+// Playwright 會在每個 worker 行程重新載入本檔，origin 因此依 TEST_PARALLEL_INDEX 對應該 worker 的服務。
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
-  workers: 1,
+  workers,
   retries: 0,
   timeout: 20000,
   expect: { timeout: 5000 },
   reporter: [['list'], ['json', { outputFile: 'reports/e2e.json' }]],
-  use: { baseURL: 'http://127.0.0.1:5173', trace: 'retain-on-failure' },
+  use: { baseURL: origin, trace: 'retain-on-failure' },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } },
   ],
-  webServer: [
-    { command: 'npm run build && node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strictPort', url: 'http://127.0.0.1:5173', reuseExistingServer: false },
-    { command: 'npm run dev:test-worker', url: 'http://127.0.0.1:8787/health', reuseExistingServer: false },
-  ],
+  webServer: { command: 'node scripts/e2e-servers.mjs', url: `http://127.0.0.1:${readyPort}`, reuseExistingServer: !process.env.CI, timeout: 180000 },
 });

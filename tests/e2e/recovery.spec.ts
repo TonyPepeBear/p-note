@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { openPrivate, saved, blocks } from './helpers';
+import { origin } from './ports';
 
 test.beforeEach(async ({ request }) => { await request.post('/__test/reset'); await request.post('/__test/control', { data: { now: Date.now() + 86400000 } }); });
 
@@ -10,7 +11,7 @@ for (const [idCase, action] of [['SYNC-10', 'delete'], ['SYNC-11', 'restore'], [
   try {
     const other = await otherContext.newPage(); await openPrivate(other, id);
     const original = await (await other.request.get('/api/pages/' + id)).json();
-    const headers = { Origin: 'http://127.0.0.1:5173' };
+    const headers = { Origin: origin };
     const backup = action === 'restore' ? await (await other.request.post('/api/backups', { headers, data: {} })).json() : undefined;
     await page.context().setOffline(true);
     await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '只在舊裝置的草稿' }));

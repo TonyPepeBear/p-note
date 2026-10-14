@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { openPrivate, saved } from "./helpers";
+import { origin } from "./ports";
 
 test.beforeEach(async ({ request, page }, info) => {
   await request.post("/__test/reset");
@@ -70,7 +71,7 @@ test("UI-02：正文優先、導覽可觸控且手機無水平溢出", async ({
   const notes: string[] = [];
   for (const title of ["週末的小旅行", "靈感收集", "閱讀筆記"]) {
     const response = await page.request.post("/api/pages", {
-      headers: { Origin: "http://127.0.0.1:5173" },
+      headers: { Origin: origin },
       data: { title, parent_id: null },
     });
     expect(response.status()).toBe(200);

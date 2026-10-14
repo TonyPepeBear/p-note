@@ -12,6 +12,7 @@ import {
   openPageActions,
   moveToTrash,
 } from "./helpers";
+import { origin } from "./ports";
 
 type PageInfo = {
   id: string;
@@ -39,7 +40,7 @@ async function create(
   parent_id: string | null = null,
 ): Promise<PageInfo> {
   const response = await page.request.post("/api/pages", {
-    headers: { Origin: "http://127.0.0.1:5173" },
+    headers: { Origin: origin },
     data: { title, parent_id },
   });
   expect(response.status()).toBe(200);
@@ -237,7 +238,7 @@ test("PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除�
   });
   await saved(page);
   await page.request.post(`/api/pages/${separate.id}/delete`, {
-    headers: { Origin: "http://127.0.0.1:5173" },
+    headers: { Origin: origin },
     data: {},
   });
   await openPage(page, parent.id);
@@ -316,7 +317,7 @@ test("PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹", asyn
   await openPage(page, target.id);
   await text(page, "正文的中文內容與搜尋");
   await page.request.post(`/api/pages/${parent.id}/delete`, {
-    headers: { Origin: "http://127.0.0.1:5173" },
+    headers: { Origin: origin },
     data: {},
   });
   await expect

@@ -6,8 +6,9 @@ import {
   saved,
   showNavigation,
 } from "./helpers";
+import { origin } from "./ports";
 
-const headers = { Origin: "http://127.0.0.1:5173" };
+const headers = { Origin: origin };
 
 test.beforeEach(async ({ request }) => {
   await request.post("/__test/reset");

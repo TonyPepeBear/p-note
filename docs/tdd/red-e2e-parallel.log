@@ -1,0 +1,1582 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+
+
+Running 80 tests using 4 workers
+
+[1/80] [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷
+[2/80] [chromium-desktop] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器
+[3/80] [chromium-desktop] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用
+[4/80] [chromium-desktop] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出
+[5/80] [chromium-desktop] › tests/e2e/backup.spec.ts:106:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引
+[WebServer] ✘ [ERROR] Uncaught Error: 測試清空產品儲存 
+[WebServer] 
+[WebServer] 
+
+[WebServer] 4:16:05 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at writeChunk (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19625:13)
+[WebServer]     at IncomingMessage.<anonymous> (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19638:6)
+[WebServer]     at IncomingMessage.emit (node:events:531:35)
+
+[WebServer] 4:16:05 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at writeChunk (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19625:13)
+[WebServer]     at IncomingMessage.<anonymous> (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19638:6)
+[WebServer]     at IncomingMessage.emit (node:events:531:35)
+
+[WebServer] 4:16:05 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at writeChunk (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19625:13)
+[WebServer]     at IncomingMessage.<anonymous> (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19635:6)
+[WebServer]     at IncomingMessage.emit (node:events:519:28)
+
+[WebServer] 4:16:05 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at writeChunk (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19625:13)
+[WebServer]     at IncomingMessage.<anonymous> (file:///Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/chunks/node.js:19635:6)
+[WebServer]     at IncomingMessage.emit (node:events:519:28)
+
+[6/80] [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留
+[7/80] [chromium-desktop] › tests/e2e/editor.spec.ts:37:1 › 技術原型 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返
+[8/80] [chromium-desktop] › tests/e2e/editor.spec.ts:56:14 › 技術原型 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔
+  1) [chromium-desktop] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 ───────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      16 |   await page.getByLabel("Email", { exact: true }).fill("owner@example.test");
+      17 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+    > 18 |   await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                          ^
+      19 |   const mails = (await (await request.get("/__test/mailbox")).json()) as {
+      20 |     url: string;
+      21 |   }[];
+        at login (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:18:42)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:51:3
+
+    Error Context: test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2) [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 ──────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/api-keys.spec.ts:7:3
+
+    Error Context: test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  3) [chromium-desktop] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 ────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      20 |   await page.getByLabel("Email").fill("owner@example.test");
+      21 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+    > 22 |   await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                          ^
+      23 | }
+      24 | async function confirm(page: Page, url: string) {
+      25 |   await page.goto(url);
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:22:42)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:49:3
+
+    Error Context: test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-01：掃描只開確認頁，按鈕-POST-登入今日編輯器-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[9/80] [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 技術原型 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點
+[10/80] [chromium-desktop] › tests/e2e/assets.spec.ts:70:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致
+[11/80] [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效
+[12/80] [chromium-desktop] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口
+[13/80] [chromium-desktop] › tests/e2e/editor.spec.ts:97:1 › 技術原型 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步
+[14/80] [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留
+[15/80] [chromium-desktop] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組
+[16/80] [chromium-desktop] › tests/e2e/editor.spec.ts:148:1 › 技術原型 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存
+[17/80] [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留
+[18/80] [chromium-desktop] › tests/e2e/editor.spec.ts:37:1 › 正式頁面 › EDIT-02：程式碼縮排、換行、語言及複製內容往返
+[WebServer] 4:16:12 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at Readable.read (node:internal/streams/readable:782:10)
+
+[WebServer] 4:16:12 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at Readable.read (node:internal/streams/readable:782:10)
+
+[19/80] [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點
+  4) [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 ───
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/api-keys.spec.ts:27:14
+
+    Error Context: test-results/api-keys-KEY-04：網站與-API-正文雙向同步，網站修改使舊-ETag-失效-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/api-keys-KEY-04：網站與-API-正文雙向同步，網站修改使舊-ETag-失效-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/api-keys-KEY-04：網站與-API-正文雙向同步，網站修改使舊-ETag-失效-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  5) [chromium-desktop] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口 ─────────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      20 |   await page.getByLabel("Email").fill("owner@example.test");
+      21 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+    > 22 |   await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                          ^
+      23 | }
+      24 | async function confirm(page: Page, url: string) {
+      25 |   await page.goto(url);
+        at requestLink (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:22:42)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:74:3
+
+    Error Context: test-results/auth-AUTH-03：重用與過期連結顯示錯誤及重新申請入口-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-03：重用與過期連結顯示錯誤及重新申請入口-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-03：重用與過期連結顯示錯誤及重新申請入口-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[20/80] [chromium-desktop] › tests/e2e/environment.spec.ts:3:1 › ENV-04：React／Vite 與本機 Worker 可啟動
+[21/80] [chromium-desktop] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證
+[22/80] [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作
+  6) [chromium-desktop] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 ───
+
+    Error: expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      34 |   await page.getByLabel("圖片原檔", { exact: true }).setInputFiles(file);
+      35 |   await page.getByRole("button", { name: "上傳圖片", exact: true }).click();
+    > 36 |   await expect.poll(() => urls(page)).toHaveLength(1);
+         |                                       ^
+      37 |   await saved(page);
+      38 |   return (await urls(page))[0];
+      39 | }
+        at insert (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:36:39)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:99:15
+
+    Error Context: test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-EDIT-03：上傳原圖後另一-context／重開讀到穩定引用與相同位元組-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[23/80] [chromium-desktop] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API
+  7) [chromium-desktop] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 ──────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "稍後重試"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+
+
+      101 |   await page.getByLabel("Email").fill("owner@example.test");
+      102 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+    > 103 |   await expect(page.getByRole("alert")).toContainText("稍後重試");
+          |                                         ^
+      104 |   await expect(page.getByRole("status")).toHaveCount(0);
+      105 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+      106 |   await expect(page.getByRole("alert")).toContainText("頻繁");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:103:41
+
+    Error Context: test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  8) [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-focus.spec.ts:5:3
+
+    Error Context: test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-focus-EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[24/80] [chromium-desktop] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期
+[25/80] [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同
+  9) [chromium-desktop] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 64
+    + Received  + 45
+
+      Object {
+        "data": Array [
+    -     82,
+    -     73,
+    -     70,
+    -     70,
+    +     123,
+    +     34,
+    +     109,
+    +     101,
+    +     115,
+    +     115,
+    +     97,
+    +     103,
+    +     101,
+    +     34,
+          58,
+    -     0,
+    -     0,
+    -     0,
+    -     87,
+    -     69,
+    -     66,
+    -     80,
+    -     86,
+    -     80,
+    -     56,
+    -     32,
+    -     46,
+    -     0,
+    -     0,
+    -     0,
+    -     16,
+    -     2,
+    -     0,
+    -     157,
+    -     1,
+    -     42,
+    -     2,
+    -     0,
+    -     2,
+    -     0,
+    -     1,
+    -     64,
+    -     38,
+    -     37,
+    -     160,
+    -     2,
+    -     116,
+    -     186,
+    -     1,
+    -     248,
+    -     1,
+    -     248,
+    -     0,
+    -     3,
+    -     200,
+    -     0,
+    -     254,
+    -     234,
+    -     212,
+    -     127,
+    -     253,
+    -     38,
+    -     141,
+    -     83,
+    -     241,
+    -     245,
+    -     96,
+    -     255,
+    -     236,
+    -     102,
+    -     63,
+    -     104,
+    -     207,
+    -     241,
+    +     34,
+    +     231,
+    +     153,
+    +     187,
+    +     229,
+    +     133,
+    +     165,
+    +     229,
+    +     183,
+    +     178,
+    +     229,
+    +     136,
+    +     176,
+    +     230,
+    +     156,
+    +     159,
+    +     239,
+          188,
+    -     0,
+    +     140,
+    +     232,
+    +     171,
+    +     139,
+    +     233,
+    +     135,
+    +     141,
+    +     230,
+    +     150,
+    +     176,
+    +     231,
+    +     153,
+    +     187,
+    +     229,
+    +     133,
+    +     165,
+    +     34,
+    +     125,
+        ],
+        "type": "Buffer",
+      }
+
+      190 |     const url = (await urls(page)).find((url) => !known.has(url))!;
+      191 |     known.add(url);
+    > 192 |     expect(await (await page.request.get(url)).body()).toEqual(
+          |                                                        ^
+      193 |       Buffer.from(bytes),
+      194 |     );
+      195 |   }
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/assets.spec.ts:192:56
+
+    Error Context: test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/assets-ASSET-CLIENT-01：拒絕格式／超限，BlockNote-原生上傳入口沿用私有-API-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[26/80] [chromium-desktop] › tests/e2e/assets.spec.ts:198:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功
+[27/80] [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:5:1 › SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步
+[28/80] [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認
+[29/80] [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:44:1 › SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入
+  10) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:6:14
+
+    Error Context: test-results/formal-offline-SYNC-01：正式有權限雙-context-併發編輯不同段落，持久確認後內容相同-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-01：正式有權限雙-context-併發編輯不同段落，持久確認後內容相同-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-01：正式有權限雙-context-併發編輯不同段落，持久確認後內容相同-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[30/80] [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改
+[31/80] [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:52:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟
+  11) [chromium-desktop] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期 ─────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      116 |   await control(request, Date.now() + 29 * 86400000);
+      117 |   await page.reload();
+    > 118 |   await expect(page.locator('.tiptap[contenteditable="true"]')).toHaveCount(1);
+          |                                                                 ^
+      119 |   expect(page.url()).toBe(original);
+      120 |   expect((await (await request.get("/__test/mailbox")).json()).length).toBe(1);
+      121 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/auth.spec.ts:118:65
+
+    Error Context: test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不續期-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不續期-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-AUTH-05：重開在-30-天內沿用-cookie，讀取不寄信且不續期-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[32/80] [chromium-desktop] › tests/e2e/auth.spec.ts:123:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代
+[WebServer] 4:16:27 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:16:27 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[33/80] [chromium-desktop] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存
+  12) [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:52:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-reconnect.spec.ts:53:12
+
+    Error Context: test-results/formal-reconnect-SYNC-CACH-82fd0-人-API／登入連結，索引損毀時保留正文且明確拒絕開啟-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-reconnect-SYNC-CACH-82fd0-人-API／登入連結，索引損毀時保留正文且明確拒絕開啟-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-reconnect-SYNC-CACH-82fd0-人-API／登入連結，索引損毀時保留正文且明確拒絕開啟-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[34/80] [chromium-desktop] › tests/e2e/offline.spec.ts:6:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂
+[35/80] [chromium-desktop] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯
+[36/80] [chromium-desktop] › tests/e2e/offline.spec.ts:33:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認
+  13) [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.getAttribute: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '區塊操作', exact: true })
+
+
+       at helpers.ts:113
+
+      111 | export async function blockAction(page: Page, label: string) {
+      112 |   const trigger = page.getByRole("button", { name: "區塊操作", exact: true });
+    > 113 |   if ((await trigger.getAttribute("aria-expanded")) !== "true")
+          |                      ^
+      114 |     await trigger.click();
+      115 |   await page.getByRole("menuitem", { name: label, exact: true }).click();
+      116 |   const menu = page.getByRole("menu", { name: "區塊操作" });
+        at blockAction (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:113:22)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:85:9
+
+    Error Context: test-results/editor-正式頁面-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-正式頁面-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-正式頁面-EDIT-04：觸控／鍵盤可插入移動刪除，縮小-viewport-保持焦點-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[37/80] [chromium-desktop] › tests/e2e/offline.spec.ts:75:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存
+[38/80] [chromium-desktop] › tests/e2e/editor.spec.ts:97:1 › 正式頁面 › EDIT-05：中文 composition、換行與游標在另一端同步
+[39/80] [chromium-desktop] › tests/e2e/offline.spec.ts:100:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離
+[WebServer] 4:16:35 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:16:35 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[40/80] [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留
+[41/80] [chromium-desktop] › tests/e2e/pages.spec.ts:76:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇
+[42/80] [chromium-desktop] › tests/e2e/pages.spec.ts:95:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期
+[WebServer] 4:16:37 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:16:37 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[43/80] [chromium-desktop] › tests/e2e/pages.spec.ts:130:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回
+  14) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 15000ms
+      - waiting for getByTestId('ready')
+
+
+       at helpers.ts:52
+
+      50 |     await page.getByRole("button", { name: "確認登入", exact: true }).click();
+      51 |   }
+    > 52 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      53 |     timeout: 15000,
+      54 |   });
+      55 |   await saved(page);
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:52:43)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:20:14
+
+    Error Context: test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[44/80] [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功
+  15) [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "僅保留在本機"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        - locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">同步中</p>
+        - unexpected value "同步中"
+        13 × locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">僅保留在本機</p>
+           - unexpected value "僅保留在本機"
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[45/80] [chromium-desktop] › tests/e2e/editor.spec.ts:148:1 › 正式頁面 › SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存
+[46/80] [chromium-desktop] › tests/e2e/recovery.spec.ts:6:116 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記
+[47/80] [chromium-desktop] › tests/e2e/recovery.spec.ts:6:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記
+  16) [chromium-desktop] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 ──────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 10000ms
+      - waiting for getByTestId('ready')
+
+
+      119 |       0,
+      120 |     );
+    > 121 |     await expect(fresh.getByTestId("ready")).toHaveText("可編輯", {
+          |                                              ^
+      122 |       timeout: 10000,
+      123 |     });
+      124 |     await expect(fresh.locator(".tiptap")).toContainText("只在雲端的內容");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:121:46
+
+    Error Context: test-results/local-first-UX-22：未下載的頁面等雲端內容到達後才可編輯-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-UX-22：未下載的頁面等雲端內容到達後才可編輯-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-UX-22：未下載的頁面等雲端內容到達後才可編輯-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[48/80] [chromium-desktop] › tests/e2e/save-failure.spec.ts:5:1 › SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試
+[WebServer] 4:16:47 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:16:47 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[49/80] [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:82:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線
+  17) [chromium-desktop] › tests/e2e/pages.spec.ts:130:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 ───────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at go (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:59:23)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:176:3
+
+    Error Context: test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[50/80] [chromium-desktop] › tests/e2e/pages.spec.ts:207:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶
+  18) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:82:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ─────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+      16 |     data: { title, parent_id: null },
+      17 |   });
+    > 18 |   expect(response.status()).toBe(200);
+         |                             ^
+      19 |   return ((await response.json()) as { id: string }).id;
+      20 | }
+      21 |
+        at createNote (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:18:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:85:13
+
+    Error Context: test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[51/80] [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:99:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置
+[WebServer] 4:16:49 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:16:49 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[52/80] [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:126:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用
+[53/80] [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:164:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端
+[WebServer] 4:16:52 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:16:52 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[54/80] [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:197:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換
+  19) [chromium-desktop] › tests/e2e/pages.spec.ts:207:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 ────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at login (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:34:9)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:211:3
+
+    Error Context: test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[55/80] [chromium-desktop] › tests/e2e/pages.spec.ts:277:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變
+[WebServer] 4:16:56 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 4:16:56 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[56/80] [chromium-desktop] › tests/e2e/pages.spec.ts:308:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹
+  20) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 15000ms
+      - waiting for getByTestId('ready')
+
+
+       at helpers.ts:52
+
+      50 |     await page.getByRole("button", { name: "確認登入", exact: true }).click();
+      51 |   }
+    > 52 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      53 |     timeout: 15000,
+      54 |   });
+      55 |   await saved(page);
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:52:43)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:39:3
+
+    Error Context: test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-09：正式未下載頁面／IndexedDB-故障不宣稱本機保存成功-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[57/80] [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代
+  21) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:197:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "僅保留在本機"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        2 × locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">同步中</p>
+          - unexpected value "同步中"
+        12 × locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">僅保留在本機</p>
+           - unexpected value "僅保留在本機"
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at arrive (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:79:9)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:240:3
+
+    Error Context: test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[58/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:48:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態
+[59/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:65:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出
+[60/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:128:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點
+  22) [chromium-desktop] › tests/e2e/recovery.spec.ts:6:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 15000ms
+      - waiting for getByTestId('ready')
+
+
+       at helpers.ts:52
+
+      50 |     await page.getByRole("button", { name: "確認登入", exact: true }).click();
+      51 |   }
+    > 52 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      53 |     timeout: 15000,
+      54 |   });
+      55 |   await saved(page);
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:52:43)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/recovery.spec.ts:7:14
+
+    Error Context: test-results/recovery-SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/recovery-SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/recovery-SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[61/80] [chromium-desktop] › tests/e2e/recovery.spec.ts:6:116 › BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記
+  23) [chromium-desktop] › tests/e2e/pages.spec.ts:308:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 ─────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('region', { name: '搜尋結果' }).getByRole('link')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('region', { name: '搜尋結果' }).getByRole('link') with timeout 5000ms
+      - waiting for getByRole('region', { name: '搜尋結果' }).getByRole('link')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      335 |   await page.getByRole("button", { name: "搜尋", exact: true }).click();
+      336 |   const results = page.getByRole("region", { name: "搜尋結果" });
+    > 337 |   await expect(results.getByRole("link")).toHaveCount(1);
+          |                                           ^
+      338 |   await go(page, () =>
+      339 |     results.getByRole("link", { name: "搜尋目標", exact: true }).click(),
+      340 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:337:43
+
+    Error Context: test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[62/80] [chromium-desktop] › tests/e2e/pages.spec.ts:347:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽
+[63/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:80:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試
+  24) [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "僅保留在本機"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        3 × locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">同步中</p>
+          - unexpected value "同步中"
+        11 × locator resolved to <p data-size="xs" data-testid="cloud-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">僅保留在本機</p>
+           - unexpected value "僅保留在本機"
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/formal-offline.spec.ts:53:181
+
+    Error Context: test-results/formal-offline-SYNC-12：正式跨分頁中文收斂，API-權限拒絕其他-owner-與世代-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/formal-offline-SYNC-12：正式跨分頁中文收斂，API-權限拒絕其他-owner-與世代-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/formal-offline-SYNC-12：正式跨分頁中文收斂，API-權限拒絕其他-owner-與世代-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[64/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:129:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試
+[65/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:168:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消
+[66/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:199:1 › UX-04：空白、過長或失敗的標題恢復原值並說明
+  25) [chromium-desktop] › tests/e2e/pages.spec.ts:347:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 ──────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      26 |   await page.getByLabel("Email", { exact: true }).fill("owner@example.test");
+      27 |   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
+    > 28 |   await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                          ^
+      29 |   const mails = (await (await request.get("/__test/mailbox")).json()) as {
+      30 |     url: string;
+      31 |   }[];
+        at login (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:28:42)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/pages.spec.ts:353:3
+
+    Error Context: test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/pages-PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[67/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:222:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題
+[WebServer] 4:17:10 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:17:10 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[68/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:272:1 › UX-06：區塊選單可連續上移並標示目前區塊
+[69/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:304:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製
+[70/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:330:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔
+[WebServer] 4:17:13 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:17:13 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[71/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:399:1 › UX-09：日記面板立即列出當月且日期不重複
+[72/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:421:1 › UX-10：手機首屏上半部即可開始書寫
+  26) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:128:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 ──
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('ready')
+    Expected: "可編輯"
+    Received: "僅供檢視"
+    Timeout:  15000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 15000ms
+      - waiting for getByTestId('ready')
+        31 × locator resolved to <span data-testid="ready">僅供檢視</span>
+           - unexpected value "僅供檢視"
+
+
+       at helpers.ts:52
+
+      50 |     await page.getByRole("button", { name: "確認登入", exact: true }).click();
+      51 |   }
+    > 52 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      53 |     timeout: 15000,
+      54 |   });
+      55 |   await saved(page);
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:52:43)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:132:3
+
+    Error Context: test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[73/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:154:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消
+[74/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:431:1 › UX-11：頁面樹可收合並在重新整理後保留
+[75/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:460:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋
+[WebServer] 4:17:17 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:17:17 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[76/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:492:1 › UX-13：長標題還原不溢出並有明確回饋
+[WebServer] 4:17:18 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[WebServer] 4:17:18 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+
+[77/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:529:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉
+[78/80] [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:616:1 › UX-15：小字輔助文字對比達 WCAG AA
+  27) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:154:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 ─────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "查看登入郵件"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+       at helpers.ts:45
+
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+      44 |       .click();
+    > 45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+         |                                            ^
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+      48 |     ).json()) as { url: string }[];
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:45:44)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:155:14
+
+    Error Context: test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[79/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:177:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存
+[80/80] [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:199:1 › UI-06：備份有空狀態、成功卡片與安全還原
+  27 failed
+    [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 ───────────
+    [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 ────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 ────────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 ────
+    [chromium-desktop] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API 
+    [chromium-desktop] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 ─────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口 ──────────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 ───────────────
+    [chromium-desktop] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期 ───────
+    [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 
+    [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ──
+    [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 ─
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 
+    [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 
+    [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:52:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟 
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 ────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:130:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 ─────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:207:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 ──────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:308:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 ───────────────
+    [chromium-desktop] › tests/e2e/pages.spec.ts:347:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 ────────
+    [chromium-desktop] › tests/e2e/recovery.spec.ts:6:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 ─
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:82:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ───────
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:197:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ──
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:128:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 ────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:154:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 ───────────
+  53 passed (1.4m)

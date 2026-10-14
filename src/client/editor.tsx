@@ -802,7 +802,7 @@ export async function start(
   if ((!navigator.onLine || localOnly || isolated) && !downloaded)
     throw new Error("此頁尚未下載，請連線後再開啟");
   const provider = new YProvider(
-    checkAccess ? location.host : "127.0.0.1:8787",
+    location.host,
     room,
     doc,
     {

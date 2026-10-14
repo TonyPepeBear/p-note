@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import * as Y from 'yjs';
 import { blocks, open, saved } from './helpers';
+import { origin, api } from './ports';
 
 test('PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂', async ({ page, browser }) => {
   const room = await open(page);
@@ -9,7 +10,7 @@ test('PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快�
     { id: 'desktop', type: 'paragraph', content: '電腦' }, { id: 'phone', type: 'paragraph', content: '手機' },
   ]));
   await saved(page);
-  const otherContext = await browser.newContext({ baseURL: 'http://127.0.0.1:5173' });
+  const otherContext = await browser.newContext({ baseURL: origin });
   try {
     const peer = await otherContext.newPage();
     await open(peer, room);
@@ -36,7 +37,7 @@ test('PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置�
     { id: 'offline', type: 'paragraph', content: '離線端' }, { id: 'online', type: 'paragraph', content: '在線端' },
   ]));
   await saved(page);
-  const otherContext = await browser.newContext({ baseURL: 'http://127.0.0.1:5173' });
+  const otherContext = await browser.newContext({ baseURL: origin });
   try {
     const peer = await otherContext.newPage();
     await open(peer, room);
@@ -55,7 +56,7 @@ test('PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置�
     expect(JSON.stringify(await blocks(peer))).toContain('在線修改保留');
     expect(JSON.stringify(await blocks(peer))).toContain('離線修改保留');
     const name = await page.evaluate(() => window.probe!.room);
-    const response = await page.request.get(`http://127.0.0.1:8787/parties/rooms/${name}/state`);
+    const response = await page.request.get(`${api}/parties/rooms/${name}/state`);
     expect(response.status()).toBe(200);
     const local = await page.evaluate(async () => Array.from(await window.probe!.localState()));
     const serverDoc = new Y.Doc();

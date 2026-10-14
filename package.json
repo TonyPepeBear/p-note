@@ -12,6 +12,8 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.workers.config.ts",
     "test:e2e": "playwright test",
+    "test:e2e:fast": "playwright test --project=chromium-desktop",
+    "test:e2e:serve": "node scripts/e2e-servers.mjs --watch",
     "test:build": "npm run build && node scripts/test-build.mjs",
     "test:spec-coverage": "node scripts/spec-coverage.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
