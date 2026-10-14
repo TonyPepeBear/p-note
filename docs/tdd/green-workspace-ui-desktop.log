@@ -1,0 +1,245 @@
+[WebServer] (node:57830) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:57878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:17:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (6.1s)
+(node:57905) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:29:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (5.8s)
+(node:57916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:46:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (5.7s)
+(node:57939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:63:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (5.7s)
+(node:57962) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:78:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (5.7s)
+(node:57981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:90:1 › UI-06：備份有空狀態、成功卡片與安全還原 (5.7s)
+
+
+  1) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:17:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true })
+
+
+      16 |
+      17 | test('UI-01：登入有清楚用途、唯一主操作與完整狀態', async ({ page }, info) => {
+    > 18 |   await page.goto('/'); await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+         |                                                                                 ^
+      19 |   await screenshot(page, 'login', info.project.name);
+      20 |   await expect(page.getByText('不需要密碼', { exact: false })).toBeVisible();
+      21 |   await expect(page.locator('.login-card')).toBeVisible();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:18:81
+
+    Error Context: test-results/workspace-ui-UI-01：登入有清楚用途、唯一主操作與完整狀態-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-01：登入有清楚用途、唯一主操作與完整狀態-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-01：登入有清楚用途、唯一主操作與完整狀態-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:29:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:24
+
+      22 | export async function openPrivate(page: Page, id?: string) {
+      23 |   await page.goto(id ? '/?page=' + encodeURIComponent(id) : '/');
+    > 24 |   await expect(page.getByLabel('Email', { exact: true }).or(page.getByTestId('ready')).first()).toBeVisible();
+         |                                                                                                 ^
+      25 |   if (await page.getByLabel('Email', { exact: true }).isVisible()) {
+      26 |     await page.getByLabel('Email', { exact: true }).fill('owner@example.test');
+      27 |     await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:97)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:30:3
+
+    Error Context: test-results/workspace-ui-UI-02：正文優先、導覽可觸控且手機無水平溢出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-02：正文優先、導覽可觸控且手機無水平溢出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-02：正文優先、導覽可觸控且手機無水平溢出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:46:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 ────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:24
+
+      22 | export async function openPrivate(page: Page, id?: string) {
+      23 |   await page.goto(id ? '/?page=' + encodeURIComponent(id) : '/');
+    > 24 |   await expect(page.getByLabel('Email', { exact: true }).or(page.getByTestId('ready')).first()).toBeVisible();
+         |                                                                                                 ^
+      25 |   if (await page.getByLabel('Email', { exact: true }).isVisible()) {
+      26 |     await page.getByLabel('Email', { exact: true }).fill('owner@example.test');
+      27 |     await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:97)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:47:3
+
+    Error Context: test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-03：搜尋與日記以獨立面板呈現，Escape-返回觸發點-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:63:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:24
+
+      22 | export async function openPrivate(page: Page, id?: string) {
+      23 |   await page.goto(id ? '/?page=' + encodeURIComponent(id) : '/');
+    > 24 |   await expect(page.getByLabel('Email', { exact: true }).or(page.getByTestId('ready')).first()).toBeVisible();
+         |                                                                                                 ^
+      25 |   if (await page.getByLabel('Email', { exact: true }).isVisible()) {
+      26 |     await page.getByLabel('Email', { exact: true }).fill('owner@example.test');
+      27 |     await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:97)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:64:14
+
+    Error Context: test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-04：頁面操作有明確範圍，移到垃圾桶可取消-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:78:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:24
+
+      22 | export async function openPrivate(page: Page, id?: string) {
+      23 |   await page.goto(id ? '/?page=' + encodeURIComponent(id) : '/');
+    > 24 |   await expect(page.getByLabel('Email', { exact: true }).or(page.getByTestId('ready')).first()).toBeVisible();
+         |                                                                                                 ^
+      25 |   if (await page.getByLabel('Email', { exact: true }).isVisible()) {
+      26 |     await page.getByLabel('Email', { exact: true }).fill('owner@example.test');
+      27 |     await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:97)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:79:3
+
+    Error Context: test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:90:1 › UI-06：備份有空狀態、成功卡片與安全還原 ─────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:24
+
+      22 | export async function openPrivate(page: Page, id?: string) {
+      23 |   await page.goto(id ? '/?page=' + encodeURIComponent(id) : '/');
+    > 24 |   await expect(page.getByLabel('Email', { exact: true }).or(page.getByTestId('ready')).first()).toBeVisible();
+         |                                                                                                 ^
+      25 |   if (await page.getByLabel('Email', { exact: true }).isVisible()) {
+      26 |     await page.getByLabel('Email', { exact: true }).fill('owner@example.test');
+      27 |     await page.getByRole('button', { name: '寄送登入連結', exact: true }).click();
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:97)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:91:3
+
+    Error Context: test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:17:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 ────────────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:29:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 ────────────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:46:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 ─────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:63:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 ────────────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:78:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 ───────────
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:90:1 › UI-06：備份有空狀態、成功卡片與安全還原 ──────────────

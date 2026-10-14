@@ -15,7 +15,7 @@ export default defineConfig({
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } },
   ],
   webServer: [
-    { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: false },
+    { command: 'npm run build && node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 5173 --strictPort', url: 'http://127.0.0.1:5173', reuseExistingServer: false },
     { command: 'npm run dev:test-worker', url: 'http://127.0.0.1:8787/health', reuseExistingServer: false },
   ],
 });

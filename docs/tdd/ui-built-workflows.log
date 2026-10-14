@@ -1,0 +1,283 @@
+[WebServer] (node:1031) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:1040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 27 tests using 1 worker
+
+(node:1095) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 1:06:41 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 1:06:41 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   1 [chromium-desktop] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (3.5s)
+  ✓   2 [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (2.1s)
+[WebServer] 1:06:46 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 1:06:46 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓   3 [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (2.9s)
+  ✓   4 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:48:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (2.2s)
+  ✓   5 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:65:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (2.3s)
+  ✓   6 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:128:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (6.2s)
+  ✓   7 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:154:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (5.9s)
+  ✓   8 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:177:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (3.3s)
+  ✘   9 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:199:1 › UI-06：備份有空狀態、成功卡片與安全還原 (21.0s)
+(node:2104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  10 [chromium-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (27.8s)
+(node:2617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  11 [chromium-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (7.5s)
+[WebServer] 1:08:18 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 1:08:18 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✓  12 [chromium-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (5.2s)
+  ✓  13 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:48:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (2.4s)
+  ✓  14 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:65:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (7.1s)
+  ✓  15 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:128:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (5.8s)
+  ✓  16 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:154:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (5.5s)
+  ✓  17 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:177:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (2.7s)
+  ✓  18 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:199:1 › UI-06：備份有空狀態、成功卡片與安全還原 (6.8s)
+(node:3746) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  19 [webkit-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (29.0s)
+(node:4228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  20 [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (25.9s)
+(node:4785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  21 [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (672ms)
+Worker teardown timeout of 20000ms exceeded.
+
+Failed worker ran 1 test:
+[webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留
+
+
+  1) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:199:1 › UI-06：備份有空狀態、成功卡片與安全還原 ────────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Error: Test timeout of 20000ms exceeded.
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+      - Test timeout of 20000ms exceeded.
+
+
+       at helpers.ts:24
+
+      22 |
+      23 | export async function saved(page: Page) {
+    > 24 |   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存");
+         |                                                  ^
+      25 |   await expect(page.getByTestId("local-status")).toHaveText("本機已儲存");
+      26 | }
+      27 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:24:50)
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:55:9)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:203:3
+
+    Error Context: test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-06：備份有空狀態、成功卡片與安全還原-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Test timeout of 20000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: '備份設定', exact: true })
+    Expected: visible
+    Error: Test timeout of 20000ms exceeded.
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: '備份設定', exact: true }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: '備份設定', exact: true })
+      - Test timeout of 20000ms exceeded.
+
+
+      47 |   await expect(
+      48 |     page.getByRole("heading", { name: "備份設定", exact: true }),
+    > 49 |   ).toBeVisible();
+         |     ^
+      50 |   await expect(page.locator(".tiptap")).toBeHidden();
+      51 |   await page.getByRole("button", { name: "建立備份", exact: true }).click();
+      52 |   const link = page.getByRole("link", { name: "下載 ZIP", exact: true });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:49:5
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.click: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '寄送登入連結', exact: true })
+        - locator resolved to <button type="submit" data-size="sm" data-block="true" data-with-right-section="true" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+
+
+       at helpers.ts:44
+
+      42 |     await page
+      43 |       .getByRole("button", { name: "寄送登入連結", exact: true })
+    > 44 |       .click();
+         |        ^
+      45 |     await expect(page.getByRole("status")).toContainText("查看登入郵件");
+      46 |     const mails = (await (
+      47 |       await page.request.get("/__test/mailbox")
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:44:8)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/backup.spec.ts:19:14
+
+    Error Context: test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/backup-BACKUP-06：設定頁建立成功備份並下載完整-ZIP，正文與圖片可解析且憑證不在匯出-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 ────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: 須建立真正 BlockNote 編輯器
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('.tiptap[contenteditable="true"]')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 須建立真正 BlockNote 編輯器 locator('.tiptap[contenteditable="true"]') with timeout 5000ms
+      - waiting for locator('.tiptap[contenteditable="true"]')
+        4 × locator resolved to 0 elements
+          - unexpected value "0"
+
+
+       at helpers.ts:16
+
+      14 |     page.locator('.tiptap[contenteditable="true"]'),
+      15 |     "須建立真正 BlockNote 編輯器",
+    > 16 |   ).toHaveCount(1);
+         |     ^
+      17 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      18 |   await page.reload();
+      19 |   await expect(page.getByTestId("ready")).toHaveText("可編輯");
+        at open (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:16:5)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:15:3
+
+    Error Context: test-results/editor-技術原型-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-技術原型-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-技術原型-PROBE-EDIT-01：基本區塊、格式與順序重開後保留-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:199:1 › UI-06：備份有空狀態、成功卡片與安全還原 ─────────────
+    [chromium-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 
+    [webkit-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 ─
+    [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 ─────────
+  1 interrupted
+    [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 ───────────────
+  6 did not run
+  16 passed (4.0m)
+  1 error was not a part of any test, see above for details

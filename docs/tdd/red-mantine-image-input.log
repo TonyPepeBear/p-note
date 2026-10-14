@@ -1,0 +1,47 @@
+[WebServer] (node:64411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:64453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:171:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (6.9s)
+
+
+  1) [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:171:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 ─────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('button', { name: '圖片檔案', exact: true })
+    Expected substring: "選擇圖片檔案"
+    Received string:    ""
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('button', { name: '圖片檔案', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '圖片檔案', exact: true })
+        14 × locator resolved to <input type="file" id="image-file" data-variant="default" accept="image/jpeg,image/png,image/webp,image/gif" class="m_8fb7ebe7 mantine-Input-input mantine-TextInput-input"/>
+           - unexpected value ""
+
+
+      178 |   ).toBeVisible();
+      179 |   await expect(page.getByLabel("圖片檔案", { exact: true })).toBeVisible();
+    > 180 |   await expect(page.getByRole("button", { name: "圖片檔案", exact: true })).toContainText("選擇圖片檔案");
+          |                                                                         ^
+      181 |   await expect(
+      182 |     page.getByRole("button", { name: "上傳圖片", exact: true }),
+      183 |   ).toBeDisabled();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/workspace-ui.spec.ts:180:73
+
+    Error Context: test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workspace-ui-UI-05：圖片工具在面板內，關閉後正文可持續保存-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:171:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 ──────────

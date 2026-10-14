@@ -20,4 +20,6 @@ it('ENV-06：實際報告解析保留環境、失敗及未執行狀態', () => {
   expect(reportCases({ suites: [{ specs: [{ title: 'PROBE-EDIT-01：編輯', tests: [{ projectName: 'webkit-mobile', results: [{ status: 'skipped' }] }] }] }] }, 'e2e'))
     .toEqual([{ id: 'PROBE-EDIT-01@webkit-mobile', status: 'skipped' }]);
   expect(() => reportCases({}, 'integration')).toThrow('報告格式');
+  expect(reportCases({ suites: [{ specs: [{ title: 'UI-03：搜尋', tests: [{ projectName: 'webkit-mobile', results: [{ status: 'failed' }] }] }] }] }, 'e2e'))
+    .toEqual([{ id: 'UI-03@webkit-mobile', status: 'failed' }]);
 });

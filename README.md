@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。提供階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。開發使用 OpenSpec 與 TDD；未部署。
+個人筆記／日記系統。提供階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。介面使用 Mantine，開發使用 OpenSpec 與 TDD；正式網站為 [note.tonypepe.com](https://note.tonypepe.com)。
 
 ## 自動化驗證
 
@@ -56,5 +56,6 @@ npm run dev
 - [第一版需求與決策](docs/v1-scope.md)
 - [部署前完成、驗證與發布設定](docs/predeployment.md)
 - [正式 Cloudflare 發布與驗證](docs/production-deployment.md)
+- [Mantine 介面重設、實際畫面與驗收](docs/ui-redesign.md)
 - [OpenSpec 任務](openspec/changes/personal-notes-v1/tasks.md)
 - [技術驗證結果與 TDD 證據](docs/tdd/README.md)

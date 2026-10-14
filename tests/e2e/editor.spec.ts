@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { open as openProbe, openPrivate, saved, blocks } from './helpers';
+import { open as openProbe, openPrivate, saved, blocks, copyCode, blockAction } from './helpers';
 
 for (const formal of [false, true]) {
 const open = formal ? openPrivate : openProbe;
@@ -43,7 +43,7 @@ test(`${prefix}EDIT-02：程式碼縮排、換行、語言及複製內容往返`
     editor.setTextCursorPosition('code', 'start');
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (text: string) => { window.copiedCode = text; } } });
   }, code);
-  await page.getByRole('button', { name: '複製程式碼', exact: true }).click();
+  await copyCode(page);
   expect(await page.evaluate(() => window.copiedCode)).toBe(code);
   await saved(page);
   const before = await blocks(page);
@@ -77,19 +77,19 @@ test(`${prefix}EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 
     ]);
     editor.setTextCursorPosition('two', 'end');
   });
-  const action = page.getByText('區塊操作', { exact: true });
+  const action = page.getByRole('button', { name: '區塊操作', exact: true });
   if (testInfo.project.use.hasTouch) await action.tap();
   else { await action.focus(); await page.keyboard.press('Enter'); }
-  await page.getByRole('button', { name: '上移區塊' }).click();
+  await blockAction(page, '上移區塊');
   expect((await blocks(page)).map(block => block.id)).toEqual(['two', 'one']);
-  await page.getByRole('button', { name: '插入段落' }).click();
+  await blockAction(page, '插入段落');
   await page.keyboard.insertText('新段落');
   await page.setViewportSize({ width: 390, height: 340 });
   await expect(page.locator('.tiptap')).toBeFocused();
   const box = await page.locator('.tiptap').boundingBox();
   expect(box?.width).toBeLessThanOrEqual(390);
   expect((await blocks(page)).some(block => JSON.stringify(block).includes('新段落'))).toBe(true);
-  await page.getByRole('button', { name: '刪除區塊' }).click();
+  await blockAction(page, '刪除區塊');
   expect((await blocks(page)).map(block => block.id)).toEqual(['two', 'one']);
   await saved(page);
 });
@@ -138,7 +138,7 @@ test(`${prefix}COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態�
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   for (const mode of ['denied', 'missing']) {
     await page.evaluate(mode => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: mode === 'missing' ? undefined : { writeText: async () => { throw new DOMException('測試拒絕', 'NotAllowedError'); } } }), mode);
-    await page.getByRole('button', { name: '複製程式碼', exact: true }).click();
+    await copyCode(page);
     await saved(page); await expect(page.getByRole('alert')).toContainText('複製失敗');
     await expect(page.locator('.tiptap')).toContainText('保留程式碼');
   }

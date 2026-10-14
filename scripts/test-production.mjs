@@ -8,6 +8,7 @@ process.loadEnvFile('.dev.vars.release');
 const origin = process.env.BETTER_AUTH_URL;
 assert.equal(origin, 'https://note.tonypepe.com');
 const tokenFile = '.env.production-login';
+const ui = process.argv.includes('--ui');
 const report = { startedAt: new Date().toISOString(), origin, checks: {} };
 let phase = 'DEPLOY-02';
 let browser;
@@ -45,6 +46,12 @@ try {
   login.on('response', response => { const path = new URL(response.url()).pathname; if (response.status() >= 400) console.error('HTTP ' + response.status() + ' ' + path); });
   login.on('websocket', socket => console.log('WebSocket 路徑：' + new URL(socket.url()).pathname));
   await login.goto('/');
+  if (ui) {
+    await expect(login.locator('.mantine-Paper-root.login-card')).toBeVisible();
+    assert(await login.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), '正式登入版面不得溢出');
+    await login.screenshot({ path: 'docs/screenshots/ui/production-login.png', fullPage: true, animations: 'disabled' });
+    report.checks['UI-PRODUCTION'] = { mantineLogin: true, noOverflow: true, screenshot: 'docs/screenshots/ui/production-login.png' };
+  }
   await login.getByLabel('Email', { exact: true }).fill(process.env.OWNER_EMAIL);
   report.mailRequestedAt = new Date().toISOString();
   const sent = login.waitForResponse(response => new URL(response.url()).pathname === '/api/login');
@@ -136,5 +143,5 @@ try {
   await browser?.close();
   report.completedAt = new Date().toISOString();
   report.passed = !process.exitCode;
-  writeFileSync('docs/tdd/production-results.json', JSON.stringify(report, null, 2) + '\n');
+  writeFileSync(ui ? 'docs/tdd/ui-production-results.json' : 'docs/tdd/production-results.json', JSON.stringify(report, null, 2) + '\n');
 }

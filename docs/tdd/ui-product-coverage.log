@@ -1,0 +1,5 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs
+
+e2e 報告仍有失敗
