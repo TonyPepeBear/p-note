@@ -22,6 +22,7 @@ export function Editor({ session, title, readOnly = false }: { session: Session;
   const [image, setImage] = useState<{ file: File; blockId?: string }>();
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState('');
+  const [copyError, setCopyError] = useState('');
   const editor = useCreateBlockNote(withCollaboration({
     collaboration: { fragment: doc.getXmlFragment('body'), provider, user: { name: '本機測試', color: '#2563eb' } },
     ...(title ? { uploadFile: async (file: File, blockId?: string) => {
@@ -173,14 +174,17 @@ export function Editor({ session, title, readOnly = false }: { session: Session;
     </section>}
     <div className="actions">
       {!title && <button onClick={() => insert('image')}>插入測試圖片</button>}
-      <button onClick={() => {
+      <button onClick={async () => {
+        setCopyError('');
         const block = currentBlock();
         if (block.type === 'codeBlock') {
           const code = block.content.map(item => item.type === 'text' ? item.text : '').join('');
-          void navigator.clipboard.writeText(code).catch(() => setCloud('複製失敗'));
+          try { await navigator.clipboard.writeText(code); }
+          catch { setCopyError('複製失敗，請手動選取程式碼複製'); }
         }
       }}>複製程式碼</button>
     </div>
+    {copyError && <p role="alert">{copyError}</p>}
     <BlockNoteView editor={editor} theme="light" editable={!readOnly} />
   </main>;
 }
@@ -215,7 +219,7 @@ export async function start(scope?: string[], checkAccess?: Session['checkAccess
   if ((!navigator.onLine || localOnly || isolated) && !downloaded) throw new Error('此頁尚未下載，請連線後再開啟');
   const provider = new YProvider(checkAccess ? location.host : '127.0.0.1:8787', room, doc, {
     party: checkAccess ? 'sync' : 'rooms', connect: false, disableBc: true,
-    ...(checkAccess ? { params: { page: scope[1], generation: scope[2] } } : {}),
+    ...(checkAccess ? { protocol: location.protocol === 'https:' ? 'wss' : 'ws', params: { page: scope[1], generation: scope[2] } } : {}),
   });
   if (navigator.onLine && !localOnly && !isolated) {
     await new Promise<void>((resolve, reject) => {

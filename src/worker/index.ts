@@ -5,17 +5,19 @@ import { fromBase64 } from 'lib0/buffer';
 import * as decoding from 'lib0/decoding';
 import * as Y from 'yjs';
 
-// shortcut: 原型單筆更新限 512 KiB；正式正文限制須在產品整合前驗證。
+// 每筆更新最多 512 KiB，避免不可信資料造成無界解碼。
 const MAX_UPDATE_BYTES = 512 * 1024;
 
 export class ProbeRoom extends YServer<Env> {
   static options = { hibernate: true };
   private tail: Promise<void> = Promise.resolve();
+  protected async now(): Promise<number> { return Date.now(); }
 
   async onLoad(): Promise<Y.Doc> {
     const sql = this.ctx.storage.sql;
     sql.exec('CREATE TABLE IF NOT EXISTS updates (checkpoint INTEGER PRIMARY KEY AUTOINCREMENT, payload BLOB NOT NULL)');
     sql.exec('CREATE TABLE IF NOT EXISTS snapshot (id INTEGER PRIMARY KEY CHECK(id = 1), checkpoint INTEGER NOT NULL, payload BLOB NOT NULL)');
+    sql.exec('CREATE TABLE IF NOT EXISTS document_metadata (id INTEGER PRIMARY KEY CHECK(id = 1), modified_at INTEGER NOT NULL)');
     const doc = new Y.Doc();
     try {
       for (const row of sql.exec<{ payload: ArrayBuffer }>('SELECT payload FROM snapshot')) Y.applyUpdate(doc, new Uint8Array(row.payload));
@@ -57,14 +59,19 @@ export class ProbeRoom extends YServer<Env> {
       if (update) {
         if (update.byteLength > MAX_UPDATE_BYTES) throw new Error('更新超限');
         const candidate = new Y.Doc();
+        let changed = false;
         try {
           Y.applyUpdate(candidate, Y.encodeStateAsUpdate(this.document));
           Y.applyUpdate(candidate, update);
+          const before = Y.encodeStateAsUpdate(this.document); const after = Y.encodeStateAsUpdate(candidate);
+          changed = before.length !== after.length || before.some((value, index) => value !== after[index]);
         } finally {
           candidate.destroy();
         }
+        const modified = changed ? await this.now() : undefined;
         const checkpoint = this.ctx.storage.transactionSync(() => {
           this.ctx.storage.sql.exec('INSERT INTO updates (payload) VALUES (?)', update!);
+          if (modified !== undefined) this.ctx.storage.sql.exec('INSERT INTO document_metadata VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET modified_at = MAX(modified_at, excluded.modified_at)', modified);
           return this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT last_insert_rowid() AS checkpoint').one().checkpoint;
         });
         await this.ctx.storage.sync();
@@ -73,31 +80,42 @@ export class ProbeRoom extends YServer<Env> {
       // 預設廣播同步發生在 applyUpdate；必須先完成持久寫入才交給套件。
       if (typeof message === 'string') Y.applyUpdate(this.document, update!, connection);
       else super.onMessage(connection, message);
+      if (update) {
+        try {
+          const pending = this.ctx.storage.sql.exec<{ count: number; bytes: number }>('SELECT count(*) AS count, COALESCE(SUM(length(payload)), 0) AS bytes FROM updates').one();
+          if (pending.count >= 64 || pending.bytes >= 2 * 1024 * 1024) await this.compact();
+        } catch { /* 整理不否定已完成的持久確認；原紀錄仍可重試。 */ }
+      }
     } catch {
       this.sendCustomMessage(connection, JSON.stringify({ type: 'error', id, message: '更新未保存，請重試' }));
     }
   }
 
   async onRequest(request: Request): Promise<Response> {
-    await this.tail;
     const path = new URL(request.url).pathname;
-    if (path.endsWith('/state')) return new Response(Y.encodeStateAsUpdate(this.document));
     if (path.endsWith('/compact') && request.method === 'POST') {
+      const work = this.tail.then(() => this.compact()); this.tail = work.catch(() => {});
       try {
-        const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>(
-          'SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)',
-        ).one().checkpoint;
-        this.ctx.storage.transactionSync(() => {
-          this.ctx.storage.sql.exec('INSERT OR REPLACE INTO snapshot VALUES (1, ?, ?)', checkpoint, Y.encodeStateAsUpdate(this.document));
-          this.ctx.storage.sql.exec('DELETE FROM updates WHERE checkpoint <= ?', checkpoint);
-        });
-        await this.ctx.storage.sync();
+        await work;
         return new Response('ok');
       } catch {
         return new Response('整理失敗，原紀錄保留', { status: 503 });
       }
     }
+    await this.tail;
+    if (path.endsWith('/state')) return new Response(Y.encodeStateAsUpdate(this.document));
     return new Response('Not found', { status: 404 });
+  }
+
+  private async compact(): Promise<void> {
+    const doc = await this.onLoad(); let snapshot: Uint8Array;
+    try { snapshot = Y.encodeStateAsUpdate(doc); } finally { doc.destroy(); }
+    const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
+    this.ctx.storage.transactionSync(() => {
+      this.ctx.storage.sql.exec('INSERT OR REPLACE INTO snapshot VALUES (1, ?, ?)', checkpoint, snapshot);
+      this.ctx.storage.sql.exec('DELETE FROM updates WHERE checkpoint <= ?', checkpoint);
+    });
+    await this.ctx.storage.sync();
   }
 }
 

@@ -4,6 +4,7 @@ dist/
 .dev.vars*
 .env*
 test-results/
+test-results-smoke/
 playwright-report/
 reports/
 .DS_Store

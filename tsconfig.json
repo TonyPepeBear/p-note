@@ -23,7 +23,9 @@
     "src/shared",
     "vite.config.ts",
     "playwright.config.ts",
+    "playwright.smoke.config.ts",
     "tests/e2e",
+    "tests/smoke",
     "tests/unit"
   ]
 }

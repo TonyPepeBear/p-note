@@ -136,6 +136,9 @@ export class SyncRoom extends ProbeRoom {
 
   private async index(scope: Scope): Promise<void> {
     if (await roomName(scope.owner, scope.page, scope.generation) !== this.name) return;
+    const modified = this.ctx.storage.sql.exec<{ modified_at: number }>('SELECT modified_at FROM document_metadata WHERE id = 1').toArray()[0]?.modified_at;
+    if (modified !== undefined) await this.env.DB.prepare('UPDATE pages SET updated_at = MAX(updated_at, ?) WHERE id = ? AND owner_id = ? AND sync_generation = ?')
+      .bind(modified, scope.page, scope.owner, scope.generation).run();
     const fragment = this.document.getXmlFragment('body');
     const plain = Array.from(fragment.createTreeWalker(node => node instanceof Y.XmlText))
       .map(node => (node as Y.XmlText).toDelta().map((part: { insert: unknown }) => typeof part.insert === 'string' ? part.insert : '').join('')).join('\n').normalize('NFC');

@@ -1,0 +1,48 @@
+
+Running 1 test using 1 worker
+
+(node:29790) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/smoke/build.spec.ts:4:1 › BUILD-01：真實 dist 在 HTTPS Worker 登入、wss 保存與離線刷新可用 (15.7s)
+
+
+  1) tests/smoke/build.spec.ts:4:1 › BUILD-01：真實 dist 在 HTTPS Worker 登入、wss 保存與離線刷新可用 ──────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 15000ms
+      - waiting for getByTestId('ready')
+        - waiting for "https://127.0.0.1:5184/" navigation to finish...
+        - navigated to "https://127.0.0.1:5184/"
+
+
+       at ../e2e/helpers.ts:32
+
+      30 |     await page.goto(mails.at(-1)!.url); await page.getByRole('button', { name: '確認登入', exact: true }).click();
+      31 |   }
+    > 32 |   await expect(page.getByTestId('ready')).toHaveText('可編輯', { timeout: 15000 }); await saved(page);
+         |                                           ^
+      33 |   await page.evaluate(() => navigator.serviceWorker.ready);
+      34 |   return new URL(page.url()).searchParams.get('page')!;
+      35 | }
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:32:43)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/smoke/build.spec.ts:9:3
+
+    Error Context: test-results/build-BUILD-01：真實-dist-在-HTTPS-Worker-登入、wss-保存與離線刷新可用/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/build-BUILD-01：真實-dist-在-HTTPS-Worker-登入、wss-保存與離線刷新可用/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/build-BUILD-01：真實-dist-在-HTTPS-Worker-登入、wss-保存與離線刷新可用/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/smoke/build.spec.ts:4:1 › BUILD-01：真實 dist 在 HTTPS Worker 登入、wss 保存與離線刷新可用 ───────────────

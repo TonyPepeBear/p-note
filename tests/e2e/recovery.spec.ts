@@ -26,6 +26,15 @@ for (const [idCase, action] of [['SYNC-10', 'delete'], ['SYNC-11', 'restore'], [
     await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
     await expect(page.locator('.tiptap')).toHaveAttribute('contenteditable', 'false');
     await expect(page.locator('.tiptap')).toContainText('只在舊裝置的草稿');
+    if (idCase === 'SYNC-11') {
+      await page.getByRole('button', { name: '載入目前版本', exact: true }).click(); await saved(page);
+      await expect(page.locator('.tiptap')).toContainText('雲端原稿');
+      await expect(page.getByLabel('本機舊版本', { exact: true })).toBeVisible();
+      await page.getByRole('button', { name: '檢視舊版本', exact: true }).click();
+      await page.getByRole('button', { name: '檢視本機草稿', exact: true }).click();
+      await expect(page.locator('.tiptap')).toHaveAttribute('contenteditable', 'false');
+      await expect(page.locator('.tiptap')).toContainText('只在舊裝置的草稿');
+    }
     const current = await other.request.get('/api/pages/' + id);
     expect(current.status()).toBe(action === 'delete' ? 409 : 200);
     if (action === 'restore') expect((await current.json()).sync_generation).not.toBe(original.sync_generation);

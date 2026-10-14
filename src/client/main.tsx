@@ -5,7 +5,7 @@ import type { PageInfo } from '../shared/pages';
 import { api, navigate, saveDraft } from './api';
 import { BackupSettings } from './backup-settings';
 import { Navigation } from './navigation';
-import { rememberPage, cachedPage } from './page-cache';
+import { rememberPage, cachedPage, cachedVersions } from './page-cache';
 import { readLocal, saveLocal } from './cache';
 
 function Login({ confirm = false }: { confirm?: boolean }) {
@@ -44,6 +44,7 @@ function App() {
   const [recovery, setRecovery] = useState<PageInfo>();
   const [isolated, setIsolated] = useState<{ page: PageInfo; current?: PageInfo }>();
   const [viewDraft, setViewDraft] = useState(false); const [forking, setForking] = useState(false);
+  const [versions, setVersions] = useState<PageInfo[]>([]); const [draftVersion, setDraftVersion] = useState('');
   const [login, setLogin] = useState(false);
   const [error, setError] = useState('');
   const confirm = location.pathname === '/login/confirm';
@@ -79,13 +80,22 @@ function App() {
         return;
       }
       const page = response ? await response.json() as PageInfo : cachedPage(id ?? undefined);
+      const draft = new URLSearchParams(location.search).get('draft');
+      if (draft) {
+        const version = cachedVersions(page).find(item => item.sync_generation === draft);
+        if (!version) throw new Error('本機草稿資訊不完整，請載入目前版本');
+        await isolate(version, page); return;
+      }
       const old = localPage(page.id, page.owner_id);
       const accepted = sessionStorage.getItem('p-note-load-current');
       if (old && old.sync_generation !== page.sync_generation && accepted !== page.id && accepted !== 'restored') {
         setError('頁面世代已變更，本機內容已隔離'); await isolate(old, page); return;
       }
       sessionStorage.removeItem('p-note-load-current');
-      try { rememberPage(page); } catch { setError('頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存'); }
+      try {
+        rememberPage(page); const previousVersions = cachedVersions(page);
+        setVersions(previousVersions); setDraftVersion(previousVersions[0]?.sync_generation ?? '');
+      } catch { setError('頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存'); }
       history.replaceState(null, '', `/?page=${page.id}`);
       sessionStorage.setItem('p-note-return-url', location.pathname + location.search);
       sessionStorage.setItem('p-note-scope', JSON.stringify(page));
@@ -135,6 +145,13 @@ function App() {
     }}>備份設定</button>}
     {settings && <BackupSettings close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
     <div className="workspace" hidden={settings} style={settings ? { display: 'none' } : undefined}>
+      {!login && !isolated && page && versions.length > 0 && <section aria-label="保留的本機草稿" style={{ gridColumn: '1 / -1' }}>
+        <label htmlFor="draft-version">本機舊版本</label>{' '}
+        <select id="draft-version" value={draftVersion} onChange={event => setDraftVersion(event.target.value)}>{versions.map((version, index) => <option key={version.sync_generation} value={version.sync_generation}>本機草稿 {index + 1}：{version.title}</option>)}</select>{' '}
+        <button onClick={() => {
+          void saveDraft().then(() => location.assign(`/?page=${encodeURIComponent(page.id)}&draft=${encodeURIComponent(draftVersion)}`)).catch(() => setError('本機儲存失敗，草稿仍保留'));
+        }}>檢視舊版本</button>
+      </section>}
       {!login && !isolated && (page || recovery) && <Navigation page={(page ?? recovery)!} changed={setPage} error={setError} />}
       {isolated && !login && <main>
         <p>本機草稿已隔離。{isolated.current ? `目前版本：${isolated.current.title}` : '原頁面無法編輯，請還原或另存。'}</p>

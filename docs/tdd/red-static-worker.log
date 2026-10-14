@@ -1,0 +1,39 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/static.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/static.test.ts (2 tests | 1 failed) 44ms
+   × STATIC-01：應用 Worker 提供建置入口與靜態資源，登入確認 GET 不消耗憑證 21ms
+   ✓ STATIC-02：靜態入口不能繞過私人 API，也不能提供測試／原型房間 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/static.test.ts > STATIC-01：應用 Worker 提供建置入口與靜態資源，登入確認 GET 不消耗憑證
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ tests/workers/static.test.ts:23:35
+     21| it('STATIC-01：應用 Worker 提供建置入口與靜態資源，登入確認 GET 不消耗憑證', async () => {
+     22|   const { get, requested } = assets();
+     23|   expect((await get('/')).status).toBe(200); expect(await (await get('…
+       |                                   ^
+     24|   const count = await env.DB.prepare('SELECT count(*) AS n FROM verifi…
+     25|   const response = await get('/login/confirm?token=fixture-token'); ex…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  02:05:35
+   Duration  6.67s (transform 2.15s, setup 0ms, import 4.41s, tests 44ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

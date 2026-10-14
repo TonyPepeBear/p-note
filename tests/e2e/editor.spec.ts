@@ -129,6 +129,22 @@ test(`${prefix}EDIT-05：中文 composition、換行與游標在另一端同步`
   expect(selection).toEqual({ collapsed: true, offset: 3 });
 });
 
+test(`${prefix}COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留`, async ({ page }) => {
+  await open(page);
+  await page.evaluate(() => {
+    const editor = window.probe!.editor;
+    editor.replaceBlocks(editor.document, [{ id: 'copy-code', type: 'codeBlock', content: 'const value = "保留程式碼";' }]); editor.setTextCursorPosition('copy-code', 'start');
+  }); await saved(page);
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  for (const mode of ['denied', 'missing']) {
+    await page.evaluate(mode => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: mode === 'missing' ? undefined : { writeText: async () => { throw new DOMException('測試拒絕', 'NotAllowedError'); } } }), mode);
+    await page.getByRole('button', { name: '複製程式碼', exact: true }).click();
+    await saved(page); await expect(page.getByRole('alert')).toContainText('複製失敗');
+    await expect(page.locator('.tiptap')).toContainText('保留程式碼');
+  }
+  expect(errors).toEqual([]);
+});
+
 test(`${prefix}SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存`, async ({ page }) => {
   await open(page);
   await saved(page);

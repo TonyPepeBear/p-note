@@ -1,0 +1,46 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/pages.test.ts -t PAGE-03
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+ ❯ tests/workers/pages.test.ts (9 tests | 1 failed | 8 skipped) 197ms
+   ↓ PAGE-01：今日入口沿用已保存日記與世代，不重建正文
+   ↓ PAGE-02：併發建立同日期取得同一日記與房間
+   × PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確 197ms
+   ↓ PAGE-04：根筆記／子頁可編輯，列表與路徑保留所有權，標題不改世代
+   ↓ PAGE-05：拒絕自己／子孫／他人／刪除／不存在上層，併發互移不形成循環
+   ↓ PAGE-06：刪除／還原上層保留正文與 R2，先前單獨刪除子頁不復活且活躍連線停止
+   ↓ PAGE-07：日期在垃圾桶時提供原 ID 還原，重試不另建日記
+   ↓ PAGE-08：中文標題／正文／literal 搜尋排除垃圾桶子樹與他人，索引不改正文
+   ↓ PAGE-GUARD-01：暫停／解除失敗保留意圖且停止讀寫，重啟後同操作可重試
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/pages.test.ts > PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確
+AssertionError: expected 1792029952562 to be 1792030012562 // Object.is equality
+
+- Expected
++ Received
+
+- 1792030012562
++ 1792029952562
+
+ ❯ tests/workers/pages.test.ts:73:67
+     71|   await post('/__test/control', { now: now + 120000 }); await commit(c…
+     72|   await client.stub.reindex({ owner, page: page.id, generation: page.s…
+     73|   expect((await result(get(`/api/pages/${page.id}`))).updated_at).toBe…
+       |                                                                   ^
+     74|   await post('/__test/control', { now: now + 180000 }); await commit(c…
+     75|   await client.stub.reindex({ owner, page: page.id, generation: page.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  10:04:49
+   Duration  3.32s (transform 1.06s, setup 0ms, import 2.40s, tests 197ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

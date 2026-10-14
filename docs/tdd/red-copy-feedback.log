@@ -1,0 +1,264 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/editor.spec.ts -g COPY-01
+
+[WebServer] (node:36726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:36784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.6s)
+(node:36810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.2s)
+(node:36823) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.1s)
+(node:36836) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.2s)
+(node:36855) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.3s)
+(node:36892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (6.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ─
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ──
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-技術原型-PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('cloud-status')
+    Expected: "雲端已儲存"
+    Received: "複製失敗"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('cloud-status') with timeout 5000ms
+      - waiting for getByTestId('cloud-status')
+        14 × locator resolved to <span data-testid="cloud-status">複製失敗</span>
+           - unexpected value "複製失敗"
+
+
+       at helpers.ts:14
+
+      12 |
+      13 | export async function saved(page: Page) {
+    > 14 |   await expect(page.getByTestId('cloud-status')).toHaveText('雲端已儲存');
+         |                                                  ^
+      15 |   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+      16 | }
+      17 |
+        at saved (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:14:50)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/editor.spec.ts:142:11
+
+    Error Context: test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/editor-正式頁面-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+    [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ──
+    [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+    [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ───
+    [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 
+    [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 ─────

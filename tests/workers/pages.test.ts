@@ -67,6 +67,16 @@ it('PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表
   await post('/__test/control', { now: now + 60000 });
   const edited = await result(post(`/api/pages/${page.id}/title`, { title: '補寫的日記' }));
   expect(edited.journal_date).toBe('2024-02-29'); expect(edited.created_at).toBe(now); expect(edited.updated_at).toBe(now + 60000);
+  const client = await connect(page); const body = document('實際補寫正文');
+  await post('/__test/control', { now: now + 120000 }); await commit(client, body, 'body-time');
+  await client.stub.reindex({ owner, page: page.id, generation: page.sync_generation });
+  expect((await result(get(`/api/pages/${page.id}`))).updated_at).toBe(now + 120000);
+  await post('/__test/control', { now: now + 180000 }); await commit(client, body, 'duplicate-time');
+  await client.stub.reindex({ owner, page: page.id, generation: page.sync_generation });
+  expect((await result(get(`/api/pages/${page.id}`))).updated_at).toBe(now + 120000); body.destroy();
+  await env.DB.prepare('UPDATE pages SET updated_at = ? WHERE id = ?').bind(now, page.id).run();
+  await abortAllDurableObjects(); await connect(page);
+  expect((await result(get(`/api/pages/${page.id}`))).updated_at).toBe(now + 120000);
   const list = await (await get('/api/journals?month=2024-02')).json<PageRow[]>();
   expect(list.map(item => item.id)).toEqual([page.id]);
   for (const date of ['2023-02-29', '1900-02-29', '2024-04-31', '2024-00-01', '2024-13-01', '2024-01-00', '0000-01-01', '2024-2-1', '日期']) {

@@ -1,0 +1,21 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/auto-compaction.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+stdout | tests/workers/auto-compaction.test.ts > COMPACT-AUTO-01：64 筆更新自動整理，abort 後正文與最高檢查點仍完整
+整理門檻量測 {"更新筆數":63,"更新位元組":761202,"快照位元組":12146}
+
+ ✓ tests/workers/auto-compaction.test.ts (3 tests) 7866ms
+   ✓ COMPACT-AUTO-01：64 筆更新自動整理，abort 後正文與最高檢查點仍完整  3591ms
+   ✓ COMPACT-AUTO-02：紀錄超過 2 MiB 提前整理，大正文雜湊與持久確認保持一致  689ms
+   ✓ COMPACT-AUTO-03：整理交易失敗不否定已完成確認，保留紀錄並在下次更新重試  3586ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  10:25:35
+   Duration  10.70s (transform 913ms, setup 0ms, import 2.17s, tests 7.87s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

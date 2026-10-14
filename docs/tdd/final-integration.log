@@ -1,0 +1,141 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/TonyPepe/project/p-note
+
+stdout | tests/workers/auto-compaction.test.ts > COMPACT-AUTO-01：64 筆更新自動整理，abort 後正文與最高檢查點仍完整
+整理門檻量測 {"更新筆數":63,"更新位元組":761202,"快照位元組":12146}
+
+ ✓ tests/workers/auto-compaction.test.ts (3 tests) 7828ms
+   ✓ COMPACT-AUTO-01：64 筆更新自動整理，abort 後正文與最高檢查點仍完整  3563ms
+   ✓ COMPACT-AUTO-02：紀錄超過 2 MiB 提前整理，大正文雜湊與持久確認保持一致  726ms
+   ✓ COMPACT-AUTO-03：整理交易失敗不否定已完成確認，保留紀錄並在下次更新重試  3538ms
+uncaught exception; source = Uncaught (in promise); stack = Error: D1_ERROR: 測試原子切換中斷: SQLITE_CONSTRAINT (extended: SQLITE_CONSTRAINT_TRIGGER)
+    at D1DatabaseSessionAlwaysPrimary._sendOrThrow (cloudflare-internal:d1-api:188:19)
+    at async cloudflare-internal:d1-api:137:19
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:87:7)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:135:150
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:62:77)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:141:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:67:16)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:141:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:88:12)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試階段中斷
+    at D1Database.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/restore.test.ts:141:94)
+    at D1Database.prepare (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:103:10)
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份未完成或校驗失敗，原成功備份保留
+    at fail (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/backups.ts:13:35)
+    at readFile (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/backups.ts:28:57)
+    at RestoreCoordinator.verified (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:25:21)
+    at RestoreCoordinator.restore (/Users/tony.cheng/TonyPepe/project/p-note/src/worker/restore.ts:47:20)
+ ✓ tests/workers/restore.test.ts (9 tests) 5924ms
+   ✓ BACKUP-01：保留中備份完整恢復階層／日記／垃圾桶／正文／圖片，覆蓋前現況可恢復  575ms
+   ✓ RESTORE-IDEMPOTENT-01：同請求確認遺失後重送不再換世代，也不覆蓋其後已保存的修改  587ms
+   ✓ RESTORE-ATOMIC-01：D1 batch 中途插入失敗回滾全部 metadata，不留下部分新世代  496ms
+   ✓ RESTORE-EXPIRED-ACK-01：已完成請求的回應遺失，目標備份到期後仍能取得先前結果  502ms
+   ✓ RESTORE-PIN-01：到期清理在選取之後才出現還原引用，也不能刪除正在使用的備份  434ms
+   ✓ BACKUP-08：乾淨產品儲存完整恢復與索引重建，不使撤銷的 session／magic link 復活  492ms
+   ✓ BACKUP-09：還原後舊房間仍停止，舊更新不能污染新世代或復活其他日記  473ms
+   ✓ BACKUP-07：暫停／準備／原子切換／解除中斷保留現況與意圖，abort 後同操作可重試  1953ms
+   ✓ RESTORE-GUARD-01：損毀正文／圖片與 metadata 不暫停現況，不發布空文件  411ms
+uncaught exception; source = Uncaught (in promise); stack = Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/yjs/dist/yjs.mjs:109:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/backup-helpers.ts:2:1
+ ✓ tests/workers/backup-catalog.test.ts (10 tests) 4553ms
+   ✓ BACKUP-CATALOG-01：成功清單包含固定階層／日期／垃圾桶、持久正文與所有原圖副本，不包含憑證  455ms
+   ✓ BACKUP-03：正文／原圖讀取、校驗或副本寫入失敗不建立成功清單，最新成功不變  538ms
+   ✓ BACKUP-04：已擷取頁面在發布前切世代時拒絕整份備份，不發布混合世代  421ms
+   ✓ BACKUP-CATALOG-02：已知備份 ID 仍驗證登入、所有權與 manifest 校驗  417ms
+   ✓ BACKUP-02：每日排程的清理覆蓋 90 天前一刻／邊界／之後，共享圖片副本與原檔保留  485ms
+   ✓ BACKUP-PUBLISH-01：清單寫入後、原子發布前換世代仍須失敗，不能只在最後 R2 寫入前檢查  456ms
+   ✓ BACKUP-PUBLISH-02：保留期從所有副本與清單校驗完成後的成功時間開始  426ms
+   ✓ BACKUP-CLEANUP-01：清理中斷留下 expiring 意圖，拒絕讀取半套備份且可重試完成  473ms
+   ✓ BACKUP-05：完整清單記錄逐篇擷取時間窗與檢查點，不包含未送達雲端的離線更新  397ms
+   ✓ ASSET-05：移除正文引用後，成功備份清理只刪到期副本，保留其他備份副本與活躍原檔  485ms
+ ✓ tests/workers/assets.test.ts (5 tests) 2152ms
+   ✓ ASSET-03：四種原檔、10 MiB 邊界；偽造 MIME／內容／截斷／SVG／HEIC 被拒絕  1722ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試暫停中斷
+    at /Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:186:84
+    at maybeHandleRunRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:157:24)
+    at DurableObject.Wrapper.fetch (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@cloudflare/vitest-plugin/dist/worker/lib/cloudflare/test-internal.mjs:552:26)
+uncaught exception; source = Uncaught (in promise); stack = Error: 測試解除中斷
+    at DurableObjectStorage.<anonymous> (/Users/tony.cheng/TonyPepe/project/p-note/tests/workers/pages.test.ts:191:63)
+    at DurableObjectStorage.put (Users/tony.cheng/TonyPepe/project/p-note/node_modules/@vitest/spy/dist/index.js:332:34)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:81:30
+ ✓ tests/workers/pages.test.ts (9 tests) 1818ms
+   ✓ PAGE-03：補寫歸屬日期不變、實際更新時間獨立，月份列表與日期邊界正確  338ms
+   ✓ PAGE-GUARD-01：暫停／解除失敗保留意圖且停止讀寫，重啟後同操作可重試  330ms
+ ✓ tests/workers/backup-export.test.ts (5 tests) 2076ms
+   ✓ BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，排除登入憑證與服務密鑰  444ms
+   ✓ ZIP-SCHEMA-02：建立時亦校驗 metadata，不發布無法下載的成功備份  390ms
+   ✓ ZIP-STREAM-01：串流期間副本失效則中止整份下載，不產生可解析的部分 ZIP  423ms
+   ✓ ZIP-GUARD-01：下載驗證登入／所有權／保留期，副本毀損時拒絕回傳成功 ZIP  401ms
+   ✓ ZIP-SCHEMA-01：即使清單雜湊正確也拒絕路徑穿越、重複頁面、外人資料、循環與憑證欄位  417ms
+ ✓ tests/workers/auth.test.ts (11 tests) 1042ms
+stderr | tests/workers/sync.test.ts > 技術原型 > PROBE-LOAD-01：持久紀錄損毀時載入失敗，不建立空文件覆蓋
+Error in ProbeRoom:corrupt fetch: Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+
+ ✓ tests/workers/sync.test.ts (22 tests) 1677ms
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:98:35
+uncaught exception; source = Uncaught (in promise); stack = Error: 備份頁面世代或結構已變更
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/sync-room.ts:106:37
+uncaught exception; source = Uncaught (in promise); stack = Error: Unexpected end of array
+    at Module.create (/Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/error.js:12:28)
+    at /Users/tony.cheng/TonyPepe/project/p-note/node_modules/lib0/decoding.js:40:41
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at async /Users/tony.cheng/TonyPepe/project/p-note/node_modules/y-partyserver/dist/server/index.js:3:31
+    at VitestModuleEvaluator._runInlinedModule (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vitest/dist/module-evaluator.js:206:4)
+    at VitestModuleRunner.directRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1288:59)
+    at VitestModuleRunner.cachedRequest (Users/tony.cheng/TonyPepe/project/p-note/node_modules/vite/dist/node/module-runner.js:1195:73)
+    at /Users/tony.cheng/TonyPepe/project/p-note/src/worker/index.ts:3:1
+ ✓ tests/workers/backup.test.ts (4 tests) 545ms
+ ✓ tests/workers/recovery.test.ts (3 tests) 481ms
+ ✓ tests/workers/editor.test.ts (1 test) 163ms
+ ✓ tests/workers/mail.test.ts (5 tests) 141ms
+ ✓ tests/workers/environment.test.ts (3 tests) 66ms
+ ✓ tests/workers/static.test.ts (2 tests) 32ms
+
+ Test Files  14 passed (14)
+      Tests  92 passed (92)
+   Start at  10:34:24
+   Duration  48.04s (transform 1.13s, setup 0ms, import 16.32s, tests 28.50s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/TonyPepe/project/p-note/reports/integration.json

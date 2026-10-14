@@ -2,6 +2,7 @@
   "$schema": "./node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/config-schema.json",
   "name": "p-note-local-app",
   "main": "src/worker/app.ts",
+  "assets": { "directory": "./dist", "binding": "STATIC", "run_worker_first": true },
   "compatibility_date": "2026-10-13",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,

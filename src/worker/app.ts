@@ -97,7 +97,17 @@ export async function handle(request: Request, env: Env, services: Services = { 
 }
 
 export default {
-  fetch: (request: Request, env: Env, ctx: ExecutionContext) => handle(request, env, undefined, ctx),
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url); const path = url.pathname;
+    if (path.startsWith('/api/') || path.startsWith('/parties/') || path === '/health') return handle(request, env, undefined, ctx);
+    if (path.startsWith('/__test') || path === '/probe' || !['GET', 'HEAD'].includes(request.method)) return new Response('Not found', { status: 404 });
+    const confirm = path === '/login/confirm';
+    if (confirm) { url.pathname = '/'; url.search = ''; }
+    const response = await env.STATIC.fetch(confirm ? new Request(url, request) : request);
+    if (!confirm) return response;
+    const headers = new Headers(response.headers); headers.set('Cache-Control', 'no-store'); headers.set('Referrer-Policy', 'no-referrer');
+    return new Response(response.body, { status: response.status, headers });
+  },
   async scheduled(controller: ScheduledController, env: Env) {
     if (controller.cron !== '0 19 * * *' || !configured(env)) throw new Error('備份排程設定不完整');
     const owner = await env.DB.prepare('SELECT id FROM user WHERE email = ?').bind(env.OWNER_EMAIL.toLowerCase()).first<string>('id');

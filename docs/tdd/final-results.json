@@ -1,0 +1,18 @@
+{
+  "單元": 5,
+  "Workers": 92,
+  "瀏覽器": 150,
+  "建置": 1,
+  "正式情境": 47,
+  "必需環境結果": 129,
+  "已通過環境結果": 129,
+  "未執行": 0,
+  "部署": false,
+  "報告校驗": {
+    "unit": "5b4bd9c23e3eabc782ed0f84f9f53a6f1e57f45dbef973ffb10a1ed064d47762",
+    "integration": "41abacdb51b436203b76afacb0977510636f53fa8c07f78c120907ae2dff93be",
+    "e2e": "abe0bf7deb415b1235cfb5abb2a5236587949cc12d1544762e6d75bf4cad0b61",
+    "smoke": "fcb90936ea6bbe8b2bb68bee5b04ff7547f449b91d0d18d33ac64b6b137e0c7f"
+  },
+  "總數": 248
+}

@@ -5,6 +5,8 @@ import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
 import restoreMigration from '../migrations/0004.sql';
 import { roomName } from '../src/shared/room';
+import * as Y from 'yjs';
+import { toBase64 } from 'lib0/buffer';
 
 export { ProbeRoom };
 export class RestoreCoordinator extends AppRestoreCoordinator {
@@ -17,6 +19,15 @@ export class SyncRoom extends AppSyncRoom {
     return await this.env.DB.prepare('SELECT now FROM test_control WHERE id = 1').first<number>('now') ?? Date.now();
   }
   async onRequest(request?: Request): Promise<Response> {
+    if (request && new URL(request.url).pathname === '/__test/storage-failure' && request.method === 'POST') {
+      await this.setName(this.ctx.id.name!);
+      const { fail } = await request.json<{ fail: boolean }>();
+      if (typeof fail !== 'boolean') return new Response('無效故障設定', { status: 400 });
+      this.ctx.storage.sql.exec('DROP TRIGGER IF EXISTS __test_fail_update');
+      if (fail) this.ctx.storage.sql.exec("CREATE TRIGGER __test_fail_update BEFORE INSERT ON updates BEGIN SELECT RAISE(ABORT, '測試 SQLite 寫入失敗'); END");
+      const doc = await this.onLoad();
+      try { return Response.json({ state: toBase64(Y.encodeStateAsUpdate(doc)) }); } finally { doc.destroy(); }
+    }
     if (request && new URL(request.url).pathname === '/__test/clear-storage') {
       for (const connection of this.getConnections()) connection.close(1012, '測試清空產品儲存');
       await this.ctx.storage.deleteAll(); await this.ctx.storage.sync();
@@ -44,6 +55,11 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path === '/__test/storage-failure' && request.method === 'POST') {
+        const { room, fail } = await request.json<{ room: string; fail: boolean }>();
+        if (!/^[a-f0-9]{64}$/.test(room) || typeof fail !== 'boolean') return new Response('無效測試故障', { status: 400 });
+        return env.SYNC.getByName(room).fetch('http://127.0.0.1/__test/storage-failure', { method: 'POST', body: JSON.stringify({ fail }) });
+      }
       if (path === '/__test/clear-product' && request.method === 'POST') {
         const pages = (await env.DB.prepare('SELECT id, owner_id, sync_generation FROM pages').all<{ id: string; owner_id: string; sync_generation: string }>()).results;
         await env.DB.batch(['page_search', 'pages', 'assets'].map(table => env.DB.prepare(`DELETE FROM ${table}`)));
@@ -95,7 +111,7 @@ export default {
       const value = Reflect.get(target, key, target);
       return typeof value === 'function' ? value.bind(target) : value;
     } }) : env.ASSETS;
-    return handle(request, { ...env, ASSETS: assets, OWNER_EMAIL: 'owner@example.test', BETTER_AUTH_URL: 'http://127.0.0.1:5173', BETTER_AUTH_SECRET: 'test-only-secret-with-at-least-32-characters' }, {
+    return handle(request, { ...env, ASSETS: assets, OWNER_EMAIL: 'owner@example.test', BETTER_AUTH_URL: env.BETTER_AUTH_URL, BETTER_AUTH_SECRET: 'test-only-secret-with-at-least-32-characters' }, {
       now: () => control?.now ?? Date.now(),
       sendMail: async (email, url) => {
         if (control?.fail) throw new Error('測試寄信故障');

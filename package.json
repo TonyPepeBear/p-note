@@ -12,6 +12,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.workers.config.ts",
     "test:e2e": "playwright test",
+    "test:build": "npm run build && node scripts/test-build.mjs",
     "test:spec-coverage": "node scripts/spec-coverage.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "worker:types": "node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js types --config wrangler.app.jsonc",

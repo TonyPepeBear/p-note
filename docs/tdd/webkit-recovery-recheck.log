@@ -1,0 +1,22 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/assets.spec.ts tests/e2e/recovery.spec.ts tests/e2e/save-failure.spec.ts --project=webkit-mobile
+
+[WebServer] (node:27957) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:28047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [webkit-mobile] › tests/e2e/assets.spec.ts:21:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 (8.5s)
+  ✓  2 [webkit-mobile] › tests/e2e/assets.spec.ts:33:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 (8.5s)
+  ✓  3 [webkit-mobile] › tests/e2e/assets.spec.ts:44:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 (5.2s)
+  ✓  4 [webkit-mobile] › tests/e2e/assets.spec.ts:58:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API (6.7s)
+  ✓  5 [webkit-mobile] › tests/e2e/assets.spec.ts:84:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 (6.0s)
+  ✓  6 [webkit-mobile] › tests/e2e/recovery.spec.ts:6:116 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (14.2s)
+  ✓  7 [webkit-mobile] › tests/e2e/recovery.spec.ts:6:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (17.1s)
+  ✓  8 [webkit-mobile] › tests/e2e/recovery.spec.ts:6:116 › BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (7.0s)
+  ✓  9 [webkit-mobile] › tests/e2e/save-failure.spec.ts:5:1 › SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試 (3.7s)
+
+  9 passed (1.4m)

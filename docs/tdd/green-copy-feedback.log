@@ -1,0 +1,23 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/editor.spec.ts -g COPY-01
+
+[WebServer] (node:37343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:37377) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.5s)
+  ✓  2 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.2s)
+(node:37404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.1s)
+  ✓  4 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.2s)
+(node:37427) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.2s)
+  ✓  6 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.1s)
+
+  6 passed (10.2s)
