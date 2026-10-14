@@ -2,6 +2,7 @@ export type PageRow = {
   id: string; owner_id: string; kind: 'note' | 'journal'; title: string;
   parent_id: string | null; journal_date: string | null; sync_generation: string;
   metadata_revision: number; created_at: number; updated_at: number; deleted_at: number | null;
+  database_config?: string | null; property_values?: string;
 };
 export type PageInfo = PageRow & { room: string; ancestors?: PageRow[]; summary?: string };
 

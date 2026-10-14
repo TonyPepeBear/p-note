@@ -1,6 +1,8 @@
+import { createBackup, checksum } from '../src/worker/backups';
 import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRestoreCoordinator } from '../src/worker/app';
 import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
+import databaseMigration from '../migrations/0006_note_databases.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
@@ -47,6 +49,9 @@ async function setup(env: Env) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
+  if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('pages') WHERE name = 'database_config'").first()) {
+    for (const sql of databaseMigration.split(';').map(s => s.trim()).filter(Boolean)) await env.DB.prepare(sql).run();
+  }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_asset_control (id INTEGER PRIMARY KEY, fail INTEGER)');
 }
 
@@ -97,6 +102,25 @@ export default {
         return Response.json({ ok: true });
       }
       if (path === '/__test/mailbox') return Response.json((await env.DB.prepare('SELECT * FROM test_mailbox').all()).results);
+      if (path === '/__test/database-backup' && request.method === 'POST') {
+        const input = await request.json<{ legacy?: boolean; invalid?: boolean }>();
+        const owner = (await env.DB.prepare('SELECT id FROM user LIMIT 1').first<{ id: string }>())!.id;
+        if (input.invalid) {
+          const page = (await env.DB.prepare("SELECT id, database_config FROM pages WHERE kind = 'note' LIMIT 1").first<{ id: string; database_config: string | null }>())!;
+          await env.DB.prepare("UPDATE pages SET database_config = '{}' WHERE id = ?").bind(page.id).run();
+          try { await createBackup(env, owner, Date.now); return Response.json({ unexpected: true }); } catch { return Response.json({ rejected: true }, { status: 503 }); }
+          finally { await env.DB.prepare('UPDATE pages SET database_config = ? WHERE id = ?').bind(page.database_config, page.id).run(); }
+        }
+        const backup = await createBackup(env, owner, Date.now);
+        if (input.legacy) {
+          const key = owner + '/' + backup.id + '/manifest.json'; const object = (await env.BACKUPS.get(key))!;
+          const manifest = await object.json<{ pages: { metadata: Record<string, unknown> }[] }>();
+          for (const page of manifest.pages) { delete page.metadata.database_config; delete page.metadata.property_values; }
+          const bytes = new TextEncoder().encode(JSON.stringify(manifest)); await env.BACKUPS.put(key, bytes);
+          await env.DB.prepare('UPDATE backups SET manifest_checksum = ?, manifest_size = ? WHERE id = ?').bind(await checksum(bytes), bytes.length, backup.id).run();
+        }
+        return Response.json(backup);
+      }
       if (path === '/__test/reset' && request.method === 'POST') {
         const tables = (await env.DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").all<{ name: string }>()).results;
         await env.DB.batch(tables.map(({ name }) => env.DB.prepare(`DELETE FROM "${name}"`)).reverse());

@@ -1,0 +1,10 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs --databases
+
+{
+  "範圍": "筆記資料庫",
+  "必需結果": 30,
+  "已通過": 30,
+  "未通過": []
+}

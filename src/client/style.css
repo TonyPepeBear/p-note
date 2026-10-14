@@ -335,3 +335,19 @@ body {
   padding: 20px;
   margin: auto;
 }
+
+.database-page { max-width: 1200px; min-width: 0; margin: 0 auto; padding: 32px; }
+.database-title { margin: 12px 0 24px; }
+.database-title input { font-size: 28px; font-weight: 700; height: 56px; border-color: transparent; background: transparent; }
+.database-scroll { max-width: 100%; overflow-x: auto; }
+.database-scroll th, .database-scroll td { min-width: 160px; vertical-align: top; }
+.database-scroll td:first-child { min-width: 200px; }
+.property-input { min-width: 140px; }
+.note-properties { max-width: 880px; margin: 20px auto 0; }
+.properties-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
+@media (max-width: 600px) {
+  .database-page { padding: 20px 12px; }
+  .note-properties { margin: 12px; }
+  .properties-grid { grid-template-columns: 1fr; }
+  .database-page > .mantine-Group-root { max-width: 100%; }
+}

@@ -86,8 +86,8 @@ export class RestoreCoordinator extends DurableObject<Env> {
       }
       await db.batch([
         db.prepare('DELETE FROM pages WHERE owner_id = ?').bind(owner),
-        ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-          .bind(p.id, owner, p.kind, p.title, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at)),
+        ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+          .bind(p.id, owner, p.kind, p.title, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at, p.database_config ?? null, p.property_values ?? '{}')),
         ...target.assets.map(({ metadata: a }) => db.prepare(`INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET object_key = excluded.object_key, original_name = excluded.original_name, mime_type = excluded.mime_type, byte_size = excluded.byte_size, checksum = excluded.checksum, created_at = excluded.created_at WHERE assets.owner_id = excluded.owner_id`)
           .bind(a.id, owner, `${owner}/${a.id}/restore/${op!.id}`, a.original_name, a.mime_type, a.byte_size, a.checksum, a.created_at)),

@@ -151,8 +151,8 @@ export async function handlePages(request: Request, env: Env, owner: string, now
     changed = await db.prepare(`${VISIBLE}, descendants AS (SELECT id FROM pages WHERE id = ? AND owner_id = ? UNION SELECT child.id FROM pages child JOIN descendants ON child.parent_id = descendants.id)
       UPDATE pages SET parent_id = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND kind = 'note' AND id IN (SELECT id FROM visible)
       AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
-      AND (? IS NULL OR (? IN (SELECT id FROM visible WHERE kind = 'note') AND ? NOT IN (SELECT id FROM descendants)))`)
-      .bind(owner, id, owner, parentId, now, id, owner, owner, parentId, parentId, parentId).run();
+      AND (? IS NULL OR (? IN (SELECT id FROM visible WHERE kind = 'note') AND ? NOT IN (SELECT id FROM descendants))) AND (? = 0 OR ? IS NULL OR ? IN (SELECT id FROM visible WHERE database_config IS NULL))`)
+      .bind(owner, id, owner, parentId, now, id, owner, owner, parentId, parentId, parentId, page!.database_config ? 1 : 0, parentId, parentId).run();
   }
   if (!changed.meta.changes) fail(409, '上層無效、移動會形成循環，或頁面變更處理中');
   return pageResponse(env, owner, (await db.prepare('SELECT * FROM pages WHERE id = ?').bind(id).first<PageRow>())!);

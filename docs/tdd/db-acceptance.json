@@ -1,0 +1,1962 @@
+{
+  "fullRun": {
+    "cases": 321,
+    "passed": 318,
+    "failed": 3,
+    "failures": "兩個 DB-05 總時間上限、一個 DB-06 WebKit 故障注入"
+  },
+  "finalDatabaseRun": {
+    "passed": 33,
+    "failed": 0
+  },
+  "verifiedUniqueCases": 324,
+  "existingCases": 291,
+  "databaseCases": 33,
+  "note": "採完整回歸與修正測試配置後的資料庫針對性重跑合併；不是宣稱單次完整 324 項全綠",
+  "cases": [
+    {
+      "project": "chromium-desktop",
+      "title": "KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "AUTH-03：重用與過期連結顯示錯誤及重新申請入口",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "AUTH-03：重用與過期連結顯示錯誤及重新申請入口",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "AUTH-03：重用與過期連結顯示錯誤及重新申請入口",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-01：建立資料庫、筆記與移入移出保留正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-02：刪除與還原資料庫不復活先前刪除列",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-03：各欄位在表格與筆記往返、重新命名保留值",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-05：儲存檢視獨立篩選、排序、隱藏與重開",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-07：權限、刪除、舊世代與离線屬性限制",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-08：手機與鍵盤可新增欄位且整頁不溢出",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-10：舊格式備份可還原且無效新設定拒絕",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-01：建立資料庫、筆記與移入移出保留正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-02：刪除與還原資料庫不復活先前刪除列",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-03：各欄位在表格與筆記往返、重新命名保留值",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-05：儲存檢視獨立篩選、排序、隱藏與重開",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-07：權限、刪除、舊世代與离線屬性限制",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-08：手機與鍵盤可新增欄位且整頁不溢出",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-10：舊格式備份可還原且無效新設定拒絕",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-01：建立資料庫、筆記與移入移出保留正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-02：刪除與還原資料庫不復活先前刪除列",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-03：各欄位在表格與筆記往返、重新命名保留值",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-05：儲存檢視獨立篩選、排序、隱藏與重開",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-07：權限、刪除、舊世代與离線屬性限制",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-08：手機與鍵盤可新增欄位且整頁不溢出",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-10：舊格式備份可還原且無效新設定拒絕",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-01：基本區塊、格式與順序重開後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-02：程式碼縮排、換行、語言及複製內容往返",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-05：中文 composition、換行與游標在另一端同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "ENV-04：React／Vite 與本機 Worker 可啟動",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "ENV-04：React／Vite 與本機 Worker 可啟動",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "ENV-04：React／Vite 與本機 Worker 可啟動",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-22：未下載的頁面等雲端內容到達後才可編輯",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-03：今天入口只在有今天的本機日記時直接開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-04：缺少正文的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-04：損毀索引的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-04：不同擁有者的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-04：已知登出後不以本機快取繞過登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在登入到期時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在刪頁時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在還原版本時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-06：背景驗證斷線 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-06：背景驗證 500 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-22：未下載的頁面等雲端內容到達後才可編輯",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-03：今天入口只在有今天的本機日記時直接開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-04：缺少正文的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-04：損毀索引的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-04：不同擁有者的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-04：已知登出後不以本機快取繞過登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在登入到期時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在刪頁時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在還原版本時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-06：背景驗證斷線 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-06：背景驗證 500 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-22：未下載的頁面等雲端內容到達後才可編輯",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-03：今天入口只在有今天的本機日記時直接開啟",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-04：缺少正文的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-04：損毀索引的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-04：不同擁有者的快取不冒充可用文件",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-04：已知登出後不以本機快取繞過登入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在登入到期時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在刪頁時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在還原版本時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-06：背景驗證斷線 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-06：背景驗證 500 後恢復，原編輯器完成同步",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-16：側欄切換頁面不重新載入，只保留一條同步連線",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-17：上一頁與下一頁回到對應頁面並還原捲動位置",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-18：快速連續切換只開啟最後一頁且內容不混用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-19：輸入後立即換頁，修改保留並保存到雲端",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-01：新版載入前本機保存失敗時保留畫面不重新載入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-16：側欄切換頁面不重新載入，只保留一條同步連線",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-17：上一頁與下一頁回到對應頁面並還原捲動位置",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-18：快速連續切換只開啟最後一頁且內容不混用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-19：輸入後立即換頁，修改保留並保存到雲端",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-01：新版載入前本機保存失敗時保留畫面不重新載入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-16：側欄切換頁面不重新載入，只保留一條同步連線",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-17：上一頁與下一頁回到對應頁面並還原捲動位置",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-18：快速連續切換只開啟最後一頁且內容不混用",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-19：輸入後立即換頁，修改保留並保存到雲端",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-01：新版載入前本機保存失敗時保留畫面不重新載入",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-01：登入有清楚用途、唯一主操作與完整狀態",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-02：正文優先、導覽可觸控且手機無水平溢出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-04：頁面操作有明確範圍，移到垃圾桶可取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-05：圖片工具在面板內，關閉後正文可持續保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UI-06：備份有空狀態、成功卡片與安全還原",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-01：登入有清楚用途、唯一主操作與完整狀態",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-02：正文優先、導覽可觸控且手機無水平溢出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-04：頁面操作有明確範圍，移到垃圾桶可取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-05：圖片工具在面板內，關閉後正文可持續保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UI-06：備份有空狀態、成功卡片與安全還原",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-01：登入有清楚用途、唯一主操作與完整狀態",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-02：正文優先、導覽可觸控且手機無水平溢出",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-04：頁面操作有明確範圍，移到垃圾桶可取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-05：圖片工具在面板內，關閉後正文可持續保存",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UI-06：備份有空狀態、成功卡片與安全還原",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-01：連續輸入時保存狀態列不跳動、不出現重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-02：雲端失敗與離線顯示非成功圖示與重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-03：標題可直接編輯，Enter 保存、Escape 取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-04：空白、過長或失敗的標題恢復原值並說明",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-05：新筆記與子頁面以未命名建立並可立即輸入標題",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-06：區塊選單可連續上移並標示目前區塊",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-07：刪除區塊可復原，非程式碼區塊停用複製",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-08：隔離與錯誤提示使用易懂文字並正確分隔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-09：日記面板立即列出當月且日期不重複",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-10：手機首屏上半部即可開始書寫",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-11：頁面樹可收合並在重新整理後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-13：長標題還原不溢出並有明確回饋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "UX-15：小字輔助文字對比達 WCAG AA",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-01：連續輸入時保存狀態列不跳動、不出現重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-02：雲端失敗與離線顯示非成功圖示與重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-03：標題可直接編輯，Enter 保存、Escape 取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-04：空白、過長或失敗的標題恢復原值並說明",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-05：新筆記與子頁面以未命名建立並可立即輸入標題",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-06：區塊選單可連續上移並標示目前區塊",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-07：刪除區塊可復原，非程式碼區塊停用複製",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-08：隔離與錯誤提示使用易懂文字並正確分隔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-09：日記面板立即列出當月且日期不重複",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-10：手機首屏上半部即可開始書寫",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-11：頁面樹可收合並在重新整理後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-13：長標題還原不溢出並有明確回饋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "UX-15：小字輔助文字對比達 WCAG AA",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-01：連續輸入時保存狀態列不跳動、不出現重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-02：雲端失敗與離線顯示非成功圖示與重試",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-03：標題可直接編輯，Enter 保存、Escape 取消",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-04：空白、過長或失敗的標題恢復原值並說明",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-05：新筆記與子頁面以未命名建立並可立即輸入標題",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-06：區塊選單可連續上移並標示目前區塊",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-07：刪除區塊可復原，非程式碼區塊停用複製",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-08：隔離與錯誤提示使用易懂文字並正確分隔",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-09：日記面板立即列出當月且日期不重複",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-10：手機首屏上半部即可開始書寫",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-11：頁面樹可收合並在重新整理後保留",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-13：長標題還原不溢出並有明確回饋",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "UX-15：小字輔助文字對比達 WCAG AA",
+      "status": "passed",
+      "source": "db-full-e2e.log"
+    },
+    {
+      "project": "chromium-desktop",
+      "title": "DB-04：大型欄位設定與完整中文值可保存",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "chromium-mobile",
+      "title": "DB-04：大型欄位設定與完整中文值可保存",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    },
+    {
+      "project": "webkit-mobile",
+      "title": "DB-04：大型欄位設定與完整中文值可保存",
+      "status": "passed",
+      "source": "db-three-browser-final.log"
+    }
+  ]
+}

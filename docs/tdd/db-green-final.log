@@ -1,0 +1,91 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts
+
+
+Running 10 tests using 1 worker
+
+(node:94412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (1.8s)
+  ✓   2 [chromium-desktop] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (825ms)
+  ✓   3 [chromium-desktop] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (1.4s)
+  ✓   4 [chromium-desktop] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (2.3s)
+  ✓   5 [chromium-desktop] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (3.2s)
+  ✓   6 [chromium-desktop] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (4.6s)
+  ✓   7 [chromium-desktop] › tests/e2e/databases.spec.ts:409:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.2s)
+  ✘   8 [chromium-desktop] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (1.2s)
+(node:94521) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [chromium-desktop] › tests/e2e/databases.spec.ts:498:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (6.8s)
+(node:94537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [chromium-desktop] › tests/e2e/databases.spec.ts:580:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (1.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      493 |       () => document.documentElement.scrollWidth <= innerWidth,
+      494 |     ),
+    > 495 |   ).toBe(true);
+          |     ^
+      496 | });
+      497 |
+      498 | test("DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文", async ({ page, browser }) => {
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:495:5
+
+    Error Context: test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/databases.spec.ts:498:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByLabel('Email', { exact: true }).or(getByTestId('ready')).first() with timeout 5000ms
+      - waiting for getByLabel('Email', { exact: true }).or(getByTestId('ready')).first()
+
+
+       at helpers.ts:39
+
+      37 |       .or(page.getByTestId("ready"))
+      38 |       .first(),
+    > 39 |   ).toBeVisible();
+         |     ^
+      40 |   if (await page.getByLabel("Email", { exact: true }).isVisible()) {
+      41 |     await page.getByLabel("Email", { exact: true }).fill("owner@example.test");
+      42 |     await page
+        at openPrivate (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/helpers.ts:39:5)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:566:37
+
+    Error Context: test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:498:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ───────────
+  8 passed (26.2s)

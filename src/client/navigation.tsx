@@ -43,6 +43,7 @@ import {
   IconTrash,
   IconCloud,
   IconSettings,
+  IconDatabase,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
@@ -231,7 +232,7 @@ export function Navigation({
               component="a"
               href={"/?page=" + item.id}
               label={item.title}
-              leftSection={<IconFileText size={18} />}
+              leftSection={item.database_config ? <IconDatabase size={18} /> : <IconFileText size={18} />}
               active={item.id === page.id}
               aria-current={item.id === page.id ? "page" : undefined}
               onClick={(event) => link(event, item.id)}
@@ -298,6 +299,9 @@ export function Navigation({
           >
             新增筆記
           </Button>
+          <Button variant="subtle" fullWidth leftSection={<IconDatabase size={18} />} disabled={busy} onClick={() => {
+            void run(async () => { const database = await request('/api/databases', { title: '未命名資料庫' }); if (database) await navigate(database.id); });
+          }}>新增資料庫</Button>
         </Stack>
         <Divider my="xl" />
         <Group justify="space-between" mb="sm">
@@ -736,6 +740,9 @@ export function Navigation({
                   >
                     新增子頁面
                   </Button>
+                  {!page.database_config && <Button variant="light" disabled={busy} onClick={() => {
+                    void run(async () => { const database = await request('/api/databases', { title: '未命名資料庫', parent_id: page.id }); if (database) await navigate(database.id); });
+                  }}>新增子資料庫</Button>}
                   <form
                     onSubmit={(event) => {
                       event.preventDefault();

@@ -1,3 +1,4 @@
+import { readConfig, readValues, validValue } from '../shared/databases';
 import type { BackupFile, BackupManifest } from '../shared/backup';
 import { validDate } from '../shared/pages';
 import { IMAGE_LIMIT, IMAGE_TYPES } from '../shared/image';
@@ -26,7 +27,11 @@ export function validateManifest(data: BackupManifest): void {
       || (p.parent_id !== null && !identifier(p.parent_id)) || !integer(item.checkpoint) || !integer(item.captured_at)
       || item.captured_at < data.started_at || item.captured_at > data.captured_until
       || !keys(item, ['metadata', 'checkpoint', 'captured_at', 'file'])
-      || !keys(p, ['id', 'owner_id', 'kind', 'title', 'parent_id', 'journal_date', 'sync_generation', 'metadata_revision', 'created_at', 'updated_at', 'deleted_at'])) invalid();
+      || !keys(p, ['id', 'owner_id', 'kind', 'title', 'parent_id', 'journal_date', 'sync_generation', 'metadata_revision', 'created_at', 'updated_at', 'deleted_at', 'database_config', 'property_values'])) invalid();
+    try {
+      if (p.database_config !== undefined && p.database_config !== null) { if (p.kind !== 'note' || typeof p.database_config !== 'string') invalid(); readConfig(p.database_config); }
+      if (p.property_values !== undefined) { if (typeof p.property_values !== 'string') invalid(); readValues(p.property_values); }
+    } catch { invalid(); }
     if (p.kind === 'journal') {
       if (p.parent_id !== null || typeof p.journal_date !== 'string' || !validDate(p.journal_date) || dates.has(p.journal_date)) invalid();
       dates.add(p.journal_date);
@@ -38,6 +43,12 @@ export function validateManifest(data: BackupManifest): void {
     if (p.parent_id === null) roots.push(p.id);
     else {
       if (pages.get(p.parent_id)?.metadata.kind !== 'note') invalid();
+      const parent = pages.get(p.parent_id)!.metadata;
+      if (parent.database_config) {
+        if (p.database_config) invalid();
+        const values = readValues(p.property_values);
+        for (const field of readConfig(parent.database_config).properties) if (values[field.id] !== undefined && !validValue(field, values[field.id])) invalid();
+      }
       const list = children.get(p.parent_id) ?? []; list.push(p.id); children.set(p.parent_id, list);
     }
   }

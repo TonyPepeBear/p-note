@@ -1,0 +1,453 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test
+
+
+Running 321 tests using 4 workers
+
+(node:6846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6848) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    2 [chromium-desktop] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 (4.3s)
+  ✓    3 [chromium-desktop] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 (6.5s)
+  ✓    4 [chromium-desktop] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (7.3s)
+  ✓    1 [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (8.0s)
+  ✓    5 [chromium-desktop] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口 (4.9s)
+  ✓    9 [chromium-desktop] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 (1.1s)
+  ✓    6 [chromium-desktop] › tests/e2e/assets.spec.ts:70:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 (4.2s)
+  ✓    8 [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (4.0s)
+  ✓   10 [chromium-desktop] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期 (2.2s)
+  ✓    7 [chromium-desktop] › tests/e2e/backup.spec.ts:106:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (5.2s)
+  ✓   14 [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (907ms)
+  ✓   15 [chromium-desktop] › tests/e2e/editor.spec.ts:37:1 › 技術原型 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (1.0s)
+  ✓   13 [chromium-desktop] › tests/e2e/auth.spec.ts:123:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (4.9s)
+  ✓   11 [chromium-desktop] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 (6.9s)
+  ✓   16 [chromium-desktop] › tests/e2e/editor.spec.ts:56:14 › 技術原型 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (3.2s)
+  ✓   17 [chromium-desktop] › tests/e2e/environment.spec.ts:4:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (1.2s)
+  ✓   19 [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 技術原型 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (4.7s)
+  ✓   20 [chromium-desktop] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (4.9s)
+  ✓   12 [chromium-desktop] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (12.4s)
+  ✓   21 [chromium-desktop] › tests/e2e/editor.spec.ts:97:1 › 技術原型 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (3.7s)
+  ✓   24 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (2.0s)
+  ✓   18 [chromium-desktop] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API (12.5s)
+  ✓   25 [chromium-desktop] › tests/e2e/editor.spec.ts:148:1 › 技術原型 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (2.1s)
+  ✓   22 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (8.9s)
+  ✓   27 [chromium-desktop] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (3.3s)
+  ✓   23 [chromium-desktop] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (9.4s)
+  ✓   26 [chromium-desktop] › tests/e2e/assets.spec.ts:198:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 (5.1s)
+  ✓   29 [chromium-desktop] › tests/e2e/editor.spec.ts:37:1 › 正式頁面 › EDIT-02：程式碼縮排、換行、語言及複製內容往返 (3.6s)
+  ✓   31 [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:5:1 › SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步 (3.4s)
+  ✓   28 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (6.2s)
+  ✓   32 [chromium-desktop] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (2.9s)
+  ✓   34 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (1.9s)
+  ✓   30 [chromium-desktop] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (7.5s)
+  ✓   35 [chromium-desktop] › tests/e2e/editor.spec.ts:97:1 › 正式頁面 › EDIT-05：中文 composition、換行與游標在另一端同步 (2.3s)
+  ✓   33 [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 (4.1s)
+  ✓   36 [chromium-desktop] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (2.5s)
+  ✓   38 [chromium-desktop] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (2.3s)
+  ✓   39 [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:44:1 › SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入 (2.0s)
+  ✓   37 [chromium-desktop] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (3.8s)
+  ✓   41 [chromium-desktop] › tests/e2e/editor.spec.ts:148:1 › 正式頁面 › SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (1.4s)
+  ✓   42 [chromium-desktop] › tests/e2e/formal-reconnect.spec.ts:54:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟 (1.3s)
+  ✓   44 [chromium-desktop] › tests/e2e/offline.spec.ts:7:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (1.8s)
+  ✓   45 [chromium-desktop] › tests/e2e/pages.spec.ts:77:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 (2.2s)
+  ✓   46 [chromium-desktop] › tests/e2e/offline.spec.ts:34:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (2.9s)
+  ✓   40 [chromium-desktop] › tests/e2e/local-first.spec.ts:67:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (8.5s)
+  ✓   48 [chromium-desktop] › tests/e2e/offline.spec.ts:76:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (2.6s)
+  ✓   50 [chromium-desktop] › tests/e2e/offline.spec.ts:101:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (3.9s)
+  ✓   43 [chromium-desktop] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (14.0s)
+  ✓   47 [chromium-desktop] › tests/e2e/pages.spec.ts:96:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 (11.6s)
+  ✓   49 [chromium-desktop] › tests/e2e/local-first.spec.ts:112:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (9.3s)
+  ✓   51 [chromium-desktop] › tests/e2e/recovery.spec.ts:7:116 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (4.6s)
+  ✓   53 [chromium-desktop] › tests/e2e/pages.spec.ts:131:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 (5.4s)
+  ✓   52 [chromium-desktop] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (6.6s)
+  ✓   55 [chromium-desktop] › tests/e2e/recovery.spec.ts:7:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (5.5s)
+  ✓   54 [chromium-desktop] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 (7.1s)
+  ✓   56 [chromium-desktop] › tests/e2e/pages.spec.ts:208:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 (5.0s)
+  ✓   57 [chromium-desktop] › tests/e2e/databases.spec.ts:409:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (4.3s)
+  ✓   59 [chromium-desktop] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 (3.9s)
+  ✓   58 [chromium-desktop] › tests/e2e/recovery.spec.ts:7:116 › BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.1s)
+  ✓   61 [chromium-desktop] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (3.3s)
+  ✓   62 [chromium-desktop] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 (3.9s)
+  ✓   60 [chromium-desktop] › tests/e2e/pages.spec.ts:278:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 (6.6s)
+  ✓   63 [chromium-desktop] › tests/e2e/save-failure.spec.ts:5:1 › SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試 (6.0s)
+  ✓   65 [chromium-desktop] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：缺少正文的快取不冒充可用文件 (5.0s)
+  ✓   64 [chromium-desktop] › tests/e2e/databases.spec.ts:501:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (7.3s)
+  ✓   66 [chromium-desktop] › tests/e2e/pages.spec.ts:309:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 (5.5s)
+  ✓   67 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (3.2s)
+  ✓   69 [chromium-desktop] › tests/e2e/databases.spec.ts:593:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (2.8s)
+  ✓   72 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:53:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (1.0s)
+  ✓   68 [chromium-desktop] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：損毀索引的快取不冒充可用文件 (4.8s)
+  ✓   70 [chromium-desktop] › tests/e2e/pages.spec.ts:348:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 (3.7s)
+  ✓   71 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (5.1s)
+  ✓   73 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:70:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (4.2s)
+  ✓   75 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:81:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (3.9s)
+  ✓   74 [chromium-desktop] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：不同擁有者的快取不冒充可用文件 (6.1s)
+  ✓   78 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:130:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (2.6s)
+  ✓   77 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:133:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (4.4s)
+  ✓   76 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (9.2s)
+  ✓   80 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:169:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (5.5s)
+  ✓   79 [chromium-desktop] › tests/e2e/local-first.spec.ts:352:1 › LFN-04：已知登出後不以本機快取繞過登入 (6.3s)
+  ✓   81 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:159:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (4.8s)
+  ✓   85 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:182:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (2.9s)
+  ✓   83 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:200:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (4.0s)
+  ✓   82 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (5.9s)
+  ✓   86 [chromium-desktop] › tests/e2e/workspace-ui.spec.ts:204:1 › UI-06：備份有空狀態、成功卡片與安全還原 (2.0s)
+  ✓   84 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 (5.1s)
+(node:15192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   87 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:223:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (5.2s)
+  ✓   89 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 (4.6s)
+  ✓   88 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 (5.5s)
+  ✓   91 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:273:1 › UX-06：區塊選單可連續上移並標示目前區塊 (1.6s)
+  ✓   90 [chromium-mobile] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (5.8s)
+  ✓   94 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:305:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (2.1s)
+  ✓   92 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 (3.3s)
+  ✓   93 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 (3.3s)
+  ✓   95 [chromium-mobile] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (3.5s)
+  ✓   97 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 (5.7s)
+  ✓   96 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:331:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (5.9s)
+  ✓   99 [chromium-mobile] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 (4.1s)
+  ✓   98 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:252:1 › LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面 (8.9s)
+(node:15249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  101 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:400:1 › UX-09：日記面板立即列出當月且日期不重複 (6.5s)
+  ✓  104 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:422:1 › UX-10：手機首屏上半部即可開始書寫 (3.2s)
+  ✓  100 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 (9.9s)
+  ✓  103 [chromium-mobile] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 (3.9s)
+  ✓  102 [chromium-mobile] › tests/e2e/assets.spec.ts:70:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 (8.9s)
+  ✓  106 [chromium-desktop] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 (3.5s)
+  ✓  107 [chromium-mobile] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口 (4.0s)
+  ✓  105 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:432:1 › UX-11：頁面樹可收合並在重新整理後保留 (5.3s)
+  ✓  110 [chromium-mobile] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 (2.4s)
+  ✓  108 [chromium-mobile] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 (7.2s)
+  ✓  111 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:461:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (6.8s)
+  ✓  112 [chromium-mobile] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期 (5.4s)
+  ✓  109 [chromium-desktop] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 (9.8s)
+  ✓  114 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:493:1 › UX-13：長標題還原不溢出並有明確回饋 (5.3s)
+  ✓  115 [chromium-mobile] › tests/e2e/auth.spec.ts:123:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (5.7s)
+  ✓  113 [chromium-mobile] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API (11.6s)
+  ✓  116 [chromium-desktop] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 (8.0s)
+  ✓  117 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:530:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (5.0s)
+(node:15364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  119 [chromium-mobile] › tests/e2e/assets.spec.ts:198:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 (4.0s)
+  ✓  118 [chromium-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (6.0s)
+  ✓  122 [chromium-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (1.6s)
+  ✓  124 [chromium-mobile] › tests/e2e/editor.spec.ts:37:1 › 技術原型 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (4.4s)
+  ✓  120 [chromium-desktop] › tests/e2e/workspace-usability.spec.ts:617:1 › UX-15：小字輔助文字對比達 WCAG AA (8.3s)
+(node:15501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  125 [chromium-mobile] › tests/e2e/editor.spec.ts:56:14 › 技術原型 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (3.3s)
+  ✓  126 [chromium-mobile] › tests/e2e/environment.spec.ts:4:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (878ms)
+  ✓  127 [chromium-mobile] › tests/e2e/editor.spec.ts:71:1 › 技術原型 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (2.1s)
+  ✓  121 [chromium-mobile] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (12.6s)
+  ✓  123 [chromium-mobile] › tests/e2e/backup.spec.ts:106:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (12.6s)
+  ✓  128 [chromium-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (3.4s)
+  ✓  129 [chromium-mobile] › tests/e2e/editor.spec.ts:97:1 › 技術原型 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (4.7s)
+  ✓  133 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (1.5s)
+  ✓  134 [chromium-mobile] › tests/e2e/editor.spec.ts:148:1 › 技術原型 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (1.1s)
+  ✓  132 [chromium-mobile] › tests/e2e/formal-reconnect.spec.ts:5:1 › SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步 (5.5s)
+  ✓  130 [chromium-mobile] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (7.1s)
+  ✓  135 [chromium-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (3.1s)
+  ✓  131 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (9.2s)
+  ✓  137 [chromium-mobile] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (4.4s)
+  ✓  136 [chromium-mobile] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 (5.2s)
+  ✓  138 [chromium-mobile] › tests/e2e/editor.spec.ts:37:1 › 正式頁面 › EDIT-02：程式碼縮排、換行、語言及複製內容往返 (3.0s)
+  ✓  139 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (5.1s)
+  ✓  141 [chromium-mobile] › tests/e2e/formal-reconnect.spec.ts:44:1 › SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入 (3.6s)
+  ✓  142 [chromium-mobile] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (5.2s)
+  ✓  143 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (3.4s)
+  ✓  144 [chromium-mobile] › tests/e2e/formal-reconnect.spec.ts:54:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟 (3.0s)
+  ✓  140 [chromium-mobile] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (8.2s)
+  ✓  145 [chromium-mobile] › tests/e2e/editor.spec.ts:97:1 › 正式頁面 › EDIT-05：中文 composition、換行與游標在另一端同步 (9.5s)
+  ✓  146 [chromium-mobile] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (11.2s)
+  ✓  149 [chromium-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (4.3s)
+  ✓  150 [chromium-mobile] › tests/e2e/offline.spec.ts:7:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (2.8s)
+  ✓  147 [chromium-mobile] › tests/e2e/local-first.spec.ts:67:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (16.1s)
+  ✓  151 [chromium-mobile] › tests/e2e/editor.spec.ts:148:1 › 正式頁面 › SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (3.8s)
+  ✓  152 [chromium-mobile] › tests/e2e/offline.spec.ts:34:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (3.2s)
+  ✓  155 [chromium-mobile] › tests/e2e/offline.spec.ts:76:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (1.5s)
+  ✓  154 [chromium-mobile] › tests/e2e/pages.spec.ts:77:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 (4.2s)
+  ✓  156 [chromium-mobile] › tests/e2e/offline.spec.ts:101:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (4.8s)
+  ✘  148 [chromium-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (22.0s)
+  ✓  153 [chromium-mobile] › tests/e2e/local-first.spec.ts:112:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (8.1s)
+(node:15862) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  158 [chromium-mobile] › tests/e2e/recovery.spec.ts:7:116 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.8s)
+  ✓  157 [chromium-mobile] › tests/e2e/pages.spec.ts:96:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 (9.5s)
+  ✓  160 [chromium-mobile] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (8.4s)
+  ✓  159 [chromium-mobile] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 (11.3s)
+  ✓  161 [chromium-mobile] › tests/e2e/recovery.spec.ts:7:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (5.7s)
+  ✓  162 [chromium-mobile] › tests/e2e/pages.spec.ts:131:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 (6.8s)
+  ✓  163 [chromium-mobile] › tests/e2e/databases.spec.ts:409:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (4.4s)
+  ✓  164 [chromium-mobile] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 (7.1s)
+  ✓  167 [chromium-mobile] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (6.1s)
+  ✓  165 [chromium-mobile] › tests/e2e/recovery.spec.ts:7:116 › BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (11.7s)
+  ✓  168 [chromium-mobile] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 (5.2s)
+  ✓  166 [chromium-mobile] › tests/e2e/pages.spec.ts:208:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 (12.8s)
+  ✓  169 [chromium-mobile] › tests/e2e/databases.spec.ts:501:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (7.0s)
+  ✓  170 [chromium-mobile] › tests/e2e/save-failure.spec.ts:5:1 › SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試 (4.2s)
+  ✓  171 [chromium-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：缺少正文的快取不冒充可用文件 (4.5s)
+  ✓  173 [chromium-mobile] › tests/e2e/databases.spec.ts:593:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (2.7s)
+  ✓  176 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:53:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (1.5s)
+  ✓  172 [chromium-mobile] › tests/e2e/pages.spec.ts:278:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 (6.9s)
+  ✓  174 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (5.5s)
+  ✓  175 [chromium-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：損毀索引的快取不冒充可用文件 (5.7s)
+  ✓  177 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:70:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (3.8s)
+  ✓  178 [chromium-mobile] › tests/e2e/pages.spec.ts:309:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 (5.2s)
+  ✓  179 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (5.8s)
+  ✓  181 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:133:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (4.3s)
+  ✓  180 [chromium-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：不同擁有者的快取不冒充可用文件 (6.2s)
+  ✓  184 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:159:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (3.1s)
+  ✓  182 [chromium-mobile] › tests/e2e/pages.spec.ts:348:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 (4.8s)
+  ✓  183 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (4.1s)
+  ✓  185 [chromium-mobile] › tests/e2e/local-first.spec.ts:352:1 › LFN-04：已知登出後不以本機快取繞過登入 (3.5s)
+  ✓  186 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:182:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (1.6s)
+  ✓  187 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:81:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (2.7s)
+  ✓  190 [chromium-mobile] › tests/e2e/workspace-ui.spec.ts:204:1 › UI-06：備份有空狀態、成功卡片與安全還原 (2.4s)
+(node:16159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  189 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 (3.8s)
+  ✓  191 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:130:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (1.8s)
+  ✓  188 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (4.9s)
+  ✓  193 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 (4.3s)
+  ✓  194 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:169:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (5.8s)
+  ✓  195 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 (7.7s)
+  ✓  192 [webkit-mobile] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (7.9s)
+  ✓  197 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:200:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (3.8s)
+  ✓  196 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 (5.6s)
+  ✓  199 [webkit-mobile] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (4.0s)
+  ✓  198 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 (6.0s)
+  ✓  200 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:223:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (7.1s)
+  ✓  201 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 (7.5s)
+  ✓  202 [webkit-mobile] › tests/e2e/assets.spec.ts:47:1 › ASSET-02：中斷上傳顯示失敗／重試，不插入不存在原檔的正式引用 (6.6s)
+  ✓  204 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:273:1 › UX-06：區塊選單可連續上移並標示目前區塊 (3.8s)
+  ✓  205 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 (6.9s)
+  ✓  207 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:305:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (3.6s)
+  ✓  203 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:252:1 › LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面 (10.0s)
+  ✓  206 [webkit-mobile] › tests/e2e/assets.spec.ts:70:1 › ASSET-04：含圖片頁面垃圾桶再還原，引用與原檔保持一致 (6.2s)
+(node:16317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  208 [chromium-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 (7.6s)
+  ✓  211 [webkit-mobile] › tests/e2e/auth.spec.ts:43:1 › AUTH-01：掃描只開確認頁，按鈕 POST 登入今日編輯器 (5.6s)
+  ✓  209 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:331:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (9.9s)
+  ✓  210 [webkit-mobile] › tests/e2e/assets.spec.ts:93:1 › EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相同位元組 (11.3s)
+  ✓  213 [webkit-mobile] › tests/e2e/auth.spec.ts:69:1 › AUTH-03：重用與過期連結顯示錯誤及重新申請入口 (4.7s)
+  ✓  214 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:400:1 › UX-09：日記面板立即列出當月且日期不重複 (4.4s)
+  ✓  216 [webkit-mobile] › tests/e2e/auth.spec.ts:94:1 › AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證 (1.6s)
+  ✓  212 [chromium-mobile] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 (8.5s)
+  ✓  217 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:422:1 › UX-10：手機首屏上半部即可開始書寫 (2.0s)
+  ✓  218 [webkit-mobile] › tests/e2e/auth.spec.ts:110:1 › AUTH-05：重開在 30 天內沿用 cookie，讀取不寄信且不續期 (3.8s)
+  ✓  215 [webkit-mobile] › tests/e2e/assets.spec.ts:130:1 › ASSET-CLIENT-01：拒絕格式／超限，BlockNote 原生上傳入口沿用私有 API (6.9s)
+  ✓  220 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:432:1 › UX-11：頁面樹可收合並在重新整理後保留 (6.1s)
+  ✓  219 [chromium-mobile] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 (6.4s)
+(node:16366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  222 [webkit-mobile] › tests/e2e/assets.spec.ts:198:1 › ASSET-INSERT-01：原檔上傳後區塊插入失敗，保留重試且不宣稱引用成功 (3.5s)
+  ✓  221 [webkit-mobile] › tests/e2e/auth.spec.ts:123:1 › AUTH-06：離線草稿在到期後仍存在，重新登入返回原頁並重驗世代 (5.0s)
+  ✓  226 [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 技術原型 › PROBE-EDIT-01：基本區塊、格式與順序重開後保留 (2.3s)
+  ✓  223 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:461:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (5.3s)
+  ✓  227 [webkit-mobile] › tests/e2e/editor.spec.ts:37:1 › 技術原型 › PROBE-EDIT-02：程式碼縮排、換行、語言及複製內容往返 (1.7s)
+  ✓  229 [webkit-mobile] › tests/e2e/editor.spec.ts:56:14 › 技術原型 › PROBE-EDIT-03：固定圖片引用同步及重開，兩端讀到相同原檔 (6.8s)
+  ✓  224 [webkit-mobile] › tests/e2e/backup.spec.ts:16:1 › BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖片可解析且憑證不在匯出 (11.1s)
+  ✓  225 [webkit-mobile] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (14.7s)
+  ✓  228 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:493:1 › UX-13：長標題還原不溢出並有明確回饋 (10.8s)
+  ✓  230 [webkit-mobile] › tests/e2e/editor.spec.ts:71:1 › 技術原型 › PROBE-EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (3.6s)
+  ✓  234 [webkit-mobile] › tests/e2e/editor.spec.ts:97:1 › 技術原型 › PROBE-EDIT-05：中文 composition、換行與游標在另一端同步 (5.1s)
+  ✓  235 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 技術原型 › PROBE-COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (2.4s)
+  ✓  232 [webkit-mobile] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (9.1s)
+  ✓  231 [webkit-mobile] › tests/e2e/backup.spec.ts:106:1 › BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖與索引 (12.2s)
+  ✓  236 [webkit-mobile] › tests/e2e/editor.spec.ts:148:1 › 技術原型 › PROBE-SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (1.8s)
+  ✓  238 [webkit-mobile] › tests/e2e/environment.spec.ts:4:1 › ENV-04：React／Vite 與本機 Worker 可啟動 (809ms)
+  ✓  233 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:530:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (10.3s)
+  ✓  240 [webkit-mobile] › tests/e2e/formal-focus.spec.ts:4:1 › EDIT-FOCUS-01：正式頁面縮小鍵盤可視範圍，游標所在段落仍可看見與操作 (4.7s)
+  ✓  241 [chromium-mobile] › tests/e2e/workspace-usability.spec.ts:617:1 › UX-15：小字輔助文字對比達 WCAG AA (5.6s)
+  ✓  239 [webkit-mobile] › tests/e2e/editor.spec.ts:14:1 › 正式頁面 › EDIT-01：基本區塊、格式與順序重開後保留 (6.1s)
+  ✓  237 [webkit-mobile] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (10.1s)
+(node:16456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  243 [webkit-mobile] › tests/e2e/editor.spec.ts:37:1 › 正式頁面 › EDIT-02：程式碼縮排、換行、語言及複製內容往返 (6.5s)
+  ✓  242 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:5:1 › SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確認後內容相同 (10.6s)
+  ✓  245 [webkit-mobile] › tests/e2e/formal-reconnect.spec.ts:5:1 › SYNC-RECONNECT-01：瀏覽器在線而 API 503，已下載頁面仍可啟動／保存，恢復後重試同步 (8.3s)
+  ✓  246 [webkit-mobile] › tests/e2e/editor.spec.ts:71:1 › 正式頁面 › EDIT-04：觸控／鍵盤可插入移動刪除，縮小 viewport 保持焦點 (7.0s)
+  ✓  244 [webkit-mobile] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (13.1s)
+  ✓  247 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:19:1 › SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改 (11.1s)
+  ✓  249 [webkit-mobile] › tests/e2e/editor.spec.ts:97:1 › 正式頁面 › EDIT-05：中文 composition、換行與游標在另一端同步 (8.0s)
+  ✓  248 [webkit-mobile] › tests/e2e/formal-reconnect.spec.ts:22:1 › SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保存本機，重試後持久確認 (9.3s)
+  ✓  251 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:38:1 › SYNC-09：正式未下載頁面／IndexedDB 故障不宣稱本機保存成功 (2.8s)
+  ✓  253 [webkit-mobile] › tests/e2e/formal-reconnect.spec.ts:44:1 › SYNC-RECONNECT-03：API 明確拒絕登入時不以本機快取繞過，保留草稿供重新登入 (4.0s)
+  ✓  252 [webkit-mobile] › tests/e2e/editor.spec.ts:132:1 › 正式頁面 › COPY-01：剪貼簿拒絕或不可用時不改雲端保存狀態，正文仍保留 (4.9s)
+  ✓  256 [webkit-mobile] › tests/e2e/editor.spec.ts:148:1 › 正式頁面 › SYNC-04：延遲舊確認不會把後續輸入顯示成已儲存 (7.6s)
+  ✓  255 [webkit-mobile] › tests/e2e/formal-reconnect.spec.ts:54:1 › SYNC-CACHE-01：啟動資源快取拒絕私人 API／登入連結，索引損毀時保留正文且明確拒絕開啟 (8.9s)
+  ✓  254 [webkit-mobile] › tests/e2e/formal-offline.spec.ts:51:1 › SYNC-12：正式跨分頁中文收斂，API 權限拒絕其他 owner 與世代 (12.7s)
+  ✘  250 [webkit-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (20.4s)
+(node:16592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  258 [webkit-mobile] › tests/e2e/offline.spec.ts:7:1 › PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快照收斂 (3.3s)
+  ✓  259 [webkit-mobile] › tests/e2e/pages.spec.ts:77:1 › PAGE-01：首頁今天沿用既有日記與正文，不建立第二篇 (5.5s)
+  ✓  261 [webkit-mobile] › tests/e2e/offline.spec.ts:34:1 › PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置且收到持久確認 (3.4s)
+  ✓  263 [webkit-mobile] › tests/e2e/offline.spec.ts:76:1 › PROBE-SYNC-09：未下載頁面不可離線編輯；IndexedDB 寫入失敗不宣稱已本機保存 (1.4s)
+  ✓  257 [webkit-mobile] › tests/e2e/local-first.spec.ts:67:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (10.8s)
+  ✓  264 [webkit-mobile] › tests/e2e/offline.spec.ts:101:1 › PROBE-SYNC-12：同瀏覽器兩分頁收斂，不同 owner／世代快取隔離 (3.6s)
+  ✘  260 [webkit-mobile] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (9.0s)
+(node:16675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  262 [webkit-mobile] › tests/e2e/pages.spec.ts:96:1 › PAGE-03：日期補寫與月份列表返回原日記，修改標題不改日期 (7.8s)
+  ✓  265 [webkit-mobile] › tests/e2e/local-first.spec.ts:112:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (6.6s)
+  ✓  266 [webkit-mobile] › tests/e2e/recovery.spec.ts:7:116 › SYNC-10：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.2s)
+  ✓  267 [webkit-mobile] › tests/e2e/databases.spec.ts:409:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (4.3s)
+  ✓  268 [webkit-mobile] › tests/e2e/pages.spec.ts:131:1 › PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回 (7.4s)
+  ✓  271 [webkit-mobile] › tests/e2e/databases.spec.ts:477:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (3.8s)
+  ✓  270 [webkit-mobile] › tests/e2e/recovery.spec.ts:7:116 › SYNC-11：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (6.4s)
+  ✓  269 [webkit-mobile] › tests/e2e/local-first.spec.ts:205:1 › LFN-02：網路請求未回應時，已下載頁面 500 毫秒內切換並可寫入本機 (8.6s)
+  ✓  273 [webkit-mobile] › tests/e2e/databases.spec.ts:501:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (6.3s)
+  ✓  275 [webkit-mobile] › tests/e2e/local-first.spec.ts:245:1 › LFN-03：上一頁、下一頁與重新整理不等頁面資訊即恢復本機內容 (5.4s)
+  ✓  272 [webkit-mobile] › tests/e2e/pages.spec.ts:208:1 › PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除子頁仍留垃圾桶 (9.6s)
+  ✓  276 [webkit-mobile] › tests/e2e/databases.spec.ts:593:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (2.9s)
+  ✓  274 [webkit-mobile] › tests/e2e/recovery.spec.ts:7:116 › BACKUP-09：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記 (8.5s)
+  ✓  277 [webkit-mobile] › tests/e2e/local-first.spec.ts:286:1 › LFN-03：今天入口只在有今天的本機日記時直接開啟 (3.9s)
+  ✓  279 [webkit-mobile] › tests/e2e/save-failure.spec.ts:5:1 › SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試 (4.2s)
+  ✓  280 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (3.7s)
+  ✓  282 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:53:1 › UI-01：登入有清楚用途、唯一主操作與完整狀態 (1.1s)
+  ✓  278 [webkit-mobile] › tests/e2e/pages.spec.ts:278:1 › PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 不變 (6.9s)
+  ✓  281 [webkit-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：缺少正文的快取不冒充可用文件 (5.0s)
+  ✓  283 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (3.8s)
+  ✓  284 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:70:1 › UI-02：正文優先、導覽可觸控且手機無水平溢出 (4.0s)
+  ✓  285 [webkit-mobile] › tests/e2e/pages.spec.ts:309:1 › PAGE-08：中文正文搜尋與導航，刪除上層後排除子樹 (4.2s)
+  ✓  286 [webkit-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：損毀索引的快取不冒充可用文件 (4.3s)
+  ✓  288 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:133:1 › UI-03：搜尋與日記以獨立面板呈現，Escape 返回觸發點 (3.5s)
+  ✓  287 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (5.1s)
+  ✓  289 [webkit-mobile] › tests/e2e/pages.spec.ts:348:1 › PAGE-LOCAL-01：本機保存失敗時保留原頁與草稿，不繼續導覽 (4.4s)
+  ✓  290 [webkit-mobile] › tests/e2e/local-first.spec.ts:309:3 › LFN-04：不同擁有者的快取不冒充可用文件 (4.1s)
+  ✓  293 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:81:1 › UX-01：連續輸入時保存狀態列不跳動、不出現重試 (2.5s)
+  ✓  291 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:159:1 › UI-04：頁面操作有明確範圍，移到垃圾桶可取消 (4.9s)
+  ✓  292 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (4.5s)
+  ✓  296 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:182:1 › UI-05：圖片工具在面板內，關閉後正文可持續保存 (2.3s)
+  ✓  295 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:130:1 › UX-02：雲端失敗與離線顯示非成功圖示與重試 (3.5s)
+  ✓  294 [webkit-mobile] › tests/e2e/local-first.spec.ts:352:1 › LFN-04：已知登出後不以本機快取繞過登入 (5.1s)
+  ✓  298 [webkit-mobile] › tests/e2e/workspace-ui.spec.ts:204:1 › UI-06：備份有空狀態、成功卡片與安全還原 (2.7s)
+  ✓  297 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:200:1 › UX-20：背景發現新版時先保存草稿再整頁載入最後目標，查詢失敗仍站內切換 (5.8s)
+  ✓  299 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:169:1 › UX-03：標題可直接編輯，Enter 保存、Escape 取消 (3.7s)
+  ✓  302 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:200:1 › UX-04：空白、過長或失敗的標題恢復原值並說明 (2.0s)
+  ✓  300 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在登入到期時保留且不寫回 (5.5s)
+  ✓  301 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:227:1 › LFN-01：新版載入前本機保存失敗時保留畫面不重新載入 (3.1s)
+  ✓  304 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在刪頁時保留且不寫回 (2.9s)
+  ✓  303 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:223:1 › UX-05：新筆記與子頁面以未命名建立並可立即輸入標題 (4.8s)
+  ✓  305 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:252:1 › LFN-07：快速換頁時過期的驗證與版本回應不影響最後頁面 (4.0s)
+  ✓  306 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷權限時保留且不寫回 (2.8s)
+  ✓  307 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:273:1 › UX-06：區塊選單可連續上移並標示目前區塊 (1.5s)
+  ✓  309 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:305:1 › UX-07：刪除區塊可復原，非程式碼區塊停用複製 (2.0s)
+  ✓  308 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在擁有者改變時保留且不寫回 (2.9s)
+  ✓  311 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在還原版本時保留且不寫回 (2.9s)
+  ✓  310 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:331:1 › UX-08：隔離與錯誤提示使用易懂文字並正確分隔 (3.7s)
+  ✓  312 [webkit-mobile] › tests/e2e/local-first.spec.ts:371:3 › LFN-05：驗證期間的草稿在撤銷且本機保存失敗時保留且不寫回 (2.0s)
+  ✓  313 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:400:1 › UX-09：日記面板立即列出當月且日期不重複 (1.7s)
+  ✓  315 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:422:1 › UX-10：手機首屏上半部即可開始書寫 (1.7s)
+  ✓  314 [webkit-mobile] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證斷線 後恢復，原編輯器完成同步 (3.7s)
+  ✓  316 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:432:1 › UX-11：頁面樹可收合並在重新整理後保留 (3.1s)
+  ✓  318 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:461:1 › UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋 (2.4s)
+  ✓  317 [webkit-mobile] › tests/e2e/local-first.spec.ts:445:3 › LFN-06：背景驗證 500 後恢復，原編輯器完成同步 (4.3s)
+  ✓  319 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:493:1 › UX-13：長標題還原不溢出並有明確回饋 (2.0s)
+  ✓  320 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:530:1 › UX-14：備份還原高亮、捲入可視範圍並可取消；全域錯誤可關閉 (1.3s)
+  ✓  321 [webkit-mobile] › tests/e2e/workspace-usability.spec.ts:617:1 › UX-15：小字輔助文字對比達 WCAG AA (1.6s)
+
+
+  1) [chromium-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ───────────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: apiRequestContext.get: Test timeout of 20000ms exceeded.
+
+      346 |   }
+      347 |   const pages = await (
+    > 348 |     await page.request.get("/api/databases/" + db.id)
+          |                        ^
+      349 |   ).json();
+      350 |   expect(pages.rows).toHaveLength(3);
+      351 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:348:24
+
+    Error Context: test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ─────────────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: apiRequestContext.get: Test timeout of 20000ms exceeded.
+
+      21 | }
+      22 | async function config(page: Page, db: { id: string }, next: object) {
+    > 23 |   const old = await (await page.request.get("/api/pages/" + db.id)).json();
+         |                                         ^
+      24 |   const response = await post(page, "/api/databases/" + db.id + "/config", {
+      25 |     previous: old.database_config,
+      26 |     generation: old.sync_generation,
+        at config (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:23:41)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:332:11
+
+    Error Context: test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 ─────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('property-status')
+    Expected substring: "測試保存失敗"
+    Received string:    "已儲存"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByTestId('property-status') with timeout 5000ms
+      - waiting for getByTestId('property-status')
+        2 × locator resolved to <p data-size="xs" data-testid="property-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">儲存中</p>
+          - unexpected value "儲存中"
+        12 × locator resolved to <p data-size="xs" data-testid="property-status" class="mantine-focus-auto m_b6d8b162 mantine-Text-root">已儲存</p>
+           - unexpected value "已儲存"
+
+
+      368 |   await page.getByLabel("甲欄").fill("保留草稿");
+      369 |   await page.getByLabel("甲欄").blur();
+    > 370 |   await expect(page.getByTestId("property-status")).toContainText(
+          |                                                     ^
+      371 |     "測試保存失敗",
+      372 |   );
+      373 |   await expect(page.getByLabel("甲欄")).toHaveValue("保留草稿");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:370:53
+
+    Error Context: test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ────────────────
+    [webkit-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ──────────────────
+    [webkit-mobile] › tests/e2e/databases.spec.ts:353:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 ──────────────
+  318 passed (7.6m)

@@ -1,0 +1,21 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts
+
+
+Running 10 tests using 1 worker
+
+(node:17172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (3.1s)
+  ✓   2 [chromium-desktop] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (954ms)
+  ✓   3 [chromium-desktop] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (1.8s)
+  ✓   4 [chromium-desktop] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (1.3s)
+  ✓   5 [chromium-desktop] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (2.9s)
+  ✓   6 [chromium-desktop] › tests/e2e/databases.spec.ts:354:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (4.6s)
+  ✓   7 [chromium-desktop] › tests/e2e/databases.spec.ts:420:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.2s)
+  ✓   8 [chromium-desktop] › tests/e2e/databases.spec.ts:488:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (1.5s)
+  ✓   9 [chromium-desktop] › tests/e2e/databases.spec.ts:512:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (3.2s)
+  ✓  10 [chromium-desktop] › tests/e2e/databases.spec.ts:604:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (941ms)
+
+  10 passed (22.3s)

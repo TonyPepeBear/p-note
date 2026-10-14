@@ -1,6 +1,15 @@
 import { saveLocal } from './cache';
 
 const SIGNED_OUT = 'p-note:signed-out';
+const metadataDrafts = new Set<{ save: () => Promise<void>; dirty: () => boolean }>();
+export function registerDraft(save: () => Promise<void>, dirty: () => boolean): () => void {
+  const entry = { save, dirty };
+  metadataDrafts.add(entry);
+  return () => { metadataDrafts.delete(entry); };
+}
+export function hasMetadataDrafts(): boolean {
+  return [...metadataDrafts].some(entry => entry.dirty());
+}
 
 export async function api(path: string, body?: object): Promise<Response> {
   const response = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' });
@@ -16,6 +25,7 @@ export function signedOut(): boolean {
 }
 
 export async function saveDraft(): Promise<void> {
+  for (const entry of metadataDrafts) await entry.save();
   if (window.probe) {
     try { await saveLocal(window.probe.cache); }
     catch { throw new Error('本機儲存失敗，已保留目前頁面，請先重試儲存'); }

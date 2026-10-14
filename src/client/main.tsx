@@ -1,4 +1,5 @@
 import { ApiKeySettings } from './api-key-settings';
+import { DatabasePage, NoteProperties } from './databases';
 import {
   MantineProvider,
   Alert,
@@ -120,6 +121,14 @@ function App() {
       setSession(opened);
     };
     const open = async (page: PageInfo, localOnly: boolean) => {
+      if (page.database_config) {
+        rememberPage(page);
+        history.replaceState(history.state, "", `/?page=${page.id}`);
+        sessionStorage.setItem("p-note-return-url", location.pathname + location.search);
+        setPage(page);
+        setSession(undefined);
+        return;
+      }
       const old = localPage(page.id, page.owner_id);
       const accepted = sessionStorage.getItem("p-note-load-current");
       if (
@@ -230,7 +239,7 @@ function App() {
         } catch {
           /* 沒有可用索引時走雲端載入。 */
         }
-        if (local) {
+        if (local && !local.database_config) {
           try {
             await open(local, true);
             return;
@@ -508,16 +517,19 @@ function App() {
           </Stack>
         </Paper>
       )}
-      {session && page && (!isolated || viewDraft) ? (
+      {(session || page?.database_config) && page && (!isolated || viewDraft) ? (
+        page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated} /> : <>
+        <NoteProperties key={page.id} page={page} readOnly={login || !!isolated} />
         <Editor
-          key={session.room}
-          session={session}
+          key={session!.room}
+          session={session!}
           title={page.title}
           kind={page.kind}
           rename={rename}
           focusTitle={route.fresh}
           readOnly={login || !!isolated}
         />
+        </>
       ) : (
         !error && (
           <Stack align="center" py={80}>

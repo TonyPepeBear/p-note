@@ -1,0 +1,45 @@
+
+> p-note@0.0.0 test:e2e
+> playwright test tests/e2e/databases.spec.ts
+
+
+Running 30 tests using 3 workers
+
+(node:17665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17664) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium-desktop] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (4.3s)
+  ✓   4 [chromium-desktop] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (1.9s)
+  ✓   1 [chromium-mobile] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (6.5s)
+  ✓   5 [chromium-desktop] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (1.7s)
+  ✓   6 [chromium-mobile] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (2.0s)
+  ✓   7 [chromium-desktop] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (2.1s)
+  ✓   8 [chromium-mobile] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (2.2s)
+  ✓  10 [chromium-mobile] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (1.7s)
+  ✓   9 [chromium-desktop] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (3.4s)
+  ✓   3 [webkit-mobile] › tests/e2e/databases.spec.ts:73:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (13.7s)
+  ✓  11 [chromium-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (4.9s)
+  ✓  13 [webkit-mobile] › tests/e2e/databases.spec.ts:106:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (3.6s)
+  ✓  12 [chromium-desktop] › tests/e2e/databases.spec.ts:354:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (5.3s)
+  ✓  16 [chromium-desktop] › tests/e2e/databases.spec.ts:420:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.4s)
+  ✓  17 [chromium-desktop] › tests/e2e/databases.spec.ts:488:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (1.6s)
+  ✓  15 [webkit-mobile] › tests/e2e/databases.spec.ts:122:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (3.5s)
+  ✓  14 [chromium-mobile] › tests/e2e/databases.spec.ts:354:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (5.1s)
+  ✓  18 [chromium-desktop] › tests/e2e/databases.spec.ts:512:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (2.5s)
+  ✓  20 [chromium-mobile] › tests/e2e/databases.spec.ts:420:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (2.1s)
+  ✓  21 [chromium-desktop] › tests/e2e/databases.spec.ts:604:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (1.1s)
+  ✓  19 [webkit-mobile] › tests/e2e/databases.spec.ts:204:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (4.2s)
+  ✓  22 [chromium-mobile] › tests/e2e/databases.spec.ts:488:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (2.0s)
+  ✓  24 [chromium-mobile] › tests/e2e/databases.spec.ts:512:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (3.3s)
+  ✓  25 [chromium-mobile] › tests/e2e/databases.spec.ts:604:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (1.0s)
+  ✓  23 [webkit-mobile] › tests/e2e/databases.spec.ts:259:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (4.8s)
+  ✓  26 [webkit-mobile] › tests/e2e/databases.spec.ts:354:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (4.6s)
+  ✓  27 [webkit-mobile] › tests/e2e/databases.spec.ts:420:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.4s)
+  ✓  28 [webkit-mobile] › tests/e2e/databases.spec.ts:488:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (1.7s)
+  ✓  29 [webkit-mobile] › tests/e2e/databases.spec.ts:512:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (2.3s)
+  ✓  30 [webkit-mobile] › tests/e2e/databases.spec.ts:604:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (1.3s)
+
+  30 passed (43.3s)

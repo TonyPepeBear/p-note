@@ -1,0 +1,85 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts
+
+
+Running 10 tests using 1 worker
+
+(node:92421) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/databases.spec.ts:34:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (2.2s)
+  ✓   2 [chromium-desktop] › tests/e2e/databases.spec.ts:52:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (1.0s)
+  ✓   3 [chromium-desktop] › tests/e2e/databases.spec.ts:60:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (1.6s)
+  ✓   4 [chromium-desktop] › tests/e2e/databases.spec.ts:76:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (1.3s)
+  ✓   5 [chromium-desktop] › tests/e2e/databases.spec.ts:88:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (1.6s)
+  ✓   6 [chromium-desktop] › tests/e2e/databases.spec.ts:103:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (5.0s)
+  ✓   7 [chromium-desktop] › tests/e2e/databases.spec.ts:115:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.1s)
+  ✘   8 [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (1.3s)
+(node:92504) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (1.2s)
+(node:92509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [chromium-desktop] › tests/e2e/databases.spec.ts:144:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (790ms)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ───────────────
+
+    Error: locator.fill: Error: strict mode violation: getByLabel('手機摘要') resolved to 3 elements:
+        1) <input value="" type="text" aria-label="手機摘要" data-variant="default" id="mantine-hr2k25usz" class="m_8fb7ebe7 mantine-Input-input mantine-TextInput-input"/> aka getByRole('textbox', { name: '手機摘要' })
+        2) <button type="button" data-size="xs" aria-label="上移 手機摘要" data-variant="subtle" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button> aka getByRole('button', { name: '上移 手機摘要' })
+        3) <button type="button" data-size="xs" aria-label="下移 手機摘要" data-variant="subtle" class="mantine-focus-auto mantine-active m_77c9d27d mantine-Button-root m_87cf2631 mantine-UnstyledButton-root">…</button> aka getByRole('button', { name: '下移 手機摘要' })
+
+    Call log:
+      - waiting for getByLabel('手機摘要')
+
+
+      127 |   await openPrivate(page); const db = await create(page); await row(page, db, '手機筆記'); await openDB(page, db.id);
+      128 |   await page.getByRole('button', { name: '管理欄位', exact: true }).click(); await page.getByLabel('新欄位名稱').fill('手機摘要'); await page.getByLabel('新欄位類型').selectOption('text'); await page.getByLabel('新欄位名稱').press('Enter');
+    > 129 |   await page.getByRole('button', { name: '關閉欄位管理', exact: true }).click(); await page.getByLabel('手機摘要').fill('觸控與鍵盤'); await page.getByLabel('手機摘要').blur(); await expect(page.getByTestId('property-status')).toContainText('已儲存');
+          |                                                                                                          ^
+      130 |   await page.setViewportSize({ width: 375, height: 812 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      131 | });
+      132 |
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:129:106
+
+    Error Context: test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ──────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 201
+
+      134 |   await openPrivate(page); const db = await create(page); const record = await row(page, db, '備份筆記'); await config(page, db, { properties: fields, views: [view()] }); await values(page, record, 'score', 42);
+      135 |   await openPrivate(page, record.id); await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '資料庫備份正文' })); await saved(page);
+    > 136 |   const backup = await post(page, '/api/backups', {}); expect(backup.status()).toBe(200); const catalog = await backup.json();
+          |                                                                                ^
+      137 |   const zip = await page.request.get('/api/backups/' + catalog.id + '/export'); expect(zip.status()).toBe(200); expect((await zip.body()).length).toBeGreaterThan(100);
+      138 |   await values(page, record, 'score', 99); const restored = await post(page, '/api/backups/' + catalog.id + '/restore', { request_id: crypto.randomUUID() }); expect(restored.status()).toBe(200);
+      139 |   await openDB(page, db.id); expect(JSON.parse((await (await page.request.get('/api/pages/' + record.id)).json()).property_values).score).toBe(42);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:136:80
+
+    Error Context: test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ───────────
+  8 passed (19.2s)

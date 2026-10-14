@@ -1,0 +1,42 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts --grep DB-03
+
+
+Running 1 test using 1 worker
+
+(node:93022) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/databases.spec.ts:61:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (20.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:61:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 ─────────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.fill: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByLabel('名稱', { exact: true })
+
+
+      64 |   await config(page, db, { properties: props, views: [{ ...view(), columns: ['title', ...props.map(p => p.id), 'created_at', 'updated_at'] }] });
+      65 |   await openDB(page, db.id);
+    > 66 |   await page.getByLabel('名稱', { exact: true }).fill('表格修改標題'); await page.getByLabel('名稱', { exact: true }).blur(); await expect(page.getByTestId('property-status')).toContainText('已儲存');
+         |                                                ^
+      67 |   const area = page.getByTestId('database-rows');
+      68 |   await area.getByLabel('摘要').fill('中文摘要'); await area.getByLabel('摘要').blur();
+      69 |   await expect(page.getByTestId('property-status')).toContainText('已儲存');
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:66:48
+
+    Error Context: test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:61:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 ──────────────

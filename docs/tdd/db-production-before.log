@@ -1,0 +1,65 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.151.0)
+───────────────────────────────────────────────
+Created:     2026-10-14T03:18:49.908Z
+Author:      redacted@example.invalid
+Source:      Upload
+Message:     Automatic deployment on upload.
+Version(s):  (100%) f71cfeea-9540-4652-8330-95f5cecb47dd
+                 Created:  2026-10-14T03:18:49.908Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-10-14T03:30:28.731Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) bbcc5e44-64ea-4a8f-8388-682a653d0b26
+                 Created:  2026-10-14T03:30:26.417Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-10-14T05:33:10.915Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 56d44ed5-bf03-4942-afe9-55b2a1929392
+                 Created:  2026-10-14T05:33:09.660Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-10-14T06:49:41.477Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 0aec1a7b-b791-4f0f-8385-f2e1126e0203
+                 Created:  2026-10-14T06:49:39.887Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-10-14T07:51:51.333Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 8b781f4f-8c25-44fc-8b4d-18cc1d2e4c0a
+                 Created:  2026-10-14T07:51:49.937Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-10-14T08:02:26.994Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     新增個人 API key 設定與 JSON 內容介面
+Version(s):  (100%) 81abdcc4-d8fb-416e-9eda-c9ec46d07e21
+                 Created:  2026-10-14T08:02:25.231Z
+                     Tag:  api-key-settings
+                 Message:  新增個人 API key 設定與 JSON 內容介面
+
+Created:     2026-10-14T09:38:18.666Z
+Author:      redacted@example.invalid
+Source:      Unknown (deployment)
+Message:     已下載頁面本機優先切換（LFN-01～07）
+Version(s):  (100%) 017df0d7-c063-4ae6-bbab-71cf2b1d9389
+                 Created:  2026-10-14T09:38:16.759Z
+                     Tag:  local-first-nav
+                 Message:  已下載頁面本機優先切換（LFN-01～07）

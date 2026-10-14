@@ -1,0 +1,40 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts --grep DB-07
+
+
+Running 1 test using 1 worker
+
+(node:92788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/databases.spec.ts:116:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (1.5s)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:116:1 › DB-07：權限、刪除、舊世代與离線屬性限制 ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 200
+
+      120 |   expect((await page.request.get('/api/databases/not-owned')).status()).toBe(404);
+      121 |   const current = await (await page.request.get('/api/pages/' + db.id)).json();
+    > 122 |   expect((await post(page, '/api/databases/' + db.id + '/config', { previous: current.database_config, generation: 'old', config: JSON.parse(current.database_config) })).status()).toBe(409);
+          |                                                                                                                                                                                     ^
+      123 |   expect((await post(page, '/api/pages/' + record.id + '/properties', { property: 'a', value: 'x', generation: 'old' })).status()).toBe(409);
+      124 |   await openPrivate(page, record.id); await page.context().setOffline(true); await expect(page.getByText('欄位修改需要連線', { exact: true })).toBeVisible(); await expect(page.getByLabel('摘要')).toBeDisabled();
+      125 |   await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '離線正文' })); await expect(page.locator('.tiptap')).toContainText('離線正文'); await page.context().setOffline(false);
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:122:181
+
+    Error Context: test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:116:1 › DB-07：權限、刪除、舊世代與离線屬性限制 ────────────────

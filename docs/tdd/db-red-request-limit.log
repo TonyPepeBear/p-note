@@ -1,0 +1,41 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts --grep 大型欄位設定
+
+
+Running 1 test using 1 worker
+
+(node:18122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/databases.spec.ts:628:1 › DB-04：大型欄位設定與完整中文值可保存 (829ms)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:628:1 › DB-04：大型欄位設定與完整中文值可保存 ────────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 503
+
+      27 |     config: next,
+      28 |   });
+    > 29 |   expect(response.status()).toBe(200);
+         |                             ^
+      30 |   return response.json();
+      31 | }
+      32 | const property = (
+        at config (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:29:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:632:3
+
+    Error Context: test-results/databases-DB-04：大型欄位設定與完整中文值可保存-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-04：大型欄位設定與完整中文值可保存-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-04：大型欄位設定與完整中文值可保存-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:628:1 › DB-04：大型欄位設定與完整中文值可保存 ─────────────────

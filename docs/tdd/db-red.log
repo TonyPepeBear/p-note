@@ -1,0 +1,446 @@
+
+> p-note@0.0.0 test:e2e:fast
+> playwright test --project=chromium-desktop tests/e2e/databases.spec.ts
+
+[WebServer] (node:89570) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:89567) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89599) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+
+Running 10 tests using 1 worker
+
+(node:89646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [chromium-desktop] › tests/e2e/databases.spec.ts:34:1 › DB-01：建立資料庫、筆記與移入移出保留正文 (20.2s)
+(node:89692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   2 [chromium-desktop] › tests/e2e/databases.spec.ts:52:1 › DB-02：刪除與還原資料庫不復活先前刪除列 (1.0s)
+(node:89701) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 5:58:11 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 5:58:11 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘   3 [chromium-desktop] › tests/e2e/databases.spec.ts:60:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 (801ms)
+(node:89764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   4 [chromium-desktop] › tests/e2e/databases.spec.ts:76:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 (785ms)
+(node:89804) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 5:58:13 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 5:58:13 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘   5 [chromium-desktop] › tests/e2e/databases.spec.ts:88:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 (712ms)
+(node:89820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   6 [chromium-desktop] › tests/e2e/databases.spec.ts:103:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 (581ms)
+(node:89827) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 [chromium-desktop] › tests/e2e/databases.spec.ts:115:1 › DB-07：權限、刪除、舊世代與离線屬性限制 (680ms)
+(node:89833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 5:58:16 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 5:58:16 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘   8 [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 (666ms)
+(node:89841) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 (678ms)
+(node:89846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  10 [chromium-desktop] › tests/e2e/databases.spec.ts:144:1 › DB-10：舊格式備份可還原且無效新設定拒絕 (688ms)
+
+
+  1) [chromium-desktop] › tests/e2e/databases.spec.ts:34:1 › DB-01：建立資料庫、筆記與移入移出保留正文 ───────────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.click: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '新增資料庫', exact: true })
+
+
+      34 | test('DB-01：建立資料庫、筆記與移入移出保留正文', async ({ page }) => {
+      35 |   await openPrivate(page); await showNavigation(page);
+    > 36 |   await page.getByRole('button', { name: '新增資料庫', exact: true }).click();
+         |                                                                  ^
+      37 |   await expect(page.getByTestId('database-ready')).toBeVisible();
+      38 |   const db = new URL(page.url()).searchParams.get('page')!;
+      39 |   await page.getByRole('button', { name: '新增筆記', exact: true }).click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:36:66
+
+    Error Context: test-results/databases-DB-01：建立資料庫、筆記與移入移出保留正文-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-01：建立資料庫、筆記與移入移出保留正文-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-01：建立資料庫、筆記與移入移出保留正文-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/databases.spec.ts:52:1 › DB-02：刪除與還原資料庫不復活先前刪除列 ────────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:53:39
+
+    Error Context: test-results/databases-DB-02：刪除與還原資料庫不復活先前刪除列-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-02：刪除與還原資料庫不復活先前刪除列-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-02：刪除與還原資料庫不復活先前刪除列-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/databases.spec.ts:60:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 ─────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:61:39
+
+    Error Context: test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-03：各欄位在表格與筆記往返、重新命名保留值-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/databases.spec.ts:76:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 ──────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:77:39
+
+    Error Context: test-results/databases-DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-desktop] › tests/e2e/databases.spec.ts:88:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:89:39
+
+    Error Context: test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-05：儲存檢視獨立篩選、排序、隱藏與重開-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-desktop] › tests/e2e/databases.spec.ts:103:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 ──────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:104:39
+
+    Error Context: test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium-desktop] › tests/e2e/databases.spec.ts:115:1 › DB-07：權限、刪除、舊世代與离線屬性限制 ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:116:39
+
+    Error Context: test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-07：權限、刪除、舊世代與离線屬性限制-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ───────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:127:39
+
+    Error Context: test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-08：手機與鍵盤可新增欄位且整頁不溢出-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ──────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:134:39
+
+    Error Context: test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-09：ZIP-與還原保留資料庫、檢視、欄位與正文-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium-desktop] › tests/e2e/databases.spec.ts:144:1 › DB-10：舊格式備份可還原且無效新設定拒絕 ──────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       9 | async function create(page: Page, title = '筆記資料庫') {
+      10 |   const response = await post(page, '/api/databases', { title });
+    > 11 |   expect(response.status()).toBe(200);
+         |                             ^
+      12 |   return response.json();
+      13 | }
+      14 | async function row(page: Page, db: { id: string }, title: string) {
+        at create (/Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:11:29)
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/databases.spec.ts:145:39
+
+    Error Context: test-results/databases-DB-10：舊格式備份可還原且無效新設定拒絕-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/databases-DB-10：舊格式備份可還原且無效新設定拒絕-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/databases-DB-10：舊格式備份可還原且無效新設定拒絕-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10 failed
+    [chromium-desktop] › tests/e2e/databases.spec.ts:34:1 › DB-01：建立資料庫、筆記與移入移出保留正文 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:52:1 › DB-02：刪除與還原資料庫不復活先前刪除列 ─────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:60:1 › DB-03：各欄位在表格與筆記往返、重新命名保留值 ──────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:76:1 › DB-04：無效欄位值、選項及型別變更拒絕，取消刪除保留 ───────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:88:1 › DB-05：儲存檢視獨立篩選、排序、隱藏與重開 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:103:1 › DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋 ───────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:115:1 › DB-07：權限、刪除、舊世代與离線屬性限制 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:126:1 › DB-08：手機與鍵盤可新增欄位且整頁不溢出 ────────────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:133:1 › DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文 ───────────
+    [chromium-desktop] › tests/e2e/databases.spec.ts:144:1 › DB-10：舊格式備份可還原且無效新設定拒絕 ────────────────

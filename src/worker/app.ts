@@ -1,4 +1,5 @@
 import { handleKeys } from './api-keys';
+import { handleDatabases } from './databases';
 import { handleContentApi } from './content-api';
 import { routePartykitRequest } from 'partyserver';
 import { ProbeRoom } from './index';
@@ -87,6 +88,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
     if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());
     if (assetResponse) return assetResponse;
+    const databaseResponse = await handleDatabases(request, env, session.user.id, services.now());
+    if (databaseResponse) return databaseResponse;
     const pageResponse = await handlePages(request, env, session.user.id, services.now());
     if (pageResponse) return pageResponse;
     if (path.startsWith('/parties/sync/')) {
