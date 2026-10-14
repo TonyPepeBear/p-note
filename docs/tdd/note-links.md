@@ -24,3 +24,7 @@ WebKit 所需公開 Debian 套件僅下載並解壓至 /tmp，未修改系統。
 `npm run test:spec-coverage -- --links` 的 18 個必需環境結果全數通過；使用前輪完整 E2E 報告驗證既有產品覆蓋，135 個必需環境結果全數通過。
 
 `PLAYWRIGHT_BROWSERS_PATH=/tmp/p-note-browsers E2E_PORT_OFFSET=400 npm run test:build` 通過兩個真實 dist／HTTPS Worker 案例，包含登入、wss 保存、離線刷新與分析 POST。最後型別、正式設定、文件契約與 `git diff --check` 全部通過。
+
+## 規格同步與封存
+
+依遠端最新 AGENTS.md 的先封存再合併規則，將六個情境合入 [note-links 主規格](../../openspec/specs/note-links/spec.md)，全部開發任務完成後封存至 [2026-10-14-note-links](../../openspec/changes/archive/2026-10-14-note-links/tasks.md)。新主規格補上用途描述；12 份主規格嚴格驗證與 111 個唯一情境契約通過，進行中 changes 為空。封存結果與功能一併納入 PR，Actions 發布結果於合併後補記。
