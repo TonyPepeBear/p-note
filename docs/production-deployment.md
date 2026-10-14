@@ -57,3 +57,9 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 依使用者部署指示發布程式提交 `e82c35b`（[可用性修正](ux-polish.md)，本機完整回歸 213 個通過），正式 Worker 版本為 `0aec1a7b-b791-4f0f-8385-f2e1126e0203`，見 [部署紀錄](tdd/ux-production-deploy.log)。沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；發布前 [雲端設定](tdd/ux-release-cloud.log)、[建置](tdd/ux-release-build.log) 與 [預檢](tdd/ux-release-dry-run.log) 通過。
 
 [正式驗證結果](tdd/ux-production-results.json)與 [執行紀錄](tdd/ux-production-smoke.log)：DEPLOY-02（HTTPS、新版建置資源、私人 API、測試入口封鎖）與新版登入畫面無溢出通過，[正式登入截圖](screenshots/ui/production-login-ux.png)。DEPLOY-03／04 未完成：本次可用的 Gmail 連接器不是擁有者信箱，無法讀取實際登入郵件，腳本在三分鐘後判定未取得郵件；登入、雙向 wss 保存與全新 context 載入尚待以擁有者信箱重跑 `npm run test:production -- --ui`。上一版的正式證據保留於 `ui-production-*`，未被本次結果覆蓋。
+
+## 站內換頁與本機優先開啟發布：2026-10-14
+
+依使用者部署指示發布程式提交 `752076e`（[站內換頁](spa-navigation.md)、[本機優先開啟](local-first-open.md)，本機完整回歸 234 個通過），正式 Worker 版本為 `8b781f4f-8c25-44fc-8b4d-18cc1d2e4c0a`，見 [部署紀錄](tdd/spa-production-deploy.log)。沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；發布前 [雲端設定](tdd/spa-release-cloud.log)、[建置](tdd/spa-release-build.log) 與 [預檢](tdd/spa-release-dry-run.log) 通過。
+
+發布後確認正式入口提供的 module script 與本機建置相同（[`index-DncQOMWj.js`](tdd/spa-production-entry.log)）。依使用者指示，本次不執行正式登入、寄信與同步驗證，驗收以本機完整回歸為準。
