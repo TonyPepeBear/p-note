@@ -1,6 +1,6 @@
 # 本機優先開啟
 
-已下載的頁面不再等待雲端同步即可編輯。規格與任務見 [OpenSpec change](../openspec/changes/local-first-open/proposal.md)。
+已下載的頁面不再等待雲端同步即可編輯。規格與任務見 [OpenSpec change](../openspec/changes/archive/2026-10-14-local-first-open/proposal.md)。
 
 ## 行為
 

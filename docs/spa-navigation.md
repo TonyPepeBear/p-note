@@ -1,6 +1,6 @@
 # 站內換頁
 
-站內切換頁面改以 History API 進行，不再整頁重新載入。規格與任務見 [OpenSpec change](../openspec/changes/spa-navigation/proposal.md)。
+站內切換頁面改以 History API 進行，不再整頁重新載入。規格與任務見 [OpenSpec change](../openspec/changes/archive/2026-10-14-spa-navigation/proposal.md)。
 
 ## 行為
 
