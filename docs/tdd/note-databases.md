@@ -29,3 +29,7 @@ change：notion-like-note-databases。規格提交 2e1d9dd，更新設計與前�
 ## 正式發布
 
 [正式遷移](db-production-migrations.log)與[預檢](db-production-dry-run.log)成功，[發布版本](db-production-deploy.log)為 362deed1-59fd-42c8-8942-eb371297ada4。[正式 API 與瀏覽器驗證](db-production-results.json)全部通過，含版本一致、建立／欄位值、清單篩選、完整正文及全新 context 讀取；測試資料庫已移入垃圾桶、臨時 session 已刪除。此輪使用短期管理 session，未重新驗證實際寄信。
+
+## 規格同步與封存
+
+已新增 [note-databases 主規格](../../openspec/specs/note-databases/spec.md)五個需求，並將資料庫完整備份需求合入 backup-restore，保留所有既有備份情境。OpenSpec 主規格嚴格驗證 11 個全數通過；八項任務完成後將 change 封存至 [2026-10-14-notion-like-note-databases](../../openspec/changes/archive/2026-10-14-notion-like-note-databases/tasks.md)，保留 .openspec.yaml。封存後 openspec list --json 的 changes 為空。
