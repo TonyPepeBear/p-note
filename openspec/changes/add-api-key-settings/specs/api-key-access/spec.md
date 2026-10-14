@@ -40,7 +40,7 @@
 
 - **WHEN** 使用者經 API 讀取後帶有效 ETag 更新 JSON 正文
 - **THEN** 重啟後仍可讀到相同正文，網站顯示更新，搜尋可找回文字
-- **自動化驗證**: `KEY-04`；Workers＋Playwright：JSON 多型區塊往返、服務重啟、即時網站可見與網站修改後 API 讀取。
+- **自動化驗證**: `KEY-04`；Workers＋Playwright：斷言 JSON 多型區塊往返、服務重啟、即時網站可見與網站修改後 API 讀取。
 
 #### Scenario: 過時或失敗更新
 
