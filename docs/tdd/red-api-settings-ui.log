@@ -1,0 +1,60 @@
+[WebServer] (node:24894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:24913) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+
+Running 2 tests using 1 worker
+
+(node:24973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (20.1s)
+(node:25153) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (2.0s)
+
+
+  1) [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 ──────────
+
+    Test timeout of 20000ms exceeded.
+
+    Error: locator.click: Test timeout of 20000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '設定', exact: true })
+
+
+       5 | test('KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷', async ({ page }) => {
+       6 |   await page.addInitScript(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (text: string) => { (window as unknown as { copied: string }).copied = text; } } }); });
+    >  7 |   await openPrivate(page); await showNavigation(page); await page.getByRole('button', { name: '設定', exact: true }).click();
+         |                                                                                                                    ^
+       8 |   await expect(page.getByRole('heading', { name: '設定', exact: true })).toBeVisible();
+       9 |   await page.getByLabel('API key 名稱').fill('我的自動化'); await page.getByRole('button', { name: '建立 API key', exact: true }).click();
+      10 |   const card = page.getByTestId('api-key-card'); await expect(card).toHaveCount(1);
+        at /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note/tests/e2e/api-keys.spec.ts:7:116
+
+    Error Context: test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/api-keys-KEY-01-KEY-02：設定頁建立、再次顯示、複製及撤銷-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 ───────────
+  1 passed (28.1s)

@@ -22,7 +22,8 @@
       "OWNER_EMAIL",
       "BETTER_AUTH_URL",
       "BETTER_AUTH_SECRET",
-      "SENDER_EMAIL"
+      "SENDER_EMAIL",
+      "API_KEY_ENCRYPTION_SECRET"
     ]
   },
   "send_email": [

@@ -1,5 +1,6 @@
 import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRestoreCoordinator } from '../src/worker/app';
 import probe from '../src/worker/index';
+import keysMigration from '../migrations/0005_api_keys.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
@@ -42,7 +43,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');

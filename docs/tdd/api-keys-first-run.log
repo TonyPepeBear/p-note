@@ -1,0 +1,40 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/api-keys.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note
+
+ ❯ tests/workers/api-keys.test.ts (3 tests | 1 failed) 599ms
+   ✓ KEY-01：具名 key 加密保存且可再次顯示，列表無明文並禁止快取 198ms
+   ✓ KEY-02：只有本人的 cookie 可管理 key，撤銷不影響另一把 192ms
+   × KEY-03：Bearer 內容操作、帳號與垃圾桶隔離及明確 allowlist 208ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/api-keys.test.ts > KEY-03：Bearer 內容操作、帳號與垃圾桶隔離及明確 allowlist
+Error: D1_ERROR: FOREIGN KEY constraint failed: SQLITE_CONSTRAINT (extended: SQLITE_CONSTRAINT_FOREIGNKEY)
+ ❯ D1DatabaseSessionAlwaysPrimary._sendOrThrow cloudflare-internal:d1-api:188:19
+ ❯ cloudflare-internal:d1-api:478:19
+ ❯ tests/workers/api-keys.test.ts:54:3
+     52|   expect((await external(k.key, `/api/v1/pages/${page.id}`)).status).t…
+     53|   expect((await external(k.key, '/api/v1/pages')).status).toBe(200);
+     54|   await env.DB.prepare('UPDATE pages SET owner_id = ? WHERE id = ?').b…
+       |   ^
+     55|   expect((await external(k.key, `/api/v1/pages/${page.id}`)).status).t…
+     56| });
+
+Caused by: Error: FOREIGN KEY constraint failed: SQLITE_CONSTRAINT (extended: SQLITE_CONSTRAINT_FOREIGNKEY)
+ ❯ D1DatabaseSessionAlwaysPrimary._sendOrThrow cloudflare-internal:d1-api:189:24
+ ❯ cloudflare-internal:d1-api:478:19
+ ❯ tests/workers/api-keys.test.ts:54:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  15:24:11
+   Duration  3.45s (transform 960ms, setup 0ms, import 2.21s, tests 599ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note/reports/integration.json

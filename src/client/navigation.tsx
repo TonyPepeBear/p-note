@@ -42,6 +42,7 @@ import {
   IconShieldCheck,
   IconTrash,
   IconCloud,
+  IconSettings,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
@@ -53,12 +54,14 @@ export function Navigation({
   changed,
   error,
   backups,
+  settings,
   children,
 }: {
   page: PageInfo;
   changed: (page: PageInfo) => void;
   error: (message: string) => void;
   backups: () => void;
+  settings: () => void;
   children: ReactNode;
 }) {
   const [pages, setPages] = useState<PageRow[]>([]);
@@ -318,6 +321,7 @@ export function Navigation({
         </nav>
       </ScrollArea>
       <div className="sidebar-footer">
+        <NavLink component="button" label="設定" leftSection={<IconSettings size={18} />} onClick={settings} />
         <NavLink
           component="button"
           label="垃圾桶"

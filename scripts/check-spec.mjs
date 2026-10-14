@@ -27,17 +27,18 @@ for (const file of files) {
     const found = Array.from(text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g));
     assert.equal(found.length, Array.from(text.matchAll(/^#### Scenario:/gm)).length, `${file}: 情境缺驗證方法`);
     for (const [, id, method] of found) {
-      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX)-\d{2}$/.test(id), id);
+      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY)-\d{2}$/.test(id), id);
       assert(method.includes('斷言') || method.includes('檢查'), `${id}: 缺機器斷言`);
       ids.push(id);
     }
   }
 }
-assert.equal(ids.filter(id => !/^(DEPLOY|UI|UX)-/.test(id)).length, 47);
+assert.equal(ids.filter(id => !/^(DEPLOY|UI|UX|KEY)-/.test(id)).length, 47);
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
 assert.deepEqual(ids.filter(id => id.startsWith('UI-')).sort(), ['UI-01', 'UI-02', 'UI-03', 'UI-04', 'UI-05', 'UI-06']);
 assert.deepEqual(ids.filter(id => id.startsWith('UX-')).sort(), Array.from({ length: 20 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
-assert.equal(new Set(ids).size, 77);
+assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({length: 6}, (_, i) => `KEY-0${i + 1}`));
+assert.equal(new Set(ids).size, 83);
 const scope = await readFile('docs/v1-scope.md', 'utf8');
 for (const value of ['固定到期', '30×24 小時', '伺服器可讀內容', '已下載內文可離線', '10 分鐘', '60 秒', '最多 5 次', '最多 20 次', '10 MiB', '03:00', '0 19 * * *', '90×24 小時', 'Asia/Taipei', 'ZIP']) assert(scope.includes(value), `缺決策 ${value}`);
 const contracts = {
@@ -54,7 +55,7 @@ for (const [name, values] of Object.entries(contracts)) {
 }
 console.log(JSON.stringify({ 文件: files.length, 本地連結: links, 唯一情境: ids.length, 決策契約: '通過' }));
 const appConfig = JSON.parse(await readFile('wrangler.app.jsonc', 'utf8'));
-assert.deepEqual(appConfig.secrets.required, ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET', 'SENDER_EMAIL']);
+assert.deepEqual(appConfig.secrets.required, ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET', 'SENDER_EMAIL', 'API_KEY_ENCRYPTION_SECRET']);
 assert.deepEqual(appConfig.send_email, [{ name: 'EMAIL' }]);
 assert.deepEqual(appConfig.triggers.crons, ['0 19 * * *']);
 assert(!appConfig.vars, '應用設定不得提交私有值');

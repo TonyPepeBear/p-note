@@ -1,3 +1,4 @@
+import { ApiKeySettings } from './api-key-settings';
 import {
   MantineProvider,
   Alert,
@@ -38,6 +39,7 @@ function App() {
   const [error, setError] = useState("");
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
+  const [apiSettings, setApiSettings] = useState(false);
   const [fresh] = useState(
     () => new URLSearchParams(location.search).get("new") === "1",
   );
@@ -420,6 +422,7 @@ function App() {
       )}
     </>
   );
+  if (apiSettings) return <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />;
   if (settings)
     return (
       <BackupSettings
@@ -436,6 +439,7 @@ function App() {
         page={(page ?? recovery)!}
         changed={setPage}
         error={setError}
+        settings={() => { void saveDraft().then(() => setApiSettings(true)).catch(() => setError("本機儲存失敗，請重試")); }}
         backups={() => {
           void saveDraft()
             .then(() => setSettings(true))

@@ -1,0 +1,35 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/content-api.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note
+
+ ❯ tests/workers/content-api.test.ts (5 tests | 1 failed) 2630ms
+   ✓ KEY-04：JSON 區塊往返、重啟與中文搜尋保留格式  363ms
+   ✓ KEY-05：缺少／過時版本與競爭更新不覆蓋正文 200ms
+   ✓ KEY-05：無效內容、超限、跨帳號圖片與儲存故障保留原文 298ms
+   ✓ KEY-06：備份不包含 key，還原不復活已撤銷憑證 167ms
+   × KEY-05：API 大量更新後自動整理持久紀錄 1600ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/content-api.test.ts > KEY-05：API 大量更新後自動整理持久紀錄
+AssertionError: expected 65 to be less than 64
+ ❯ tests/workers/content-api.test.ts:54:19
+     52|   const { runInDurableObject } = await import('cloudflare:test');
+     53|   const pending = await runInDurableObject(env.SYNC.getByName(a.page.r…
+     54|   expect(pending).toBeLessThan(64);
+       |                   ^
+     55|   await abortAllDurableObjects(); expect(JSON.stringify(await (await a…
+     56| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  15:32:02
+   Duration  12.92s (transform 4.14s, setup 0ms, import 9.00s, tests 2.63s, environment 0ms)
+
+JSON report written to /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note/reports/integration.json

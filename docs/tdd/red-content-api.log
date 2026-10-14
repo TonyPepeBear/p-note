@@ -1,0 +1,81 @@
+
+> p-note@0.0.0 test:integration
+> vitest run --config vitest.workers.config.ts tests/workers/content-api.test.ts
+
+
+ RUN  v4.1.11 /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note
+
+ ❯ tests/workers/content-api.test.ts (4 tests | 4 failed) 397ms
+   × KEY-04：JSON 區塊往返、重啟與中文搜尋保留格式 155ms
+   × KEY-05：缺少／過時版本與競爭更新不覆蓋正文 73ms
+   × KEY-05：無效內容、超限、跨帳號圖片與儲存故障保留原文 75ms
+   × KEY-06：備份不包含 key，還原不復活已撤銷憑證 93ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workers/content-api.test.ts > KEY-04：JSON 區塊往返、重啟與中文搜尋保留格式
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/workers/content-api.test.ts:16:81
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/workers/content-api.test.ts > KEY-05：缺少／過時版本與競爭更新不覆蓋正文
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/workers/content-api.test.ts:24:81
+     22| });
+     23| it('KEY-05：缺少／過時版本與競爭更新不覆蓋正文', async () => {
+     24|   const a = await setup(); const get = await a.send(a.path); expect(ge…
+       |                                                                                 ^
+     25|   expect((await a.send(a.path, 'PUT', { blocks })).status).toBe(428);
+     26|   expect((await a.send(a.path, 'PUT', { blocks }, '"old"')).status).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/workers/content-api.test.ts > KEY-05：無效內容、超限、跨帳號圖片與儲存故障保留原文
+AssertionError: expected 403 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 403
+
+ ❯ tests/workers/content-api.test.ts:31:81
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/workers/content-api.test.ts > KEY-06：備份不包含 key，還原不復活已撤銷憑證
+TypeError: manifest.files is not iterable
+ ❯ tests/workers/content-api.test.ts:44:31
+     42|   const manifest = await readManifest(env, a.page.owner_id, backup.id,…
+     43|   const serialized = JSON.stringify(manifest); expect(serialized).not.…
+     44|   for (const file of manifest.files) { const object = await env.BACKUP…
+       |                               ^
+     45|   await a.auth.post(`/api/keys/${a.k.id}/revoke`, {});
+     46|   expect((await a.auth.post(`/api/backups/${backup.id}/restore`, {})).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  15:24:52
+   Duration  4.71s (transform 1.68s, setup 0ms, import 3.61s, tests 397ms, environment 0ms)
+
+JSON report written to /Users/tony.cheng/.codex/worktrees/api-key-settings/p-note/reports/integration.json

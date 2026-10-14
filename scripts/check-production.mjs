@@ -18,7 +18,7 @@ assert(!config.d1_databases[0].database_id.startsWith('00000000'));
 assert.deepEqual(config.r2_buckets.map(bucket => [bucket.binding, bucket.bucket_name]), [
   ['ASSETS', 'p-note-production-assets'], ['BACKUPS', 'p-note-production-backups'],
 ]);
-assert.deepEqual(config.secrets.required.toSorted(), ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET', 'SENDER_EMAIL'].toSorted());
+assert.deepEqual(config.secrets.required.toSorted(), ['OWNER_EMAIL', 'BETTER_AUTH_URL', 'BETTER_AUTH_SECRET', 'SENDER_EMAIL', 'API_KEY_ENCRYPTION_SECRET'].toSorted());
 assert.deepEqual(config.triggers.crons, ['0 19 * * *']);
 const local = JSON.parse(readFileSync('wrangler.app.jsonc', 'utf8'));
 assert.deepEqual(config.durable_objects, local.durable_objects);

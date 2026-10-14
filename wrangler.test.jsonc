@@ -5,7 +5,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "preview_urls": false,
-  "vars": { "OWNER_EMAIL": "owner@example.test", "BETTER_AUTH_URL": "http://127.0.0.1:5173", "BETTER_AUTH_SECRET": "test-only-secret-with-at-least-32-characters", "SENDER_EMAIL": "noreply@example.test" },
+  "vars": { "OWNER_EMAIL": "owner@example.test", "BETTER_AUTH_URL": "http://127.0.0.1:5173", "BETTER_AUTH_SECRET": "test-only-secret-with-at-least-32-characters", "SENDER_EMAIL": "noreply@example.test", "API_KEY_ENCRYPTION_SECRET": "abababababababababababababababababababababababababababababababab" },
   "send_email": [{ "name": "EMAIL" }],
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "ProbeRoom" }, { "name": "SYNC", "class_name": "SyncRoom" }, { "name": "RESTORES", "class_name": "RestoreCoordinator" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ProbeRoom", "SyncRoom"] }, { "tag": "v2", "new_sqlite_classes": ["RestoreCoordinator"] }],

@@ -107,7 +107,7 @@ export class ProbeRoom extends YServer<Env> {
     return new Response('Not found', { status: 404 });
   }
 
-  private async compact(): Promise<void> {
+  protected async compact(): Promise<void> {
     const doc = await this.onLoad(); let snapshot: Uint8Array;
     try { snapshot = Y.encodeStateAsUpdate(doc); } finally { doc.destroy(); }
     const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;

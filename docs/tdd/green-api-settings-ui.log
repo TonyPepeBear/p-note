@@ -1,0 +1,35 @@
+[WebServer] (node:25380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:25393) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ▲ [WARNING] The JSX import source cannot be set without also enabling React's "automatic" JSX transform [unsupported-jsx-comment]
+[WebServer] 
+[WebServer]     node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[WebServer]       4 │ /** @jsxImportSource @tiptap/core */
+[WebServer]         ╵                      ~~~~~~~~~~~~
+[WebServer] 
+[WebServer]   You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+[WebServer] 
+[WebServer] 
+
+Running 6 tests using 1 worker
+
+(node:25421) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-desktop] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (1.8s)
+  ✓  2 [chromium-desktop] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (1.4s)
+(node:25460) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [chromium-mobile] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (2.3s)
+  ✓  4 [chromium-mobile] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (1.4s)
+(node:25484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [webkit-mobile] › tests/e2e/api-keys.spec.ts:5:1 › KEY-01 KEY-02：設定頁建立、再次顯示、複製及撤銷 (4.3s)
+  ✓  6 [webkit-mobile] › tests/e2e/api-keys.spec.ts:26:1 › KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效 (2.0s)
+
+  6 passed (18.3s)

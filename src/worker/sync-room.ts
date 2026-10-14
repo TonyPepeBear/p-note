@@ -1,3 +1,5 @@
+import { apiKeyOwner, keyHash } from './api-keys';
+import { blockEditor, validatedBlocks, replaceBlocks, readBlocks } from './block-json';
 import type { Connection, ConnectionContext } from 'partyserver';
 import { ProbeRoom } from './index';
 import { VISIBLE } from './pages';
@@ -87,6 +89,52 @@ export class SyncRoom extends ProbeRoom {
     await this.setName(this.ctx.id.name!);
     const work = this.permissionTail.then(() => this.index(scope));
     this.permissionTail = work.catch(() => {}); return work;
+  }
+
+  async content(scope: Scope, hash: string, input?: { blocks: unknown; etag: string }): Promise<{ status: number; message?: string; blocks?: ReturnType<typeof readBlocks>; etag?: string }> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(async () => {
+      try {
+        const key = await apiKeyOwner(this.env, hash);
+        if (!key || key.owner_id !== scope.owner) return { status: 401, message: 'API key 無效或已撤銷' };
+        if (this.paused || await roomName(scope.owner, scope.page, scope.generation) !== this.name) return { status: 409, message: '頁面狀態已改變' };
+        const allowed = await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND sync_generation = ?
+          AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
+          AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(scope.owner, scope.page, scope.generation, scope.owner, scope.owner).first();
+        if (!allowed) return { status: 409, message: '頁面狀態已改變' };
+        const doc = await this.onLoad();
+        try {
+          const editor = blockEditor();
+          const before = Y.encodeStateAsUpdate(doc);
+          const etag = '"' + scope.generation + ':' + await keyHash(Array.from(before).join(',')) + '"';
+          if (!input) return { status: 200, blocks: readBlocks(doc, editor), etag };
+          if (input.etag !== etag) return { status: 412, message: '正文已更新，請重新讀取後再修改' };
+          const blocks = await validatedBlocks(input.blocks, this.env, scope.owner, editor);
+          const vector = Y.encodeStateVector(doc);
+          replaceBlocks(doc, blocks, editor);
+          const output = readBlocks(doc, editor);
+          const update = Y.encodeStateAsUpdate(doc, vector);
+          if (update.length > 512 * 1024) return { status: 400, message: '正文更新超過大小限制' };
+          await this.prune();
+          if (!await apiKeyOwner(this.env, hash)) return { status: 401, message: 'API key 已撤銷' };
+          const modified = await this.now();
+          this.ctx.storage.transactionSync(() => {
+            this.ctx.storage.sql.exec('INSERT INTO updates (payload) VALUES (?)', update);
+            this.ctx.storage.sql.exec('INSERT INTO document_metadata VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET modified_at = MAX(modified_at, excluded.modified_at)', modified);
+          });
+          await this.ctx.storage.sync();
+          Y.applyUpdate(this.document, update);
+          await this.ctx.storage.put('scope', scope);
+          await this.index(scope).catch(() => {});
+          try {
+            const pending = this.ctx.storage.sql.exec<{ count: number; bytes: number }>('SELECT count(*) AS count, COALESCE(SUM(length(payload)), 0) AS bytes FROM updates').one();
+            if (pending.count >= 64 || pending.bytes >= 2 * 1024 * 1024) await this.compact();
+          } catch { /* 整理失敗保留已保存的紀錄，下一次更新重試。 */ }
+          return { status: 200, blocks: output, etag: '"' + scope.generation + ':' + await keyHash(Array.from(Y.encodeStateAsUpdate(doc)).join(',')) + '"' };
+        } finally { doc.destroy(); }
+      } catch (failure) { return { status: failure instanceof Error && 'status' in failure && failure.status === 400 ? 400 : 503, message: '正文未能處理，請檢查格式或稍後重試' }; }
+    });
+    this.permissionTail = work.then(() => {}, () => {}); return work;
   }
 
   async capture(scope: Scope): Promise<{ data: Uint8Array; checkpoint: number; generation: string; capturedAt: number }> {

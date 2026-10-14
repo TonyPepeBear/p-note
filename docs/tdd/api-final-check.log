@@ -1,0 +1,15 @@
+
+> p-note@0.0.0 check
+> tsc --noEmit && tsc --noEmit -p tests/tsconfig.json
+
+
+> p-note@0.0.0 check:spec
+> node scripts/check-spec.mjs
+
+{"文件":58,"本地連結":378,"唯一情境":83,"決策契約":"通過"}
+登入設定來源與本機測試隔離契約：通過
+
+> p-note@0.0.0 check:production
+> node scripts/check-production.mjs
+
+DEPLOY-01：正式設定、資源隔離、網域與密鑰未追蹤斷言通過

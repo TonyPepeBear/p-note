@@ -60,3 +60,5 @@ npm run dev
 - [工作區可用性修正與驗收](docs/ux-polish.md)
 - [OpenSpec 任務](openspec/changes/archive/2026-10-14-personal-notes-v1/tasks.md)
 - [技術驗證結果與 TDD 證據](docs/tdd/README.md)
+
+- [個人 API key 與 JSON 內容介面](docs/api.md)

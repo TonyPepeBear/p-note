@@ -1,0 +1,10 @@
+
+> p-note@0.0.0 test:spec-coverage
+> node scripts/spec-coverage.mjs
+
+{
+  "範圍": "完整產品",
+  "必需結果": 129,
+  "已通過": 129,
+  "未通過": []
+}

@@ -1,3 +1,5 @@
+import { handleKeys } from './api-keys';
+import { handleContentApi } from './content-api';
 import { routePartykitRequest } from 'partyserver';
 import { ProbeRoom } from './index';
 import { SyncRoom } from './sync-room';
@@ -27,6 +29,11 @@ export async function handle(request: Request, env: Env, services: Services = { 
   if (!path.startsWith('/api/') && !path.startsWith('/parties/sync/')) return new Response('Not found', { status: 404 });
   if (path.startsWith('/api/auth/')) return new Response('Not found', { status: 404 });
   if (!configured(env)) return error('登入設定不完整', 503);
+  if (path.startsWith('/api/v1/')) {
+    try { return await handleContentApi(request, env, services.now()); }
+    catch (failure) { return error(failure instanceof PageError ? failure.message : '服務暫時無法完成，請稍後重試', failure instanceof PageError ? failure.status : 503); }
+  }
+  if (request.headers.has('Authorization')) return error('此入口僅限網站登入', 401);
   const origin = request.headers.get('Origin');
   if ((origin && origin !== env.BETTER_AUTH_URL) || (request.method !== 'GET' && origin !== env.BETTER_AUTH_URL)
     || request.headers.get('Sec-Fetch-Site') === 'cross-site') return error('來源不允許', 403);
@@ -73,6 +80,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
       response.headers.set('Cache-Control', 'no-store');
       return response;
     }
+    const keysResponse = await handleKeys(request, env, session.user.id, services.now());
+    if (keysResponse) return keysResponse;
     if (!path.startsWith('/api/backups') && await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(session.user.id).first()) return error('還原處理中，請重試原備份', 503);
     const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
