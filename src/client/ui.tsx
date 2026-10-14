@@ -1,95 +1,59 @@
-import {
-  createTheme,
-  defaultVariantColorsResolver,
-  darken,
-  parseThemeColor,
-  Group,
-  Text,
-  ThemeIcon,
-  type CSSVariablesResolver,
-} from "@mantine/core";
+import { createTheme, defaultVariantColorsResolver, darken, parseThemeColor, Group, Text, type CSSVariablesResolver } from "@mantine/core";
 import { IconNotebook } from "@tabler/icons-react";
 
-export const interactionColors = {
-  hover: "#edf1eb",
-  text: "#243532",
-  selected: "#dce9df",
-  selectedHover: "#cdddce",
-};
+const fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", Helvetica, Arial, sans-serif';
 
 export const theme = createTheme({
-  primaryColor: "teal",
-  primaryShade: 8,
-  defaultRadius: "md",
-  // dark 色盤的 light-hover 是中灰，淺色介面的中性操作改用共用淺底。
+  primaryColor: "blue",
+  primaryShade: 7,
+  defaultRadius: "sm",
+  fontFamily,
   variantColorResolver: (input) => {
     const defaults = defaultVariantColorsResolver(input);
     const parsed = parseThemeColor({ color: input.color ?? input.theme.primaryColor, theme: input.theme });
-    // 最深色階不能退回較淺一階，否則白字在 hover 後會失去對比。
     if (input.variant === "filled" && parsed.isThemeColor && parsed.shade === 9) {
       return { ...defaults, hover: darken(input.theme.colors[parsed.color][9], 0.1) };
     }
     if (["gray", "dark"].includes(input.color ?? "") && ["subtle", "light"].includes(input.variant)) {
-      return {
-        ...defaults,
-        hover: "var(--p-note-hover-bg)",
-        color: "var(--p-note-interactive-text)",
-      };
+      return { ...defaults, hover: "#efefed", color: "#57564f" };
     }
     return defaults;
   },
+  fontSizes: { xs: "12px", sm: "13px", md: "14px", lg: "16px", xl: "18px" },
+  radius: { xs: "3px", sm: "4px", md: "6px", lg: "8px", xl: "10px" },
+  headings: { fontFamily, fontWeight: "650" },
   colors: {
-    // 最深橘色用於覆蓋還原，確保一般狀態的白字也達到 4.5:1。
     orange: ["#fff4e6", "#ffe8cc", "#ffd8a8", "#ffc078", "#ffa94d", "#ff922b", "#fd7e14", "#f76707", "#e8590c", "#c9400d"],
-    teal: [
-      "#eff6f1",
-      "#dcece2",
-      "#bddccc",
-      "#98c6b0",
-      "#70ae93",
-      "#499377",
-      "#2b7b62",
-      "#20694f",
-      "#185b43",
-      "#104735",
-    ],
-  },
-  fontFamily: 'Inter, "Noto Sans TC", system-ui, sans-serif',
-  headings: {
-    fontFamily: 'Inter, "Noto Sans TC", system-ui, sans-serif',
-    fontWeight: "650",
+    gray: ["#f7f7f5", "#f1f1ef", "#e9e9e7", "#d9d9d6", "#b6b5b2", "#92918d", "#6f6e69", "#57564f", "#37352f", "#25241f"],
+    blue: ["#f0f7fe", "#e5f1fc", "#cce4f9", "#a6d0f3", "#72b4eb", "#4397e2", "#2383e2", "#176dc1", "#135a9e", "#104b83"],
   },
   components: {
-    Button: { defaultProps: { size: "sm", h: 44, fw: 600 } },
-    ActionIcon: { defaultProps: { size: 44, variant: "subtle" } },
-    TextInput: { defaultProps: { size: "md", withAsterisk: false } },
-    NativeSelect: { defaultProps: { size: "md" } },
-    Modal: {
-      defaultProps: {
-        radius: "lg",
-        padding: "xl",
-        overlayProps: { backgroundOpacity: 0.35, blur: 3 },
-      },
-    },
-    Drawer: {
-      defaultProps: {
-        padding: "lg",
-        overlayProps: { backgroundOpacity: 0.35, blur: 3 },
-      },
-    },
+    Button: { defaultProps: { size: "sm", fw: 500 } },
+    ActionIcon: { defaultProps: { size: 32, variant: "subtle", color: "gray" } },
+    TextInput: { defaultProps: { size: "sm", withAsterisk: false } },
+    NativeSelect: { defaultProps: { size: "sm" } },
+    Select: { defaultProps: { size: "sm" } },
+    MultiSelect: { defaultProps: { size: "sm" } },
+    Checkbox: { defaultProps: { size: "sm" } },
+    Modal: { defaultProps: { radius: "lg", padding: "lg", overlayProps: { backgroundOpacity: 0.25 }, transitionProps: { duration: 120 }, closeButtonProps: { "aria-label": "關閉對話框" } } },
+    Drawer: { defaultProps: { padding: "sm", overlayProps: { backgroundOpacity: 0.25 }, transitionProps: { duration: 120 } } },
+    Tooltip: { defaultProps: { openDelay: 400, withArrow: false } },
+    Alert: { defaultProps: { radius: "sm" } },
   },
 });
 
-// Mantine 預設 dimmed（gray.6）在淺底小字只有約 3.3:1，未達 WCAG AA。
 export const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {
-    "--mantine-color-dimmed": "#5c6862",
-    "--p-note-hover-bg": interactionColors.hover,
-    "--p-note-interactive-text": interactionColors.text,
-    "--p-note-selected-bg": interactionColors.selected,
-    "--p-note-selected-hover-bg": interactionColors.selectedHover,
-    "--mantine-color-default-hover": interactionColors.hover,
+    "--mantine-color-text": "#37352f",
+    "--mantine-color-body": "#ffffff",
+    "--mantine-color-dimmed": "#6f6e69",
+    "--mantine-color-default-border": "#e9e9e7",
+    "--p-note-hover-bg": "#efefed",
+    "--p-note-interactive-text": "#37352f",
+    "--p-note-selected-bg": "#e9e9e7",
+    "--p-note-selected-hover-bg": "#dededb",
+    "--mantine-color-default-hover": "#efefed",
     "--mantine-color-red-light": "var(--mantine-color-red-0)",
     "--mantine-color-red-light-hover": "var(--mantine-color-red-1)",
   },
@@ -98,13 +62,9 @@ export const resolver: CSSVariablesResolver = () => ({
 
 export function Brand() {
   return (
-    <Group gap={10} wrap="nowrap">
-      <ThemeIcon size={36} radius={12} color="teal.8">
-        <IconNotebook size={22} stroke={1.8} />
-      </ThemeIcon>
-      <Text fw={750} size="xl" c="dark.8" style={{ letterSpacing: "-0.7px" }}>
-        p-note
-      </Text>
+    <Group gap={8} wrap="nowrap" className="workspace-brand">
+      <span className="brand-mark"><IconNotebook size={20} stroke={1.7} /></span>
+      <Text fw={650} size="md" style={{ letterSpacing: "-0.3px" }}>p-note</Text>
     </Group>
   );
 }

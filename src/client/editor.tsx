@@ -1,20 +1,21 @@
 import {
   Alert,
-  Badge,
+  ActionIcon,
   Button,
   Group,
   Menu,
   Modal,
-  Paper,
   Stack,
   Text,
   FileInput,
   Title,
+  Tooltip,
   VisuallyHidden,
 } from "@mantine/core";
 import {
   IconArrowDown,
   IconArrowUp,
+  IconBook2,
   IconCloudCheck,
   IconCloudOff,
   IconCloudUpload,
@@ -25,9 +26,9 @@ import {
   IconPlus,
   IconRefresh,
   IconTrash,
-  IconChevronDown,
+  IconDots,
 } from "@tabler/icons-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
@@ -41,10 +42,11 @@ import { isCurrentReceipt } from "../shared/receipt";
 import { roomName } from "../shared/room";
 import { IMAGE_TYPES, IMAGE_RULE } from "../shared/image";
 import { uploadImage } from "./assets";
+import { NoteLinkSuggestions, followNoteLink } from "./note-links";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
-import { NoteLinkSuggestions, followNoteLink } from './note-links';
+import "./editor.css";
 
 export type Session = {
   doc: Y.Doc;
@@ -55,7 +57,7 @@ export type Session = {
 };
 
 const cloudStates = {
-  saved: { icon: IconCloudCheck, color: "teal.8" },
+  saved: { icon: IconCloudCheck, color: "dimmed" },
   syncing: { icon: IconCloudUpload, color: "dimmed" },
   offline: { icon: IconCloudOff, color: "orange.9" },
   failed: { icon: IconCloudX, color: "red.8" },
@@ -123,7 +125,7 @@ function DocumentTitle({
   };
   return (
     <>
-      <Title order={1} mt="xs">
+      <Title order={1} className="document-title">
         <textarea
           ref={input}
           className="title-input"
@@ -148,7 +150,7 @@ function DocumentTitle({
         />
       </Title>
       {error && (
-        <Alert color="red" role="alert" mt="xs">
+        <Alert className="editor-error" color="red" role="alert" mt="xs">
           {error}
         </Alert>
       )}
@@ -163,6 +165,7 @@ export function Editor({
   rename,
   focusTitle = false,
   readOnly = false,
+  properties,
   ownerId,
 }: {
   session: Session;
@@ -171,6 +174,7 @@ export function Editor({
   rename?: (title: string) => Promise<void>;
   focusTitle?: boolean;
   readOnly?: boolean;
+  properties?: ReactNode;
   ownerId?: string;
 }) {
   const { doc, cache, provider, room } = session;
@@ -178,7 +182,7 @@ export function Editor({
   const [uploading, setUploading] = useState(false);
   const [imageError, setImageError] = useState("");
   const [copyError, setCopyError] = useState("");
-  const [linkError, setLinkError] = useState('');
+  const [linkError, setLinkError] = useState("");
   const [imageOpen, setImageOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [activeBlock, setActiveBlock] = useState<{
@@ -191,7 +195,7 @@ export function Editor({
       collaboration: {
         fragment: doc.getXmlFragment("body"),
         provider,
-        user: { name: title ? "我" : "本機測試", color: "#0f766e" },
+        user: { name: title ? "我" : "本機測試", color: "#2383e2" },
       },
       ...(title
         ? {
@@ -489,92 +493,102 @@ export function Editor({
   return (
     <section className="editor-document">
       <div className="document-heading">
+        <div className="document-kind">
+          {kind === "journal" ? <IconBook2 size={18} /> : <IconFileText size={18} />}
+          <span>{kind === "journal" ? "日記" : "筆記"}</span>
+        </div>
         {title === undefined ? (
-          <Title order={1}>p-note 技術驗證</Title>
+          <Title order={1} className="document-title">p-note 技術驗證</Title>
         ) : (
-          <>
-            <Badge
-              variant="light"
-              color={kind === "journal" ? "teal" : "gray"}
-              size="sm"
-            >
-              {kind === "journal" ? "日記" : "筆記"}
-            </Badge>
-            <DocumentTitle
-              title={title}
-              rename={readOnly ? undefined : rename}
-              focus={focusTitle}
-              done={() => {
-                editor.setTextCursorPosition(editor.document[0], "start");
-                editor.focus();
-              }}
-            />
-          </>
+          <DocumentTitle
+            title={title}
+            rename={readOnly ? undefined : rename}
+            focus={focusTitle}
+            done={() => {
+              editor.setTextCursorPosition(editor.document[0], "start");
+              editor.focus();
+            }}
+          />
         )}
       </div>
+      {properties && <div className="document-properties">{properties}</div>}
       {!title && (
-        <Text size="sm">
+        <Text size="sm" c="dimmed" className="editor-prototype-note">
           本機原型：圖片為固定 fixture，正式資產服務尚未接入。
         </Text>
       )}
-      <Group className="save-status" gap="sm" wrap="wrap">
-        <VisuallyHidden data-testid="save-announcer" aria-live="polite">
-          {announced}
-        </VisuallyHidden>
-        <Badge color={readOnly ? "gray" : "teal"} variant="dot">
-          <span data-testid="ready">
+      <div className="editor-utilities">
+        <Group className="save-status" gap={10} wrap="wrap">
+          <VisuallyHidden data-testid="save-announcer" aria-live="polite">
+            {announced}
+          </VisuallyHidden>
+          <span className="editor-ready" data-testid="ready" data-readonly={readOnly}>
             {ready ? (readOnly ? "僅供檢視" : "可編輯") : "載入中"}
           </span>
-        </Badge>
-        <Text size="xs" c="dimmed" data-testid="local-status">
-          {local}
-        </Text>
-        <Group
-          gap={5}
-          className="cloud-indicator"
-          data-state={state}
-          c={cloudStates[state].color}
-        >
-          <CloudIcon size={15} />
-          <Text size="xs" data-testid="cloud-status">
-            {readOnly ? "僅保留在本機" : cloud}
+          <Text size="xs" c="dimmed" data-testid="local-status" className="editor-local-status">
+            {local}
           </Text>
-        </Group>
-        {retry && (
-          <Button
-            variant="subtle"
-            size="compact-sm"
-            h={32}
-            leftSection={<IconRefresh size={14} />}
-            onClick={() => {
-              if (!provider.wsconnected && navigator.onLine)
-                reconnect.current();
-              void window.probe?.flush();
-            }}
+          <Group
+            gap={5}
+            className="cloud-indicator"
+            data-state={state}
+            c={cloudStates[state].color}
+            wrap="nowrap"
           >
-            重試儲存
-          </Button>
-        )}
-      </Group>
-      {!readOnly && (
-        <Group className="editor-toolbar" justify="space-between" wrap="nowrap">
-          <Group gap={6} wrap="nowrap">
+            <CloudIcon size={15} aria-hidden="true" />
+            <Text size="xs" data-testid="cloud-status">
+              {readOnly ? "僅保留在本機" : cloud}
+            </Text>
+          </Group>
+          {retry && (
+            <Button
+              variant="subtle"
+              color="gray"
+              size="compact-sm"
+              className="editor-retry"
+              leftSection={<IconRefresh size={14} />}
+              onClick={() => {
+                if (!provider.wsconnected && navigator.onLine)
+                  reconnect.current();
+                void window.probe?.flush();
+              }}
+            >
+              重試儲存
+            </Button>
+          )}
+        </Group>
+        {!readOnly && (
+          <Group className="editor-toolbar" gap={2} wrap="nowrap" aria-label="編輯工具">
+            <Text size="xs" c="dimmed" className="editor-shortcut">
+              輸入 / 新增區塊
+            </Text>
             {title && (
-              <Button
-                variant="subtle"
-                color="dark"
-                leftSection={<IconPhoto size={18} />}
-                aria-haspopup="dialog"
-                aria-expanded={imageOpen}
-                onClick={() => setImageOpen(true)}
-              >
-                插入圖片
-              </Button>
+              <Tooltip label="插入圖片" withArrow={false}>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  className="editor-tool"
+                  aria-label="插入圖片"
+                  aria-haspopup="dialog"
+                  aria-expanded={imageOpen}
+                  onClick={() => setImageOpen(true)}
+                >
+                  <IconPhoto size={18} />
+                </ActionIcon>
+              </Tooltip>
             )}
             {!title && (
-              <Button variant="subtle" onClick={() => insert("image")}>
-                插入測試圖片
-              </Button>
+              <Tooltip label="插入測試圖片" withArrow={false}>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  className="editor-tool"
+                  aria-label="插入測試圖片"
+                  onClick={() => insert("image")}
+                >
+                  <IconPhoto size={18} />
+                </ActionIcon>
+              </Tooltip>
             )}
             <Menu
               opened={toolsOpen}
@@ -590,38 +604,40 @@ export function Editor({
               }}
               onExitTransitionEnd={() => editor.focus()}
               returnFocus={false}
-              position="bottom-start"
-              width={240}
+              position="bottom-end"
+              width={224}
               // 手機鍵盤彈出時可視高度很小，選單需翻轉並限高捲動，否則項目會落在畫面外。
               middlewares={{ flip: true, shift: true, size: true }}
             >
               <Menu.Target>
-                <Button
+                <ActionIcon
                   variant="subtle"
-                  color="dark"
-                  leftSection={<IconFileText size={17} />}
-                  rightSection={<IconChevronDown size={14} />}
+                  color="gray"
+                  className="editor-tool"
+                  aria-label="區塊操作"
+                  title="區塊操作"
                 >
-                  區塊操作
-                </Button>
+                  <IconDots size={19} />
+                </ActionIcon>
               </Menu.Target>
-              <Menu.Dropdown className="block-menu">
+              <Menu.Dropdown className="editor-block-menu block-menu" aria-label="區塊操作">
+                <Menu.Label>目前區塊</Menu.Label>
                 <Menu.Item
-                  leftSection={<IconPlus size={17} />}
+                  leftSection={<IconPlus size={16} />}
                   onClick={() => insert("paragraph")}
                 >
                   插入段落
                 </Menu.Item>
                 <Menu.Item
                   closeMenuOnClick={false}
-                  leftSection={<IconArrowUp size={17} />}
+                  leftSection={<IconArrowUp size={16} />}
                   onClick={() => editor.moveBlocksUp()}
                 >
                   上移區塊
                 </Menu.Item>
                 <Menu.Item
                   closeMenuOnClick={false}
-                  leftSection={<IconArrowDown size={17} />}
+                  leftSection={<IconArrowDown size={16} />}
                   onClick={() => editor.moveBlocksDown()}
                 >
                   下移區塊
@@ -629,7 +645,7 @@ export function Editor({
                 {title !== undefined && (
                   <>
                     <Menu.Item
-                      leftSection={<IconCode size={17} />}
+                      leftSection={<IconCode size={16} />}
                       disabled={!activeBlock?.code}
                       onClick={() => {
                         void copy();
@@ -647,8 +663,7 @@ export function Editor({
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
-                  style={{ color: "var(--mantine-color-red-9)" }}
-                  leftSection={<IconTrash size={17} />}
+                  leftSection={<IconTrash size={16} />}
                   onClick={() => editor.removeBlocks([currentBlock()])}
                 >
                   刪除區塊
@@ -656,63 +671,71 @@ export function Editor({
               </Menu.Dropdown>
             </Menu>
             {!title && (
-              <Button
-                variant="subtle"
-                onClick={() => {
-                  void copy();
-                }}
-              >
-                複製程式碼
-              </Button>
+              <Tooltip label="複製程式碼" withArrow={false}>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  className="editor-tool"
+                  aria-label="複製程式碼"
+                  onClick={() => {
+                    void copy();
+                  }}
+                >
+                  <IconCode size={18} />
+                </ActionIcon>
+              </Tooltip>
             )}
           </Group>
-          <Text size="xs" c="dimmed" className="editor-shortcut">
-            輸入 / 新增區塊
-          </Text>
-        </Group>
-      )}
+        )}
+      </div>
       {copyError && (
-        <Alert color="red" role="alert" my="md">
+        <Alert className="editor-error" color="red" role="alert" my="sm">
           {copyError}
         </Alert>
       )}
-      {linkError && <Alert color="red" role="alert" my="md">{linkError}</Alert>}
+      {linkError && (
+        <Alert className="editor-error" color="red" role="alert" my="sm">
+          {linkError}
+        </Alert>
+      )}
       {toolsOpen && activeBlock && (
-        <style>{`.writing-surface .bn-block-outer[data-id="${CSS.escape(activeBlock.id)}"] > .bn-block > .bn-block-content { outline: 2px solid var(--mantine-color-teal-3); outline-offset: 2px; border-radius: 6px; }`}</style>
+        <style>{`.editor-document .writing-surface .bn-block-outer[data-id="${CSS.escape(activeBlock.id)}"] > .bn-block > .bn-block-content { outline: 2px solid var(--mantine-color-blue-2); outline-offset: 2px; border-radius: 4px; }`}</style>
       )}
       <div
         className="writing-surface"
         data-active-block={toolsOpen ? activeBlock?.id : undefined}
-        onClickCapture={event => followNoteLink(event, setLinkError)}
+        onClickCapture={(event) => followNoteLink(event, setLinkError)}
       >
-        <BlockNoteView editor={editor} theme="light" editable={!readOnly}>
+        <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly}>
           {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
         </BlockNoteView>
       </div>
       {title && !readOnly && (
         <Modal
+          classNames={{ content: "editor-image-dialog", header: "editor-image-header", body: "editor-image-body" }}
           opened={imageOpen}
           onClose={() => {
             if (!uploading) setImageOpen(false);
           }}
           title="圖片上傳"
+          size="sm"
+          centered
           closeButtonProps={{
             "aria-label": "關閉圖片上傳",
             disabled: uploading,
           }}
         >
-          <Stack gap="lg">
+          <Stack gap="md">
             <Text size="sm" c="dimmed">
-              插入照片或截圖，讓筆記更完整。
+              選擇要加入筆記的照片或截圖。
             </Text>
             <FileInput
               id="image-file"
               label="圖片檔案"
               placeholder="選擇圖片檔案"
               value={image?.file ?? null}
-              size="md"
-              styles={{ input: { minHeight: 44 } }}
-              leftSection={<IconPhoto size={18} />}
+              size="sm"
+              leftSection={<IconPhoto size={17} />}
               fileInputProps={{ "aria-label": "圖片原檔" }}
               accept={IMAGE_TYPES.join(",")}
               disabled={uploading}
@@ -721,26 +744,32 @@ export function Editor({
                 setImageError("");
               }}
             />
-            <Paper p="md" bg="gray.0" radius="md">
-              <Text size="xs" c="dimmed" lh={1.8}>
-                {IMAGE_RULE}，保留原圖不壓縮。
-              </Text>
-            </Paper>
+            <Text size="xs" c="dimmed" lh={1.65}>
+              {IMAGE_RULE}，保留原圖不壓縮。
+            </Text>
             {imageError && (
-              <Alert color="red" role="alert" title="圖片尚未插入">
+              <Alert className="editor-error" color="red" role="alert" title="圖片尚未插入">
                 {imageError}
               </Alert>
             )}
-            <Button
-              disabled={!image || uploading}
-              loading={uploading}
-              leftSection={<IconPhoto size={18} />}
-              onClick={() => {
-                void upload();
-              }}
-            >
-              {uploading ? "圖片上傳中" : imageError ? "重試上傳" : "上傳圖片"}
-            </Button>
+            <Group justify="flex-end" className="editor-image-actions">
+              <Button
+                variant="default"
+                disabled={uploading}
+                onClick={() => setImageOpen(false)}
+              >
+                取消
+              </Button>
+              <Button
+                disabled={!image || uploading}
+                loading={uploading}
+                onClick={() => {
+                  void upload();
+                }}
+              >
+                {uploading ? "圖片上傳中" : imageError ? "重試上傳" : "上傳圖片"}
+              </Button>
+            </Group>
           </Stack>
         </Modal>
       )}

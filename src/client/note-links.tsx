@@ -1,25 +1,33 @@
-import { Alert, Anchor, Button, Group, Paper, Stack, Text, Title } from '@mantine/core';
-import { useCallback, useEffect, useState } from 'react';
+import { Button } from '@mantine/core';
+import { IconBook2, IconChevronDown, IconFileText, IconLink, IconSearch } from '@tabler/icons-react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { SuggestionMenuController, type SuggestionMenuProps } from '@blocknote/react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import type { PageRow } from '../shared/pages';
 import { noteLinkHref, noteLinkId, type Backlink } from '../shared/note-links';
 import { api, navigate, signedOut } from './api';
+import './note-links.css';
 
 type Item = { id?: string; title: string; detail: string; query?: string };
 function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: SuggestionMenuProps<Item>) {
-  return <Paper withBorder shadow="md" p="xs" radius="md" style={{ width: 320, maxWidth: 'calc(100vw - 32px)', maxHeight: 300, overflowY: 'auto' }}>
-    <Text size="xs" c="dimmed" px="xs" mb="xs">連結筆記或日記</Text>
-    <div role="listbox" id="bn-suggestion-menu" aria-label="筆記連結搜尋">
+  return <div className="note-link-menu">
+    <div className="note-link-menu-label">連結筆記或日記</div>
+    <div className="note-link-options" role="listbox" id="bn-suggestion-menu" aria-label="筆記連結搜尋">
       {items.map((item, index) => <button type="button" role="option" id={'bn-suggestion-menu-item-' + index}
         key={item.id ?? 'message'} aria-selected={index === selectedIndex} className="note-link-option"
         onMouseDown={event => event.preventDefault()} onClick={() => onItemClick?.(item)}>
-        <Text component="span" size="sm" fw={500} style={{ display: 'block', overflowWrap: 'anywhere' }}>{item.title}</Text>
-        <Text component="span" size="xs" c="dimmed">{item.detail}</Text>
+        {item.id ? (item.detail === '日記'
+          ? <IconBook2 className="note-link-option-icon" size={17} aria-hidden="true" />
+          : <IconFileText className="note-link-option-icon" size={17} aria-hidden="true" />)
+          : <IconSearch className="note-link-option-icon" size={17} aria-hidden="true" />}
+        <span className="note-link-option-copy">
+          <span className="note-link-option-title">{item.title}</span>
+          <span className="note-link-option-detail">{item.detail}</span>
+        </span>
       </button>)}
-      {!items.length && <Text size="sm" p="xs">{loadingState.startsWith('loading') ? '搜尋中…' : '沒有符合的筆記'}</Text>}
+      {!items.length && <div className="note-link-empty">{loadingState.startsWith('loading') ? '搜尋中…' : '沒有符合的筆記'}</div>}
     </div>
-  </Paper>;
+  </div>;
 }
 export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor; owner: string }) {
   const getItems = useCallback(async (query: string): Promise<Item[]> => {
@@ -43,7 +51,7 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
     }
     const q = query.trim().normalize('NFC').toLocaleLowerCase();
     const matches = pages.filter(p => p.title.normalize('NFC').toLocaleLowerCase().includes(q)).sort((a, b) => b.updated_at - a.updated_at || a.id.localeCompare(b.id));
-    return matches.map(p => ({ id: p.id, title: p.title, detail: p.kind === 'journal' ? '日記 · ' + p.journal_date : '筆記 · ' + p.id }));
+    return matches.map(p => ({ id: p.id, title: p.title, detail: p.kind === 'journal' ? '日記' : '筆記' }));
   }, [owner]);
   return <SuggestionMenuController triggerCharacter="[[" getItems={getItems} suggestionMenuComponent={LinkMenu}
     shouldOpen={() => editor.getTextCursorPosition().block.type !== 'codeBlock'}
@@ -54,6 +62,8 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
 }
 
 export function Backlinks({ id }: { id: string }) {
+  const [expanded, setExpanded] = useState(true);
+  const contentId = useId();
   const [links, setLinks] = useState<Backlink[]>();
   const [error, setError] = useState('');
   const [offline, setOffline] = useState(!navigator.onLine);
@@ -76,16 +86,31 @@ export function Backlinks({ id }: { id: string }) {
     window.addEventListener('focus', run); window.addEventListener('online', run); window.addEventListener('offline', run); window.addEventListener('p-note:backlinks-retry', run);
     return () => { disposed = true; clearInterval(timer); window.removeEventListener('focus', run); window.removeEventListener('online', run); window.removeEventListener('offline', run); window.removeEventListener('p-note:backlinks-retry', run); };
   }, [id]);
-  return <Paper component="section" role="region" aria-label="反向連結" withBorder p="lg" mt="xl" radius="md">
-    <Group justify="space-between" mb="sm"><Title order={2} size="h4">反向連結</Title><Text size="xs" c="dimmed">引用這頁的筆記</Text></Group>
-    {offline ? <Text size="sm" c="dimmed">連線後可查看最新反向連結</Text> : error ? <Alert color="red" role="alert">
-      {error}<Button variant="subtle" size="xs" onClick={() => window.dispatchEvent(new Event('p-note:backlinks-retry'))}>重試反向連結</Button>
-    </Alert> : links === undefined ? <Text size="sm" c="dimmed">正在讀取反向連結…</Text> : !links.length ? <Text size="sm" c="dimmed">目前沒有其他筆記引用這頁</Text> :
-      <Stack gap="xs">{links.map(p => <Anchor key={p.id} href={noteLinkHref(p.id)} style={{ overflowWrap: 'anywhere' }} onClick={event => {
-        if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault(); void navigate(p.id).catch(failure => setError((failure as Error).message));
-      }}>{p.title}</Anchor>)}</Stack>}
-  </Paper>;
+  return <section className="note-backlinks" role="region" aria-label="反向連結">
+    <button
+      type="button"
+      className="note-backlinks-toggle"
+      aria-expanded={expanded}
+      aria-controls={contentId}
+      onClick={() => setExpanded(value => !value)}
+    >
+      <IconChevronDown size={14} aria-hidden="true" style={{ transform: expanded ? undefined : 'rotate(-90deg)' }} />
+      <IconLink size={16} aria-hidden="true" />
+      <span>反向連結</span>
+      {links !== undefined && !offline && !error && <span className="note-backlinks-count">{links.length}</span>}
+    </button>
+    <div className="note-backlinks-content" id={contentId} hidden={!expanded}>
+      <p className="note-backlinks-description">引用這頁的筆記</p>
+      {offline ? <p className="note-backlinks-state">連線後可查看最新反向連結</p> : error ? <div className="note-backlinks-error" role="alert">
+        <span>{error}</span>
+        <Button className="note-backlinks-retry" variant="subtle" color="gray" size="xs" onClick={() => window.dispatchEvent(new Event('p-note:backlinks-retry'))}>重試反向連結</Button>
+      </div> : links === undefined ? <p className="note-backlinks-state">正在讀取反向連結…</p> : !links.length ? <p className="note-backlinks-state">目前沒有其他筆記引用這頁</p> :
+        <div className="note-backlinks-list">{links.map(p => <a className="note-backlink" key={p.id} href={noteLinkHref(p.id)} onClick={event => {
+          if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault(); void navigate(p.id).catch(failure => setError((failure as Error).message));
+        }}><IconFileText size={16} aria-hidden="true" /><span className="note-backlink-title">{p.title}</span></a>)}</div>}
+    </div>
+  </section>;
 }
 
 export function followNoteLink(event: React.MouseEvent<HTMLElement>, failure: (message: string) => void) {

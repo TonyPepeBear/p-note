@@ -43,7 +43,6 @@ test("UI-07：中性操作 hover 保持淺色一致，主操作可讀", async ({
   await page.goto("/");
   const primary = await hoverColor(page, button(page, "寄送登入連結"));
   expect(primary.color.slice(0, 3)).toEqual([255, 255, 255]);
-  expect(primary.background[1]).toBeGreaterThan(primary.background[0]);
   await openPrivate(page);
   let neutral: number[] | undefined;
   for (const name of ["備份設定", "插入圖片", "區塊操作"]) {
@@ -71,7 +70,7 @@ test("UI-08：側欄 hover 保留選取狀態，觸控不黏住", async ({ page,
   await page.goto("/?page=" + (await response.json()).id);
   await saved(page);
   await showNavigation(page);
-  const selected = page.locator('.sidebar-content .mantine-NavLink-root[data-active]:visible').first();
+  const selected = page.locator('.pn-note-link[aria-current="page"]:visible');
   const idle = button(page, "日記");
   await page.mouse.move(0, 0);
   const selectedBefore = await appearance(selected);
@@ -82,13 +81,13 @@ test("UI-08：側欄 hover 保留選取狀態，觸控不黏住", async ({ page,
     await button(page, "關閉日記回顧").click();
     await showNavigation(page);
     expect((await appearance(idle)).background).toEqual(idleBefore.background);
-    await expect(selected).toHaveAttribute("data-active", "true");
+    await expect(selected).toHaveAttribute("aria-current", "page");
   } else {
     const idleHover = await hoverColor(page, idle);
     const selectedHover = await hoverColor(page, selected);
     expect(selectedHover.background).not.toEqual(idleHover.background);
     expect(selectedHover.background).not.toEqual(selectedBefore.background);
-    await expect(selected).toHaveAttribute("data-active", "true");
+    await expect(selected).toHaveAttribute("aria-current", "page");
     await page.mouse.move(0, 0);
     expect((await appearance(selected)).background).toEqual(selectedBefore.background);
   }

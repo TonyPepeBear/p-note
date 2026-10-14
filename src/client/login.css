@@ -1,0 +1,87 @@
+.login-page.login-page {
+  min-height: 100dvh;
+  padding: 48px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #fff;
+}
+
+.login-page .login-layout {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: auto;
+}
+
+.login-card.login-card {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: #37352f;
+}
+
+.login-heading .mantine-Title-root {
+  letter-spacing: -0.7px;
+  line-height: 1.3;
+}
+
+.login-card .mantine-Input-label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.login-card .mantine-Input-input {
+  background: #fff;
+}
+
+.login-card .mantine-Alert-root {
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.login-card .mantine-Alert-message {
+  overflow-wrap: anywhere;
+}
+
+.login-card .mantine-Alert-title,
+.login-card .mantine-Alert-message {
+  color: #37352f;
+}
+
+.login-privacy {
+  border-top: 1px solid #e9e9e7;
+  padding-top: 16px;
+}
+
+.login-privacy svg {
+  flex-shrink: 0;
+}
+
+.login-page .login-footer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .login-page.login-page {
+    padding: 32px 24px 24px;
+  }
+
+  .login-page .login-layout {
+    margin: auto;
+  }
+
+  .login-card.login-card {
+    padding: 0 !important;
+  }
+
+  .login-card .mantine-Button-root,
+  .login-card .mantine-Input-input {
+    min-height: 44px;
+  }
+}

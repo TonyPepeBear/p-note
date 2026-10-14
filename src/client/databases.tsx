@@ -2,21 +2,41 @@ import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Anchor,
-  Badge,
   Button,
   Checkbox,
   Group,
   Modal,
   MultiSelect,
   NativeSelect,
-  Paper,
   Stack,
   Table,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core";
-import { IconDatabase, IconPlus } from "@tabler/icons-react";
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconArrowsSort,
+  IconCalendar,
+  IconCheck,
+  IconChevronDown,
+  IconDatabase,
+  IconExternalLink,
+  IconFileText,
+  IconFilter,
+  IconHash,
+  IconLayoutList,
+  IconLink,
+  IconListDetails,
+  IconPlus,
+  IconSearch,
+  IconSettings,
+  IconTable,
+  IconTrash,
+  IconTypography,
+  IconX,
+} from "@tabler/icons-react";
+import "./databases.css";
 import { api, navigate, registerDraft, hasMetadataDrafts } from "./api";
 import type { PageInfo, PageRow } from "../shared/pages";
 import {
@@ -35,6 +55,17 @@ import {
   type Property,
   type PropertyValue,
 } from "../shared/databases";
+
+
+function PropertyIcon({ type, size = 15 }: { type: string; size?: number }) {
+  const Icon = type === "number" ? IconHash
+    : type === "date" ? IconCalendar
+    : type === "checkbox" ? IconCheck
+    : type === "url" ? IconLink
+    : type === "select" || type === "multiSelect" ? IconListDetails
+    : IconTypography;
+  return <Icon size={size} stroke={1.6} aria-hidden="true" />;
+}
 
 async function request(path: string, body?: object) {
   const response = await api(path, body);
@@ -276,8 +307,8 @@ export function NoteProperties({
   const config = data?.config ?? readConfig(parent.database_config);
   const row = data?.rows.find((r) => r.id === page.id) ?? page;
   return (
-    <Paper className="note-properties" p="md" withBorder>
-      <Group justify="space-between">
+    <section className="note-properties" aria-label="筆記屬性">
+      <Group className="note-properties-header" justify="space-between">
         <Anchor
           href={"/?page=" + parent.id}
           onClick={(e) => {
@@ -285,10 +316,11 @@ export function NoteProperties({
             void navigate(parent.id).catch((e) => setStatus(e.message));
           }}
         >
+          <IconDatabase size={14} aria-hidden="true" />
           返回 {parent.title}
         </Anchor>
-        <Text size="xs" c="dimmed" data-testid="property-status">
-          {status || "欄位以連線保存"}
+        <Text size="xs" c="dimmed" role="status" data-testid="property-status">
+          {status}
         </Text>
       </Group>
       {!online && (
@@ -303,10 +335,11 @@ export function NoteProperties({
       )}
       <div className="properties-grid">
         {config.properties.map((p) => (
-          <div key={p.id}>
-            <Text size="sm" c="dimmed" mb={4}>
-              {p.name}
-            </Text>
+          <div className="note-property-row" key={p.id}>
+            <div className="note-property-label">
+              <PropertyIcon type={p.type} />
+              <span>{p.name}</span>
+            </div>
             <FieldInput
               row={row}
               property={p}
@@ -316,7 +349,7 @@ export function NoteProperties({
           </div>
         ))}
       </div>
-    </Paper>
+    </section>
   );
 }
 
@@ -343,6 +376,7 @@ export function DatabasePage({
   const [newType, setNewType] = useState<Property["type"]>("text");
   const [remove, setRemove] = useState<string>();
   const [editingView, setEditingView] = useState<DatabaseView>();
+  const viewSection = useRef("");
   const base = useRef<string>("");
   useEffect(() => setTitle(page.title), [page.title]);
   const config = data?.config ?? readConfig(page.database_config!);
@@ -375,7 +409,8 @@ export function DatabasePage({
     setManager(true);
     setFailure("");
   };
-  const editView = (v: DatabaseView) => {
+  const editView = (v: DatabaseView, section = "") => {
+    viewSection.current = section;
     base.current = data?.page.database_config ?? page.database_config!;
     setEditingView(structuredClone(v));
     setFailure("");
@@ -395,50 +430,119 @@ export function DatabasePage({
       className="database-page"
       data-testid={data ? "database-ready" : "database-loading"}
     >
-      <Group gap="sm">
-        <IconDatabase size={24} />
-        <Badge variant="light">資料庫</Badge>
-      </Group>
-      <TextInput
-        aria-label="資料庫標題"
-        className="database-title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onBlur={() => {
-          if (title.trim() && title !== page.title)
-            void run(() => rename(title));
-        }}
-        disabled={disabled}
-      />
-      <Group justify="space-between" align="end" mb="md">
-        <Group>
+      <header className="database-heading">
+        <IconDatabase className="database-page-icon" size={38} stroke={1.4} aria-hidden="true" />
+        <TextInput
+          aria-label="資料庫標題"
+          className="database-title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={() => {
+            if (title.trim() && title !== page.title)
+              void run(() => rename(title));
+          }}
+          disabled={disabled}
+        />
+      </header>
+      <div className="database-toolbar">
+        <div className="database-view-navigation">
+          <div className="database-view-tabs" role="tablist" aria-label="資料庫檢視">
+            {config.views.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="database-view-tab"
+                role="tab"
+                id={"database-view-" + item.id}
+                aria-selected={view.id === item.id}
+                aria-controls="database-view-panel"
+                tabIndex={view.id === item.id ? 0 : -1}
+                onClick={() => setSelected(item.id)}
+                onKeyDown={(event) => {
+                  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                  event.preventDefault();
+                  const index = config.views.findIndex((v) => v.id === item.id);
+                  const next = event.key === "Home" ? 0
+                    : event.key === "End" ? config.views.length - 1
+                    : (index + (event.key === "ArrowRight" ? 1 : -1) + config.views.length) % config.views.length;
+                  setSelected(config.views[next].id);
+                  event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("[role=tab]")[next]?.focus();
+                }}
+              >
+                {item.layout === "table" ? <IconTable size={15} aria-hidden="true" /> : <IconLayoutList size={15} aria-hidden="true" />}
+                <span>{item.name}</span>
+              </button>
+            ))}
+          </div>
           <NativeSelect
-            label="目前檢視"
+            aria-label="目前檢視"
+            title="切換檢視"
+            className="database-view-picker"
             value={view.id}
             data={config.views.map((v) => ({ value: v.id, label: v.name }))}
+            rightSection={<IconChevronDown size={14} aria-hidden="true" />}
             onChange={(e) => setSelected(e.target.value)}
           />
           <Button
             variant="subtle"
-            onClick={() => editView(view)}
-            disabled={disabled}
-          >
-            檢視設定
-          </Button>
-          <Button
-            variant="subtle"
+            className="database-icon-button"
+            aria-label="新增檢視"
+            title="新增檢視"
             onClick={() => editView(initialView(crypto.randomUUID(), "新檢視"))}
             disabled={disabled}
           >
-            新增檢視
+            <IconPlus size={16} aria-hidden="true" />
           </Button>
-        </Group>
-        <Group>
-          <Button variant="light" onClick={editProperties} disabled={disabled}>
-            管理欄位
+        </div>
+        <div className="database-toolbar-actions" role="toolbar" aria-label="資料庫工具列">
+          <Button
+            variant="subtle"
+            className={view.filters.length ? "database-active-tool" : undefined}
+            leftSection={<IconFilter size={15} aria-hidden="true" />}
+            onClick={() => editView(view, "database-filter-settings")}
+            disabled={disabled}
+          >
+            篩選{view.filters.length ? ` · ${view.filters.length}` : ""}
           </Button>
           <Button
-            leftSection={<IconPlus size={16} />}
+            variant="subtle"
+            className={view.sorts.length ? "database-active-tool" : undefined}
+            leftSection={<IconArrowsSort size={15} aria-hidden="true" />}
+            onClick={() => editView(view, "database-sort-settings")}
+            disabled={disabled}
+          >
+            排序{view.sorts.length ? ` · ${view.sorts.length}` : ""}
+          </Button>
+          <Button
+            variant="subtle"
+            className="database-icon-button"
+            aria-label="管理欄位"
+            title="管理欄位"
+            onClick={editProperties}
+            disabled={disabled}
+          >
+            <IconListDetails size={17} aria-hidden="true" />
+          </Button>
+          <Button
+            variant="subtle"
+            className="database-icon-button"
+            aria-label="檢視設定"
+            title="檢視設定"
+            onClick={() => editView(view)}
+            disabled={disabled}
+          >
+            <IconSettings size={16} aria-hidden="true" />
+          </Button>
+          <TextInput
+            aria-label="搜尋資料庫筆記"
+            placeholder="搜尋…"
+            className="database-search"
+            leftSection={<IconSearch size={15} aria-hidden="true" />}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <Button
+            leftSection={<IconPlus size={15} aria-hidden="true" />}
             disabled={disabled}
             onClick={() =>
               void run(async () => {
@@ -452,18 +556,8 @@ export function DatabasePage({
           >
             新增筆記
           </Button>
-        </Group>
-      </Group>
-      <TextInput
-        aria-label="搜尋資料庫筆記"
-        placeholder="搜尋筆記名稱…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        mb="md"
-      />
-      <Text size="xs" c="dimmed" data-testid="property-status" mb="sm">
-        {status || "欄位以連線保存"}
-      </Text>
+        </div>
+      </div>
       {!online && (
         <Alert color="orange" mb="sm">
           欄位修改需要連線
@@ -477,14 +571,17 @@ export function DatabasePage({
           </Button>
         </Alert>
       )}
-      <div className="database-scroll" data-testid="database-rows">
+      <div className="database-scroll" id="database-view-panel" role="tabpanel" aria-labelledby={"database-view-" + view.id} data-testid="database-rows">
         {view.layout === "table" ? (
-          <Table withTableBorder withColumnBorders>
+          <Table className="database-table" withColumnBorders>
             <Table.Thead>
               <Table.Tr>
                 {view.columns.map((id) => (
                   <Table.Th key={id}>
-                    {fields.find((p) => p.id === id)?.name}
+                    <span className="database-column-heading">
+                      <PropertyIcon type={fields.find((p) => p.id === id)?.type ?? "text"} />
+                      {fields.find((p) => p.id === id)?.name}
+                    </span>
                   </Table.Th>
                 ))}
               </Table.Tr>
@@ -495,7 +592,8 @@ export function DatabasePage({
                   {view.columns.map((id) => (
                     <Table.Td key={id}>
                       {id === "title" ? (
-                        <>
+                        <div className="database-title-cell">
+                          <IconFileText className="database-row-icon" size={16} stroke={1.6} aria-hidden="true" />
                           <FieldInput
                             row={row}
                             property={{
@@ -508,15 +606,19 @@ export function DatabasePage({
                             disabled={readOnly}
                           />
                           <Anchor
+                            className="database-open-row"
+                            aria-label={"開啟 " + row.title}
+                            title={"開啟 " + row.title}
                             href={"/?page=" + row.id}
                             onClick={(e) => {
                               e.preventDefault();
                               void run(() => navigate(row.id));
                             }}
                           >
-                            開啟 {row.title}
+                            <IconExternalLink size={14} aria-hidden="true" />
+                            <span className="database-visually-hidden">開啟 {row.title}</span>
                           </Anchor>
-                        </>
+                        </div>
                       ) : id === "created_at" || id === "updated_at" ? (
                         <Text size="xs">
                           {new Date(row[id]).toLocaleString("zh-TW", {
@@ -538,60 +640,71 @@ export function DatabasePage({
             </Table.Tbody>
           </Table>
         ) : (
-          <Stack gap="xs">
+          <div className="database-list">
             {rows.map((row) => (
-              <Paper key={row.id} p="sm" withBorder data-testid="database-row">
+              <div className="database-list-row" key={row.id} data-testid="database-row">
                 <Anchor
+                  className="database-list-title"
                   href={"/?page=" + row.id}
                   onClick={(e) => {
                     e.preventDefault();
                     void run(() => navigate(row.id));
                   }}
                 >
-                  {row.title}
+                  <IconFileText size={17} stroke={1.6} aria-hidden="true" />
+                  <span>{row.title}</span>
                 </Anchor>
+                <div className="database-list-values">
                 {view.columns
                   .filter((id) => id !== "title")
                   .map((id) => (
-                    <Text key={id} size="sm" c="dimmed">
-                      {fields.find((p) => p.id === id)?.name}：
+                    <Text key={id} size="sm" c="dimmed" title={fields.find((p) => p.id === id)?.name}>
                       {id === "created_at" || id === "updated_at"
-                        ? new Date(row[id]).toLocaleString("zh-TW")
+                        ? new Date(row[id]).toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })
                         : displayValue(
                             readValues(row.property_values)[id] ?? null,
                             config.properties.find((p) => p.id === id),
                           )}
                     </Text>
                   ))}
-              </Paper>
+                </div>
+              </div>
             ))}
-          </Stack>
+          </div>
         )}
       </div>
       {!rows.length && (
-        <Text c="dimmed" py="xl" ta="center">
-          {data?.rows.length
-            ? "沒有符合的筆記"
-            : "新增第一篇筆記，或從頁面操作將既有筆記移入。"}
-        </Text>
+        <div className="database-empty">
+          <IconFileText size={26} stroke={1.3} aria-hidden="true" />
+          <Text size="sm">{!data ? "正在載入筆記…" : data.rows.length ? "沒有符合的筆記" : "從第一篇筆記開始"}</Text>
+          <Text size="xs" c="dimmed">{!data ? "" : data.rows.length ? "試著調整搜尋或篩選條件。" : "點選「新增筆記」，或將既有筆記移入這個資料庫。"}</Text>
+        </div>
       )}
+      <div className="database-footer">
+        <Text size="xs" c="dimmed">{rows.length} 篇筆記</Text>
+        <Text size="xs" c="dimmed" role="status" data-testid="property-status">{status}</Text>
+      </div>
       <Modal
         opened={manager}
         onClose={() => setManager(false)}
         title="管理欄位"
         size="lg"
+        classNames={{ content: "database-dialog", header: "database-dialog-header", body: "database-dialog-body" }}
         closeButtonProps={{ "aria-label": "關閉欄位管理" }}
       >
-        <Stack>
-          {failure && <Alert color="red">{failure}</Alert>}
+        <Stack gap="md">
+          {failure && <Alert color="red" role="alert">{failure}</Alert>}
           <Text size="sm" c="dimmed">
-            名稱沿用筆記標題。已有值的欄位若要更換類型，請新增欄位；刪除與移出後，原值仍保留但不顯示。
+            自訂筆記的屬性與順序。已有內容的欄位如需變更類型，請新增另一個欄位。
           </Text>
+          <div className="database-field-list">
+          {!properties.length && <Text className="database-settings-empty" size="sm" c="dimmed">尚未新增屬性。新增日期、標籤或其他欄位，讓筆記更好整理。</Text>}
           {properties.map((p, index) => (
-            <Paper withBorder p="sm" key={p.id}>
-              <Stack gap="xs">
+            <div className="database-field-editor" key={p.id}>
+              <div className="database-field-editor-main">
+                <PropertyIcon type={p.type} />
                 <TextInput
-                  label={"欄位名稱 " + (index + 1)}
+                  aria-label={"欄位名稱 " + (index + 1)}
                   value={p.name}
                   onChange={(e) =>
                     setProperties((items) =>
@@ -602,7 +715,7 @@ export function DatabasePage({
                   }
                 />
                 <NativeSelect
-                  label={"欄位類型 " + (index + 1)}
+                  aria-label={"欄位類型 " + (index + 1)}
                   value={p.type}
                   data={Object.entries(PROPERTY_TYPES).map(
                     ([value, label]) => ({ value, label }),
@@ -621,12 +734,25 @@ export function DatabasePage({
                     )
                   }
                 />
+                <div className="database-field-actions">
+                  <Button variant="subtle" className="database-icon-button" aria-label={"上移 " + p.name} title="上移欄位" disabled={index === 0} onClick={() => setProperties(move(properties, index, -1))}>
+                    <IconArrowUp size={14} aria-hidden="true" />
+                  </Button>
+                  <Button variant="subtle" className="database-icon-button" aria-label={"下移 " + p.name} title="下移欄位" disabled={index === properties.length - 1} onClick={() => setProperties(move(properties, index, 1))}>
+                    <IconArrowDown size={14} aria-hidden="true" />
+                  </Button>
+                  <Button color="red" variant="subtle" className="database-icon-button" aria-label={"刪除 " + p.name} title={"刪除 " + p.name} onClick={() => setRemove(p.id)}>
+                    <IconTrash size={14} aria-hidden="true" />
+                  </Button>
+                </div>
+              </div>
                 {["select", "multiSelect"].includes(p.type) && (
-                  <Stack gap="xs">
+                  <div className="database-options-editor">
+                    <Text size="xs" c="dimmed" className="database-section-caption">選項</Text>
                     {p.options.map((o, i) => (
-                      <Group key={o.id} align="end">
+                      <Group className="database-option-row" key={o.id} gap="xs">
                         <TextInput
-                          label={"選項 " + p.name + " " + (i + 1)}
+                          aria-label={"選項 " + p.name + " " + (i + 1)}
                           value={o.name}
                           onChange={(e) =>
                             setProperties((items) =>
@@ -648,6 +774,9 @@ export function DatabasePage({
                         <Button
                           variant="subtle"
                           color="red"
+                          className="database-icon-button"
+                          aria-label={"移除選項 " + o.name}
+                          title={"移除選項 " + o.name}
                           onClick={() =>
                             setProperties((items) =>
                               items.map((x) =>
@@ -663,13 +792,13 @@ export function DatabasePage({
                             )
                           }
                         >
-                          移除選項 {o.name}
+                          <IconX size={14} aria-hidden="true" />
                         </Button>
                       </Group>
                     ))}
                     <TextInput
-                      label={"新增選項 " + p.name}
-                      placeholder="輸入名稱後按 Enter"
+                      aria-label={"新增選項 " + p.name}
+                      placeholder="＋ 新增選項，按 Enter 確認"
                       onKeyDown={(e) => {
                         if (e.key !== "Enter" || !e.currentTarget.value.trim())
                           return;
@@ -691,38 +820,12 @@ export function DatabasePage({
                         e.currentTarget.value = "";
                       }}
                     />
-                  </Stack>
+                  </div>
                 )}
-                <Group>
-                  <Button
-                    variant="subtle"
-                    size="xs"
-                    aria-label={"上移 " + p.name}
-                    onClick={() => setProperties(move(properties, index, -1))}
-                  >
-                    上移
-                  </Button>
-                  <Button
-                    variant="subtle"
-                    size="xs"
-                    aria-label={"下移 " + p.name}
-                    onClick={() => setProperties(move(properties, index, 1))}
-                  >
-                    下移
-                  </Button>
-                  <Button
-                    color="red"
-                    variant="subtle"
-                    size="xs"
-                    onClick={() => setRemove(p.id)}
-                  >
-                    刪除 {p.name}
-                  </Button>
-                </Group>
-              </Stack>
-            </Paper>
+            </div>
           ))}
-          <form
+          </div>
+          <form className="database-new-field"
             onSubmit={(e) => {
               e.preventDefault();
               void run(async () => {
@@ -745,7 +848,7 @@ export function DatabasePage({
               });
             }}
           >
-            <Stack>
+            <div className="database-new-field-row">
               <TextInput
                 label="新欄位名稱"
                 value={newName}
@@ -762,11 +865,13 @@ export function DatabasePage({
                 }))}
                 onChange={(e) => setNewType(e.target.value as Property["type"])}
               />
-              <Button type="submit" disabled={disabled}>
+              <Button type="submit" variant="default" leftSection={<IconPlus size={14} aria-hidden="true" />} disabled={disabled}>
                 新增欄位
               </Button>
-            </Stack>
+            </div>
           </form>
+          <div className="database-dialog-footer">
+          <Text size="xs" c="dimmed">刪除欄位後，原值仍保留於筆記與備份。</Text>
           <Button
             disabled={disabled}
             onClick={() =>
@@ -791,19 +896,21 @@ export function DatabasePage({
           >
             儲存欄位
           </Button>
+          </div>
         </Stack>
       </Modal>
       <Modal
         opened={!!remove}
         onClose={() => setRemove(undefined)}
         title="刪除欄位"
+        classNames={{ content: "database-dialog", header: "database-dialog-header", body: "database-dialog-body" }}
       >
         <Stack>
           <Text>
             刪除「{properties.find((p) => p.id === remove)?.name}
             」？原值保留於備份及筆記資料，不再顯示。
           </Text>
-          <Group>
+          <Group className="database-dialog-footer">
             <Button variant="default" onClick={() => setRemove(undefined)}>
               取消刪除
             </Button>
@@ -837,10 +944,16 @@ export function DatabasePage({
         onClose={() => setEditingView(undefined)}
         title="檢視設定"
         size="lg"
+        transitionProps={{ onEntered: () => {
+          if (viewSection.current) document.getElementById(viewSection.current)?.scrollIntoView({ block: "start" });
+        } }}
+        classNames={{ content: "database-dialog", header: "database-dialog-header", body: "database-dialog-body" }}
       >
         {editingView && (
-          <Stack>
-            {failure && <Alert color="red">{failure}</Alert>}
+          <Stack gap="lg">
+            {failure && <Alert color="red" role="alert">{failure}</Alert>}
+            <section className="database-settings-section">
+              <div className="database-view-details">
             <TextInput
               label="檢視名稱"
               value={editingView.name}
@@ -858,29 +971,37 @@ export function DatabasePage({
                 updateView({ layout: e.target.value as "table" | "list" })
               }
             />
-            <Text fw={500}>顯示欄位與順序</Text>
+              </div>
+            </section>
+            <section className="database-settings-section">
+            <Text className="database-section-title" fw={500}>顯示欄位與順序</Text>
             {editingView.columns.map((id, i) => (
-              <Group key={id}>
-                <Text size="sm">{fields.find((p) => p.id === id)?.name}</Text>
+              <Group className="database-visible-field" key={id} gap="xs">
+                <PropertyIcon type={fields.find((p) => p.id === id)?.type ?? "text"} size={14} />
+                <Text className="database-visible-field-name" size="sm">{fields.find((p) => p.id === id)?.name}</Text>
                 <Button
                   size="compact-xs"
                   variant="subtle"
+                  className="database-icon-button"
+                  disabled={i === 0}
                   aria-label={"上移檢視欄位 " + id}
                   onClick={() =>
                     updateView({ columns: move(editingView.columns, i, -1) })
                   }
                 >
-                  上移
+                  <IconArrowUp size={14} aria-hidden="true" />
                 </Button>
                 <Button
                   size="compact-xs"
                   variant="subtle"
+                  className="database-icon-button"
+                  disabled={i === editingView.columns.length - 1}
                   aria-label={"下移檢視欄位 " + id}
                   onClick={() =>
                     updateView({ columns: move(editingView.columns, i, 1) })
                   }
                 >
-                  下移
+                  <IconArrowDown size={14} aria-hidden="true" />
                 </Button>
                 {id !== "title" && (
                   <Button
@@ -910,7 +1031,11 @@ export function DatabasePage({
                   顯示 {p.name}
                 </Button>
               ))}
+            </section>
+            <section className="database-settings-section" id="database-filter-settings">
+            <Text className="database-section-title" fw={500}><IconFilter size={15} aria-hidden="true" /> 篩選</Text>
             <NativeSelect
+              className="database-filter-mode"
               label="篩選組合"
               value={editingView.filterMode}
               data={[
@@ -922,8 +1047,7 @@ export function DatabasePage({
               }
             />
             {editingView.filters.map((f, i) => (
-              <Paper key={i} withBorder p="sm">
-                <Stack gap="xs">
+              <div className="database-filter-row" key={i}>
                   <NativeSelect
                     label={"篩選欄位 " + (i + 1)}
                     value={f.property}
@@ -1006,11 +1130,12 @@ export function DatabasePage({
                   >
                     移除篩選 {i + 1}
                   </Button>
-                </Stack>
-              </Paper>
+              </div>
             ))}
+            {!editingView.filters.length && <Text className="database-settings-empty" size="sm" c="dimmed">顯示全部筆記。新增條件可縮小範圍。</Text>}
             <Button
-              variant="light"
+              variant="subtle"
+              leftSection={<IconPlus size={14} aria-hidden="true" />}
               onClick={() =>
                 updateView({
                   filters: [
@@ -1022,8 +1147,11 @@ export function DatabasePage({
             >
               新增篩選
             </Button>
+            </section>
+            <section className="database-settings-section" id="database-sort-settings">
+            <Text className="database-section-title" fw={500}><IconArrowsSort size={15} aria-hidden="true" /> 排序</Text>
             {editingView.sorts.map((s, i) => (
-              <Group key={i} align="end">
+              <Group className="database-sort-row" key={i} align="end" gap="xs">
                 <NativeSelect
                   label={"排序欄位 " + (i + 1)}
                   value={s.property}
@@ -1068,8 +1196,10 @@ export function DatabasePage({
                 </Button>
               </Group>
             ))}
+            {!editingView.sorts.length && <Text className="database-settings-empty" size="sm" c="dimmed">依預設順序顯示筆記。</Text>}
             <Button
-              variant="light"
+              variant="subtle"
+              leftSection={<IconPlus size={14} aria-hidden="true" />}
               onClick={() =>
                 updateView({
                   sorts: [
@@ -1081,7 +1211,8 @@ export function DatabasePage({
             >
               新增排序
             </Button>
-            <Group>
+            </section>
+            <Group className="database-dialog-footer">
               <Button
                 disabled={disabled}
                 onClick={() =>
