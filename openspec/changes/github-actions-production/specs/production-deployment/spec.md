@@ -5,12 +5,12 @@
 發布流程 SHALL 在推送 master 或手動選擇 master 時驗證該提交、建置、套用正式資料遷移並部署既有正式服務；所有正式發布 MUST 依序執行。其他分支 MUST 不得發布正式服務。
 
 #### Scenario: CICD-01 分支與失敗阻擋
-- **自動化驗證**: `CICD-01`；Playwright 讀取 workflow，斷言 master 觸發、手動分支限制、完整三瀏覽器測試先於部署、相依工作成功才發布及同一 concurrency 群組不取消執行中發布。
-- **WHEN** master 推送或手動觸發，且檢查或測試失敗
+- **自動化驗證**: `CICD-01`；Playwright 讀取 workflow，斷言 master 觸發、手動分支限制、型別／設定／建置與預檢先於部署、步驟失敗停止及同一 concurrency 群組不取消執行中發布。
+- **WHEN** master 推送或手動觸發，且檢查、建置或預檢失敗
 - **THEN** 發布工作不執行；通過後才依序進行資料遷移、部署與 HTTPS 檢查
 
 #### Scenario: CICD-02 部署憑證隔離
-- **自動化驗證**: `CICD-02`；Playwright 設定檢查與 GitHub secret 名稱查詢，斷言部署憑證僅注入發布工作，不讀取本機私人檔，不輸出或覆寫既有 Worker secrets。
+- **自動化驗證**: `CICD-02`；Playwright 設定檢查與 GitHub secret 名稱查詢，斷言部署憑證僅注入遠端發布步驟，不讀取本機私人檔，不輸出或覆寫既有 Worker secrets。
 - **WHEN** CI 使用部署 API token 發布正式服務
 - **THEN** 憑證來自 GitHub Actions Secrets，程式與報告不包含私人值；缺少憑證立即失敗，不執行資料遷移
 
