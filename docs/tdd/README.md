@@ -1,6 +1,12 @@
 # TDD 開發與驗證證據
 
-此文件保留本機技術驗證與正式產品 TDD 證據。完整正式保存故障 UI、部署前整合與最終驗收仍在進行，OpenSpec change 不封存。
+此文件保留本機技術驗證與正式產品 TDD 證據。最新部署前結果為 [248 個結果全部通過](final-results.json)，正式情境 [129／129](final-product-coverage.log)。完整需求／命令／限制見 [部署前驗證](../predeployment.md)。未部署、不封存；下方階段保留當時的範圍與狀態。
+
+## 最終部署前驗證
+
+[Workers 92](final-integration.log)、[瀏覽器 150](final-e2e.log)、[單元 5](final-unit.log)、[真實建置 HTTPS smoke 1](final-build-smoke.log) 均通過，無 skip。型別與文件契約、OpenSpec 嚴格驗證、Worker dry-run、獨立 ZIP 及私人設定檢查均完成。
+
+新增有效 Red：舊草稿入口 [red-old-draft-access](red-old-draft-access.log)、Worker 靜態入口 [red-static-worker](red-static-worker.log)、HTTPS 誤用 ws [red-build-smoke](red-build-smoke.log)、正文更新時間 [red-body-updated-time](red-body-updated-time.log)、自動整理 [red-auto-compaction](red-auto-compaction.log)、複製污染保存狀態 [red-copy-feedback](red-copy-feedback.log)。Green 與全部回歸見上述最終報告；自動整理量測見 [green-auto-compaction](green-auto-compaction.log)。
 
 ## 第九階段：覆蓋還原與舊草稿
 

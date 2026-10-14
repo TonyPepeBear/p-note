@@ -1,8 +1,8 @@
 # 私有圖片規格
 
-狀態：Q7 已採預設；ASSET-01～04 與 EDIT-03 已完成本機私有圖片服務。使用者已確認 ASSET-05 的成功備份／清理驗收留待 7.1；未部署。
+狀態：部署前實作與自動化驗證已完成；未部署、未封存。
 
-驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。實作、容器驗證與像素解碼邊界見 [圖片開發文件](../../../../../docs/assets-development.md)，結果見 [TDD 證據](../../../../../docs/tdd/README.md)；ASSET-05 仍未完成。
+驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。最新結果與各階段範圍見 [TDD 證據](../../../../../docs/tdd/README.md)。
 
 ## Purpose
 

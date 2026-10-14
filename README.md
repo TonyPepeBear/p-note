@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。目前完成 React＋Vite、BlockNote、Yjs 本機技術驗證、資料結構與登入，以及日期補寫／月份列表、階層筆記／標題／移動、垃圾桶與中文標題／內文搜尋、私有圖片上傳／穩定引用。登入使用本機測試寄件匣；備份、完整正式同步驗收與部署仍在後續 OpenSpec 任務。
+個人筆記／日記系統。提供階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。開發使用 OpenSpec 與 TDD；未部署。
 
 ## 自動化驗證
 
@@ -10,26 +10,32 @@
 npx --yes npm@11.21.0 ci
 npm run worker:types
 ./node_modules/.bin/playwright install chromium webkit
-npm run validate:probe
+npm test
+npm run test:build
+npm run test:spec-coverage
+npm run check
+npm run check:spec
+openspec validate personal-notes-v1 --type change --strict --no-interactive
+git diff --check
 ```
 
-`validate:probe` 執行單元、真正本機 Workers 整合、Chromium 桌面／手機與 WebKit 手機 E2E，再比對原型追蹤 ID、檢查型別、建置與文件契約。全程機器斷言，沒有人工驗收。OpenSpec 額外執行 `openspec validate personal-notes-v1 --type change --strict --no-interactive`。
+全程機器斷言，沒有人工驗收。Workers 測試檔案依序執行；各案例內的併發操作仍使用真實同步屏障與連線。`test:build` 需要 OpenSSL，會自動產生並清理測試憑證，以真實 dist 和本機 HTTPS Worker 驗證登入、wss 與離線刷新，使用假的寄件匣與隔離儲存。
 
-`npm run test:spec-coverage` 是完整產品的檢查，目前會因尚未完成而失敗；`npm run test:spec-coverage -- --probe` 只驗收本次技術範圍，不能代替完整產品驗收。
+`npm run test:spec-coverage` 比對 47 個正式情境及 129 個必需環境結果，缺漏、重複、skip 或失敗均拒絕。`--probe` 只檢查原型，不能代替完整產品驗收。
 
 `npm run test:spec-coverage -- --auth` 比對本輪 AUTH-01～08 的 Workers 與三種瀏覽器結果。先執行完整 `npm test`，避免以篩選執行的報告作完整覆蓋。
 
 `npm run test:spec-coverage -- --pages` 比對 PAGE-01～08 的 Workers 與三種瀏覽器結果；頁面、日期、垃圾桶、搜尋及儲存保護詳見 [頁面開發文件](docs/pages-development.md)。
 
-`npm run test:spec-coverage -- --assets` 比對 ASSET-01～04、EDIT-03 的私有圖片結果；ASSET-05 留待備份。上傳限制、權限與原檔保留詳見 [圖片開發文件](docs/assets-development.md)。
+`npm run test:spec-coverage -- --assets` 比對 ASSET-01～04、EDIT-03 的私有圖片結果；ASSET-05 由完整產品追蹤涵蓋。上傳限制、權限與原檔保留詳見 [圖片開發文件](docs/assets-development.md)。
 
 ## 本機登入與今日編輯器
 
-分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。應用預設已接上原生 Email adapter，詳見 [寄信開發](docs/mail-development.md)；備份／還原與完整驗收仍待完成，尚未部署。
+分別啟動 `npm run dev` 與 `npm run dev:test-worker`，開啟 `http://127.0.0.1:5173/`。測試 Worker 使用假設定，自動套用隔離本機 schema，寄件匣與故障／時鐘入口供自動化測試使用。應用預設已接上原生 Email adapter，詳見 [寄信開發](docs/mail-development.md)，沒有寄送實際郵件或部署。
 
 設定來源、權限邊界與驗證見 [登入開發文件](docs/auth-development.md)。
 
-編輯器的「備份設定」提供建立備份與完整 ZIP 下載；格式、權限、串流與獨立解析驗證見 [匯出開發](docs/export-development.md)。覆蓋還原仍在實作，尚未部署。
+編輯器的「備份設定」提供建立備份、完整 ZIP 下載與成功備份覆蓋還原。格式、權限、串流與獨立解析驗證見 [匯出開發](docs/export-development.md)；復原與重試見 [還原開發](docs/restore-development.md)。
 
 ## 本機原型
 
@@ -48,5 +54,6 @@ npm run dev
 目前使用官方 Vitest plugin 內的 Wrangler CLI；y-partyserver 的 Workers types 4 peer 已明確鎖定，執行時與 Env 使用 Wrangler 產生的最新型別。乾淨安裝已用 npm 11.21.0 驗證；npm 10 的可選 peer 解析曾發生內部錯誤，不使用 force 或忽略 peer 檢查。
 
 - [第一版需求與決策](docs/v1-scope.md)
+- [部署前完成、驗證與發布設定](docs/predeployment.md)
 - [OpenSpec 任務](openspec/changes/personal-notes-v1/tasks.md)
 - [技術驗證結果與 TDD 證據](docs/tdd/README.md)

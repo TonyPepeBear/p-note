@@ -1,8 +1,8 @@
 # 個人登入規格
 
-狀態：Q1、Q4 已採預設；Q3 的正式 Email／寄件設定待接入服務前提供。本輪已以測試寄件匣實作登入與必要同步權限，不接正式寄信服務或部署。
+狀態：部署前實作與自動化驗證已完成；未部署、未封存。
 
-驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。本輪 AUTH-01～08 的結果見 [TDD 證據](../../../../../docs/tdd/README.md)，不表示後續資產／備份功能已完成。
+驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。最新結果與各階段範圍見 [TDD 證據](../../../../../docs/tdd/README.md)。
 
 ## Purpose
 
@@ -12,7 +12,7 @@
 
 ### Requirement: Email magic link 登入
 
-系統 SHALL 提供 Email magic link 登入，並只允許設定的擁有者登入，不提供公開註冊。指定 Email 為 Q3 待提供資訊。
+系統 SHALL 提供 Email magic link 登入，並只允許設定的擁有者登入，不提供公開註冊。指定 Email 由 Q3 私人設定提供，不寫入規格。
 
 #### Scenario: 擁有者登入
 
