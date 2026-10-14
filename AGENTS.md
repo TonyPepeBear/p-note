@@ -4,16 +4,22 @@
 - 使用 openspec 開發
 - 使用 TDD 開發流程
   - Red／Green／Refactor 迴圈只跑相關的 E2E spec 與 Chromium 桌面：`npm run test:e2e:fast -- tests/e2e/<相關>.spec.ts`（可加 `--last-failed`），可先常駐 `npm run test:e2e:serve`
-  - 完整三瀏覽器 `npm run test:e2e` 留到 change 驗收時執行
+  - 完整三瀏覽器 `npm run test:e2e` 只在產品功能 change 驗收時執行，不綁入每次部署
+  - 同一個 checkout 不同時啟動多組 E2E 服務；只改連接埠仍會共用測試資料目錄
   - 其他 worktree 同時跑 E2E 時設定不同的 `E2E_PORT_OFFSET`（例如 100）
-- 使用 spec 開發的流程
-  - 創建、修改 spec 文件後，自動 commit 不需經過 user 同意
-  - 完成開發 spec 後，自動部署、commit 不需經過 user 同意
-  - 不要創建需要人類驗證的 spec，都使用自動化的方式驗證開發
+- 開發、PR 與部署流程
+  - 在功能分支完成變更；建立或修改 spec 後自動 commit，不需再次詢問同意
+  - 完成使用者要求與相關驗證後，自動 commit、push 功能分支，建立以 `master` 為目標的 PR
+  - **PR 建立後立即合併**，不等待人工 review 或再次確認，也不以「已開 PR、等待合併」作為完成；上述提交、推送、開 PR 與合併皆已授權
+  - 若 GitHub 強制檢查、分支保護、權限或合併衝突阻擋合併，處理本次變更範圍內的問題；無法處理時回報具體原因，不繞過保護
+  - 合併後由 `master` 的 GitHub Actions 自動部署至 Cloudflare；確認該次 workflow 的發布與 HTTPS 檢查結果，不再於本機重複部署或重跑整套產品 E2E
+  - 部署任務只處理建置、設定、遷移、發布與入口檢查；不得自行擴大成既有產品測試或功能修復
+  - 純文件或 agent 規則修改不建立 OpenSpec change、不跑產品測試；使用 `[skip ci]` 避免不必要的部署，仍依上述 PR 流程合併
+  - spec 的驗收使用自動化斷言，不建立需要人類操作或目視確認的驗收門檻
 - Git 隱私與敏感資料
   - 作者與提交者一律使用已確認屬於該 GitHub 帳號的 `@users.noreply.github.com` 信箱，不得使用真實登入信箱。提交前確認實際 author／committer，包含環境變數覆寫與提交訊息中的共同作者資訊；需要設定時只修改此 repository 的 local config，不修改 global config。
   - 不得將真實登入／收件者信箱、API key、密鑰、私鑰、登入連結或 token、session cookie、Authorization 標頭、私人筆記內容寫入受 Git 追蹤的檔案、提交訊息或檔名。此規則也適用於文件、spec、測試紀錄、JSON 報告與截圖。
-  - 憑證只存放於 Cloudflare Secrets 或已被 Git 忽略的本機檔案；新增私人檔案前先確認忽略規則有效。`.gitignore` 無法保護已追蹤的檔案，不能只因檔名符合忽略規則就視為安全。
+  - 憑證只存放於 Cloudflare Secrets、GitHub Actions Secrets 或已被 Git 忽略的本機檔案；新增私人檔案前先確認忽略規則有效。`.gitignore` 無法保護已追蹤的檔案，不能只因檔名符合忽略規則就視為安全。
   - 文件與範例使用 `owner@example.test` 等明確的假資料及示意資源名稱／ID。不得直接提交正式郵件、資料庫查詢或平台 API 的原始回應；驗證證據只保留必要的時間、狀態與布林斷言，例如 `recipientExpected: true`。
   - 測試與部署輸出在寫入可提交的 log／報告前，先以程式移除或遮蔽敏感欄位；截圖使用測試資料或先以程式遮罩。不得先把敏感原文寫入受追蹤檔案，再於下一個 commit 才清除。
   - 只暫存本次工作的明確檔案；commit 前檢查 staged diff，包含新增檔案、紀錄及圖片，push 前檢查所有欲推送提交的內容與作者／提交者資訊。上述自動 commit 流程也必須先通過這些檢查。
