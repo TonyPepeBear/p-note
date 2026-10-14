@@ -10,3 +10,11 @@
   - 創建、修改 spec 文件後，自動 commit 不需經過 user 同意
   - 完成開發 spec 後，自動部署、commit 不需經過 user 同意
   - 不要創建需要人類驗證的 spec，都使用自動化的方式驗證開發
+- Git 隱私與敏感資料
+  - 作者與提交者一律使用已確認屬於該 GitHub 帳號的 `@users.noreply.github.com` 信箱，不得使用真實登入信箱。提交前確認實際 author／committer，包含環境變數覆寫與提交訊息中的共同作者資訊；需要設定時只修改此 repository 的 local config，不修改 global config。
+  - 不得將真實登入／收件者信箱、API key、密鑰、私鑰、登入連結或 token、session cookie、Authorization 標頭、私人筆記內容寫入受 Git 追蹤的檔案、提交訊息或檔名。此規則也適用於文件、spec、測試紀錄、JSON 報告與截圖。
+  - 憑證只存放於 Cloudflare Secrets 或已被 Git 忽略的本機檔案；新增私人檔案前先確認忽略規則有效。`.gitignore` 無法保護已追蹤的檔案，不能只因檔名符合忽略規則就視為安全。
+  - 文件與範例使用 `owner@example.test` 等明確的假資料及示意資源名稱／ID。不得直接提交正式郵件、資料庫查詢或平台 API 的原始回應；驗證證據只保留必要的時間、狀態與布林斷言，例如 `recipientExpected: true`。
+  - 測試與部署輸出在寫入可提交的 log／報告前，先以程式移除或遮蔽敏感欄位；截圖使用測試資料或先以程式遮罩。不得先把敏感原文寫入受追蹤檔案，再於下一個 commit 才清除。
+  - 只暫存本次工作的明確檔案；commit 前檢查 staged diff，包含新增檔案、紀錄及圖片，push 前檢查所有欲推送提交的內容與作者／提交者資訊。上述自動 commit 流程也必須先通過這些檢查。
+  - 不得合併或重新推送敏感資料清理前的舊歷史。發現既有提交含敏感資料時，先停止推送並回報，再依使用者授權清理歷史；單純新增刪除或遮蔽檔案的 commit，不代表舊歷史已清除。
