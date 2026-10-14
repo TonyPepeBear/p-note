@@ -33,3 +33,4 @@
 - [GitHub Actions](https://github.com/TonyPepeBear/p-note/actions/runs/38582082623) 首輪建置、型別、正式設定、部署預檢、資料庫遷移及 Cloudflare 發布均成功。最後的首頁建置檢查讀到上一版 module 資源，故首輪 workflow 標示失敗。
 - 發布後以同一份 `scripts/check-deployment.mjs` 重驗 [正式 HTTPS 入口](https://note.tonypepe.com)：本次 JavaScript 建置一致、資源可讀、私人 API 拒絕未登入、測試入口封鎖，全部斷言通過。
 - 額外唯讀 HTTPS 檢查斷言正式 CSS 與本次建置一致，編輯器及側欄選取 hover 色彩變數皆已發布；首頁及 CSS 均為 200。
+- 經使用者明確批准後，重跑同一發布提交的工作；[第二次執行](https://github.com/TonyPepeBear/p-note/actions/runs/38582082623/attempts/2) 於台北時間 2026-10-14 22:47 完成，最終狀態為 success。建置、資料庫遷移、Cloudflare 發布，以及最後的正式建置與私人 HTTPS 入口檢查全部成功。
