@@ -1,4 +1,5 @@
 import { ApiKeySettings } from './api-key-settings';
+import { registerPwa } from './pwa';
 import { DatabasePage, NoteProperties } from './databases';
 import {
   MantineProvider,
@@ -273,6 +274,10 @@ function App() {
         localOnly = true;
       }
       if (response?.status === 401) {
+        setLogin(true);
+        return;
+      }
+      if (!response && signedOut()) {
         setLogin(true);
         return;
       }
@@ -592,6 +597,11 @@ function App() {
   );
 }
 
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  void registerPwa().catch(() => {
+    // 首次下載失敗仍允許登入；編輯器會重試並顯示離線資源錯誤。
+  });
+}
 const root = createRoot(document.getElementById("root")!);
 const render = (node: React.ReactNode) =>
   root.render(

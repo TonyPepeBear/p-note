@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { PwaControls } from "./pwa-controls";
 import {
   Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Modal, NativeSelect,
   Stack, Text, TextInput,
@@ -214,6 +215,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
       })}><IconDatabase size={18} /><span>新增資料庫</span></button>
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
+      <PwaControls disabled={navigationLocked} />
       <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "api" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); settings(); }}>
         <IconSettings size={17} /><span>設定</span>
       </button>
