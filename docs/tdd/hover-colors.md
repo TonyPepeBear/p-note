@@ -24,6 +24,12 @@
 - 已依最新 AGENTS.md 在合併 PR 前同步主規格並提交封存結果。
 - 整合遠端新筆記連結功能並解決衝突後，相關 30 個案例首輪 29 通過，WebKit 的 LINK-01 導航案例失敗且單獨重跑仍失敗。
 - 最終保留 BlockNote 原本的 light 主題流程，改由 CSS 色彩變數調整編輯器及 portal；重跑 hover 與 LINK-01 相關情境，18 個三瀏覽器案例全部通過，包含曾失敗的導航案例。最終型別與 115 個規格契約通過。此為針對最終整合變更的驗證，不宣稱新筆記連結功能納入前一輪完整 345 項執行。
-- 發布由 master 的 GitHub Actions 執行；正式 workflow 與 HTTPS 結果於發布後補記。
+- 正式發布與 HTTPS 檢查結果見下方紀錄。
 
 原始測試資料、登入連結、憑證、trace 與截圖不提交。
+
+## 正式發布
+- [PR #5](https://github.com/TonyPepeBear/p-note/pull/5) 已合併；發布提交為 `95dc0a34ed3179185b22d9018828ec5c92314d94`。
+- [GitHub Actions](https://github.com/TonyPepeBear/p-note/actions/runs/38582082623) 首輪建置、型別、正式設定、部署預檢、資料庫遷移及 Cloudflare 發布均成功。最後的首頁建置檢查讀到上一版 module 資源，故首輪 workflow 標示失敗。
+- 發布後以同一份 `scripts/check-deployment.mjs` 重驗 [正式 HTTPS 入口](https://note.tonypepe.com)：本次 JavaScript 建置一致、資源可讀、私人 API 拒絕未登入、測試入口封鎖，全部斷言通過。
+- 額外唯讀 HTTPS 檢查斷言正式 CSS 與本次建置一致，編輯器及側欄選取 hover 色彩變數皆已發布；首頁及 CSS 均為 200。
