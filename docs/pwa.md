@@ -26,4 +26,4 @@ HTTP 快取只保存公開外殼、圖示與靜態資源，不保存私人 API�
 
 PWA 的離線驗證使用建置後入口；`npm run dev` 的開發模組不在正式靜態資源白名單內。Service Worker 需要 HTTPS 或 localhost。
 
-驗收情境為 PWA-01～06，見 [PWA E2E](../tests/e2e/pwa.spec.ts)、[Service Worker 單元測試](../tests/unit/service-worker.test.ts)。`npm run test:spec-coverage -- --pwa` 檢查各情境的必需執行環境；[部署檢查](../scripts/check-deployment.mjs) 確認正式 manifest、PNG 圖示、Service Worker 與當次建置預快取一致。
+驗收情境為 PWA-01～06，見 [PWA E2E](../tests/e2e/pwa.spec.ts)、[Service Worker 單元測試](../tests/unit/service-worker.test.ts)。`npm run test:spec-coverage -- --pwa` 檢查各情境的必需執行環境；建置後以本機 HTTPS smoke 驗證登入、wss 與離線刷新。正式發布沿用既有 Actions，發布成功後結束，不執行額外網站 HTTP 檢查。

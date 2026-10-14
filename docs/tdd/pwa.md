@@ -32,4 +32,8 @@ PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 E2E_WORKERS=4 npm run test:e2e
 
 ## 封存與發布
 
-完成驗證後將 change 封存並同步 [PWA 主規格](../../openspec/specs/progressive-web-app/spec.md)，再提交與合併 PR。正式發布沿用 master 的 GitHub Actions；部署結果與公開網址於交付回報提供，不在本機重複部署或重新執行整套產品 E2E。
+完成驗證後將 change 封存並同步 [PWA 主規格](../../openspec/specs/progressive-web-app/spec.md)，再提交與合併 PR。交付前同步了主分支的 hover 配色與取消發布後檢查變更，移除本輪原先準備的正式入口檢查擴充，保留最新 CICD-03 與發布規則；主規格契約更新為 121 個唯一情境。
+
+整合後以單一 worker 執行 `pwa.spec.ts`、`hover-colors.spec.ts` 與 `deployment.spec.ts`，三瀏覽器 42 項全部通過（PWA 21、hover 12、發布契約 9），本機 HTTPS 建置 smoke 再跑 2 項通過；型別、PWA 覆蓋、正式設定與 13 份主規格嚴格驗證通過。
+
+正式發布沿用 master 的 GitHub Actions；確認資料遷移與發布結果後結束，不執行額外正式網站 HTTP 檢查、不在本機重複部署或重新執行整套產品 E2E。

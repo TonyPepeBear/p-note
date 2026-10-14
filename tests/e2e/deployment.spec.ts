@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
-import { createServer } from 'node:http';
-import type { AddressInfo } from 'node:net';
 
 const workflowPath = '.github/workflows/deploy-production.yml';
 
@@ -16,7 +14,7 @@ test('CICD-01：master 才發布，建置失敗阻擋且發布不並行', () => 
   const deploy = workflow.split('\n  deploy:')[1];
   for (const command of ['npm ci', 'npm run check', 'npm run check:production', 'npm run build']) expect(deploy).toContain(command);
   expect(workflow).not.toMatch(/continue-on-error|if: always\(\)|pull_request_target/);
-  const commands = ['npm run check', 'npm run build', '--dry-run', 'd1 migrations apply', ' deploy --config wrangler.production.jsonc\n', 'node scripts/check-deployment.mjs'];
+  const commands = ['npm run check', 'npm run build', '--dry-run', 'd1 migrations apply', ' deploy --config wrangler.production.jsonc\n'];
   let previous = -1;
   for (const command of commands) {
     const index = deploy.indexOf(command);
@@ -37,31 +35,11 @@ test('CICD-02：僅發布工作讀取 GitHub secret，不使用本機秘密檔',
   expect(workflow).not.toMatch(/\.dev\.vars|\.env\.release|--secrets-file|secret bulk|secret put|--keep-vars/);
 });
 
-test('CICD-03：部署 smoke 拒絕舊版建置與錯誤的私人入口狀態', async () => {
-  expect(existsSync('scripts/check-deployment.mjs'), '缺少部署後入口檢查').toBe(true);
-  const { checkDeployment } = await import('../../scripts/check-deployment.mjs');
-  let script = '/assets/index-current.js';
-  let privateStatus = 401;
-  let testStatus = 404;
-  const server = createServer((req, res) => {
-    if (req.url === '/') { res.setHeader('content-type', 'text/html'); res.end(`<script type="module" src="${script}"></script>`); }
-    else if (req.url === '/api/pages') { res.writeHead(privateStatus); res.end(); }
-    else if (req.url === '/assets/index-current.js') { res.setHeader('content-type', 'application/javascript'); res.end('export {};'); }
-    else if (req.url === '/manifest.webmanifest') { res.setHeader('content-type', 'application/manifest+json'); res.end(readFileSync('public/manifest.webmanifest')); }
-    else if (req.url?.startsWith('/icons/')) { res.setHeader('content-type', 'image/png'); res.end(readFileSync('public' + req.url)); }
-    else if (req.url === '/sw.js') { res.setHeader('content-type', 'application/javascript'); res.end('const precache = ["/assets/index-current.js"];'); }
-    else { res.writeHead(testStatus); res.end(); }
-  });
-  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
-  const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-  const html = '<script type="module" src="/assets/index-current.js"></script>';
-  try {
-    await checkDeployment(origin, html);
-    script = '/assets/index-old.js';
-    await expect(checkDeployment(origin, html)).rejects.toThrow();
-    script = '/assets/index-current.js'; privateStatus = 200;
-    await expect(checkDeployment(origin, html)).rejects.toThrow();
-    privateStatus = 401; testStatus = 200;
-    await expect(checkDeployment(origin, html)).rejects.toThrow();
-  } finally { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
+test('CICD-03：發布成功後結束，不執行網站與入口檢查', () => {
+  const workflow = readFileSync(workflowPath, 'utf8');
+  const steps = workflow.split(/\n {6}- /).slice(1);
+  expect(steps.at(-1)).toMatch(/^name: 遷移資料庫並發布/);
+  expect(steps.at(-1)).toContain('d1 migrations apply');
+  expect(steps.at(-1)?.trimEnd()).toMatch(/deploy --config wrangler\.production\.jsonc$/);
+  expect(workflow).not.toMatch(/check-deployment|確認正式建置與私人入口|curl |wget |test:production/);
 });

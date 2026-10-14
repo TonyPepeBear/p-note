@@ -648,6 +648,7 @@ export function Editor({
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
+                  style={{ color: "var(--mantine-color-red-9)" }}
                   leftSection={<IconTrash size={17} />}
                   onClick={() => editor.removeBlocks([currentBlock()])}
                 >

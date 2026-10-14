@@ -18,23 +18,6 @@ export async function checkDeployment(origin, expectedHtml) {
     assert.match(asset.headers.get('content-type') ?? '', /javascript/, 'CICD-03：script 類型錯誤');
     await asset.arrayBuffer();
   }
-  const manifestResponse = await get('/manifest.webmanifest');
-  assert.equal(manifestResponse.status, 200, 'PWA：正式 manifest 不可用');
-  assert.match(manifestResponse.headers.get('content-type') ?? '', /json|manifest/, 'PWA：manifest 類型錯誤');
-  const manifest = await manifestResponse.json();
-  assert.equal(manifest.start_url, '/'); assert.equal(manifest.display, 'standalone');
-  for (const icon of [...manifest.icons, { src: '/icons/apple-touch-icon.png' }]) {
-    const response = await get(icon.src);
-    assert.equal(response.status, 200, 'PWA：正式圖示不可用');
-    assert.match(response.headers.get('content-type') ?? '', /image\/png/);
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    assert.deepEqual([...bytes.slice(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
-  }
-  const serviceWorker = await get('/sw.js');
-  assert.equal(serviceWorker.status, 200); assert.match(serviceWorker.headers.get('content-type') ?? '', /javascript/);
-  const source = await serviceWorker.text();
-  assert(!source.includes('__P_NOTE_'), 'PWA：正式 Service Worker 尚未完成建置');
-  for (const script of expectedScripts) assert(source.includes(script), 'PWA：預快取缺少本次建置');
   assert.equal((await get('/api/pages')).status, 401, 'CICD-03：私人 API 未拒絕未登入請求');
   for (const path of ['/__test/reset', '/probe', '/parties/rooms/test']) {
     assert.equal((await get(path)).status, 404, 'CICD-03：測試入口未封鎖');
