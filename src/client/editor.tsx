@@ -1,3 +1,4 @@
+import { registerPwa } from './pwa';
 import {
   Alert,
   Badge,
@@ -752,7 +753,7 @@ let booting: Promise<void> | undefined;
 
 function boot() {
   booting ??= (async () => {
-    await navigator.serviceWorker.register("/sw.js");
+    await registerPwa();
     if (navigator.onLine) {
       const registration = await navigator.serviceWorker.ready;
       const urls = performance

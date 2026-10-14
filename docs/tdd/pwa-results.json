@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-14",
+  "unit": {
+    "passed": 8
+  },
+  "workers": {
+    "passed": 107
+  },
+  "fullBrowserRun": {
+    "total": 372,
+    "passed": 361,
+    "timedOut": 11,
+    "skipped": 0,
+    "workers": 4
+  },
+  "failedCasesRerun": {
+    "total": 11,
+    "passed": 11,
+    "workers": 1,
+    "allOriginalFailuresResolved": true,
+    "timeoutChanged": false
+  },
+  "finalPwa": {
+    "passed": 21,
+    "projects": [
+      "chromium-desktop",
+      "chromium-mobile",
+      "webkit-mobile"
+    ]
+  },
+  "httpsBuildSmoke": {
+    "passed": 2
+  },
+  "rawPrivateDataIncluded": false,
+  "integratedVerification": {
+    "passed": 42,
+    "pwa": 21,
+    "hover": 12,
+    "deploymentContract": 9,
+    "specScenarios": 121,
+    "productionHttpChecksAdded": false
+  }
+}

@@ -65,6 +65,12 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
+      if (path === '/__test/pwa-sw' && request.method === 'GET') {
+        const source = await (await fetch(new URL('/sw.js', env.BETTER_AUTH_URL))).text();
+        return new Response(source.replace(/p-note-shell-([^']+)/, 'p-note-shell-$1-test-update'), {
+          headers: { 'Content-Type': 'application/javascript', 'Cache-Control': 'no-store', 'Service-Worker-Allowed': '/' },
+        });
+      }
       if (path === '/__test/storage-failure' && request.method === 'POST') {
         const { room, fail } = await request.json<{ room: string; fail: boolean }>();
         if (!/^[a-f0-9]{64}$/.test(room) || typeof fail !== 'boolean') return new Response('無效測試故障', { status: 400 });

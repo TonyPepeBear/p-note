@@ -1,3 +1,4 @@
+import { PwaControls } from './pwa-controls';
 import {
   useEffect,
   useRef,
@@ -331,6 +332,7 @@ export function Navigation({
         </nav>
       </ScrollArea>
       <div className="sidebar-footer">
+        <PwaControls />
         <NavLink component="button" label="設定" leftSection={<IconSettings size={18} />} onClick={settings} />
         <NavLink
           component="button"
