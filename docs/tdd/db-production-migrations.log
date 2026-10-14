@@ -1,0 +1,22 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.151.0)
+───────────────────────────────────────────────
+Resource location: remote 
+
+Migrations to be applied:
+┌─────────────────────────┐
+│ name                    │
+├─────────────────────────┤
+│ 0006_note_databases.sql │
+└─────────────────────────┘
+? About to apply 1 migration(s)
+Your database may not be available to serve requests during the migration, continue?
+🤖 Using fallback value in non-interactive context: yes
+🌀 Executing on remote database p-note-production (5a1ead73-a776-4e75-824c-387e0f9bd5c6):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 3 commands in 1.31ms
+┌─────────────────────────┬────────┐
+│ name                    │ status │
+├─────────────────────────┼────────┤
+│ 0006_note_databases.sql │ ✅     │
+└─────────────────────────┴────────┘

@@ -1,0 +1,26 @@
+
+ ⛅️ wrangler 4.149.0 (update available 4.151.0)
+───────────────────────────────────────────────
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe JSX import source cannot be set without also enabling React's "automatic" JSX transform[0m [unsupported-jsx-comment]
+
+    node_modules/@tiptap/extension-bold/dist/index.js:4:21:
+[37m      4 │ /** @jsxImportSource [32m@tiptap/core[37m */
+        ╵                      [32m~~~~~~~~~~~~[0m
+
+  You can enable React's "automatic" JSX transform for this file by using a "@jsxRuntime automatic" comment.
+
+
+✨ Read 27 files from the assets directory /Users/tony.cheng/TonyPepe/project/p-note/dist
+Total Upload: 3853.96 KiB / gzip: 797.89 KiB
+Your Worker has access to the following bindings:
+Binding                                       Resource            
+env.ROOMS (ProbeRoom)                         Durable Object      
+env.SYNC (SyncRoom)                           Durable Object      
+env.RESTORES (RestoreCoordinator)             Durable Object      
+env.EMAIL (unrestricted)                      Send Email          
+env.DB (p-note-production)                    D1 Database         
+env.ASSETS (p-note-production-assets)         R2 Bucket           
+env.BACKUPS (p-note-production-backups)       R2 Bucket           
+env.STATIC                                    Assets              
+
+--dry-run: exiting now.

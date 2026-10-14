@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。提供階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。介面使用 Mantine，開發使用 OpenSpec 與 TDD；正式網站為 [note.tonypepe.com](https://note.tonypepe.com)。
+個人筆記／日記系統。提供筆記資料庫、自訂欄位與表格／清單檢視、階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。介面使用 Mantine，開發使用 OpenSpec 與 TDD；正式網站為 [note.tonypepe.com](https://note.tonypepe.com)。
 
 ## 自動化驗證
 

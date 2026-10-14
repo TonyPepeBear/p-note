@@ -83,3 +83,13 @@ node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.j
 依專案流程發布程式提交 `4ba7a6a`（[TDD 報告](tdd/local-first-page-navigation.md)，三瀏覽器 291 個通過），正式 Worker 版本為 `017df0d7-c063-4ae6-bbab-71cf2b1d9389`，見 [部署紀錄](tdd/lfn-production-deploy.log)。發布前正式版本為 `81abdcc4-d8fb-416e-9eda-c9ec46d07e21`（API key），本提交已包含。只改前端，沿用既有 D1、R2、DO、寄信設定與排程，沒有資料遷移或密鑰變更；[雲端設定](tdd/lfn-release-cloud.log)（以即時 [secret 名稱](tdd/lfn-production-secrets.json)比對）、[建置](tdd/lfn-release-build.log)與[預檢](tdd/lfn-release-dry-run.log)通過。
 
 [正式 smoke](tdd/lfn-production-smoke.log)：入口 module script 與本機建置相同、未登入頁面 API 回 401、測試入口 404。未執行需實際郵件登入的 `npm run test:production`，驗收以本機完整回歸為準。
+
+## 筆記資料庫發布：2026-10-14
+
+發布程式提交 `cbfb357`，正式 Worker 版本為 `362deed1-59fd-42c8-8942-eb371297ada4`，tag 為 `note-databases`，見 [部署紀錄](tdd/db-production-deploy.log)。發布前確認原正式版本為 `017df0d7-c063-4ae6-bbab-71cf2b1d9389`，本提交包含既有 API key 與本機優先導覽。唯一 [D1 遷移](tdd/db-production-migrations.log)為 `0006_note_databases.sql`，只新增資料庫設定與欄位值欄，不重建或刪除原頁面。沿用原 R2、DO、密鑰與排程；[正式預檢](tdd/db-production-dry-run.log)、[資源及密鑰名稱核對](tdd/db-production-config.log)通過。
+
+[本機驗收](tdd/note-databases.md)涵蓋既有 291 個瀏覽器案例、最終資料庫 33 個三瀏覽器案例、104 個 Workers、6 個單元與 2 個 HTTPS build smoke；[結果彙整](tdd/db-acceptance.json)保留完整回歸及針對性重跑的來源，不宣稱單次完整 324 項全綠。
+
+[正式結果](tdd/db-production-results.json)與 [執行紀錄](tdd/db-production-smoke.log)確認正式 JS 等於本機建置、未登入拒絕與測試入口封鎖、資料庫及欄位 API、舊世代拒絕、Chromium 表格欄位保存／清單篩選／筆記屬性，以及正文由另一個全新 context 從雲端載入。使用十分鐘專用管理 session，不重新驗證實際郵件寄信。測試資料庫與筆記已依正常垃圾桶流程隱藏，專用 session 已刪除。
+
+使用與限制見 [筆記資料庫](note-databases.md)。

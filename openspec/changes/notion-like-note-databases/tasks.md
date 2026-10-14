@@ -17,5 +17,5 @@
 ## 4. 驗收與發布
 
 - [x] 4.1 Refactor 後相關 E2E 持續通過；執行完整三瀏覽器 E2E、unit／integration、check、build、spec 校驗，DB-01～10 全數具通過證據，提交程式及驗收紀錄。
-- [ ] 4.2 以正式 Wrangler 設定套用 migration、dry-run、部署；自動驗證正式建置與專用資料庫操作，清理臨時 session／測試資料並提交部署結果。
-- [ ] 4.3 確認全部 tasks 完成後同步主規格、封存 change，openspec validate 及清單確認無未完成變更，提交封存紀錄。
+- [x] 4.2 以正式 Wrangler 設定套用 migration、dry-run、部署；自動驗證正式建置與專用資料庫操作，清理臨時 session／測試資料並提交部署結果。
+- [ ] 4.3 核對全部開發與正式部署證據、同步主規格，openspec validate 與 delta 比對通過，完成封存前檢查。

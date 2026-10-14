@@ -25,3 +25,7 @@ change：notion-like-note-databases。規格提交 2e1d9dd，更新設計與前�
 - [可追溯結果彙整](db-acceptance.json)：既有 291 項由完整回歸通過，新資料庫 33 項由最終針對性重跑通過，共 324 個唯一案例全數驗證。此為跨執行來源彙整，不宣稱單次完整 324 項全綠。
 - [Workers 最終回歸](db-integration-final.log)：104 個通過；[單元](db-unit.log)：6 個通過；[型別](db-check.log)、[文件契約](db-spec-check.log)通過。
 - [真實 dist／HTTPS smoke](db-build-smoke.log)：2 個通過，包含登入、wss 保存、離線刷新與分析 POST 不阻擋啟動。
+
+## 正式發布
+
+[正式遷移](db-production-migrations.log)與[預檢](db-production-dry-run.log)成功，[發布版本](db-production-deploy.log)為 362deed1-59fd-42c8-8942-eb371297ada4。[正式 API 與瀏覽器驗證](db-production-results.json)全部通過，含版本一致、建立／欄位值、清單篩選、完整正文及全新 context 讀取；測試資料庫已移入垃圾桶、臨時 session 已刪除。此輪使用短期管理 session，未重新驗證實際寄信。

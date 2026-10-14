@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-10-14T10:33:28.322Z",
+  "authentication": "十分鐘管理 session，本次不重新驗證寄信登入",
+  "checks": {
+    "deployedBuild": true,
+    "createAndValidation": true,
+    "browserPropertiesViewsAndBody": true,
+    "persisted": true,
+    "cleanup": true
+  }
+}
