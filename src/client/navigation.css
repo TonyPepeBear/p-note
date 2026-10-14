@@ -121,7 +121,7 @@
 .pn-breadcrumbs .mantine-Breadcrumbs-breadcrumb { flex-shrink: 1; min-width: 0; }
 .pn-breadcrumbs .mantine-Breadcrumbs-breadcrumb:first-child { flex-shrink: 0; }
 .pn-breadcrumbs .mantine-Anchor-root { color: #6f6e69; font-size: 13px; white-space: nowrap; }
-.pn-breadcrumbs .mantine-Breadcrumbs-separator { margin: 0; color: #b7b7b1; }
+.pn-breadcrumbs .mantine-Breadcrumbs-separator { margin: 0; color: #6f6e69; }
 .pn-current-page { display: flex; align-items: center; gap: 6px; max-width: 300px; color: #37352f; font-size: 13px; }
 .pn-current-page > svg { color: #91918e; flex: none; }
 .pn-current-page > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -176,35 +176,35 @@
 .pn-delete-copy > svg { flex: none; color: #91918e; }
 .pn-delete-copy .mantine-Text-root { min-width: 0; overflow-wrap: anywhere; line-height: 1.7; }
 /* 觸控僅在按下時回饋；hover 限實際支援懸停的指標。 */
-.pn-icon-button:active, .pn-nav-item:active, .pn-menu-action:active,
-.pn-note-row:active, .pn-tree-toggle:active, .pn-note-link:active,
-.pn-result-row:active, .pn-journal-row:active {
+.pn-icon-button:not(:disabled):active, .pn-nav-item:not(:disabled):active, .pn-menu-action:not(:disabled):active,
+.pn-note-row:not([data-disabled="true"]):active, .pn-tree-toggle:not(:disabled):active, .pn-note-link:not([aria-disabled="true"]):active,
+.pn-result-row:not([aria-disabled="true"]):active, .pn-journal-row:not([aria-disabled="true"]):active {
   background: #efefed;
   color: #37352f;
 }
-.pn-nav-item:active kbd, .pn-result-row:active .pn-result-summary { color: #5f5e5b; }
-.pn-nav-item[data-active]:active, .pn-note-row[data-active]:active,
-.pn-note-row[data-active]:active .pn-note-link, .pn-note-link[aria-current]:active {
+.pn-nav-item:not(:disabled):active kbd, .pn-result-row:not([aria-disabled="true"]):active .pn-result-summary { color: #5f5e5b; }
+.pn-nav-item[data-active]:not(:disabled):active, .pn-note-row[data-active]:not([data-disabled="true"]):active,
+.pn-note-row[data-active]:not([data-disabled="true"]):active .pn-note-link, .pn-note-link[aria-current]:not([aria-disabled="true"]):active {
   background: #dededb;
   color: #37352f;
 }
-.pn-breadcrumbs .mantine-Anchor-root:active { background: #efefed; color: #37352f; text-decoration: none; }
-.pn-danger-action:active, .pn-danger-action:active > svg { color: #b83a35; }
+.pn-breadcrumbs .mantine-Anchor-root:not(:disabled):not([aria-disabled="true"]):active { background: #efefed; color: #37352f; text-decoration: none; }
+.pn-danger-action:not(:disabled):active, .pn-danger-action:not(:disabled):active > svg { color: #b83a35; }
 @media (hover: hover) {
-  .pn-icon-button:hover, .pn-nav-item:hover, .pn-menu-action:hover,
-  .pn-note-row:hover, .pn-tree-toggle:hover, .pn-note-link:hover,
-  .pn-result-row:hover, .pn-journal-row:hover {
+  .pn-icon-button:not(:disabled):hover, .pn-nav-item:not(:disabled):hover, .pn-menu-action:not(:disabled):hover,
+  .pn-note-row:not([data-disabled="true"]):hover, .pn-tree-toggle:not(:disabled):hover, .pn-note-link:not([aria-disabled="true"]):hover,
+  .pn-result-row:not([aria-disabled="true"]):hover, .pn-journal-row:not([aria-disabled="true"]):hover {
     background: #efefed;
     color: #37352f;
   }
-  .pn-nav-item:hover kbd, .pn-result-row:hover .pn-result-summary { color: #5f5e5b; }
-  .pn-nav-item[data-active]:hover, .pn-note-row[data-active]:hover,
-  .pn-note-row[data-active]:hover .pn-note-link, .pn-note-link[aria-current]:hover {
+  .pn-nav-item:not(:disabled):hover kbd, .pn-result-row:not([aria-disabled="true"]):hover .pn-result-summary { color: #5f5e5b; }
+  .pn-nav-item[data-active]:not(:disabled):hover, .pn-note-row[data-active]:not([data-disabled="true"]):hover,
+  .pn-note-row[data-active]:not([data-disabled="true"]):hover .pn-note-link, .pn-note-link[aria-current]:not([aria-disabled="true"]):hover {
     background: #dededb;
     color: #37352f;
   }
-  .pn-breadcrumbs .mantine-Anchor-root:hover { background: #efefed; color: #37352f; text-decoration: none; }
-  .pn-danger-action:hover, .pn-danger-action:hover > svg { color: #b83a35; }
+  .pn-breadcrumbs .mantine-Anchor-root:not(:disabled):not([aria-disabled="true"]):hover { background: #efefed; color: #37352f; text-decoration: none; }
+  .pn-danger-action:not(:disabled):hover, .pn-danger-action:not(:disabled):hover > svg { color: #b83a35; }
 }
 @media (max-width: 767px) {
   .pn-sidebar { display: none; }
@@ -214,10 +214,33 @@
   .pn-topbar { height: 52px; padding: 0 4px; gap: 0; border-bottom: 1px solid #efefed; }
   .pn-icon-button { width: 44px; height: 44px; }
   .pn-topbar-actions { gap: 0; }
-  .pn-breadcrumbs .mantine-Breadcrumbs-root { gap: 5px; }
-  .pn-breadcrumbs .mantine-Breadcrumbs-breadcrumb:not(:last-child),
-  .pn-breadcrumbs .mantine-Breadcrumbs-separator { display: none; }
-  .pn-current-page { max-width: none; font-size: 13px; }
+  .pn-breadcrumbs .mantine-Breadcrumbs-root { gap: 3px; min-width: 0; }
+  .pn-breadcrumbs .mantine-Breadcrumbs-breadcrumb:first-child {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* 小螢幕保留根入口、直接上層與目前頁，所有可見路徑仍可操作。 */
+  .pn-breadcrumbs .pn-ancestor:not([data-direct-parent="true"]),
+  .pn-breadcrumbs .pn-ancestor:not([data-direct-parent="true"]) + .mantine-Breadcrumbs-separator { display: none; }
+  .pn-breadcrumbs .pn-ancestor[data-direct-parent="true"] {
+    flex: 0 1 64px;
+    min-width: 44px;
+    max-width: 64px;
+  }
+  .pn-breadcrumbs .pn-ancestor .mantine-Anchor-root {
+    display: block;
+    min-width: 0;
+    min-height: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 44px;
+  }
+  .pn-breadcrumbs .mantine-Breadcrumbs-separator { flex: none; }
+  .pn-breadcrumbs .pn-current-page { flex: 1 1 56px; min-width: 0; max-width: none; font-size: 13px; }
+  .pn-current-page > span { min-width: 0; }
   .pn-current-page > svg { display: none; }
   .pn-document-shell.document-shell { padding: 28px 24px 88px; }
   .pn-settings-shell.document-shell { padding: 0; }
@@ -244,4 +267,12 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pn-workspace *, .pn-dialog *, .pn-navigation-drawer * { scroll-behavior: auto; }
+}
+
+.pn-icon-button:disabled, .pn-nav-item:disabled, .pn-menu-action:disabled,
+.pn-breadcrumbs .mantine-Anchor-root:disabled,
+.pn-note-link[aria-disabled="true"], .pn-result-row[aria-disabled="true"],
+.pn-journal-row[aria-disabled="true"], .pn-breadcrumbs [aria-disabled="true"] {
+  opacity: .45;
+  cursor: not-allowed;
 }

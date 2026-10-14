@@ -497,7 +497,9 @@ export function DatabasePage({
         <div className="database-toolbar-actions" role="toolbar" aria-label="資料庫工具列">
           <Button
             variant="subtle"
-            className={view.filters.length ? "database-active-tool" : undefined}
+            className={"database-compact-action" + (view.filters.length ? " database-active-tool" : "")}
+            aria-label={view.filters.length ? `篩選 · ${view.filters.length}` : "篩選"}
+            title="篩選"
             leftSection={<IconFilter size={15} aria-hidden="true" />}
             onClick={() => editView(view, "database-filter-settings")}
             disabled={disabled}
@@ -506,7 +508,9 @@ export function DatabasePage({
           </Button>
           <Button
             variant="subtle"
-            className={view.sorts.length ? "database-active-tool" : undefined}
+            className={"database-compact-action" + (view.sorts.length ? " database-active-tool" : "")}
+            aria-label={view.sorts.length ? `排序 · ${view.sorts.length}` : "排序"}
+            title="排序"
             leftSection={<IconArrowsSort size={15} aria-hidden="true" />}
             onClick={() => editView(view, "database-sort-settings")}
             disabled={disabled}
@@ -543,6 +547,9 @@ export function DatabasePage({
           />
           <Button
             leftSection={<IconPlus size={15} aria-hidden="true" />}
+            className="database-compact-action"
+            aria-label="新增筆記"
+            title="新增筆記"
             disabled={disabled}
             onClick={() =>
               void run(async () => {

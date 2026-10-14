@@ -25,9 +25,11 @@ import "./settings.css";
 export function BackupSettings({
   close,
   unauthorized,
+  onNavigationLockChange,
 }: {
   close: () => void;
   unauthorized: () => void;
+  onNavigationLockChange?: (locked: boolean) => void;
 }) {
   const [backups, setBackups] = useState<BackupCatalog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,14 @@ export function BackupSettings({
   const [operation, setOperation] = useState<{ backup: string; id: string }>();
   const [interrupted, setInterrupted] = useState(false);
   const confirmation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    onNavigationLockChange?.(busy || interrupted);
+  }, [busy, interrupted, onNavigationLockChange]);
+  useEffect(() => {
+    // 只在實例卸載時釋放；busy 改變時不先解除，避免中斷重試短暫開放導覽。
+    // React 先清理舊實例，再執行新實例的 effect，新的鎖定狀態不會被覆蓋。
+    return () => onNavigationLockChange?.(false);
+  }, [onNavigationLockChange]);
   useEffect(() => {
     if (selected)
       confirmation.current?.scrollIntoView({

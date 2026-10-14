@@ -15,7 +15,7 @@ import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
 import "./navigation.css";
 
-export function Navigation({ page, changed, error, backups, settings, settingsView, databaseView, children }: {
+export function Navigation({ page, changed, error, backups, settings, settingsView, databaseView, navigationLocked = false, children }: {
   page: PageInfo;
   changed: (page: PageInfo) => void;
   error: (message: string) => void;
@@ -23,6 +23,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
   settings: () => void;
   settingsView?: "backup" | "api";
   databaseView?: boolean;
+  navigationLocked?: boolean;
   children: ReactNode;
 }) {
   const [pages, setPages] = useState<PageRow[]>([]);
@@ -52,6 +53,12 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     } catch { return []; }
   });
   const trigger = useRef<HTMLElement | null>(null);
+  // 快捷鍵的長效監聽器也必須讀取最新還原鎖定狀態。
+  const navigationLockedRef = useRef(navigationLocked);
+  navigationLockedRef.current = navigationLocked;
+  useEffect(() => {
+    if (navigationLocked) setPanel("");
+  }, [navigationLocked]);
   const setSidebar = (closed: boolean) => {
     setSidebarCollapsed(closed);
     requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
@@ -108,6 +115,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     return () => window.removeEventListener("keydown", search, true);
   }, []);
   const run = async (work: () => Promise<void>) => {
+    if (navigationLockedRef.current) return;
     setBusy(true);
     setFailure("");
     error("");
@@ -128,14 +136,20 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     return value;
   };
   const link = (event: MouseEvent<HTMLElement>, id: string) => {
+    if (navigationLockedRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     void run(() => navigate(id));
   };
   const pageLink = (item: PageRow, label = item.title) => (
-    <Anchor href={"/?page=" + item.id} onClick={(event) => link(event, item.id)}>{label}</Anchor>
+    <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
   );
   const open = (name: string, target?: HTMLElement) => {
+    if (navigationLockedRef.current) return;
     trigger.current = target ?? (document.activeElement as HTMLElement);
     trigger.current?.focus();
     setPanel(name);
@@ -148,12 +162,12 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     const nested = notesUnder(item.id).length > 0;
     const closed = collapsed.includes(item.id);
     return <div key={item.id} className="pn-tree-branch" style={{ paddingLeft: depth ? 14 : 0 }}>
-      <div className="pn-note-row" data-active={!settingsView && item.id === page.id || undefined}>
+      <div className="pn-note-row" data-disabled={navigationLocked || undefined} data-active={!settingsView && item.id === page.id || undefined}>
         {nested ? <button type="button" className="pn-tree-toggle"
           aria-label={(closed ? "展開 " : "收合 ") + item.title} aria-expanded={!closed} onClick={() => toggle(item.id)}>
           {closed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
         </button> : <span className="pn-tree-spacer" />}
-        <a href={"/?page=" + item.id} className="pn-note-link note-link"
+        <a href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} className="pn-note-link note-link"
           aria-current={!settingsView && item.id === page.id ? "page" : undefined}
           onClick={(event) => link(event, item.id)} title={item.title}>
           {item.database_config ? <IconDatabase size={17} /> : <IconFileText size={17} />}
@@ -179,12 +193,12 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
         onClick={() => setSidebar(true)}><IconChevronsLeft size={18} /></button>
     </div>
     <nav className="pn-quick-navigation" aria-label="工作區">
-      <button className="pn-nav-item pn-sidebar-search" aria-label="搜尋筆記" onClick={(event) => open("search", event.currentTarget)}>
+      <button className="pn-nav-item pn-sidebar-search" disabled={navigationLocked} aria-label="搜尋筆記" onClick={(event) => open("search", event.currentTarget)}>
         <IconSearch size={18} /><span>搜尋</span><kbd aria-hidden="true">⌘ K</kbd>
       </button>
-      <button className="pn-nav-item" data-active={!settingsView && page.kind === "journal" && page.journal_date === today(Date.now()) || undefined}
+      <button className="pn-nav-item" disabled={navigationLocked} data-active={!settingsView && page.kind === "journal" && page.journal_date === today(Date.now()) || undefined}
         onClick={() => void run(() => navigate())}><IconCalendarEvent size={18} /><span>今天</span></button>
-      <button className="pn-nav-item" onClick={(event) => openJournals(event.currentTarget)}>
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={(event) => openJournals(event.currentTarget)}>
         <IconCalendar size={18} /><span>日記</span>
       </button>
     </nav>
@@ -193,23 +207,23 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
       <nav aria-label="筆記頁面">
         {pages.some((item) => item.kind === "note") ? tree(null) : <div className="pn-sidebar-empty">還沒有筆記</div>}
       </nav>
-      <button className="pn-nav-item pn-add-page" disabled={busy} onClick={newNote}><IconPlus size={18} /><span>新增筆記</span></button>
-      <button className="pn-nav-item pn-add-page" disabled={busy} onClick={() => void run(async () => {
+      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={newNote}><IconPlus size={18} /><span>新增筆記</span></button>
+      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={() => void run(async () => {
         const database = await request("/api/databases", { title: "未命名資料庫" });
         if (database) await navigate(database.id);
       })}><IconDatabase size={18} /><span>新增資料庫</span></button>
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
-      <button className="pn-nav-item" data-active={settingsView === "api" || undefined} onClick={() => { setNavOpen(false); settings(); }}>
+      <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "api" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); settings(); }}>
         <IconSettings size={17} /><span>設定</span>
       </button>
-      <button className="pn-nav-item" aria-label="備份設定" data-active={settingsView === "backup" || undefined} onClick={() => { setNavOpen(false); backups(); }}>
+      <button className="pn-nav-item" disabled={navigationLocked} aria-label="備份設定" data-active={settingsView === "backup" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); backups(); }}>
         <IconCloud size={17} /><span>備份設定</span>
       </button>
-      <button className="pn-nav-item" onClick={(event) => { open("trash", event.currentTarget); void run(loadTrash); }}>
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={(event) => { open("trash", event.currentTarget); void run(loadTrash); }}>
         <IconTrash size={17} /><span>垃圾桶</span>
       </button>
-      <button className="pn-nav-item" onClick={() => void run(async () => {
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={() => void run(async () => {
         await saveDraft();
         const response = await api("/api/logout", {});
         if (!response.ok) throw new Error("登出失敗，請重試");
@@ -218,7 +232,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
     </nav>
   </div>;
   const panelTitle = ({ search: "搜尋筆記", journals: "日記回顧", trash: "垃圾桶", page: "頁面操作", delete: "移到垃圾桶？" } as Record<string, string>)[panel] ?? "";
-  return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed}>
+  return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
     <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
     <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
       closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
@@ -232,8 +246,9 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           onClick={() => setSidebar(false)}><IconChevronsRight size={18} /></button>}
         <nav aria-label="頁面路徑" className="pn-breadcrumbs">
           <Breadcrumbs separator={<span className="pn-path-separator">/</span>}>
-            <Anchor component="button" aria-label={settingsView ? "返回目前文件" : page.kind === "journal" ? "日記回顧" : "筆記列表"}
+            <Anchor component="button" disabled={navigationLocked} aria-disabled={navigationLocked || undefined} aria-label={settingsView ? "返回目前文件" : page.kind === "journal" ? "日記回顧" : "筆記列表"}
               onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                if (navigationLockedRef.current) { event.preventDefault(); return; }
                 if (settingsView) void run(() => navigate(page.id));
                 else if (page.kind === "journal") openJournals(event.currentTarget);
                 else if (matchMedia("(max-width: 47.99em)").matches) setNavOpen(true);
@@ -242,7 +257,8 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
                   requestAnimationFrame(() => document.querySelector<HTMLElement>('.workspace-sidebar [aria-current="page"]')?.focus());
                 }
               }}>{settingsView ? "設定" : page.kind === "journal" ? "日記" : "筆記"}</Anchor>
-            {!settingsView && page.ancestors?.map((item) => <span key={item.id}>{pageLink(item)}</span>)}
+            {!settingsView && page.ancestors?.map((item, index) => <span key={item.id} className="pn-ancestor"
+              data-direct-parent={index === (page.ancestors?.length ?? 0) - 1 || undefined}>{pageLink(item)}</span>)}
             <span className="pn-current-page" title={settingsView ? undefined : page.title}>
               {settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
               <span>{settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
@@ -250,11 +266,11 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           </Breadcrumbs>
         </nav>
         <div className="pn-topbar-actions">
-          <button className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
+          <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
             onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
-          <button className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"
-            onClick={backups}><IconCloud size={18} /></button>
-          {!settingsView && <button className="pn-icon-button" aria-label="頁面操作" title="頁面操作" aria-haspopup="dialog" aria-expanded={panel === "page"}
+          <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"
+            onClick={() => { if (!navigationLockedRef.current) backups(); }}><IconCloud size={18} /></button>
+          {!settingsView && <button disabled={navigationLocked} className="pn-icon-button" aria-label="頁面操作" title="頁面操作" aria-haspopup="dialog" aria-expanded={panel === "page"}
             onClick={(event) => open("page", event.currentTarget)}><IconDots size={20} /></button>}
         </div>
       </header>
@@ -266,6 +282,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
       if (!panel && !settled) (trigger.current?.isConnected ? trigger.current : document.querySelector<HTMLButtonElement>('button[aria-label="導覽"]'))?.focus();
     }} opened={!!panel} onClose={() => setPanel("")} title={panelTitle}
       size={panel === "search" ? 600 : panel === "delete" ? 420 : 460}
+      centered={panel === "delete"}
       className={"pn-dialog pn-dialog-" + panel} padding={20} radius={8}
       closeButtonProps={{ "aria-label": "關閉" + panelTitle }}>
       <Stack gap={16}>
@@ -283,13 +300,13 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
             <div className="pn-inline-form">
               <TextInput data-autofocus type="search" label="搜尋文字" placeholder="搜尋標題或內容…" value={query} required
                 onChange={(event) => { setQuery(event.target.value); setSearched(false); }} leftSection={<IconSearch size={18} />} />
-              <Button type="submit" loading={busy}>搜尋</Button>
+              <Button type="submit" loading={busy} disabled={navigationLocked}>搜尋</Button>
             </div>
           </form>
           {searched ? <section aria-label="搜尋結果" className="pn-result-list">
             <div className="pn-list-caption">{results.length} 個搜尋結果</div>
             {!results.length ? <div className="pn-empty-state"><IconSearch size={28} stroke={1.4} /><Text>沒有符合的頁面</Text><Text size="sm" c="dimmed">試試其他關鍵字。</Text></div>
-              : results.map((item) => <a key={item.id} className="pn-result-row" href={"/?page=" + item.id} aria-label={item.title} onClick={(event) => link(event, item.id)}>
+              : results.map((item) => <a key={item.id} className="pn-result-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
                 {item.kind === "journal" ? <IconCalendar size={19} /> : item.database_config ? <IconDatabase size={19} /> : <IconFileText size={19} />}
                 <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
                 <IconArrowRight size={16} className="pn-result-arrow" />
@@ -304,20 +321,20 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           }}>
             <div className="pn-inline-form">
               <TextInput type="date" label="日記日期" required value={date} onChange={(event) => setDate(event.target.value)} />
-              <Button type="submit" loading={busy}>開啟日期日記</Button>
+              <Button type="submit" loading={busy} disabled={navigationLocked}>開啟日期日記</Button>
             </div>
           </form>
           <div className="pn-panel-section">
             <form onSubmit={(event) => { event.preventDefault(); void run(() => loadMonth(month)); }}>
               <div className="pn-inline-form">
                 <TextInput type="month" label="日記月份" required value={month} onChange={(event) => setMonth(event.target.value)} />
-                <Button variant="default" type="submit" loading={busy}>查看月份</Button>
+                <Button variant="default" type="submit" loading={busy} disabled={navigationLocked}>查看月份</Button>
               </div>
             </form>
           </div>
           <section aria-label="月份日記" className="pn-result-list">
             <div className="pn-list-caption">{month.replace("-", " 年 ")} 月 · {journals.length} 篇日記</div>
-            {journals.length ? journals.map((item) => <a key={item.id} className="pn-journal-row" href={"/?page=" + item.id}
+            {journals.length ? journals.map((item) => <a key={item.id} className="pn-journal-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
               onClick={(event) => link(event, item.id)}>
               <span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>
               <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
@@ -331,7 +348,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           {!trash.length && <div className="pn-empty-state"><IconTrash size={30} stroke={1.4} /><Text fw={500}>垃圾桶是空的</Text></div>}
           <div className="pn-trash-list">{trash.map((item) => <div className="pn-trash-row" key={item.id}>
             <IconFileText size={18} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
-            <Button variant="default" disabled={busy} aria-label={"還原 " + item.title} onClick={() => {
+            <Button variant="default" disabled={busy || navigationLocked} aria-label={"還原 " + item.title} onClick={() => {
               setNotice("");
               void run(async () => {
                 await request(`/api/pages/${item.id}/restore`, {});
@@ -354,16 +371,16 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           }}>
             <Stack gap={10}>
               <TextInput data-autofocus label="頁面標題" maxLength={200} required value={title} onChange={(event) => setTitle(event.target.value)} />
-              <Group justify="end"><Button type="submit" loading={busy}>儲存標題</Button></Group>
+              <Group justify="end"><Button type="submit" loading={busy} disabled={navigationLocked}>儲存標題</Button></Group>
             </Stack>
           </form>
           {page.kind === "note" && <>
             <div className="pn-panel-section"><div className="pn-list-caption">新增至此頁面</div>
-              <button className="pn-menu-action" disabled={busy} onClick={() => void run(async () => {
+              <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
                 const child = await request("/api/pages", { title: "未命名", parent_id: page.id });
                 if (child) await navigate(child.id, true);
               })}><IconPlus size={18} />新增子頁面</button>
-              {!page.database_config && <button className="pn-menu-action" disabled={busy} onClick={() => void run(async () => {
+              {!page.database_config && <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
                 const database = await request("/api/databases", { title: "未命名資料庫", parent_id: page.id });
                 if (database) await navigate(database.id);
               })}><IconDatabase size={18} />新增子資料庫</button>}
@@ -380,11 +397,11 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
               <div className="pn-inline-form">
                 <NativeSelect label="移動至上層" value={parent} onChange={(event) => setParent(event.target.value)}
                   data={[{ value: "", label: "最上層" }, ...parents(null)]} />
-                <Button variant="default" type="submit" loading={busy}>移動頁面</Button>
+                <Button variant="default" type="submit" loading={busy} disabled={navigationLocked}>移動頁面</Button>
               </div>
             </form>
           </>}
-          <div className="pn-panel-section"><button className="pn-menu-action pn-danger-action" disabled={busy} onClick={() => setPanel("delete")}>
+          <div className="pn-panel-section"><button className="pn-menu-action pn-danger-action" disabled={busy || navigationLocked} onClick={() => setPanel("delete")}>
             <IconTrash size={18} />移到垃圾桶</button></div>
         </>}
         {panel === "delete" && <>
@@ -393,7 +410,7 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           </Text></div>
           <Group justify="end" gap={8} mt={8}>
             <Button variant="default" onClick={() => setPanel("")}>取消</Button>
-            <Button color="red" loading={busy} onClick={() => void run(async () => {
+            <Button color="red" loading={busy} disabled={navigationLocked} onClick={() => void run(async () => {
               await saveDraft();
               await request(`/api/pages/${page.id}/delete`, {});
               await navigate();

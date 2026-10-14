@@ -37,6 +37,11 @@
 
 .login-card .mantine-Input-input {
   background: #fff;
+  min-height: 44px;
+}
+
+.login-card .mantine-Button-root {
+  min-height: 44px;
 }
 
 .login-card .mantine-Alert-root {

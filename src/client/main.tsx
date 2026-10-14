@@ -43,6 +43,13 @@ function App() {
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
+  const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
+  useEffect(() => {
+    if (login) {
+      setSettings(false);
+      setApiSettings(false);
+    }
+  }, [login]);
   const [route, setRoute] = useState(() => ({
     serial: 0,
     fresh: new URLSearchParams(location.search).get("new") === "1",
@@ -559,8 +566,10 @@ function App() {
         error={setError}
         settingsView={apiSettings ? "api" : settings ? "backup" : undefined}
         databaseView={!!page?.database_config}
-        settings={() => { void saveDraft().then(() => { setSettings(false); setApiSettings(true); }).catch(() => setError("本機儲存失敗，請重試")); }}
+        navigationLocked={backupNavigationLocked}
+        settings={() => { if (backupNavigationLocked) return; void saveDraft().then(() => { setSettings(false); setApiSettings(true); }).catch(() => setError("本機儲存失敗，請重試")); }}
         backups={() => {
+          if (backupNavigationLocked) return;
           void saveDraft()
             .then(() => { setApiSettings(false); setSettings(true); })
             .catch((failure) =>
@@ -571,7 +580,7 @@ function App() {
         }}
       >
         <div hidden={settings || apiSettings}>{content}</div>
-        {settings && <BackupSettings close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
+        {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
         {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
       </Navigation>
     );

@@ -16,7 +16,7 @@
 .note-link-menu-label {
   margin: 0;
   padding: 6px 8px;
-  color: #787774;
+  color: #6f6e69;
   font-size: 11px;
   font-weight: 500;
   line-height: 18px;
@@ -50,7 +50,7 @@
 
 .note-link-option:hover,
 .note-link-option[aria-selected="true"] {
-  background: #f1f1ef;
+  background: #efefed;
 }
 
 .note-link-option:focus-visible {
@@ -62,7 +62,7 @@
   flex: 0 0 16px;
   width: 16px;
   height: 16px;
-  color: #787774;
+  color: #6f6e69;
 }
 
 .note-link-option-copy {
@@ -91,7 +91,7 @@
   flex: 0 1 auto;
   max-width: 100%;
   overflow-wrap: anywhere;
-  color: #787774;
+  color: #6f6e69;
   font-size: 11px;
   line-height: 17px;
 }
@@ -99,7 +99,7 @@
 .note-link-empty {
   margin: 0;
   padding: 10px 8px;
-  color: #787774;
+  color: #6f6e69;
   font-size: 13px;
   line-height: 20px;
 }
@@ -130,7 +130,7 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #787774;
+  color: #6f6e69;
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -140,7 +140,7 @@
 }
 
 .note-backlinks-toggle:hover {
-  background: #f1f1ef;
+  background: #efefed;
   color: #37352f;
 }
 
@@ -152,7 +152,7 @@
 
 .note-backlinks-count {
   margin-left: 2px;
-  color: #787774;
+  color: #6f6e69;
   font-size: 12px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -165,7 +165,7 @@
 
 .note-backlinks-description {
   margin: 0 0 8px;
-  color: #787774;
+  color: #6f6e69;
   font-size: 11px;
   line-height: 18px;
 }
@@ -173,7 +173,7 @@
 .note-backlinks-state {
   margin: 0;
   padding: 5px 0;
-  color: #787774;
+  color: #6f6e69;
   font-size: 13px;
   line-height: 20px;
 }
@@ -234,7 +234,7 @@
 }
 
 .note-backlink:hover {
-  background: #f1f1ef;
+  background: #efefed;
   color: #37352f;
   text-decoration: none;
 }
@@ -243,7 +243,7 @@
   flex: 0 0 16px;
   width: 16px;
   height: 16px;
-  color: #787774;
+  color: #6f6e69;
 }
 
 .note-backlink-title {

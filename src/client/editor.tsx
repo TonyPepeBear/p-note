@@ -42,7 +42,7 @@ import { isCurrentReceipt } from "../shared/receipt";
 import { roomName } from "../shared/room";
 import { IMAGE_TYPES, IMAGE_RULE } from "../shared/image";
 import { uploadImage } from "./assets";
-import { NoteLinkSuggestions, followNoteLink } from "./note-links";
+import { NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
@@ -663,6 +663,7 @@ export function Editor({
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
+                  style={{ color: "var(--mantine-color-red-9)" }}
                   leftSection={<IconTrash size={16} />}
                   onClick={() => editor.removeBlocks([currentBlock()])}
                 >
@@ -705,6 +706,7 @@ export function Editor({
         className="writing-surface"
         data-active-block={toolsOpen ? activeBlock?.id : undefined}
         onClickCapture={(event) => followNoteLink(event, setLinkError)}
+        onKeyDownCapture={(event) => selectNoteLinkSuggestion(event, editor)}
       >
         <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly}>
           {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}

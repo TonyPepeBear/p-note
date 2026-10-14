@@ -51,7 +51,7 @@ test("UI-02：收合與展開側邊欄保留目前文件及正在編輯的內容
   await expect(editor).toContainText("收合導覽後繼續寫作，也能重新找到頁面");
 });
 
-test("UI-06：在備份與 API key 設定切換時保留導覽並返回原文件", async ({ page }) => {
+test("UI-06：在備份與 API key 設定切換時保留導覽並返回原文件", async ({ page }, info) => {
   await page.setViewportSize({ width: 1440, height: 960 });
   const id = await openPrivate(page);
   const editor = page.locator(".tiptap");
@@ -63,6 +63,8 @@ test("UI-06：在備份與 API key 設定切換時保留導覽並返回原文件
   await expect(page.getByRole("navigation", { name: "筆記頁面", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "設定", exact: true }).click();
   await expect(page.getByRole("heading", { name: "API key 設定", exact: true })).toBeVisible();
+  await expect(page.getByText("尚未建立 API key。", { exact: true })).toBeVisible();
+  await page.screenshot({ path: `test-results/screenshots/redesign-${info.project.name}-api-settings.png`, fullPage: true });
   await expect(page.getByRole("navigation", { name: "筆記頁面", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "返回筆記", exact: true }).click();
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
@@ -149,16 +151,16 @@ test("UI-02：手機可開關導覽、新增筆記並繼續編輯且操作可觸
   await noOverflow(page);
 });
 
-test("UI-05：資料庫以鍵盤切換檢視、搜尋並新增有正文的筆記", async ({ page }) => {
+test("UI-05：資料庫以鍵盤切換檢視、搜尋並新增有正文的筆記", async ({ page }, info) => {
   test.setTimeout(45000);
   await openPrivate(page);
   const database = await post(page, "/api/databases", { title: "閱讀整理" });
   for (const title of ["閱讀計畫", "週末清單"])
     await post(page, "/api/pages", { title, parent_id: database.id });
-  const info = await (await page.request.get("/api/pages/" + database.id)).json();
+  const databaseInfo = await (await page.request.get("/api/pages/" + database.id)).json();
   await post(page, "/api/databases/" + database.id + "/config", {
-    previous: info.database_config,
-    generation: info.sync_generation,
+    previous: databaseInfo.database_config,
+    generation: databaseInfo.sync_generation,
     config: {
       properties: [],
       views: [
@@ -175,6 +177,7 @@ test("UI-05：資料庫以鍵盤切換檢視、搜尋並新增有正文的筆記
   const rows = page.getByTestId("database-row");
   await expect(all).toHaveAttribute("aria-selected", "true");
   await expect(rows).toHaveCount(2);
+  await page.screenshot({ path: `test-results/screenshots/redesign-${info.project.name}-database.png`, fullPage: true });
   await all.focus();
   await page.keyboard.press("ArrowRight");
   await expect(reading).toBeFocused();

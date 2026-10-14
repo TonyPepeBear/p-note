@@ -97,6 +97,8 @@ test("PAGE-03：日期補寫與月份列表返回原日記，修改標題不改�
   page,
   request,
 }) => {
+  // 此流程多次換頁並重建同步連線；保留每步 5 秒斷言，給 WebKit 全套併行足夠的總時間。
+  test.setTimeout(45_000);
   await login(page, request);
   await openJournal(page);
   await page.getByLabel("日記日期", { exact: true }).fill("2024-02-29");
@@ -209,6 +211,8 @@ test("PAGE-06：上層垃圾桶還原保留有效子頁／圖片，先前刪除�
   page,
   request,
 }) => {
+  // 此流程多次換頁並重建同步連線；保留每步 5 秒斷言，給 WebKit 全套併行足夠的總時間。
+  test.setTimeout(45_000);
   await login(page, request);
   const parent = await create(page, "上層");
   const child = await create(page, "有效子頁", parent.id);

@@ -36,3 +36,21 @@ test('KEY-04：網站與 API 正文雙向同步，網站修改使舊 ETag 失效
   expect((await page.request.put(path, { headers: { ...auth, 'If-Match': put.headers().etag }, data: { blocks: [] } })).status()).toBe(412);
   await page.reload(); await saved(page); await expect(page.locator('.tiptap')).toContainText('網站修改內容');
 });
+
+test('KEY-03：設定中的背景登入失效立即隱藏 key 並顯示重新登入', async ({ page }) => {
+  await openPrivate(page);
+  await page.locator('.tiptap').fill('登入失效前保留的草稿');
+  await saved(page);
+  await showNavigation(page);
+  await page.getByRole('button', { name: '設定', exact: true }).click();
+  await page.getByLabel('API key 名稱').fill('背景登入驗證');
+  await page.getByRole('button', { name: '建立 API key', exact: true }).click();
+  await page.getByTestId('api-key-card').getByRole('button', { name: '顯示', exact: true }).click();
+  await expect(page.getByLabel('完整 API key')).toBeVisible();
+  await page.request.post('/__test/control', { data: { now: Date.now() + 32 * 86400000 } });
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('完整 API key')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'API key 設定', exact: true })).toBeHidden();
+  await expect(page.locator('.tiptap')).toContainText('登入失效前保留的草稿');
+});

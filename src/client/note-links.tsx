@@ -1,8 +1,9 @@
 import { Button } from '@mantine/core';
 import { IconBook2, IconChevronDown, IconFileText, IconLink, IconSearch } from '@tabler/icons-react';
 import { useCallback, useEffect, useId, useState } from 'react';
-import { SuggestionMenuController, type SuggestionMenuProps } from '@blocknote/react';
+import { SuggestionMenuController, useExtensionState, type SuggestionMenuProps } from '@blocknote/react';
 import type { BlockNoteEditor } from '@blocknote/core';
+import { SuggestionMenu } from '@blocknote/core/extensions';
 import type { PageRow } from '../shared/pages';
 import { noteLinkHref, noteLinkId, type Backlink } from '../shared/note-links';
 import { api, navigate, signedOut } from './api';
@@ -10,11 +11,14 @@ import './note-links.css';
 
 type Item = { id?: string; title: string; detail: string; query?: string };
 function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: SuggestionMenuProps<Item>) {
-  return <div className="note-link-menu">
+  const state = useExtensionState(SuggestionMenu);
+  const loading = loadingState !== 'loaded' || items.some(item => item.query !== state?.query);
+  return <div className="note-link-menu" aria-busy={loading} data-note-query={state?.query}>
     <div className="note-link-menu-label">連結筆記或日記</div>
     <div className="note-link-options" role="listbox" id="bn-suggestion-menu" aria-label="筆記連結搜尋">
-      {items.map((item, index) => <button type="button" role="option" id={'bn-suggestion-menu-item-' + index}
+      {!loading && items.map((item, index) => <button type="button" role="option" id={'bn-suggestion-menu-item-' + index}
         key={item.id ?? 'message'} aria-selected={index === selectedIndex} className="note-link-option"
+        data-note-query={item.query}
         onMouseDown={event => event.preventDefault()} onClick={() => onItemClick?.(item)}>
         {item.id ? (item.detail === '日記'
           ? <IconBook2 className="note-link-option-icon" size={17} aria-hidden="true" />
@@ -25,7 +29,7 @@ function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: Suggestio
           <span className="note-link-option-detail">{item.detail}</span>
         </span>
       </button>)}
-      {!items.length && <div className="note-link-empty">{loadingState.startsWith('loading') ? '搜尋中…' : '沒有符合的筆記'}</div>}
+      {(loading || !items.length) && <div className="note-link-empty">{loading ? '搜尋中…' : '沒有符合的筆記'}</div>}
     </div>
   </div>;
 }
@@ -51,7 +55,7 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
     }
     const q = query.trim().normalize('NFC').toLocaleLowerCase();
     const matches = pages.filter(p => p.title.normalize('NFC').toLocaleLowerCase().includes(q)).sort((a, b) => b.updated_at - a.updated_at || a.id.localeCompare(b.id));
-    return matches.map(p => ({ id: p.id, title: p.title, detail: p.kind === 'journal' ? '日記' : '筆記' }));
+    return matches.map(p => ({ id: p.id, title: p.title, detail: p.kind === 'journal' ? '日記' : '筆記', query }));
   }, [owner]);
   return <SuggestionMenuController triggerCharacter="[[" getItems={getItems} suggestionMenuComponent={LinkMenu}
     shouldOpen={() => editor.getTextCursorPosition().block.type !== 'codeBlock'}
@@ -59,6 +63,21 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
       if (!item.id) { editor.insertInlineContent('[[' + (item.query ?? '')); return; }
       editor.insertInlineContent([{ type: 'link', href: noteLinkHref(item.id), content: item.title }, ' ']);
     }} />;
+}
+
+export function selectNoteLinkSuggestion(event: React.KeyboardEvent<HTMLElement>, editor: BlockNoteEditor) {
+  if (event.nativeEvent.isComposing || !['Enter', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(event.key)) return;
+  const state = editor.getExtension(SuggestionMenu)?.store.state;
+  if (!state?.show || state.triggerCharacter !== '[[') return;
+  const menu = event.currentTarget.querySelector<HTMLElement>('.note-link-menu');
+  const ready = menu?.getAttribute('aria-busy') === 'false' && menu.dataset.noteQuery === state.query;
+  if (ready && event.key !== 'Enter') return;
+  // BlockNote 載入新查詢時仍保留舊的鍵盤選項；先攔截，僅選取目前畫面已完成的結果。
+  event.preventDefault();
+  event.stopPropagation();
+  if (!ready) return;
+  const selected = menu.querySelector<HTMLButtonElement>('[role="option"][aria-selected="true"]');
+  if (selected?.dataset.noteQuery === state.query) selected.click();
 }
 
 export function Backlinks({ id }: { id: string }) {
