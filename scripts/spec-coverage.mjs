@@ -30,7 +30,8 @@ export function reportCases(report, environment) {
 }
 
 async function main() {
-  const { readFile } = await import('node:fs/promises');
+  const { readFile, readdir } = await import('node:fs/promises');
+  const { existsSync } = await import('node:fs');
   const probe = process.argv.includes('--probe');
   const auth = process.argv.includes('--auth');
   const pages = process.argv.includes('--pages');
@@ -52,8 +53,10 @@ async function main() {
   } else {
     const capabilities = ux ? ['workspace-usability'] : ui ? ['workspace-experience']
       : ['personal-auth', 'pages-and-journal', 'block-editing', 'realtime-sync', 'private-assets', 'backup-restore'];
+    const active = (await readdir('openspec/changes')).filter(name => name !== 'archive');
     for (const name of capabilities) {
-      const text = await readFile(`openspec/specs/${name}/spec.md`, 'utf8');
+      const deltas = active.map(change => `openspec/changes/${change}/specs/${name}/spec.md`).filter(path => existsSync(path));
+      const text = (await Promise.all([`openspec/specs/${name}/spec.md`, ...deltas].map(path => readFile(path, 'utf8')))).join('\n');
       for (const match of text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g)) {
         const [, id, method] = match;
         if (pages && !id.startsWith('PAGE-')) continue;
