@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { openPrivate, saved, blocks, gate } from './helpers';
+import { openPrivate, saved, blocks, gate, release, heldCount } from './helpers';
 
 // 多次換頁與重連的流程允許完整操作時間，個別斷言仍沿用 5 秒上限。
 test.describe.configure({ timeout: 40000 });
@@ -32,17 +32,20 @@ async function insert(page: Page, title: string, offline = false) {
 test('LINK-01：中文同名與日記搜尋、鍵盤插入、重開與站內導航', async ({ page }) => {
   await openPrivate(page);
   const source = await note(page, '來源筆記');
-  await note(page, '中文目標');
-  await note(page, '中文目標');
+  const targets = [await note(page, '中文目標'), await note(page, '中文目標')];
   await visit(page, source.id);
   await page.locator('.tiptap').click();
   await page.keyboard.type('[['); await page.keyboard.insertText('中文');
-  await expect(page.getByRole('option', { name: /中文目標/ })).toHaveCount(2);
+  const options = page.getByRole('listbox', { name: '筆記連結搜尋' }).getByRole('option');
+  await expect(options).toHaveCount(2);
+  await expect(options).toContainText(['中文目標', '中文目標']);
+  await expect(page.getByRole('option', { selected: true })).toContainText('中文目標');
   await page.keyboard.press('Enter');
   await saved(page);
   const link = page.locator('.tiptap a').first();
   const href = await link.getAttribute('href');
-  expect(href).toMatch(/^\/\?page=[\w-]+$/);
+  await expect(link).toHaveText('中文目標');
+  expect(targets.map(target => '/?page=' + target.id)).toContain(href);
   await expect(page.locator('.tiptap')).not.toContainText('[[');
   const before = await blocks(page);
   await page.reload();
@@ -59,6 +62,30 @@ test('LINK-01：中文同名與日記搜尋、鍵盤插入、重開與站內導�
   await page.keyboard.type('[['); await page.keyboard.insertText('20');
   await expect(page.getByRole('option', { name: /日記/ }).first()).toBeVisible();
   await page.keyboard.press('Escape');
+});
+
+test('LINK-01：搜尋尚未完成時 Enter 保留輸入，不插入上一批結果', async ({ page }) => {
+  await openPrivate(page);
+  const source = await note(page, '搜尋來源');
+  const target = await note(page, '延遲目標');
+  await visit(page, source.id);
+  await page.locator('.tiptap').click();
+  await page.keyboard.type('[[');
+  await expect(page.getByRole('option', { name: /搜尋來源/ })).toBeVisible();
+  await gate(page, [{ pattern: '^/api/pages$', hold: true }]);
+  await page.keyboard.insertText('延遲');
+  await expect.poll(() => heldCount(page, '^/api/pages$')).toBeGreaterThan(0);
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.tiptap a')).toHaveCount(0);
+  await expect(page.locator('.tiptap')).toContainText('[[延遲');
+  await expect(page.getByRole('option')).toHaveCount(0);
+  await release(page, '^/api/pages$');
+  await expect(page.getByRole('option')).toHaveCount(1);
+  await expect(page.getByRole('option', { selected: true })).toContainText('延遲目標');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.tiptap a')).toHaveAttribute('href', '/?page=' + target.id);
+  await expect(page.locator('.tiptap a')).toHaveText('延遲目標');
+  await saved(page);
 });
 
 test('LINK-02：反向來源去重、可返回且移除最後連結後消失', async ({ page }) => {

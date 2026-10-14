@@ -1,386 +1,65 @@
 :root {
-  color: #243532;
-  background: #fafbf9;
+  color: #37352f;
+  background: #fff;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
+  --pn-text: #37352f;
+  --pn-muted: #6f6e69;
+  --pn-border: #e9e9e7;
+  --pn-sidebar: #f7f7f5;
+  --pn-hover: rgba(55, 53, 47, .06);
+  --pn-selected: rgba(55, 53, 47, .09);
 }
-body {
-  margin: 0;
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, textarea, select { font: inherit; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid #2383e2;
+  outline-offset: 2px;
 }
-.eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.7px;
-}
-.login-page {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 48px 24px 24px;
-  background:
-    radial-gradient(ellipse at 15% 25%, #e8efea 0%, transparent 55%), #f8f9f5;
-}
-.login-layout {
-  width: min(100%, 1060px);
-  margin: auto;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 96px;
-  align-items: center;
-}
-.login-intro {
-  padding: 32px 0;
-}
-.intro-copy {
-  margin: 60px 0 46px;
-}
-.intro-copy h1 {
-  font-size: clamp(32px, 3.2vw, 46px);
-  line-height: 1.45;
-  letter-spacing: -1.6px;
-  font-weight: 650;
-  margin: 20px 0 22px;
-  color: #203c34;
-}
-.login-card {
-  box-shadow: 0 18px 80px -40px #51645e66;
-  border-color: #e4e9e3;
-}
-.login-footer {
-  text-align: center;
-  margin-top: 56px;
-}
-.app-shell {
-  background: #fbfcfa;
-}
-.app-shell .mantine-AppShell-header {
-  background: #fff;
-  border-color: #e9ece7;
-}
-.workspace-sidebar {
-  background: #f3f5f0;
-  border-color: #e4e8e0;
-}
-.sidebar-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.notes-scroll {
-  flex: 1;
-  min-height: 120px;
-  margin: 0 -8px;
-}
-.sidebar-footer {
-  padding-top: 20px;
-  border-top: 1px solid #e0e5dc;
-}
-.sidebar-empty {
-  color: #4f5d53;
-  background: #e9ede5;
-  text-align: center;
-}
-.sidebar-content .mantine-NavLink-root {
-  border-radius: 8px;
-  min-height: 44px;
-  color: #526457;
-}
-.sidebar-content .mantine-NavLink-root[data-active] {
-  color: #12624e;
-  background: var(--p-note-selected-bg);
-  font-weight: 650;
-}
-/* 有語意色的項目由 Mantine inline 變數覆蓋中性預設。 */
-.mantine-Menu-item {
-  --menu-item-hover: var(--p-note-hover-bg);
-}
-/* 滑鼠與觸控共用狀態色；停用項目不顯示可操作回饋。 */
-@media (hover: hover) {
-  .sidebar-content .mantine-NavLink-root:hover:where(:not(:disabled, [data-disabled])) {
-    background: var(--p-note-hover-bg);
-  }
-  .sidebar-content .mantine-NavLink-root[data-active]:hover:where(:not(:disabled, [data-disabled])) {
-    background: var(--p-note-selected-hover-bg);
-  }
-  .mantine-CloseButton-root:hover:where(:not(:disabled, [data-disabled])) {
-    background: var(--p-note-hover-bg);
-  }
-}
-@media (hover: none) {
-  .sidebar-content .mantine-NavLink-root:active:where(:not(:disabled, [data-disabled])) {
-    background: var(--p-note-hover-bg);
-  }
-  .sidebar-content .mantine-NavLink-root[data-active]:active:where(:not(:disabled, [data-disabled])) {
-    background: var(--p-note-selected-hover-bg);
-  }
-}
-.note-row {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-.note-row-spacer {
-  flex: none;
-  width: 28px;
-}
-.note-row .note-link {
-  flex: 1;
-  min-width: 0;
-}
-.note-link .mantine-NavLink-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.note-link .mantine-NavLink-body {
-  min-width: 0;
-}
-.header-search {
-  width: 240px;
-  justify-content: start;
-  color: #5c6862;
-  font-weight: 400;
-}
-.document-shell {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 22px 48px 100px;
-}
-.document-path {
-  margin-bottom: 32px;
-}
-.document-path .mantine-Breadcrumbs-root {
-  gap: 6px;
-}
-.document-path .mantine-Breadcrumbs-breadcrumb {
-  min-width: 0;
-}
-.document-heading h1 {
-  font-size: clamp(27px, 3vw, 38px);
-  letter-spacing: -1px;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-  color: #243b32;
-}
-.document-heading {
-  margin-bottom: 18px;
-}
-.title-input {
-  display: block;
-  width: 100%;
-  resize: none;
-  overflow: hidden;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  font: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  color: inherit;
-  border-radius: 6px;
-}
-.title-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--mantine-color-teal-2);
-}
-.block-menu {
-  overflow-y: auto;
-}
-.trash-title {
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.backup-card[aria-current="true"] {
-  border-color: var(--mantine-color-orange-6);
-  box-shadow: 0 0 0 1px var(--mantine-color-orange-6);
-}
-.save-status {
-  margin-bottom: 24px;
-  min-height: 26px;
-}
-.editor-toolbar {
-  border-top: 1px solid #e7ebe5;
-  border-bottom: 1px solid #e7ebe5;
-  padding: 6px 0;
-  margin-bottom: 26px;
-}
-.writing-surface {
-  background: white;
-  border: 1px solid #edf0e8;
-  border-radius: 14px;
-  min-height: 400px;
-  padding: 30px 0;
-  box-shadow: 0 2px 10px #22392c03;
-}
-/* 同時套用編輯器與浮動 portal，保留 BlockNote 原本的 light 主題流程。 */
-.bn-mantine[data-mantine-color-scheme="light"] {
-  --bn-colors-hovered-background: var(--p-note-hover-bg);
-  --bn-colors-hovered-text: var(--p-note-interactive-text);
-  --bn-colors-selected-background: var(--p-note-selected-bg);
-  --bn-colors-selected-text: #12624e;
-}
-.writing-surface .bn-container {
-  background: transparent;
-}
-.writing-surface .bn-editor {
-  padding-inline: 44px !important;
-  font-size: 16px;
-  line-height: 1.85;
-}
-.writing-surface .bn-block-content[data-content-type="codeBlock"] {
-  font-size: 14px;
-}
-.editor-document {
-  min-width: 0;
-}
-.app-loading {
-  max-width: 880px;
-  margin: 40px auto;
-  padding: 24px;
-}
-.mantine-Modal-title {
-  font-size: 22px;
-  font-weight: 650;
-}
-.mantine-Modal-close,
-.mantine-Drawer-close {
-  min-width: 44px;
-  min-height: 44px;
-}
-.navigation-drawer .mantine-Drawer-body {
-  height: calc(100dvh - 90px);
-}
-.backup-page {
-  max-width: 960px;
-  margin: auto;
-  padding: 32px 32px 80px;
-}
-.backup-heading {
-  margin: 48px 0 28px;
-}
-.backup-card {
-  border-color: #e5e9e1;
-}
-.backup-empty {
-  border: 1px dashed #cdd8cc;
-  padding: 56px 24px;
-  text-align: center;
-  background: #f5f8f2;
-  border-radius: 16px;
-}
+::selection { background: #d3e5f7; }
+.brand-mark { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: #e9e9e7; border-radius: 5px; color: #37352f; flex: none; }
+.workspace-brand { min-width: 0; }
+.mantine-Button-root { height: 32px; padding-inline: 12px; }
+.mantine-ActionIcon-root { border-radius: 4px; }
+.mantine-Input-input { min-height: 32px; height: 32px; border-color: #dededb; }
+.mantine-Input-input::placeholder { color: #8a8984; }
+.mantine-InputWrapper-label { color: #57564f; font-weight: 500; font-size: 13px; margin-bottom: 5px; }
+.mantine-InputWrapper-description { color: #6f6e69; }
+.mantine-MultiSelect-input { height: auto; }
+.mantine-Menu-item { --menu-item-hover: #efefed; }
+.mantine-Button-root[data-variant="default"] { background: white; border-color: #dededb; color: #37352f; box-shadow: 0 1px 2px #00000005; }
+.mantine-Modal-content { border: 1px solid #e9e9e7; box-shadow: 0 12px 48px #00000020, 0 2px 8px #00000010; }
+.mantine-Modal-header { min-height: 48px; }
+.mantine-Modal-title { font-size: 16px; font-weight: 650; }
+.mantine-Modal-close, .mantine-Drawer-close { min-width: 32px; min-height: 32px; }
+.mantine-Modal-body { overflow-wrap: anywhere; }
+.mantine-Menu-dropdown, .mantine-Popover-dropdown, .mantine-Combobox-dropdown { border-color: #e9e9e7; border-radius: 6px; box-shadow: 0 4px 20px #00000015; }
+.mantine-Menu-item { border-radius: 4px; font-size: 13px; min-height: 30px; }
+.mantine-Alert-root { padding: 12px 14px; }
+.mantine-Alert-message { font-size: 13px; line-height: 1.6; }
+.mantine-Badge-root { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.app-loading { max-width: 780px; margin: 72px auto; padding: 24px; }
+.workspace-notice { max-width: 800px; margin: 20px auto; }
+.recovery-panel { border-radius: 4px; border-color: #e9e9e7; background: #fafaf9; }
+.reauth-card { max-width: 480px; margin: 24px auto; }
+.prototype-page { max-width: 900px; padding: 24px; margin: auto; }
+.loading-document { width: min(100%, 800px); padding: 56px 24px; margin: auto; }
+.loading-document .mantine-Skeleton-root { background: #f1f1ef; }
 @media (max-width: 767px) {
-  .login-page {
-    padding: 28px 20px;
-    justify-content: flex-start;
-  }
-  .login-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    margin: 0 auto;
-    max-width: 440px;
-    align-items: stretch;
-  }
-  .login-intro {
-    padding: 0;
-  }
-  .intro-copy {
-    margin: 26px 0 0;
-  }
-  .intro-copy h1 {
-    font-size: 29px;
-    margin: 10px 0;
-    letter-spacing: -0.8px;
-  }
-  .intro-copy > .mantine-Text-root:last-child,
-  .login-intro > .mantine-Group-root:last-child,
-  .intro-copy .eyebrow {
-    display: none;
-  }
-  .login-card {
-    padding: 24px !important;
-  }
-  .login-footer {
-    margin-top: 24px;
-  }
-  .header-search .mantine-Button-label > span,
-  .header-backup .mantine-Button-label > span,
-  .editor-shortcut {
-    display: none;
-  }
-  .header-search,
-  .header-backup {
-    width: 44px;
-    padding: 0;
-    border-color: transparent;
-    background: transparent;
-  }
-  .header-search .mantine-Button-section,
-  .header-backup .mantine-Button-section {
-    margin: 0;
-  }
-  .document-shell {
-    padding: 14px 20px 72px;
-  }
-  .document-path {
-    margin-bottom: 10px;
-  }
-  .document-path .mantine-Button-label {
-    display: none;
-  }
-  .document-path .mantine-Button-section {
-    margin: 0;
-  }
-  .document-heading {
-    margin-bottom: 14px;
-  }
-  .save-status {
-    gap: 7px;
-    margin-bottom: 10px;
-  }
-  .editor-toolbar {
-    margin-bottom: 12px;
-  }
-  .writing-surface {
-    margin-inline: -8px;
-    padding: 14px 0;
-    border-radius: 12px;
-    min-height: 420px;
-  }
-  .writing-surface .bn-editor {
-    padding-inline: 28px !important;
-  }
-  .backup-page {
-    padding: 20px 20px 64px;
-  }
-  .backup-heading {
-    margin-top: 32px;
-  }
+  .mantine-Button-root, .mantine-ActionIcon-root, .mantine-Modal-close, .mantine-Drawer-close { min-height: 44px; }
+  .mantine-ActionIcon-root, .mantine-Modal-close, .mantine-Drawer-close { min-width: 44px; }
+  .mantine-Input-input { min-height: 44px; height: 44px; font-size: 16px; }
+  .mantine-MultiSelect-input { height: auto; }
+  .mantine-Menu-item { min-height: 44px; }
+  .mantine-Modal-body { padding: 16px; }
+  .mantine-Modal-header { padding-inline: 16px; }
+  .workspace-notice { margin: 12px 0; }
+  .app-loading { margin: 24px auto; padding: 20px; }
+  .prototype-page { padding: 16px; }
+  .loading-document { padding: 32px 0; }
 }
-.prototype-page {
-  max-width: 900px;
-  padding: 20px;
-  margin: auto;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
-
-.database-page { max-width: 1200px; min-width: 0; margin: 0 auto; padding: 32px; }
-.database-title { margin: 12px 0 24px; }
-.database-title input { font-size: 28px; font-weight: 700; height: 56px; border-color: transparent; background: transparent; }
-.database-scroll { max-width: 100%; overflow-x: auto; }
-.database-scroll th, .database-scroll td { min-width: 160px; vertical-align: top; }
-.database-scroll td:first-child { min-width: 200px; }
-.property-input { min-width: 140px; }
-.note-properties { max-width: 880px; margin: 20px auto 0; }
-.properties-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
-@media (max-width: 600px) {
-  .database-page { padding: 20px 12px; }
-  .note-properties { margin: 12px; }
-  .properties-grid { grid-template-columns: 1fr; }
-  .database-page > .mantine-Group-root { max-width: 100%; }
-}
-.note-link-option { width: 100%; text-align: left; padding: 10px; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; min-height: 44px; }
-.note-link-option[aria-selected="true"], .note-link-option:hover { background: var(--mantine-color-teal-0); }

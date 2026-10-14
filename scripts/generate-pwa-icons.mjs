@@ -20,10 +20,10 @@ for (const [name, size] of [['icon-192', 192], ['icon-512', 512], ['maskable-512
   const raw = Buffer.alloc(size * (1 + size * 3));
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     const px = x / size, py = y / size;
-    let color = [24, 91, 67];
-    if (px >= .30 && px <= .70 && py >= .25 && py <= .75) color = [250, 251, 249];
-    if (px >= .35 && px <= .37 && py >= .25 && py <= .75) color = [189, 220, 204];
-    if (px >= .43 && px <= .63 && ((py >= .39 && py <= .415) || (py >= .49 && py <= .515) || (py >= .59 && py <= .615))) color = [24, 91, 67];
+    let color = [233, 233, 231];
+    if (px >= .30 && px <= .70 && py >= .25 && py <= .75) color = [255, 255, 255];
+    if (px >= .35 && px <= .37 && py >= .25 && py <= .75) color = [111, 110, 105];
+    if (px >= .43 && px <= .63 && ((py >= .39 && py <= .415) || (py >= .49 && py <= .515) || (py >= .59 && py <= .615))) color = [55, 53, 47];
     const offset = y * (1 + size * 3) + 1 + x * 3;
     raw.set(color, offset);
   }

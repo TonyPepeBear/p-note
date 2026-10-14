@@ -3,13 +3,11 @@ import {
   Badge,
   Button,
   Checkbox,
-  Divider,
   Group,
   Loader,
   Paper,
   Stack,
   Text,
-  ThemeIcon,
   Title,
 } from "@mantine/core";
 import {
@@ -19,17 +17,19 @@ import {
   IconHistory,
   IconShieldCheck,
 } from "@tabler/icons-react";
-import { Brand } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import type { BackupCatalog } from "../shared/backup";
+import "./settings.css";
 
 export function BackupSettings({
   close,
   unauthorized,
+  onNavigationLockChange,
 }: {
   close: () => void;
   unauthorized: () => void;
+  onNavigationLockChange?: (locked: boolean) => void;
 }) {
   const [backups, setBackups] = useState<BackupCatalog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,14 @@ export function BackupSettings({
   const [operation, setOperation] = useState<{ backup: string; id: string }>();
   const [interrupted, setInterrupted] = useState(false);
   const confirmation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    onNavigationLockChange?.(busy || interrupted);
+  }, [busy, interrupted, onNavigationLockChange]);
+  useEffect(() => {
+    // 只在實例卸載時釋放；busy 改變時不先解除，避免中斷重試短暫開放導覽。
+    // React 先清理舊實例，再執行新實例的 effect，新的鎖定狀態不會被覆蓋。
+    return () => onNavigationLockChange?.(false);
+  }, [onNavigationLockChange]);
   useEffect(() => {
     if (selected)
       confirmation.current?.scrollIntoView({
@@ -136,55 +144,37 @@ export function BackupSettings({
     expiring: "清理中",
   };
   return (
-    <main className="backup-page">
-      <Group justify="space-between">
-        <Brand />
+    <section className="settings-page backup-page" aria-label="備份設定">
+      <header className="settings-header">
         <Button
-          variant="default"
-          leftSection={<IconArrowLeft size={17} />}
+          className="settings-back"
+          variant="subtle"
+          color="gray"
+          leftSection={<IconArrowLeft size={16} />}
           disabled={busy || interrupted}
           onClick={close}
         >
           返回編輯
         </Button>
-      </Group>
-      <div className="backup-heading">
-        <Badge variant="light" color="teal">
-          資料與備份
-        </Badge>
-        <Group justify="space-between" align="end" mt="md">
+        <Title order={1}>備份設定</Title>
+        <Text c="dimmed" size="sm" mt={8}>
+          管理雲端備份、匯出內容，或將工作區還原至先前版本。
+        </Text>
+      </header>
+      <section className="settings-section" aria-labelledby="backup-schedule-title">
+        <div className="settings-info-row">
+          <IconShieldCheck size={20} stroke={1.6} aria-hidden="true" />
           <div>
-            <Title order={1}>備份設定</Title>
-            <Text c="dimmed" mt="xs">
-              給你的想法，多一份安心。
-            </Text>
-          </div>
-          <Button
-            disabled={busy || interrupted || loading}
-            loading={busy && !operation}
-            leftSection={<IconCloud size={18} />}
-            onClick={() => {
-              void create();
-            }}
-          >
-            建立備份
-          </Button>
-        </Group>
-      </div>
-      <Paper withBorder p="lg" mb="xl" radius="lg">
-        <Group align="start" wrap="nowrap">
-          <ThemeIcon variant="light" size={40} radius="md">
-            <IconShieldCheck size={22} />
-          </ThemeIcon>
-          <div>
-            <Text fw={600}>每日自動備份，保留 90 天</Text>
-            <Text size="sm" c="dimmed" mt={5} lh={1.8}>
+            <Title id="backup-schedule-title" order={2} size="sm">
+              每日自動備份，保留 90 天
+            </Title>
+            <Text size="sm" c="dimmed" mt={6} lh={1.7}>
               每日台北 03:00 備份，成功後保留 90
               天。備份只包含已送達雲端的內容。ZIP 會包含頁面、日記與原始圖片。
             </Text>
           </div>
-        </Group>
-      </Paper>
+        </div>
+      </section>
       {interrupted && (
         <Alert color="orange" role="status" mb="lg" title="還原需要繼續">
           還原尚未完成，請重試相同備份；完成前暫停頁面存取。
@@ -195,37 +185,51 @@ export function BackupSettings({
           {error}
         </Alert>
       )}
+      <section className="settings-section backup-history" aria-labelledby="backup-history-title">
+        <Group className="settings-section-heading" justify="space-between">
+          <Group gap={8}>
+            <Title id="backup-history-title" order={2} size="sm">備份紀錄</Title>
+            {!loading && <Text size="xs" c="dimmed">{backups.length} 份</Text>}
+          </Group>
+          <Button
+            disabled={busy || interrupted || loading}
+            loading={busy && !operation}
+            leftSection={<IconCloud size={16} />}
+            onClick={() => {
+              void create();
+            }}
+          >
+            建立備份
+          </Button>
+        </Group>
       {loading ? (
-        <Group justify="center" py="xl">
+        <Group className="settings-loading" gap="sm" role="status">
           <Loader size="sm" />
-          <Text c="dimmed">載入備份中…</Text>
+          <Text c="dimmed" size="sm">載入備份中…</Text>
         </Group>
       ) : !backups.length ? (
         <div className="backup-empty">
-          <IconHistory size={42} color="#718a74" stroke={1.3} />
-          <Title order={2} size="xl" mt="md">
+          <IconHistory size={24} stroke={1.5} aria-hidden="true" />
+          <Text fw={600} size="sm" mt="sm">
             還沒有備份
-          </Title>
-          <Text c="dimmed" size="sm" mt="sm">
+          </Text>
+          <Text c="dimmed" size="sm" mt={4}>
             建立第一份備份，或等待下次自動備份。
           </Text>
         </div>
       ) : (
-        <Stack gap="md">
+        <div className="settings-list">
           {backups.map((backup) => (
             <Paper
-              withBorder
-              p="lg"
-              radius="lg"
               className="backup-card"
               aria-current={selected === backup.id ? "true" : undefined}
               key={backup.id}
             >
-              <Group justify="space-between" align="start">
-                <div>
-                  <Group gap="sm">
-                    <IconHistory size={19} color="#68856c" />
-                    <Text fw={600}>
+              <div className="backup-row">
+                <div className="backup-row-details">
+                  <Group gap={8} wrap="nowrap">
+                    <IconHistory size={17} className="settings-row-icon" aria-hidden="true" />
+                    <Text fw={500} size="sm">
                       <time
                         dateTime={new Date(
                           backup.completed_at ?? backup.started_at,
@@ -238,11 +242,11 @@ export function BackupSettings({
                     </Text>
                   </Group>
                   <Badge
-                    mt="sm"
+                    className="backup-status"
                     variant="light"
                     color={
                       backup.status === "success"
-                        ? "teal"
+                        ? "gray"
                         : backup.status === "failed"
                           ? "red"
                           : "gray"
@@ -252,7 +256,7 @@ export function BackupSettings({
                   </Badge>
                 </div>
                 {backup.status === "success" && (
-                  <Group gap="xs">
+                  <Group className="backup-row-actions" gap={6}>
                     <Button
                       component="a"
                       variant="default"
@@ -263,7 +267,7 @@ export function BackupSettings({
                       下載 ZIP
                     </Button>
                     <Button
-                      variant="light"
+                      variant="default"
                       disabled={busy || (interrupted && selected !== backup.id)}
                       onClick={() => {
                         setSelected(backup.id);
@@ -276,37 +280,33 @@ export function BackupSettings({
                     </Button>
                   </Group>
                 )}
-              </Group>
+              </div>
               {backup.error && (
-                <Text size="sm" c="red" mt="sm">
+                <Text size="sm" c="red.8" mt="sm">
                   {backup.error}
                 </Text>
               )}
             </Paper>
           ))}
-        </Stack>
+        </div>
       )}
+      </section>
       {selected && (
         <Paper
           ref={confirmation}
           component="section"
           aria-label="覆蓋還原確認"
-          withBorder
-          p="xl"
-          mt="xl"
-          radius="lg"
-          style={{ borderColor: "#e8cbb8", background: "#fffcf8" }}
+          className="restore-confirmation"
         >
-          <Stack gap="lg">
+          <Stack gap="md">
             <div>
-              <Title order={2} size="xl">
+              <Title order={2} size="sm">
                 還原這份備份
               </Title>
               <Text c="dimmed" size="sm" mt="sm" lh={1.8}>
                 還原會覆蓋目前所有頁面、日記與階層。開始前會備份目前的雲端內容；其他分頁尚未上傳的修改會另外保留。
               </Text>
             </div>
-            <Divider />
             <Checkbox
               label="我知道將以備份覆蓋目前頁面"
               checked={acknowledged}
@@ -325,7 +325,7 @@ export function BackupSettings({
                 取消還原
               </Button>
               <Button
-                color="orange.9"
+                color="red.8"
                 disabled={busy || !acknowledged}
                 loading={busy}
                 onClick={() => {
@@ -338,6 +338,6 @@ export function BackupSettings({
           </Stack>
         </Paper>
       )}
-    </main>
+    </section>
   );
 }

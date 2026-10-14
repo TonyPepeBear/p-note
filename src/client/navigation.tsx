@@ -1,69 +1,30 @@
-import { PwaControls } from './pwa-controls';
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { PwaControls } from "./pwa-controls";
 import {
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
-import {
-  ActionIcon,
-  Alert,
-  Anchor,
-  AppShell,
-  Badge,
-  Box,
-  Breadcrumbs,
-  Button,
-  Divider,
-  Drawer,
-  Group,
-  Modal,
-  NativeSelect,
-  NavLink,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  TextInput,
-  Title,
+  Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Modal, NativeSelect,
+  Stack, Text, TextInput,
 } from "@mantine/core";
 import {
-  IconArrowRight,
-  IconCalendar,
-  IconCalendarEvent,
-  IconChevronDown,
-  IconChevronRight,
-  IconDots,
-  IconFileText,
-  IconLogout,
-  IconMenu2,
-  IconPlus,
-  IconSearch,
-  IconShieldCheck,
-  IconTrash,
-  IconCloud,
-  IconSettings,
-  IconDatabase,
+  IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
+  IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
+  IconDatabase, IconDots, IconFileText, IconLogout, IconMenu2, IconPlus,
+  IconSearch, IconSettings, IconTrash,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
 import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
+import "./navigation.css";
 
-export function Navigation({
-  page,
-  changed,
-  error,
-  backups,
-  settings,
-  children,
-}: {
+export function Navigation({ page, changed, error, backups, settings, settingsView, databaseView, navigationLocked = false, children }: {
   page: PageInfo;
   changed: (page: PageInfo) => void;
   error: (message: string) => void;
   backups: () => void;
   settings: () => void;
+  settingsView?: "backup" | "api";
+  databaseView?: boolean;
+  navigationLocked?: boolean;
   children: ReactNode;
 }) {
   const [pages, setPages] = useState<PageRow[]>([]);
@@ -72,10 +33,13 @@ export function Navigation({
   const [results, setResults] = useState<PageInfo[]>([]);
   const [panel, setPanel] = useState("");
   const [navOpen, setNavOpen] = useState(false);
+  const [pwaHelpOpen, setPwaHelpOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem("p-note-sidebar-collapsed") === "true"; }
+    catch { return false; }
+  });
   const [date, setDate] = useState(page.journal_date ?? today(Date.now()));
-  const [month, setMonth] = useState(
-    (page.journal_date ?? today(Date.now())).slice(0, 7),
-  );
+  const [month, setMonth] = useState((page.journal_date ?? today(Date.now())).slice(0, 7));
   const [title, setTitle] = useState(page.title);
   const [parent, setParent] = useState(page.parent_id ?? "");
   const [query, setQuery] = useState("");
@@ -86,32 +50,38 @@ export function Navigation({
   const [collapsed, setCollapsed] = useState<string[]>(() => {
     const ancestors = new Set(page.ancestors?.map((item) => item.id));
     try {
-      const stored = JSON.parse(
-        localStorage.getItem("p-note-collapsed") ?? "[]",
-      ) as string[];
+      const stored = JSON.parse(localStorage.getItem("p-note-collapsed") ?? "[]") as string[];
       return stored.filter((id) => !ancestors.has(id));
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   });
   const trigger = useRef<HTMLElement | null>(null);
-  const toggle = (id: string) =>
-    setCollapsed((items) => {
-      const next = items.includes(id)
-        ? items.filter((item) => item !== id)
-        : [...items, id];
-      localStorage.setItem("p-note-collapsed", JSON.stringify(next));
-      return next;
-    });
+  // 快捷鍵的長效監聽器也必須讀取最新還原鎖定狀態。
+  const navigationLockedRef = useRef(navigationLocked);
+  navigationLockedRef.current = navigationLocked;
+  useEffect(() => {
+    if (navigationLocked) setPanel("");
+  }, [navigationLocked]);
+  const setSidebar = (closed: boolean) => {
+    setSidebarCollapsed(closed);
+    requestAnimationFrame(() => document.querySelector<HTMLButtonElement>(
+      closed ? 'button[aria-label="展開側邊欄"]' : '.workspace-sidebar button[aria-label="收合側邊欄"]',
+    )?.focus());
+    try { localStorage.setItem("p-note-sidebar-collapsed", String(closed)); }
+    catch { /* 儲存偏好失敗不影響導覽。 */ }
+  };
+  const toggle = (id: string) => setCollapsed((items) => {
+    const next = items.includes(id) ? items.filter((item) => item !== id) : [...items, id];
+    try { localStorage.setItem("p-note-collapsed", JSON.stringify(next)); }
+    catch { /* 儲存偏好失敗不影響頁面樹。 */ }
+    return next;
+  });
   const loadTrash = async () => {
     const response = await api("/api/trash");
     if (!response.ok) throw new Error("無法載入垃圾桶，請重試");
     setTrash((await response.json()) as PageRow[]);
   };
   const loadMonth = async (value: string) => {
-    const response = await api(
-      "/api/journals?month=" + encodeURIComponent(value),
-    );
+    const response = await api("/api/journals?month=" + encodeURIComponent(value));
     if (!response.ok) throw new Error("無效月份");
     setJournals((await response.json()) as PageRow[]);
   };
@@ -132,18 +102,12 @@ export function Navigation({
   useEffect(() => {
     setTitle(page.title);
     setParent(page.parent_id ?? "");
-    setPages((items) =>
-      items.map((item) =>
-        item.id === page.id
-          ? { ...item, title: page.title, parent_id: page.parent_id }
-          : item,
-      ),
-    );
+    setPages((items) => items.map((item) => item.id === page.id
+      ? { ...item, title: page.title, parent_id: page.parent_id } : item));
   }, [page.title, page.parent_id]);
   useEffect(() => {
     const search = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k")
-        return;
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;
       // 捕獲階段攔截，避免編輯器把 Mod+K 當成插入連結。
       event.preventDefault();
       event.stopPropagation();
@@ -153,49 +117,42 @@ export function Navigation({
     return () => window.removeEventListener("keydown", search, true);
   }, []);
   const run = async (work: () => Promise<void>) => {
+    if (navigationLockedRef.current) return;
     setBusy(true);
     setFailure("");
     error("");
-    try {
-      await work();
-    } catch (e) {
+    try { await work(); }
+    catch (e) {
       const message = e instanceof Error ? e.message : "操作失敗，請稍後重試";
       setFailure(message);
       if (!panel) error(message);
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
   const request = async (path: string, data?: object) => {
     const response = await api(path, data);
-    const value = (await response.json()) as PageInfo & {
-      message?: string;
-      page?: PageInfo;
-    };
+    const value = (await response.json()) as PageInfo & { message?: string; page?: PageInfo };
     if (!response.ok) {
-      if (response.status === 409 && value.page) {
-        await navigate(value.page.id);
-        return;
-      }
+      if (response.status === 409 && value.page) { await navigate(value.page.id); return; }
       throw new Error(value.message ?? "操作失敗，請稍後重試");
     }
     return value;
   };
   const link = (event: MouseEvent<HTMLElement>, id: string) => {
-    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+    if (navigationLockedRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
       return;
+    }
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
+    setNavOpen(false);
     void run(() => navigate(id));
   };
   const pageLink = (item: PageRow, label = item.title) => (
-    <Anchor
-      href={"/?page=" + item.id}
-      onClick={(event) => link(event, item.id)}
-    >
-      {label}
-    </Anchor>
+    <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
   );
   const open = (name: string, target?: HTMLElement) => {
+    if (navigationLockedRef.current) return;
     trigger.current = target ?? (document.activeElement as HTMLElement);
     trigger.current?.focus();
     setPanel(name);
@@ -203,616 +160,269 @@ export function Navigation({
     setFailure("");
     setNotice("");
   };
-  const notesUnder = (parentId: string | null) =>
-    pages.filter((item) => item.kind === "note" && item.parent_id === parentId);
-  const tree = (parentId: string | null, depth = 0): ReactNode =>
-    notesUnder(parentId).map((item) => {
-      const nested = notesUnder(item.id).length > 0;
-      const closed = collapsed.includes(item.id);
-      return (
-        <Box key={item.id} pl={depth ? 16 : 0}>
-          <div className="note-row">
-            {nested ? (
-              <ActionIcon
-                size={28}
-                color="gray"
-                aria-label={(closed ? "展開 " : "收合 ") + item.title}
-                aria-expanded={!closed}
-                onClick={() => toggle(item.id)}
-              >
-                {closed ? (
-                  <IconChevronRight size={15} />
-                ) : (
-                  <IconChevronDown size={15} />
-                )}
-              </ActionIcon>
-            ) : (
-              <span className="note-row-spacer" />
-            )}
-            <NavLink
-              component="a"
-              href={"/?page=" + item.id}
-              label={item.title}
-              leftSection={item.database_config ? <IconDatabase size={18} /> : <IconFileText size={18} />}
-              active={item.id === page.id}
-              aria-current={item.id === page.id ? "page" : undefined}
-              onClick={(event) => link(event, item.id)}
-              className="note-link"
-            />
-          </div>
-          {!closed && tree(item.id, depth + 1)}
-        </Box>
-      );
-    });
-  const parents = (
-    parentId: string | null,
-    depth = 0,
-  ): { value: string; label: string }[] =>
-    notesUnder(parentId)
-      .filter((item) => item.id !== page.id)
-      .flatMap((item) => [
-        { value: item.id, label: "　".repeat(depth) + item.title },
-        ...parents(item.id, depth + 1),
-      ]);
-  const openJournals = (target: HTMLElement) => {
-    open("journals", target);
-    void run(() => loadMonth(month));
-  };
-  const sidebar = (
-    <div className="sidebar-content">
-      <div>
-        <Text className="eyebrow" mb="sm" c="dimmed">
-          我的空間
-        </Text>
-        <Stack gap={4}>
-          <NavLink
-            component="button"
-            label="今天"
-            leftSection={<IconCalendarEvent size={20} />}
-            active={
-              page.kind === "journal" && page.journal_date === today(Date.now())
-            }
-            onClick={() => {
-              void run(() => navigate());
-            }}
-          />
-          <NavLink
-            component="button"
-            label="日記"
-            leftSection={<IconCalendar size={20} />}
-            onClick={(event) => openJournals(event.currentTarget)}
-          />
-          <Button
-            variant="light"
-            fullWidth
-            leftSection={<IconPlus size={18} />}
-            mt="sm"
-            disabled={busy}
-            onClick={() => {
-              void run(async () => {
-                const note = await request("/api/pages", {
-                  title: "未命名",
-                  parent_id: null,
-                });
-                if (note) await navigate(note.id, true);
-              });
-            }}
-          >
-            新增筆記
-          </Button>
-          <Button variant="subtle" fullWidth leftSection={<IconDatabase size={18} />} disabled={busy} onClick={() => {
-            void run(async () => { const database = await request('/api/databases', { title: '未命名資料庫' }); if (database) await navigate(database.id); });
-          }}>新增資料庫</Button>
-        </Stack>
-        <Divider my="xl" />
-        <Group justify="space-between" mb="sm">
-          <Text className="eyebrow" c="dimmed">
-            筆記
-          </Text>
-          <Badge color="gray" variant="light" size="sm">
-            {pages.filter((item) => item.kind === "note").length}
-          </Badge>
-        </Group>
+  const notesUnder = (parentId: string | null) => pages.filter((item) => item.kind === "note" && item.parent_id === parentId);
+  const tree = (parentId: string | null, depth = 0): ReactNode => notesUnder(parentId).map((item) => {
+    const nested = notesUnder(item.id).length > 0;
+    const closed = collapsed.includes(item.id);
+    return <div key={item.id} className="pn-tree-branch" style={{ paddingLeft: depth ? 14 : 0 }}>
+      <div className="pn-note-row" data-disabled={navigationLocked || undefined} data-active={!settingsView && item.id === page.id || undefined}>
+        {nested ? <button type="button" className="pn-tree-toggle"
+          aria-label={(closed ? "展開 " : "收合 ") + item.title} aria-expanded={!closed} onClick={() => toggle(item.id)}>
+          {closed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
+        </button> : <span className="pn-tree-spacer" />}
+        <a href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} className="pn-note-link note-link"
+          aria-current={!settingsView && item.id === page.id ? "page" : undefined}
+          onClick={(event) => link(event, item.id)} title={item.title}>
+          {item.database_config ? <IconDatabase size={17} /> : <IconFileText size={17} />}
+          <span>{item.title}</span>
+        </a>
       </div>
-      <ScrollArea className="notes-scroll" scrollbarSize={4}>
-        <nav aria-label="筆記頁面">
-          {pages.some((item) => item.kind === "note") ? (
-            tree(null)
-          ) : (
-            <Paper className="sidebar-empty" p="md" radius="md">
-              <IconFileText size={24} stroke={1.4} />
-              <Text size="sm" mt="xs">
-                留一頁給新的想法
-              </Text>
-              <Text size="xs" c="dimmed" mt={4}>
-                點選「新增筆記」開始。
-              </Text>
-            </Paper>
-          )}
-        </nav>
-      </ScrollArea>
-      <div className="sidebar-footer">
-        <PwaControls />
-        <NavLink component="button" label="設定" leftSection={<IconSettings size={18} />} onClick={settings} />
-        <NavLink
-          component="button"
-          label="垃圾桶"
-          leftSection={<IconTrash size={18} />}
-          onClick={() => {
-            open("trash");
-            void run(loadTrash);
-          }}
-        />
-        <NavLink
-          component="button"
-          label="登出"
-          leftSection={<IconLogout size={18} />}
-          onClick={() => {
-            void run(async () => {
-              await saveDraft();
-              const response = await api("/api/logout", {});
-              if (!response.ok) throw new Error("登出失敗，請重試");
-              location.assign("/");
-            });
-          }}
-        />
-        <Group gap={6} mt="md" c="dimmed">
-          <IconShieldCheck size={15} />
-          <Text size="xs">只有你能存取的私人工作區</Text>
-        </Group>
-      </div>
+      {!closed && tree(item.id, depth + 1)}
+    </div>;
+  });
+  const parents = (parentId: string | null, depth = 0): { value: string; label: string }[] => notesUnder(parentId)
+    .filter((item) => item.id !== page.id).flatMap((item) => [
+      { value: item.id, label: "　".repeat(depth) + item.title }, ...parents(item.id, depth + 1),
+    ]);
+  const openJournals = (target: HTMLElement) => { open("journals", target); void run(() => loadMonth(month)); };
+  const newNote = () => void run(async () => {
+    const note = await request("/api/pages", { title: "未命名", parent_id: null });
+    if (note) await navigate(note.id, true);
+  });
+  const sidebar = <div className="pn-sidebar-content">
+    <div className="pn-workspace-switcher">
+      <div className="pn-workspace-brand"><Brand /><span className="pn-workspace-name">私人工作區</span></div>
+      <button className="pn-icon-button pn-desktop-only" aria-label="收合側邊欄" title="收合側邊欄" aria-expanded="true" aria-controls="workspace-sidebar"
+        onClick={() => setSidebar(true)}><IconChevronsLeft size={18} /></button>
     </div>
-  );
-  const panelTitle =
-    (
-      {
-        search: "搜尋筆記",
-        journals: "日記回顧",
-        trash: "垃圾桶",
-        page: "頁面操作",
-        delete: "移到垃圾桶？",
-      } as Record<string, string>
-    )[panel] ?? "";
-  return (
-    <AppShell
-      header={{ height: 68 }}
-      navbar={{ width: 264, breakpoint: "sm", collapsed: { mobile: true } }}
-      className="app-shell"
-    >
-      <AppShell.Header>
-        <Group
-          h="100%"
-          px={{ base: "md", sm: "xl" }}
-          justify="space-between"
-          wrap="nowrap"
-        >
-          <Group gap="sm" wrap="nowrap">
-            <ActionIcon
-              hiddenFrom="sm"
-              aria-label="導覽"
-              aria-haspopup="dialog"
-              aria-expanded={navOpen}
-              color="dark"
-              onClick={() => setNavOpen(true)}
-            >
-              <IconMenu2 size={23} />
-            </ActionIcon>
-            <Brand />
-          </Group>
-          <Group gap={8} wrap="nowrap">
-            <Button
-              variant="default"
-              className="header-search"
-              leftSection={<IconSearch size={18} />}
-              aria-label="搜尋筆記"
-              onClick={(event) => open("search", event.currentTarget)}
-            >
-              <span>搜尋筆記</span>
-            </Button>
-            <Button
-              variant="subtle"
-              color="dark"
-              className="header-backup"
-              aria-label="備份設定"
-              leftSection={<IconCloud size={20} />}
-              onClick={backups}
-            >
-              <span>備份設定</span>
-            </Button>
-          </Group>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Navbar className="workspace-sidebar" p="lg" visibleFrom="sm">
-        {sidebar}
-      </AppShell.Navbar>
-      <Drawer
-        opened={navOpen}
-        onClose={() => setNavOpen(false)}
-        title="導覽"
-        size={300}
-        closeButtonProps={{ "aria-label": "關閉導覽" }}
-        className="navigation-drawer"
-      >
-        {sidebar}
-      </Drawer>
-      <AppShell.Main>
-        <div className="document-shell">
-          <Group
-            justify="space-between"
-            className="document-path"
-            wrap="nowrap"
-          >
-            <nav aria-label="頁面路徑">
-              <Breadcrumbs separator={<IconChevronRight size={13} />}>
-                <Anchor
-                  component="button"
-                  size="sm"
-                  c="dimmed"
-                  aria-label={page.kind === "journal" ? "日記回顧" : "筆記列表"}
-                  onClick={(event: MouseEvent<HTMLButtonElement>) => {
-                    if (page.kind === "journal")
-                      openJournals(event.currentTarget);
-                    else if (matchMedia("(max-width: 47.99em)").matches)
-                      setNavOpen(true);
-                    else
-                      document
-                        .querySelector<HTMLElement>(
-                          '.workspace-sidebar [aria-current="page"]',
-                        )
-                        ?.focus();
-                  }}
-                >
-                  {page.kind === "journal" ? "日記" : "筆記"}
-                </Anchor>
-                {page.ancestors?.map((item) => (
-                  <span key={item.id}>{pageLink(item)}</span>
-                ))}
-                <Text size="sm" truncate maw={220}>
-                  {page.title}
-                </Text>
-              </Breadcrumbs>
-            </nav>
-            <Button
-              variant="subtle"
-              color="gray"
-              aria-label="頁面操作"
-              aria-haspopup="dialog"
-              aria-expanded={panel === "page"}
-              leftSection={<IconDots size={20} />}
-              onClick={(event) => open("page", event.currentTarget)}
-            >
-              頁面操作
-            </Button>
-          </Group>
-          {children}
+    <nav className="pn-quick-navigation" aria-label="工作區">
+      <button className="pn-nav-item pn-sidebar-search" disabled={navigationLocked} aria-label="搜尋筆記" onClick={(event) => open("search", event.currentTarget)}>
+        <IconSearch size={18} /><span>搜尋</span><kbd aria-hidden="true">⌘ K</kbd>
+      </button>
+      <button className="pn-nav-item" disabled={navigationLocked} data-active={!settingsView && page.kind === "journal" && page.journal_date === today(Date.now()) || undefined}
+        onClick={() => { setNavOpen(false); void run(() => navigate()); }}><IconCalendarEvent size={18} /><span>今天</span></button>
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={(event) => openJournals(event.currentTarget)}>
+        <IconCalendar size={18} /><span>日記</span>
+      </button>
+    </nav>
+    <div className="pn-section-label"><span>私人頁面</span><span className="pn-note-count">{pages.filter((item) => item.kind === "note").length}</span></div>
+    <div className="pn-notes-scroll">
+      <nav aria-label="筆記頁面">
+        {pages.some((item) => item.kind === "note") ? tree(null) : <div className="pn-sidebar-empty">還沒有筆記</div>}
+      </nav>
+      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={newNote}><IconPlus size={18} /><span>新增筆記</span></button>
+      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={() => void run(async () => {
+        const database = await request("/api/databases", { title: "未命名資料庫" });
+        if (database) await navigate(database.id);
+      })}><IconDatabase size={18} /><span>新增資料庫</span></button>
+    </div>
+    <nav className="pn-sidebar-footer" aria-label="工作區管理">
+      <PwaControls disabled={navigationLocked} onHelpOpenChange={setPwaHelpOpen} />
+      <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "api" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); settings(); }}>
+        <IconSettings size={17} /><span>設定</span>
+      </button>
+      <button className="pn-nav-item" disabled={navigationLocked} aria-label="備份設定" data-active={settingsView === "backup" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); backups(); }}>
+        <IconCloud size={17} /><span>備份設定</span>
+      </button>
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={(event) => { open("trash", event.currentTarget); void run(loadTrash); }}>
+        <IconTrash size={17} /><span>垃圾桶</span>
+      </button>
+      <button className="pn-nav-item" disabled={navigationLocked} onClick={() => void run(async () => {
+        await saveDraft();
+        const response = await api("/api/logout", {});
+        if (!response.ok) throw new Error("登出失敗，請重試");
+        location.assign("/");
+      })}><IconLogout size={17} /><span>登出</span></button>
+    </nav>
+  </div>;
+  const panelTitle = ({ search: "搜尋筆記", journals: "日記回顧", trash: "垃圾桶", page: "頁面操作", delete: "移到垃圾桶？" } as Record<string, string>)[panel] ?? "";
+  return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
+    <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
+    <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
+      trapFocus={!pwaHelpOpen} closeOnEscape={!pwaHelpOpen}
+      closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
+      {sidebar}
+    </Drawer>
+    <main className="pn-main">
+      <header className="pn-topbar">
+        <button className="pn-icon-button pn-mobile-only" aria-label="導覽" aria-haspopup="dialog" aria-expanded={navOpen}
+          onClick={() => setNavOpen(true)}><IconMenu2 size={20} /></button>
+        {sidebarCollapsed && <button className="pn-icon-button pn-desktop-only" aria-label="展開側邊欄" title="展開側邊欄" aria-expanded="false" aria-controls="workspace-sidebar"
+          onClick={() => setSidebar(false)}><IconChevronsRight size={18} /></button>}
+        <nav aria-label="頁面路徑" className="pn-breadcrumbs">
+          <Breadcrumbs separator={<span className="pn-path-separator">/</span>}>
+            <Anchor component="button" disabled={navigationLocked} aria-disabled={navigationLocked || undefined} aria-label={settingsView ? "返回目前文件" : page.kind === "journal" ? "日記回顧" : "筆記列表"}
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                if (navigationLockedRef.current) { event.preventDefault(); return; }
+                if (settingsView) void run(() => navigate(page.id));
+                else if (page.kind === "journal") openJournals(event.currentTarget);
+                else if (matchMedia("(max-width: 47.99em)").matches) setNavOpen(true);
+                else {
+                  setSidebar(false);
+                  requestAnimationFrame(() => document.querySelector<HTMLElement>('.workspace-sidebar [aria-current="page"]')?.focus());
+                }
+              }}>{settingsView ? "設定" : page.kind === "journal" ? "日記" : "筆記"}</Anchor>
+            {!settingsView && page.ancestors?.map((item, index) => <span key={item.id} className="pn-ancestor"
+              data-direct-parent={index === (page.ancestors?.length ?? 0) - 1 || undefined}>{pageLink(item)}</span>)}
+            <span className="pn-current-page" title={settingsView ? undefined : page.title}>
+              {settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
+              <span>{settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
+            </span>
+          </Breadcrumbs>
+        </nav>
+        <div className="pn-topbar-actions">
+          <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
+            onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
+          <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"
+            onClick={() => { if (!navigationLockedRef.current) backups(); }}><IconCloud size={18} /></button>
+          {!settingsView && <button disabled={navigationLocked} className="pn-icon-button" aria-label="頁面操作" title="頁面操作" aria-haspopup="dialog" aria-expanded={panel === "page"}
+            onClick={(event) => open("page", event.currentTarget)}><IconDots size={20} /></button>}
         </div>
-      </AppShell.Main>
-      <Modal
-        returnFocus={false}
-        onExitTransitionEnd={() => {
-          // 站內換頁後新頁面可能已取得焦點（例如新頁標題），只在焦點無處可去時才還原。
-          const settled =
-            document.activeElement && document.activeElement !== document.body;
-          if (!panel && !settled)
-            (trigger.current?.isConnected
-              ? trigger.current
-              : document.querySelector<HTMLButtonElement>(
-                  'button[aria-label="導覽"]',
-                )
-            )?.focus();
-        }}
-        opened={!!panel}
-        onClose={() => setPanel("")}
-        title={panelTitle}
-        size={panel === "delete" ? "sm" : "md"}
-        closeButtonProps={{ "aria-label": "關閉" + panelTitle }}
-      >
-        <Stack gap="lg">
-          {failure && (
-            <Alert color="red" role="alert">
-              {failure}
-            </Alert>
-          )}
-          {panel === "search" && (
-            <>
-              <Text size="sm" c="dimmed">
-                從標題與已同步的內容，找回你的想法。
-              </Text>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void run(async () => {
-                    const response = await api(
-                      "/api/search?q=" + encodeURIComponent(query),
-                    );
-                    if (!response.ok) throw new Error("搜尋失敗，請重試");
-                    setResults((await response.json()) as PageInfo[]);
-                    setSearched(true);
-                  });
-                }}
-              >
-                <Stack gap="sm">
-                  <TextInput
-                    data-autofocus
-                    type="search"
-                    label="搜尋文字"
-                    placeholder="輸入關鍵字…"
-                    value={query}
-                    required
-                    onChange={(event) => setQuery(event.target.value)}
-                    leftSection={<IconSearch size={18} />}
-                  />
-                  <Button type="submit" loading={busy}>
-                    搜尋
-                  </Button>
-                </Stack>
-              </form>
-              {searched && (
-                <section aria-label="搜尋結果">
-                  {!results.length ? (
-                    <Text c="dimmed" ta="center" py="xl">
-                      沒有符合的頁面
-                    </Text>
-                  ) : (
-                    <Stack gap="xs">
-                      {results.map((item) => (
-                        <Paper key={item.id} p="md" withBorder>
-                          <Group justify="space-between">
-                            {pageLink(item)}
-                            <IconArrowRight size={16} />
-                          </Group>
-                          <Text size="sm" c="dimmed" mt={6} lineClamp={2}>
-                            {item.summary || "開啟頁面繼續閱讀"}
-                          </Text>
-                        </Paper>
-                      ))}
-                    </Stack>
-                  )}
-                </section>
-              )}
-            </>
-          )}
-          {panel === "journals" && (
-            <>
-              <Text c="dimmed" size="sm">
-                回到某一天，或翻閱一整個月的生活。
-              </Text>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void run(async () => {
-                    const journal = await request("/api/journal", { date });
-                    if (journal) await navigate(journal.id);
-                  });
-                }}
-              >
-                <Stack gap="sm">
-                  <TextInput
-                    type="date"
-                    label="日記日期"
-                    required
-                    value={date}
-                    onChange={(event) => setDate(event.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    loading={busy}
-                    leftSection={<IconCalendarEvent size={18} />}
-                  >
-                    開啟日期日記
-                  </Button>
-                </Stack>
-              </form>
-              <Divider label="月份回顧" />
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void run(() => loadMonth(month));
-                }}
-              >
-                <Group align="end">
-                  <TextInput
-                    type="month"
-                    label="日記月份"
-                    required
-                    value={month}
-                    onChange={(event) => setMonth(event.target.value)}
-                    style={{ flex: 1 }}
-                  />
-                  <Button variant="light" type="submit" loading={busy}>
-                    查看月份
-                  </Button>
-                </Group>
-              </form>
-              <section aria-label="月份日記">
-                <Stack gap={8}>
-                  {journals.map((item) => (
-                    <Paper key={item.id} p="sm" withBorder>
-                      {pageLink(
-                        item,
-                        item.title === item.journal_date
-                          ? item.title
-                          : item.journal_date + " " + item.title,
-                      )}
-                    </Paper>
-                  ))}
-                </Stack>
-              </section>
-            </>
-          )}
-          {panel === "trash" && (
-            <section aria-label="垃圾桶內容">
-              <Text size="sm" c="dimmed" mb="lg">
-                移除的頁面仍保留在這裡，可以隨時還原。
-              </Text>
-              {notice && (
-                <Alert color="teal" role="status" mb="lg">
-                  {notice}
-                </Alert>
-              )}
-              {!trash.length && (
-                <Stack align="center" gap="xs" py="xl">
-                  <IconTrash size={36} stroke={1.3} />
-                  <Title order={3} size="lg">
-                    垃圾桶是空的
-                  </Title>
-                  <Text c="dimmed" size="sm">
-                    安心整理，留下需要的內容。
-                  </Text>
-                </Stack>
-              )}
-              <Stack>
-                {trash.map((item) => (
-                  <Paper withBorder p="md" key={item.id}>
-                    <Group justify="space-between" wrap="nowrap">
-                      <Text lineClamp={2} className="trash-title">
-                        {item.title}
-                      </Text>
-                      <Button
-                        variant="light"
-                        disabled={busy}
-                        aria-label={"還原 " + item.title}
-                        onClick={() => {
-                          setNotice("");
-                          void run(async () => {
-                            await request(`/api/pages/${item.id}/restore`, {});
-                            setNotice(`已還原「${item.title}」`);
-                            await refresh();
-                            await loadTrash();
-                          });
-                        }}
-                      >
-                        還原
-                      </Button>
-                    </Group>
-                  </Paper>
-                ))}
-              </Stack>
-            </section>
-          )}
-          {panel === "page" && (
-            <>
-              <Text size="sm" c="dimmed">
-                整理這份{page.kind === "journal" ? "日記" : "筆記"}
-                的標題與位置。
-              </Text>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void run(async () => {
-                    const updated = await request(
-                      `/api/pages/${page.id}/title`,
-                      { title },
-                    );
-                    if (updated) changed(updated);
-                    await refresh();
-                    setPanel("");
-                  });
-                }}
-              >
-                <Stack gap="sm">
-                  <TextInput
-                    label="頁面標題"
-                    maxLength={200}
-                    required
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                  />
-                  <Button type="submit" loading={busy}>
-                    儲存標題
-                  </Button>
-                </Stack>
-              </form>
-              {page.kind === "note" && (
-                <>
-                  <Divider label="頁面階層" />
-                  <Button
-                    variant="light"
-                    leftSection={<IconPlus size={18} />}
-                    disabled={busy}
-                    onClick={() => {
-                      void run(async () => {
-                        const child = await request("/api/pages", {
-                          title: "未命名",
-                          parent_id: page.id,
-                        });
-                        if (child) await navigate(child.id, true);
-                      });
-                    }}
-                  >
-                    新增子頁面
-                  </Button>
-                  {!page.database_config && <Button variant="light" disabled={busy} onClick={() => {
-                    void run(async () => { const database = await request('/api/databases', { title: '未命名資料庫', parent_id: page.id }); if (database) await navigate(database.id); });
-                  }}>新增子資料庫</Button>}
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      void run(async () => {
-                        const moved = await request(
-                          `/api/pages/${page.id}/move`,
-                          { parent_id: parent || null },
-                        );
-                        if (moved) changed(moved);
-                        await refresh();
-                        setPanel("");
-                      });
-                    }}
-                  >
-                    <Stack gap="sm">
-                      <NativeSelect
-                        label="移動至上層"
-                        value={parent}
-                        onChange={(event) => setParent(event.target.value)}
-                        data={[{ value: "", label: "最上層" }, ...parents(null)]}
-                      />
-                      <Button variant="light" type="submit" loading={busy}>
-                        移動頁面
-                      </Button>
-                    </Stack>
-                  </form>
-                </>
-              )}
-              <Divider />
-              <Button
-                color="red"
-                variant="light"
-                leftSection={<IconTrash size={18} />}
-                disabled={busy}
-                onClick={() => setPanel("delete")}
-              >
-                移到垃圾桶
-              </Button>
-            </>
-          )}
-          {panel === "delete" && (
-            <>
-              <Text>
-                「{page.title}」會移到垃圾桶，之後可以還原。
-                {page.kind === "note" && "子頁面也會一起隱藏。"}
-              </Text>
-              <Group justify="end">
-                <Button variant="default" onClick={() => setPanel("")}>
-                  取消
-                </Button>
-                <Button
-                  color="red"
-                  loading={busy}
-                  onClick={() => {
-                    void run(async () => {
-                      await saveDraft();
-                      await request(`/api/pages/${page.id}/delete`, {});
-                      await navigate();
-                    });
-                  }}
-                >
-                  確認移到垃圾桶
-                </Button>
-              </Group>
-            </>
-          )}
-        </Stack>
-      </Modal>
-    </AppShell>
-  );
+      </header>
+      <div className={"pn-document-shell document-shell" + (settingsView ? " pn-settings-shell" : databaseView ? " pn-database-shell" : "")}>{children}</div>
+    </main>
+    <Modal returnFocus={false} onExitTransitionEnd={() => {
+      // 換頁後若新頁已取得焦點，不搶回原頁的觸發點。
+      const settled = document.activeElement && document.activeElement !== document.body;
+      if (!panel && !settled) (trigger.current?.isConnected ? trigger.current : document.querySelector<HTMLButtonElement>('button[aria-label="導覽"]'))?.focus();
+    }} opened={!!panel} onClose={() => setPanel("")} title={panelTitle}
+      size={panel === "search" ? 600 : panel === "delete" ? 420 : 460}
+      centered={panel === "delete"}
+      className={"pn-dialog pn-dialog-" + panel} padding={20} radius={8}
+      closeButtonProps={{ "aria-label": "關閉" + panelTitle }}>
+      <Stack gap={16}>
+        {failure && <Alert color="red" role="alert">{failure}</Alert>}
+        {panel === "search" && <>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+            void run(async () => {
+              const response = await api("/api/search?q=" + encodeURIComponent(query));
+              if (!response.ok) throw new Error("搜尋失敗，請重試");
+              setResults((await response.json()) as PageInfo[]);
+              setSearched(true);
+            });
+          }}>
+            <div className="pn-inline-form">
+              <TextInput data-autofocus type="search" label="搜尋文字" placeholder="搜尋標題或內容…" value={query} required
+                onChange={(event) => { setQuery(event.target.value); setSearched(false); }} leftSection={<IconSearch size={18} />} />
+              <Button type="submit" loading={busy} disabled={navigationLocked}>搜尋</Button>
+            </div>
+          </form>
+          {searched ? <section aria-label="搜尋結果" className="pn-result-list">
+            <div className="pn-list-caption">{results.length} 個搜尋結果</div>
+            {!results.length ? <div className="pn-empty-state"><IconSearch size={28} stroke={1.4} /><Text>沒有符合的頁面</Text><Text size="sm" c="dimmed">試試其他關鍵字。</Text></div>
+              : results.map((item) => <a key={item.id} className="pn-result-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
+                {item.kind === "journal" ? <IconCalendar size={19} /> : item.database_config ? <IconDatabase size={19} /> : <IconFileText size={19} />}
+                <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
+                <IconArrowRight size={16} className="pn-result-arrow" />
+              </a>)}
+          </section> : <div className="pn-search-help"><IconSearch size={26} stroke={1.4} /><Text size="sm">搜尋你的筆記與日記</Text><Text size="xs" c="dimmed">可搜尋標題及已同步的內容</Text></div>}
+          <div className="pn-dialog-footer"><span><kbd>Esc</kbd> 關閉</span><span><kbd>Enter</kbd> 搜尋</span></div>
+        </>}
+        {panel === "journals" && <>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+            void run(async () => { const journal = await request("/api/journal", { date }); if (journal) await navigate(journal.id); });
+          }}>
+            <div className="pn-inline-form">
+              <TextInput type="date" label="日記日期" required value={date} onChange={(event) => setDate(event.target.value)} />
+              <Button type="submit" loading={busy} disabled={navigationLocked}>開啟日期日記</Button>
+            </div>
+          </form>
+          <div className="pn-panel-section">
+            <form onSubmit={(event) => { event.preventDefault(); void run(() => loadMonth(month)); }}>
+              <div className="pn-inline-form">
+                <TextInput type="month" label="日記月份" required value={month} onChange={(event) => setMonth(event.target.value)} />
+                <Button variant="default" type="submit" loading={busy} disabled={navigationLocked}>查看月份</Button>
+              </div>
+            </form>
+          </div>
+          <section aria-label="月份日記" className="pn-result-list">
+            <div className="pn-list-caption">{month.replace("-", " 年 ")} 月 · {journals.length} 篇日記</div>
+            {journals.length ? journals.map((item) => <a key={item.id} className="pn-journal-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
+              onClick={(event) => link(event, item.id)}>
+              <span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>
+              <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
+              <IconChevronRight size={15} />
+            </a>) : <div className="pn-empty-state"><IconCalendar size={28} stroke={1.4} /><Text size="sm">這個月還沒有日記</Text><Text size="xs" c="dimmed">選擇日期，開始記錄。</Text></div>}
+          </section>
+        </>}
+        {panel === "trash" && <section aria-label="垃圾桶內容">
+          <Text size="sm" c="dimmed" mb={16}>已刪除的頁面會保留在這裡，隨時可以還原。</Text>
+          {notice && <Alert color="gray" role="status" mb={12}>{notice}</Alert>}
+          {!trash.length && <div className="pn-empty-state"><IconTrash size={30} stroke={1.4} /><Text fw={500}>垃圾桶是空的</Text></div>}
+          <div className="pn-trash-list">{trash.map((item) => <div className="pn-trash-row" key={item.id}>
+            <IconFileText size={18} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
+            <Button variant="default" disabled={busy || navigationLocked} aria-label={"還原 " + item.title} onClick={() => {
+              setNotice("");
+              void run(async () => {
+                await request(`/api/pages/${item.id}/restore`, {});
+                setNotice(`已還原「${item.title}」`);
+                await refresh();
+                await loadTrash();
+              });
+            }}>還原</Button>
+          </div>)}</div>
+        </section>}
+        {panel === "page" && <>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+            void run(async () => {
+              const updated = await request(`/api/pages/${page.id}/title`, { title });
+              if (updated) changed(updated);
+              await refresh();
+              setPanel("");
+            });
+          }}>
+            <Stack gap={10}>
+              <TextInput data-autofocus label="頁面標題" maxLength={200} required value={title} onChange={(event) => setTitle(event.target.value)} />
+              <Group justify="end"><Button type="submit" loading={busy} disabled={navigationLocked}>儲存標題</Button></Group>
+            </Stack>
+          </form>
+          {page.kind === "note" && <>
+            <div className="pn-panel-section"><div className="pn-list-caption">新增至此頁面</div>
+              <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
+                const child = await request("/api/pages", { title: "未命名", parent_id: page.id });
+                if (child) await navigate(child.id, true);
+              })}><IconPlus size={18} />新增子頁面</button>
+              {!page.database_config && <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
+                const database = await request("/api/databases", { title: "未命名資料庫", parent_id: page.id });
+                if (database) await navigate(database.id);
+              })}><IconDatabase size={18} />新增子資料庫</button>}
+            </div>
+            <form className="pn-panel-section" onSubmit={(event) => {
+              event.preventDefault();
+              void run(async () => {
+                const moved = await request(`/api/pages/${page.id}/move`, { parent_id: parent || null });
+                if (moved) changed(moved);
+                await refresh();
+                setPanel("");
+              });
+            }}>
+              <div className="pn-inline-form">
+                <NativeSelect label="移動至上層" value={parent} onChange={(event) => setParent(event.target.value)}
+                  data={[{ value: "", label: "最上層" }, ...parents(null)]} />
+                <Button variant="default" type="submit" loading={busy} disabled={navigationLocked}>移動頁面</Button>
+              </div>
+            </form>
+          </>}
+          <div className="pn-panel-section"><button className="pn-menu-action pn-danger-action" disabled={busy || navigationLocked} onClick={() => setPanel("delete")}>
+            <IconTrash size={18} />移到垃圾桶</button></div>
+        </>}
+        {panel === "delete" && <>
+          <div className="pn-delete-copy"><IconTrash size={24} stroke={1.5} /><Text size="sm">
+            「{page.title}」會移到垃圾桶，之後可以還原。{page.kind === "note" && "子頁面也會一起隱藏。"}
+          </Text></div>
+          <Group justify="end" gap={8} mt={8}>
+            <Button variant="default" onClick={() => setPanel("")}>取消</Button>
+            <Button color="red" loading={busy} disabled={navigationLocked} onClick={() => void run(async () => {
+              await saveDraft();
+              await request(`/api/pages/${page.id}/delete`, {});
+              await navigate();
+            })}>確認移到垃圾桶</Button>
+          </Group>
+        </>}
+      </Stack>
+    </Modal>
+  </div>;
 }

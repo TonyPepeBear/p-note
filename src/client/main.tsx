@@ -10,7 +10,7 @@ import {
   Select,
   Stack,
   Text,
-  Loader,
+  Skeleton,
 } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { theme, resolver, Brand } from "./ui";
@@ -44,6 +44,13 @@ function App() {
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
+  const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
+  useEffect(() => {
+    if (login) {
+      setSettings(false);
+      setApiSettings(false);
+    }
+  }, [login]);
   const [route, setRoute] = useState(() => ({
     serial: 0,
     fresh: new URLSearchParams(location.search).get("new") === "1",
@@ -55,6 +62,8 @@ function App() {
       // 同步卸載舊編輯器，避免換頁途中仍顯示前一頁的狀態。
       flushSync(() => {
         setSession(undefined);
+        setSettings(false);
+        setApiSettings(false);
         setRoute((current) => ({
           serial: current.serial + 1,
           fresh,
@@ -388,6 +397,7 @@ function App() {
       )}
       {error && (
         <Alert
+          className="workspace-notice"
           color="red"
           role="alert"
           mb="lg"
@@ -400,6 +410,7 @@ function App() {
       )}
       {!isolated && page && versions.length > 0 && !draftDismissed && (
         <Paper
+          className="workspace-notice recovery-panel"
           component="section"
           aria-label="保留的本機草稿"
           withBorder
@@ -453,7 +464,7 @@ function App() {
         </Paper>
       )}
       {isolated && (
-        <Paper withBorder p="lg" mb="lg">
+        <Paper className="workspace-notice recovery-panel" withBorder p="lg" mb="lg">
           <Stack>
             <Text fw={600}>本機修改已另外保留</Text>
             <Text size="sm" c="dimmed">
@@ -496,7 +507,7 @@ function App() {
         </Paper>
       )}
       {recovery && (
-        <Paper withBorder p="lg" mb="lg">
+        <Paper className="workspace-notice recovery-panel" withBorder p="lg" mb="lg">
           <Stack gap="sm" align="flex-start">
             <Text fw={600}>這頁在垃圾桶中</Text>
             <Text size="sm" c="dimmed">
@@ -525,7 +536,6 @@ function App() {
       )}
       {(session || page?.database_config) && page && (!isolated || viewDraft) ? (
         <>{page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated} /> : <>
-        <NoteProperties key={page.id} page={page} readOnly={login || !!isolated} />
         <Editor
           key={session!.room}
           session={session!}
@@ -535,40 +545,38 @@ function App() {
           rename={rename}
           focusTitle={route.fresh}
           readOnly={login || !!isolated}
+          properties={<NoteProperties key={page.id} page={page} readOnly={login || !!isolated} />}
         />
         </>}
         {!login && !isolated && <Backlinks key={page.id + page.sync_generation} id={page.id} />}</>
       ) : (
         !error && (
-          <Stack align="center" py={80}>
-            <Loader size="sm" />
-            <Text c="dimmed">正在準備你的寫作空間…</Text>
+          <Stack className="loading-document" gap="lg" role="status" aria-label="正在載入文件">
+            <Skeleton height={16} width={100} />
+            <Skeleton height={42} width="60%" mb="lg" />
+            <Skeleton height={14} width="90%" />
+            <Skeleton height={14} width="100%" />
+            <Skeleton height={14} width="72%" />
+            <Text size="xs" c="dimmed">正在載入文件…</Text>
           </Stack>
         )
       )}
     </>
   );
-  if (apiSettings) return <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />;
-  if (settings)
-    return (
-      <BackupSettings
-        close={() => setSettings(false)}
-        unauthorized={() => {
-          setSettings(false);
-          setLogin(true);
-        }}
-      />
-    );
   if (page || recovery)
     return (
       <Navigation
         page={(page ?? recovery)!}
         changed={setPage}
         error={setError}
-        settings={() => { void saveDraft().then(() => setApiSettings(true)).catch(() => setError("本機儲存失敗，請重試")); }}
+        settingsView={apiSettings ? "api" : settings ? "backup" : undefined}
+        databaseView={!!page?.database_config}
+        navigationLocked={backupNavigationLocked}
+        settings={() => { if (backupNavigationLocked) return; void saveDraft().then(() => { setSettings(false); setApiSettings(true); }).catch(() => setError("本機儲存失敗，請重試")); }}
         backups={() => {
+          if (backupNavigationLocked) return;
           void saveDraft()
-            .then(() => setSettings(true))
+            .then(() => { setApiSettings(false); setSettings(true); })
             .catch((failure) =>
               setError(
                 failure instanceof Error ? failure.message : "本機儲存失敗",
@@ -576,7 +584,9 @@ function App() {
             );
         }}
       >
-        {content}
+        <div hidden={settings || apiSettings}>{content}</div>
+        {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
+        {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
       </Navigation>
     );
   return (

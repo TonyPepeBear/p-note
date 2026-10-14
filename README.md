@@ -57,6 +57,7 @@ npm run dev
 - [部署前完成、驗證與發布設定](docs/predeployment.md)
 - [正式 Cloudflare 發布與驗證](docs/production-deployment.md)
 - [Mantine 介面重設、實際畫面與驗收](docs/ui-redesign.md)
+- [Notion 工作區全面重做與驗收](docs/notion-redesign.md)
 - [工作區可用性修正與驗收](docs/ux-polish.md)
 - [站內換頁與驗收](docs/spa-navigation.md)
 - [本機優先開啟與驗收](docs/local-first-open.md)

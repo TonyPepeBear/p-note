@@ -9,7 +9,7 @@ test.beforeEach(async ({ request }) => {
 test('PWA-01：manifest 與一般、遮罩和 Apple 圖示提供有效安裝資訊', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.webmanifest');
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#185b43');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff');
   const manifest = await (await page.request.get('/manifest.webmanifest')).json();
   expect(manifest).toMatchObject({ id: '/', name: 'p-note 私人筆記', short_name: 'p-note', lang: 'zh-TW', start_url: '/', scope: '/', display: 'standalone' });
   expect(manifest.icons).toEqual(expect.arrayContaining([
@@ -61,6 +61,55 @@ test('PWA-03：未登入也能準備離線外殼、manifest 與圖示', async ({
   expect(await page.evaluate(async () => (await fetch('/icons/icon-192.png')).ok)).toBe(true);
   await page.getByRole('button', { name: '安裝 p-note', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '安裝 p-note' })).toContainText('加入主畫面');
+});
+
+test('PWA-UI-01：手機關閉安裝說明後保留導覽與焦點，仍可開啟原文件', async ({ page }, info) => {
+  test.setTimeout(45000);
+  await page.setViewportSize({ width: 375, height: 812 });
+  // 固定使用瀏覽器不提供原生提示時的替代說明流程。
+  await page.addInitScript(() => {
+    addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+  });
+  const id = await openPrivate(page);
+  await page.evaluate(() => {
+    window.probe!.editor.updateBlock(window.probe!.editor.document[0], {
+      content: '關閉安裝說明後保留的原文件',
+    });
+  });
+  await saved(page);
+  await showNavigation(page);
+  const drawer = page.getByRole('dialog', { name: '導覽', exact: true });
+  const install = drawer.getByRole('button', { name: '安裝 p-note', exact: true });
+  await install.click();
+  const help = page.getByRole('dialog', { name: '安裝 p-note', exact: true });
+  await expect(help).toBeVisible();
+  await expect(help).toContainText('加入主畫面');
+  // 真正點擊浮層，避免只驗證 DOM 可見卻被導覽抽屜遮住。
+  await help.getByRole('button', { name: '知道了', exact: true }).click();
+  await expect(help).toBeHidden();
+  await expect(drawer).toBeVisible();
+  await expect(install).toBeFocused();
+  await install.click();
+  await expect(help).toBeVisible();
+  await expect(help).toHaveCSS('opacity', '1');
+  await page.screenshot({ path: `test-results/screenshots/redesign-${info.project.name}-install.png`, fullPage: true, animations: 'disabled' });
+  await page.keyboard.press('Escape');
+  await expect(help).toBeHidden();
+  await expect(drawer).toBeVisible();
+  await expect(install).toBeFocused();
+  await drawer.getByRole('button', { name: '今天', exact: true }).click();
+  await expect(drawer).toBeHidden();
+  await expect(page.getByTestId('ready')).toHaveText('可編輯');
+  expect(new URL(page.url()).searchParams.get('page')).toBe(id);
+  await expect(page.locator('.tiptap')).toContainText('關閉安裝說明後保留的原文件');
+  await page.locator('.tiptap').click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.insertText('，可以繼續書寫');
+  await expect(page.locator('.tiptap')).toContainText('可以繼續書寫');
+  await saved(page);
 });
 
 test('PWA-04：離線重開同筆記保留草稿，未知筆記明確拒絕', async ({ page, context }) => {

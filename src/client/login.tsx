@@ -8,7 +8,6 @@ import {
   Stack,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
 } from "@mantine/core";
 import {
@@ -16,11 +15,10 @@ import {
   IconCheck,
   IconLock,
   IconMail,
-  IconPencil,
-  IconShieldCheck,
 } from "@tabler/icons-react";
 import { api } from "./api";
 import { Brand } from "./ui";
+import "./login.css";
 
 export function Login({
   confirm = false,
@@ -64,28 +62,23 @@ export function Login({
   const card = (
     <Paper
       className="login-card"
-      radius="xl"
-      p="xl"
-      withBorder
       component="section"
       aria-label="登入"
     >
-      <Stack gap="lg">
-        <ThemeIcon variant="light" size={52} radius={16}>
-          <IconPencil size={26} stroke={1.7} />
-        </ThemeIcon>
-        <div>
-          <Title order={2} size={26}>
+      <Stack gap={24}>
+        <Brand />
+        <div className="login-heading">
+          <Title order={embedded ? 2 : 1} size={28}>
             登入 p-note
           </Title>
-          <Text mt={8} c="dimmed" lh={1.7}>
+          <Text mt={8} c="dimmed" size="sm" lh={1.7}>
             {confirming
               ? "確認後，就可以回到你的筆記。"
               : "不需要密碼。我們會寄送一次性登入連結到你的信箱。"}
           </Text>
         </div>
         {confirming ? (
-          <>
+          <Stack gap="sm">
             <Button
               loading={busy}
               leftSection={<IconCheck size={18} />}
@@ -95,10 +88,10 @@ export function Login({
             >
               確認登入
             </Button>
-            <Text size="sm" c="dimmed">
+            <Text size="xs" c="dimmed">
               連結只能使用一次，請勿轉寄。
             </Text>
-          </>
+          </Stack>
         ) : (
           <form
             onSubmit={(event) => {
@@ -106,7 +99,7 @@ export function Login({
               void send(false);
             }}
           >
-            <Stack gap="md">
+            <Stack gap="sm">
               <TextInput
                 label="Email"
                 placeholder="you@example.com"
@@ -115,7 +108,8 @@ export function Login({
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                leftSection={<IconMail size={18} />}
+                leftSection={<IconMail size={16} />}
+                disabled={busy}
               />
               <Button
                 fullWidth
@@ -130,7 +124,7 @@ export function Login({
         )}
         {message && (
           <Alert
-            color="teal"
+            color="blue"
             icon={<IconCheck size={20} />}
             role="status"
             title="登入連結已申請"
@@ -158,7 +152,7 @@ export function Login({
             重新申請登入連結
           </Button>
         )}
-        <Group gap={6} wrap="nowrap" justify="center" c="dimmed">
+        <Group className="login-privacy" gap={6} wrap="nowrap" c="dimmed">
           <IconLock size={14} />
           <Text size="xs">僅限已設定的擁有者登入</Text>
         </Group>
@@ -168,33 +162,9 @@ export function Login({
   if (embedded) return card;
   return (
     <main className="login-page">
-      <div className="login-layout">
-        <section className="login-intro">
-          <Brand />
-          <div className="intro-copy">
-            <Text className="eyebrow" c="teal.8">
-              私人筆記與日記
-            </Text>
-            <h1>
-              給想法一個家，
-              <br />
-              給日常一頁空間。
-            </h1>
-            <Text c="dimmed" size="lg" lh={1.8}>
-              安靜寫下靈感，慢慢記錄生活。
-              <br />
-              你的筆記與日記，都留在自己的空間。
-            </Text>
-          </div>
-          <Group gap="xs" c="dimmed">
-            <IconShieldCheck size={18} />
-            <Text size="sm">私人工作區 · 自動保存 · 隨時續寫</Text>
-          </Group>
-        </section>
-        {card}
-      </div>
+      <div className="login-layout">{card}</div>
       <Text className="login-footer" size="xs" c="dimmed">
-        一個屬於你的，安靜寫作的地方。
+        你的私人筆記與日記工作區
       </Text>
       <div style={{ margin: '12px auto 0' }}><PwaControls /></div>
     </main>

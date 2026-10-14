@@ -35,7 +35,7 @@ for (const file of files) {
 }
 assert.equal(ids.filter(id => !/^(DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA)-/.test(id)).length, 47);
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
-assert.deepEqual(ids.filter(id => id.startsWith('UI-')).sort(), Array.from({ length: 10 }, (_, i) => `UI-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Array.from({ length: 10 }, (_, i) => `UI-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UX-')))].sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({ length: 6 }, (_, i) => `KEY-0${i + 1}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('LFN-')))].sort(), Array.from({ length: 7 }, (_, i) => `LFN-0${i + 1}`));

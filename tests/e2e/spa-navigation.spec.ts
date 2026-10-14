@@ -75,7 +75,7 @@ test("UX-16：側欄切換頁面不重新載入，只保留一條同步連線", 
   await openPage(page, a);
   await setText(page, "甲的內容");
   await mark(page);
-  const header = await page.locator(".mantine-AppShell-header").elementHandle();
+  const header = await page.getByRole("navigation", { name: "頁面路徑", exact: true }).elementHandle();
   await clickNote(page, "乙頁");
   await arrive(page, b, "乙頁");
   await expect(page.locator(".tiptap")).not.toContainText("甲的內容");

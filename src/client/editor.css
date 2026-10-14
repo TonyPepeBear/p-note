@@ -1,0 +1,346 @@
+.editor-document {
+  width: 100%;
+  max-width: 800px;
+  min-width: 0;
+  margin-inline: auto;
+  color: #37352f;
+}
+
+.editor-document .document-heading {
+  margin-bottom: 16px;
+}
+
+.editor-document .document-kind {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  color: #6f6e69;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.editor-document .document-title {
+  margin: 0;
+  color: #37352f;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.editor-document .title-input {
+  display: block;
+  width: 100%;
+  min-height: 50px;
+  resize: none;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.editor-document .title-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.editor-document .title-input:focus-visible {
+  outline: 2px solid #b7d8f5;
+  outline-offset: 4px;
+}
+
+.editor-document .document-properties {
+  margin: 0 0 12px;
+}
+
+.editor-document .editor-prototype-note {
+  margin-bottom: 12px;
+}
+
+.editor-document .editor-utilities {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 16px;
+  min-height: 32px;
+}
+
+.editor-document .save-status {
+  min-height: 32px;
+  margin: 0;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #6f6e69;
+}
+
+.editor-document .editor-ready {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.editor-document .editor-ready::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #969590;
+}
+
+.editor-document .editor-local-status {
+  color: #6f6e69;
+  white-space: nowrap;
+}
+
+.editor-document .cloud-indicator {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.editor-document .cloud-indicator[data-state="saved"],
+.editor-document .cloud-indicator[data-state="syncing"],
+.editor-document .cloud-indicator[data-state="local"] {
+  color: #6f6e69;
+}
+
+.editor-document .editor-retry {
+  height: 32px;
+  padding-inline: 7px;
+  font-size: 12px;
+}
+
+.editor-document .editor-toolbar {
+  flex-shrink: 0;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+}
+
+.editor-document .editor-shortcut {
+  margin-right: 6px;
+  color: #6f6e69;
+  white-space: nowrap;
+}
+
+.editor-document .editor-tool {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  color: #6f6e69;
+}
+
+.editor-document .editor-tool:hover {
+  background: #efefed;
+  color: #37352f;
+}
+
+.editor-document .writing-surface {
+  margin: 0;
+  padding: 0;
+  min-height: 400px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.editor-blocknote {
+  --bn-colors-editor-background: transparent;
+  --bn-colors-editor-text: #37352f;
+  --bn-colors-menu-background: #fff;
+  --bn-colors-menu-text: #37352f;
+  --bn-colors-hovered-background: #efefed;
+  --bn-colors-hovered-text: #37352f;
+  --bn-colors-selected-background: #e8f1fb;
+  --bn-colors-selected-text: #2383e2;
+  --bn-colors-border: #e8e7e4;
+  --bn-colors-side-menu: #6f6e69;
+  --bn-border-radius: 4px;
+  --bn-font-family: inherit;
+  background: transparent;
+  font-family: inherit;
+}
+
+.editor-document .writing-surface .bn-editor {
+  min-height: 400px;
+  padding: 0 0 80px !important;
+  color: #37352f;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.editor-document .writing-surface .bn-block-content[data-content-type="codeBlock"] {
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.editor-document .writing-surface .bn-block-content[data-content-type="heading"] {
+  letter-spacing: -0.35px;
+}
+
+.editor-document .editor-error,
+.editor-image-dialog .editor-error {
+  padding: 10px 12px;
+  border: 1px solid #ead5d0;
+  border-radius: 4px;
+  background: #fdf7f5;
+  color: #9c4136;
+}
+
+.editor-block-menu {
+  max-height: min(360px, var(--popover-available-height, 70dvh));
+  padding: 5px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-color: #e8e7e4;
+  border-radius: 4px;
+  box-shadow: 0 4px 18px #19191912, 0 1px 4px #1919190a;
+}
+
+.editor-block-menu .mantine-Menu-item {
+  min-height: 32px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.editor-block-menu .mantine-Menu-label {
+  padding: 5px 9px;
+  color: #6f6e69;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.editor-image-dialog {
+  border: 1px solid #e8e7e4;
+  border-radius: 6px;
+  box-shadow: 0 12px 48px #19191926;
+}
+
+.editor-image-dialog .editor-image-header {
+  padding: 16px 20px 10px;
+}
+
+.editor-image-dialog .mantine-Modal-title {
+  color: #37352f;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-image-dialog .editor-image-body {
+  padding: 0 20px 20px;
+}
+
+.editor-image-dialog .mantine-Input-input {
+  min-height: 32px;
+  border-color: #dededb;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.editor-image-dialog .mantine-InputWrapper-label {
+  margin-bottom: 5px;
+  color: #575651;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.editor-image-dialog .editor-image-actions {
+  padding-top: 8px;
+}
+
+@media (max-width: 47.99em) {
+  .editor-document .document-heading {
+    margin-bottom: 12px;
+  }
+
+  .editor-document .document-kind {
+    margin-bottom: 6px;
+  }
+
+  .editor-document .document-title {
+    font-size: 32px;
+    letter-spacing: -0.7px;
+  }
+
+  .editor-document .title-input {
+    min-height: 44px;
+  }
+
+  .editor-document .editor-utilities {
+    gap: 0 4px;
+    margin-bottom: 12px;
+  }
+
+  .editor-document .save-status {
+    min-height: 44px;
+    gap: 6px;
+  }
+
+  .editor-document .editor-ready {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .editor-document .editor-local-status {
+    font-size: 11px;
+  }
+
+  .editor-document .cloud-indicator {
+    gap: 4px;
+  }
+
+  .editor-document .cloud-indicator .mantine-Text-root {
+    font-size: 11px;
+  }
+
+  .editor-document .editor-shortcut {
+    display: none;
+  }
+
+  .editor-document .editor-tool {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .editor-document .editor-retry {
+    min-height: 44px;
+  }
+
+  .editor-document .writing-surface,
+  .editor-document .writing-surface .bn-editor {
+    min-height: 360px;
+  }
+
+  .editor-document .writing-surface .bn-editor {
+    padding-inline: 0 !important;
+    font-size: 16px;
+  }
+
+  .editor-block-menu .mantine-Menu-item,
+  .editor-image-dialog .mantine-Button-root,
+  .editor-image-dialog .mantine-Input-input,
+  .editor-image-dialog .mantine-Modal-close {
+    min-height: 44px;
+  }
+
+  .editor-image-dialog .mantine-Modal-close {
+    min-width: 44px;
+  }
+}
