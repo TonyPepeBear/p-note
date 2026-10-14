@@ -1,0 +1,68 @@
+name: 部署 Cloudflare 正式站
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-production
+  cancel-in-progress: false
+
+env:
+  WRANGLER_SEND_METRICS: 'false'
+  E2E_WORKERS: '2'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.22.3'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run check
+      - run: npm run check:production
+      - run: npm run test:unit
+      - run: npm run test:integration
+      - run: npm run test:e2e
+      - run: npm run test:build
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://note.tonypepe.com
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.22.3'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: 部署預檢
+        run: node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js deploy --config wrangler.production.jsonc --dry-run
+      - name: 遷移資料庫並發布
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo '::error::請設定 CLOUDFLARE_API_TOKEN Actions secret'; exit 1; }
+          node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js d1 migrations apply p-note-production --config wrangler.production.jsonc --remote
+          node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js deploy --config wrangler.production.jsonc
+      - name: 確認正式建置與私人入口
+        run: node scripts/check-deployment.mjs
