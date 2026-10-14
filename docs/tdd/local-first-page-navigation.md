@@ -1,6 +1,6 @@
 # 已下載頁面本機優先導覽 TDD 報告
 
-規格見 [OpenSpec change](../../openspec/changes/local-first-page-navigation/proposal.md)。所有 Red／Green／Refactor 皆以 Chromium 桌面執行 `npm run test:e2e:fast -- tests/e2e/local-first.spec.ts tests/e2e/spa-navigation.spec.ts`，最後以三瀏覽器驗收。
+規格見 [OpenSpec change](../../openspec/changes/archive/2026-10-14-local-first-page-navigation/proposal.md)。所有 Red／Green／Refactor 皆以 Chromium 桌面執行 `npm run test:e2e:fast -- tests/e2e/local-first.spec.ts tests/e2e/spa-navigation.spec.ts`，最後以三瀏覽器驗收。
 
 ## 實作摘要
 
