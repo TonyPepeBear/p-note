@@ -21,3 +21,11 @@
 使用發布管理權限建立十分鐘專用 session，接著透過真正的網站 API 建立、兩次顯示與撤銷 key；Bearer API 建立專用筆記、正文讀寫、搜尋與 ETag 衝突；真實 Chromium 讀取正式內容並開啟設定。憑證只留在記憶體及短暫 0600 SQL 檔，檔案執行後刪除，截圖先隱藏完整 key。
 
 最後將專用筆記移入垃圾桶、撤銷 key 並刪除專用 session。不修改既有筆記；本次不重新驗證真實郵件登入。發布結果與版本完成後記錄於正式部署文件。
+
+## 已部署功能整合
+
+首次完整回歸通過後，發布前檢查發現正式站已更新為 `8b781f4f-8c25-44fc-8b4d-18cc1d2e4c0a`。為避免退回舊版，在本 worktree 合入另一 agent 已完成且提交的 `752076e`（包含站內換頁與本機優先開啟），整合提交為 `f95747c`；只處理本 worktree 的設定狀態及規格計數衝突。未取用其未提交檔案。
+
+整合只涉及前端四個檔案，後端仍是已通過 101 個 Workers 測試的相同程式；整合後重跑完整三瀏覽器回歸與 HTTPS smoke，結果另存發布驗收紀錄。
+
+整合後完整回歸為 [240 個 E2E](tdd/api-merged-e2e.log)、[2 個 HTTPS smoke](tdd/api-merged-smoke.log)，[產品 129／可用性 66／API 15 個情境環境](tdd/api-merged-coverage.log)皆通過；[型別與文件契約](tdd/api-merged-check.log)、[OpenSpec strict](tdd/api-merged-openspec.log)通過。另保留 6 個單元及 101 個 Workers 的既有本輪結果。

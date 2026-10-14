@@ -29,8 +29,10 @@ if (process.argv.includes('--cloud')) {
   const cloud = JSON.parse(readFileSync('docs/tdd/production-cloud.json', 'utf8'));
   assert(cloud.settings.success && cloud.secrets.success && cloud.domain.success);
   assert.equal(cloud.settings.bindings.find(binding => binding.name === 'DB').id, config.d1_databases[0].database_id);
-  assert.deepEqual(cloud.secrets.result.map(secret => secret.name).sort(), config.secrets.required.toSorted());
-  assert(cloud.secrets.result.every(secret => secret.type === 'secret_text'));
+  const secretsReport = process.argv.find(arg => arg.startsWith('--secrets-report='))?.split('=').slice(1).join('=');
+  const secrets = secretsReport ? JSON.parse(readFileSync(secretsReport, 'utf8')) : cloud.secrets.result;
+  assert.deepEqual(secrets.map(secret => secret.name).sort(), config.secrets.required.toSorted());
+  assert(secrets.every(secret => secret.type === 'secret_text'));
   assert.equal(cloud.domain.result.length, 1);
   assert.equal(cloud.domain.result[0].hostname, config.routes[0].pattern);
   assert.equal(cloud.domain.result[0].service, config.name);

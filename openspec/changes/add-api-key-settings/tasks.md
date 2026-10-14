@@ -15,5 +15,5 @@
 
 ## 4. 驗證與發布
 
-- [ ] 4.1 通過單元、Workers、E2E、型別、build smoke、OpenSpec strict 與 diff check；保存 TDD 證據並提交完成實作。
+- [x] 4.1 通過單元、Workers、E2E、型別、build smoke、OpenSpec strict 與 diff check；保存 TDD 證據並提交完成實作。
 - [ ] 4.2 檢查正式版本無其他未整合部署，新增加密 secret、D1 migration、dry-run、部署並自動驗證 KEY-06 正式 HTTP 功能；記錄版本、清理測試憑證與頁面、提交發布紀錄，保留獨立 worktree。
