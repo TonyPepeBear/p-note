@@ -13,7 +13,7 @@
 ## Decisions
 
 - pages 新增 nullable database_config TEXT 與 property_values TEXT DEFAULT '{}'。有 config 的 note 是資料庫容器，其直接 note 子頁為資料列。不擴充 kind，避免 SQLite 重建以及既有 API／快取歧義；獨立資料表會增加備份、生命週期及查詢協調，本次沒有必要。
-- config JSON 包含 properties 與 views，欄位為穩定 UUID；view 包含 layout、columns、filters、filterMode、sorts。內建 title／created_at／updated_at 不加入可刪自訂欄位。屬性最多 50、檢視最多 20、每檢視最多 20 條件／排序，單一值文字最多 2000 字元，設定在既有 request 大小限制內。
+- config JSON 包含 properties 與 views，欄位為穩定 UUID；view 包含 layout、columns、filters、filterMode、sorts。內建 title／created_at／updated_at 不加入可刪自訂欄位。屬性最多 50、檢視最多 20、每檢視最多 20 條件／排序，單一值文字最多 2000 字元，設定本體上限 64 KiB，設定請求含 previous 上限 256 KiB，屬性請求上限 16 KiB；一般表單保留 4 KiB。
 - 屬性更新以 SQLite json_set 修改單一欄，條件包含 owner、有效頁面、parent/config 與 sync_generation；避免整包覆蓋其他欄。config 更新比對原始 JSON，拒絕過期寫入；已有值的欄位禁止更換型別，改以新增欄位。已使用選項不允許移除，改名保留選項 ID。
 - 刪除欄位及移出筆記保留隱藏的穩定 ID 值，不在新資料庫顯示或重映射；回原資料庫仍保有值。避免移動默默破壞資料。前端清楚說明，備份保留此資料。
 - 資料庫容器直接讀取 metadata，不啟動空正文 room 或套用正文草稿隔離；筆記資料列維持既有正文世代隔離。
