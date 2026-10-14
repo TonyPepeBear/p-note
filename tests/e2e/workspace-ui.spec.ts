@@ -11,12 +11,16 @@ test.beforeEach(async ({ request, page }, info) => {
   if (info.project.name === "chromium-desktop")
     await page.setViewportSize({ width: 1440, height: 960 });
 });
+// 只有指定 P_NOTE_UI_STAGE 時才更新文件引用的截圖，平常執行不弄髒版控。
+const screenshotDir = process.env.P_NOTE_UI_STAGE
+  ? "docs/screenshots/ui"
+  : "test-results/screenshots";
 async function screenshot(
   page: import("@playwright/test").Page,
   name: string,
   project: string,
 ) {
-  await mkdir("docs/screenshots/ui", { recursive: true });
+  await mkdir(screenshotDir, { recursive: true });
   if (await page.locator(".mantine-Modal-content").isVisible())
     await expect(page.locator(".mantine-Drawer-content")).toBeHidden();
   for (const selector of [
@@ -33,7 +37,7 @@ async function screenshot(
     }
   }
   await page.screenshot({
-    path: `docs/screenshots/ui/${process.env.P_NOTE_UI_STAGE ?? "after"}-${project}-${name}.png`,
+    path: `${screenshotDir}/${process.env.P_NOTE_UI_STAGE ?? "after"}-${project}-${name}.png`,
     fullPage: true,
     animations: "disabled",
   });

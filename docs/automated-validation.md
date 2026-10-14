@@ -89,6 +89,7 @@ CI 依相同入口執行相關測試，收集 TDD 報告與情境對照。初次
 
 - `E2E_WORKERS`（預設 4）決定服務組數與 Playwright worker 數；常駐服務的組數須不少於執行時的 worker 數。
 - `E2E_PORT_OFFSET` 讓其他 worktree 使用不同 port（含建置 smoke），避免重用到別人的服務。
+- UI 截圖預設寫到 `test-results/screenshots`；要更新文件引用的 `docs/screenshots/ui` 時設定 `P_NOTE_UI_STAGE=after`。
 - 非 CI 環境會重用已就緒的服務（就緒訊號在 5172＋位移）；CI 每次自行啟動。
 
 ## 官方參考
