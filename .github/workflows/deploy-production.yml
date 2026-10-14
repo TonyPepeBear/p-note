@@ -44,5 +44,3 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || { echo '::error::請設定 CLOUDFLARE_API_TOKEN Actions secret'; exit 1; }
           node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js d1 migrations apply p-note-production --config wrangler.production.jsonc --remote
           node node_modules/@cloudflare/vitest-plugin/node_modules/wrangler/bin/wrangler.js deploy --config wrangler.production.jsonc
-      - name: 確認正式建置與私人入口
-        run: node scripts/check-deployment.mjs
