@@ -9,7 +9,7 @@ context: |
   docs/v1-scope.md 區分已確認決策、設計提案與待確認事項。
   依 AGENTS.md 使用 TDD；全部開發驗收自動化，規格修改與開發完成後自動提交相關檔案。
   docs/automated-validation.md 定義 Red／Green／Refactor、情境 ID、工具與驗證限制。
-  第一版部署前工作已完成。使用者已授權部署至 Cloudflare、設定 note.tonypepe.com、驗證正式登入寄信與同步並自動提交；不封存。使用 OpenSpec 與 TDD，私人密鑰由環境提供，不寫入規格或驗證紀錄。
+  第一版部署前工作已完成。使用者已授權部署至 Cloudflare、設定 note.tonypepe.com、驗證正式登入寄信與同步並自動提交。2026-10-14 依使用者指示封存已完成的 change，現行需求以 openspec/specs 主規格為準。使用 OpenSpec 與 TDD，私人密鑰由環境提供，不寫入規格或驗證紀錄。
 
 rules:
   specs:

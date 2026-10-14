@@ -1,6 +1,6 @@
 # 本機資料結構與登入
 
-已建立 Better Auth 1.7.7＋D1、固定 30 天 session、10 分鐘單次 magic link、今日入口與必要同步權限邊界。原生寄信 adapter 已接入，實際寄信與部署尚未執行；資料來源與限制以 [設計](../openspec/changes/personal-notes-v1/design.md) 為準。
+已建立 Better Auth 1.7.7＋D1、固定 30 天 session、10 分鐘單次 magic link、今日入口與必要同步權限邊界。原生寄信 adapter 已接入，實際寄信與部署尚未執行；資料來源與限制以 [設計](../openspec/changes/archive/2026-10-14-personal-notes-v1/design.md) 為準。
 
 ## Q3 設定來源
 

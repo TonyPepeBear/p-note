@@ -127,7 +127,7 @@ Red 日誌命令退出碼皆為 1，Green 日誌皆為 0。最初覆蓋檢查器
 - 全部儲存、WebSocket、abort／eviction 使用本機 Workers runtime；未驗證已部署 Cloudflare 的長期運作、平台事故或正式 Email 服務。
 - 原型單筆 Yjs 更新限制 512 KiB、快照整理由測試／本機端點觸發；正式正文限制、自動整理門檻與 IndexedDB SDK 掛鉤升級仍需後續自動化測試。
 - 已測瀏覽器斷網與重連；瀏覽器仍在線但後端不可用時的啟動退化，留在正式同步整合測試。本輪 Service Worker 已加入 API／憑證頁排除與舊 shell 版本清理，完整正式離線啟動仍留待後續。
-- Q3 的正式擁有者 Email、網站與寄件設定在接入服務前提供；本輪 AUTH 已完成本機驗證，V3／V4、完整 PAGE／ASSET／BACKUP 依 [任務](../../openspec/changes/personal-notes-v1/tasks.md) 繼續。
+- Q3 的正式擁有者 Email、網站與寄件設定在接入服務前提供；本輪 AUTH 已完成本機驗證，V3／V4、完整 PAGE／ASSET／BACKUP 依 [任務](../../openspec/changes/archive/2026-10-14-personal-notes-v1/tasks.md) 繼續。
 
 ## 原始參考
 

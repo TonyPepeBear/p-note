@@ -1,6 +1,6 @@
 # 工作區可用性修正
 
-依 Mantine 改版後的 UI/UX 審查，修正會干擾寫作或造成誤解的介面問題。規格與任務見 [OpenSpec change](../openspec/changes/polish-workspace-usability/proposal.md)。
+依 Mantine 改版後的 UI/UX 審查，修正會干擾寫作或造成誤解的介面問題。規格與任務見 [OpenSpec change](../openspec/changes/archive/2026-10-14-polish-workspace-usability/proposal.md)。
 
 ## 修正內容
 

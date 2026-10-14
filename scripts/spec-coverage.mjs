@@ -30,7 +30,7 @@ export function reportCases(report, environment) {
 }
 
 async function main() {
-  const { readFile, readdir } = await import('node:fs/promises');
+  const { readFile } = await import('node:fs/promises');
   const probe = process.argv.includes('--probe');
   const auth = process.argv.includes('--auth');
   const pages = process.argv.includes('--pages');
@@ -50,9 +50,10 @@ async function main() {
       required.push(...projects.map(project => `${id}@${project}`));
     }
   } else {
-    const dir = ux ? 'openspec/changes/polish-workspace-usability/specs' : ui ? 'openspec/changes/redesign-mantine-workspace/specs' : 'openspec/changes/personal-notes-v1/specs';
-    for (const name of await readdir(dir)) {
-      const text = await readFile(`${dir}/${name}/spec.md`, 'utf8');
+    const capabilities = ux ? ['workspace-usability'] : ui ? ['workspace-experience']
+      : ['personal-auth', 'pages-and-journal', 'block-editing', 'realtime-sync', 'private-assets', 'backup-restore'];
+    for (const name of capabilities) {
+      const text = await readFile(`openspec/specs/${name}/spec.md`, 'utf8');
       for (const match of text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g)) {
         const [, id, method] = match;
         if (pages && !id.startsWith('PAGE-')) continue;

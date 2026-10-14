@@ -23,7 +23,7 @@ for (const file of files) {
     assert(existsSync(resolve(dirname(file), target.split('#')[0])), `${file}: ${target}`);
     links++;
   }
-  if (file.includes('/specs/')) {
+  if (file.includes('/specs/') && !file.includes('/archive/')) {
     const found = Array.from(text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g));
     assert.equal(found.length, Array.from(text.matchAll(/^#### Scenario:/gm)).length, `${file}: 情境缺驗證方法`);
     for (const [, id, method] of found) {
@@ -49,7 +49,7 @@ const contracts = {
   'backup-restore': ['每日台北 03:00', '90×24 小時', '時間窗', 'ZIP'],
 };
 for (const [name, values] of Object.entries(contracts)) {
-  const text = await readFile(`openspec/changes/personal-notes-v1/specs/${name}/spec.md`, 'utf8');
+  const text = await readFile(`openspec/specs/${name}/spec.md`, 'utf8');
   for (const value of values) assert(text.includes(value), `${name} 決策不一致：${value}`);
 }
 console.log(JSON.stringify({ 文件: files.length, 本地連結: links, 唯一情境: ids.length, 決策契約: '通過' }));

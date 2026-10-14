@@ -1,14 +1,9 @@
-# 備份與還原規格
-
-狀態：部署前實作與自動化驗證已完成；未部署、未封存。
-
-驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。最新結果與各階段範圍見 [TDD 證據](../../../../../docs/tdd/README.md)。
+# backup-restore Specification
 
 ## Purpose
-
 讓私人筆記、日記、頁面階層與圖片在事故或誤操作後有可驗證的完整復原資料，保留九十天並支援可攜匯出；還原應保護現況、隔離舊裝置狀態，且不使舊登入憑證重新有效。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 90 天完整備份
 

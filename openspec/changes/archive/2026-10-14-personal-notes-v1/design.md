@@ -1,6 +1,6 @@
 # Design
 
-狀態：第一版部署前實作與自動化驗證完成，未部署、不封存。決策以 [需求整理](../../../docs/v1-scope.md) 為準；最新完整證據與各階段界線見 [部署前驗證](../../../docs/predeployment.md) 與 [TDD 結果](../../../docs/tdd/README.md)。下方先前階段紀錄保留當時範圍，以「部署前完成範圍」及後續實作節為最新設計。
+狀態：第一版部署前實作與自動化驗證完成，未部署、不封存。決策以 [需求整理](../../../../docs/v1-scope.md) 為準；最新完整證據與各階段界線見 [部署前驗證](../../../../docs/predeployment.md) 與 [TDD 結果](../../../../docs/tdd/README.md)。下方先前階段紀錄保留當時範圍，以「部署前完成範圍」及後續實作節為最新設計。
 
 ## Context
 
@@ -102,7 +102,7 @@ y-partyserver 的 onLoad／onSave 不證明預設廣播順序符合承諾。V2 �
 
 規劃採 Vitest 單元、Cloudflare 官方 Workers runtime 整合與 Playwright 端到端。保存與恢復測試使用真正隔離的 D1／DO／R2 與 WebSocket，透過官方 eviction／abort 及邊界故障注入測試中斷，不用純記憶體 mock 證明持久化。寄信用機器可讀測試寄件匣，日期與 90 天保留使用可控時鐘。
 
-手機採 Chromium／WebKit 模擬、觸控與 viewport 斷言；中文採 composition／input fixture。這些不等於原生 OS 鍵盤與輸入法，限制明確記錄，不另設人工驗收。全部自動化方法、ID 對照、結果證據與未覆蓋限制見 [驗證計畫](../../../docs/automated-validation.md)。
+手機採 Chromium／WebKit 模擬、觸控與 viewport 斷言；中文採 composition／input fixture。這些不等於原生 OS 鍵盤與輸入法，限制明確記錄，不另設人工驗收。全部自動化方法、ID 對照、結果證據與未覆蓋限制見 [驗證計畫](../../../../docs/automated-validation.md)。
 
 Q1–Q9 是產品契約與部署輸入，輸入確定後由機器驗證完整性與一致性；V1–V4 全部透過自動化測試。未決值保留草案，不以測試報告代替產品選擇。完整 spec ID 與測試結果比對不得把 skip／todo／未執行算通過。
 
@@ -114,7 +114,7 @@ Q1–Q9 是產品契約與部署輸入，輸入確定後由機器驗證完整性
 
 IndexedDB 以 owner／page／generation 雜湊名稱隔離。y-indexeddb 9.0.12 未回報逐筆交易完成與寫入失敗，因此保留載入，停止其預設更新寫入，改由明確交易合併舊快取與保存完整狀態。原型掛鉤固定版本並在升級前重驗。關閉 BroadcastChannel，避免以分頁直接交換掩蓋服務保存故障；離線刷新另用靜態 Service Worker 快取。
 
-原型尚未有正式 session、資料所有權或世代切換；只接受本機入口，不能據此把正式 AUTH／ASSET／BACKUP 算通過。具體結果、版本、TDD 證據與限制見 [技術驗證](../../../docs/tdd/README.md)。
+原型尚未有正式 session、資料所有權或世代切換；只接受本機入口，不能據此把正式 AUTH／ASSET／BACKUP 算通過。具體結果、版本、TDD 證據與限制見 [技術驗證](../../../../docs/tdd/README.md)。
 
 ## Risks / Trade-offs
 

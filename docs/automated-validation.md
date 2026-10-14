@@ -54,12 +54,12 @@ Q1、Q2、Q4–Q9 已採預設，Q3 留作接入服務前部署資訊；使用�
 
 | 能力 | 情境 ID | 計畫來源 |
 | --- | --- | --- |
-| personal-auth | AUTH-01～AUTH-08 | [spec](../openspec/changes/personal-notes-v1/specs/personal-auth/spec.md) |
-| pages-and-journal | PAGE-01～PAGE-08 | [spec](../openspec/changes/personal-notes-v1/specs/pages-and-journal/spec.md) |
-| block-editing | EDIT-01～EDIT-05 | [spec](../openspec/changes/personal-notes-v1/specs/block-editing/spec.md) |
-| realtime-sync | SYNC-01～SYNC-12 | [spec](../openspec/changes/personal-notes-v1/specs/realtime-sync/spec.md) |
-| private-assets | ASSET-01～ASSET-05 | [spec](../openspec/changes/personal-notes-v1/specs/private-assets/spec.md) |
-| backup-restore | BACKUP-01～BACKUP-09 | [spec](../openspec/changes/personal-notes-v1/specs/backup-restore/spec.md) |
+| personal-auth | AUTH-01～AUTH-08 | [spec](../openspec/specs/personal-auth/spec.md) |
+| pages-and-journal | PAGE-01～PAGE-08 | [spec](../openspec/specs/pages-and-journal/spec.md) |
+| block-editing | EDIT-01～EDIT-05 | [spec](../openspec/specs/block-editing/spec.md) |
+| realtime-sync | SYNC-01～SYNC-12 | [spec](../openspec/specs/realtime-sync/spec.md) |
+| private-assets | ASSET-01～ASSET-05 | [spec](../openspec/specs/private-assets/spec.md) |
+| backup-restore | BACKUP-01～BACKUP-09 | [spec](../openspec/specs/backup-restore/spec.md) |
 
 目前共 47 個情境 ID；是完整產品計畫；此次技術驗證的子項結果另記錄，不把未實作的正式服務算通過。後續測試名稱或 metadata 帶入 ID，機器比對 spec 與測試報告；沒有對應測試、skip／todo、未執行或失敗不能算已覆蓋。文件編號檢查不能冒充產品測試覆蓋率。
 

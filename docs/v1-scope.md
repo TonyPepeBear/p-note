@@ -110,10 +110,10 @@
 
 ## OpenSpec 入口
 
-- [變更說明](../openspec/changes/personal-notes-v1/proposal.md)
-- [技術設計](../openspec/changes/personal-notes-v1/design.md)
-- [後續任務](../openspec/changes/personal-notes-v1/tasks.md)
-- [能力規格](../openspec/changes/personal-notes-v1/specs/)
+- [變更說明](../openspec/changes/archive/2026-10-14-personal-notes-v1/proposal.md)
+- [技術設計](../openspec/changes/archive/2026-10-14-personal-notes-v1/design.md)
+- [後續任務](../openspec/changes/archive/2026-10-14-personal-notes-v1/tasks.md)
+- [能力規格](../openspec/specs/)
 - [TDD 與自動化驗證](automated-validation.md)
 
 ## 官方參考

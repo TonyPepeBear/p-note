@@ -1,14 +1,9 @@
-# 區塊編輯規格
-
-狀態：部署前實作與自動化驗證已完成；未部署、未封存。
-
-驗證採 TDD 且全部自動化，方法與限制見 [自動化驗證計畫](../../../../../docs/automated-validation.md)。最新結果與各階段範圍見 [TDD 證據](../../../../../docs/tdd/README.md)。
+# block-editing Specification
 
 ## Purpose
-
 提供在電腦與手機都能自由書寫的區塊編輯體驗，包含已確認的圖片與程式碼內容，並維持文字、區塊順序及格式在保存和重開後的完整性，讓主要操作不依賴滑鼠懸停或精準拖曳。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 文字與區塊編輯
 

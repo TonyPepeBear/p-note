@@ -2,13 +2,13 @@
 
 狀態：已完成 35／35；使用者授權的部署前工作全部完成。規格與實作自動提交，不部署、不封存。後續雲端資源佈建、migration、secrets、網站路由及發布另行授權。
 
-Q／V 編號見 [需求整理](../../../docs/v1-scope.md)，情境 ID、工具、故障與斷言見 [自動化驗證計畫](../../../docs/automated-validation.md)。產品選擇是輸入，不是人工測試；沒有人工收信、實際手機操作、目視截圖或手動還原的驗收任務。
+Q／V 編號見 [需求整理](../../../../docs/v1-scope.md)，情境 ID、工具、故障與斷言見 [自動化驗證計畫](../../../../docs/automated-validation.md)。產品選擇是輸入，不是人工測試；沒有人工收信、實際手機操作、目視截圖或手動還原的驗收任務。
 
 所有行為依 **Red → Green → Refactor** 執行：先留正確原因失敗的自動化報告，再最小實作使同測試通過，重構後跑相關回歸。Red 任務只在失敗原因正確且機器證據保存後完成；Green 不能把 skip／todo 視為通過。以實際建立的命令與報告更新完成狀態。
 
 依 AGENTS.md，規格變更與完成開發後各自自動 commit；不得因 artifacts 齊備而開始 apply。不得勾選未執行的產品任務。
 
-機器證據見 [部署前驗證](../../../docs/predeployment.md) 與 [最終結果](../../../docs/tdd/final-results.json)：單元 5、Workers 92、全套瀏覽器 150、真實建置 HTTPS smoke 1，共 248 個結果通過，沒有 skip。正式 47 情境的必需環境結果 129／129；獨立 ZIP 校驗 3／3。型別、Vite build、Worker dry-run、文件契約、OpenSpec 嚴格驗證及差異空白檢查通過。
+機器證據見 [部署前驗證](../../../../docs/predeployment.md) 與 [最終結果](../../../../docs/tdd/final-results.json)：單元 5、Workers 92、全套瀏覽器 150、真實建置 HTTPS smoke 1，共 248 個結果通過，沒有 skip。正式 47 情境的必需環境結果 129／129；獨立 ZIP 校驗 3／3。型別、Vite build、Worker dry-run、文件契約、OpenSpec 嚴格驗證及差異空白檢查通過。
 
 ## 1. 產品契約輸入與規格自動檢查
 
