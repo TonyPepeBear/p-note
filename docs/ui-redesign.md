@@ -26,6 +26,8 @@
 
 ## 目前驗收與發布狀態
 
+2026-10-14 更新：任務 8／8 完成。完整本機驗收在後續可用性修正的程式碼（`e82c35b`）上完成：[完整瀏覽器回歸](tdd/ux-final-e2e.log) 213 個通過、[UI 情境覆蓋](tdd/ux-ui-coverage.log) 18／18，其餘檢查見 [可用性修正驗收](ux-polish.md)。以下保留當時的歷史狀態。
+
 2026-10-14：任務 7／8 完成，Mantine 改版已部署至 [note.tonypepe.com](https://note.tonypepe.com)，完整本機驗收仍待完成。6 個單元、92 個 Workers 測試及 2 個真實 HTTPS 建置情境通過；[第四次全套回歸](tdd/ui-fourth-full-e2e.log)為 158／168 通過。後段系統負載升到 140～174，Safari 出現 10 個未通過情境；[匿名系統統計](tdd/ui-environment.log)保存負載與記憶體資料，不記錄其他程序或使用者內容。
 
 E2E 改以正式 `dist` 與 Vite preview 執行，沿用相同 API／WebSocket 測試後端、三種瀏覽器、20 秒整體逾時、5 秒斷言及零重試，驗收直接覆蓋將上線的產物。[正式建置流程試跑](tdd/ui-built-workflows.log)的 JSON 報告為 16 個通過、4 個失敗、7 個未完成，並有中止錯誤；因持續高負載而中止，不將這次中止視為成功。[狀態摘要](tdd/ui-current-status.json)列出實際結果。

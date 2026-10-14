@@ -18,13 +18,21 @@
       "notRun": 7,
       "interrupted": true,
       "log": "ui-built-workflows.log"
+    },
+    "finalAcceptance": {
+      "commit": "e82c35b",
+      "fullBrowserRun": {
+        "passed": 213,
+        "failed": 0,
+        "log": "ux-final-e2e.log"
+      },
+      "uiCoverage": "18/18",
+      "note": "於包含 polish-workspace-usability 的程式碼上完成"
     }
   },
-  "completedTasks": 7,
-  "allAcceptanceComplete": false,
-  "pendingTasks": [
-    "4.1 完整本機回歸與情境覆蓋"
-  ],
+  "completedTasks": 8,
+  "allAcceptanceComplete": true,
+  "pendingTasks": [],
   "deployment": {
     "versionId": "56d44ed5-bf03-4942-afe9-55b2a1929392",
     "uiCommit": "af44c33",
