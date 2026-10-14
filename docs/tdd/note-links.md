@@ -28,3 +28,9 @@ WebKit 所需公開 Debian 套件僅下載並解壓至 /tmp，未修改系統。
 ## 規格同步與封存
 
 依遠端最新 AGENTS.md 的先封存再合併規則，將六個情境合入 [note-links 主規格](../../openspec/specs/note-links/spec.md)，全部開發任務完成後封存至 [2026-10-14-note-links](../../openspec/changes/archive/2026-10-14-note-links/tasks.md)。新主規格補上用途描述；12 份主規格嚴格驗證與 111 個唯一情境契約通過，進行中 changes 為空。封存結果與功能一併納入 PR，Actions 發布結果於合併後補記。
+
+## 正式發布
+
+[PR #4](https://github.com/TonyPepeBear/p-note/pull/4) 已合併，master 提交為 `d7daa4f`，自動觸發 [GitHub Actions 發布](https://github.com/TonyPepeBear/p-note/actions/runs/38579627460)。run 的 status 為 `completed`、conclusion 為 `success`；型別、正式設定、建置、部署預檢、D1 migrations、Worker 發布及正式 HTTPS smoke 步驟全數通過。最小證據：`migrationExecuted: true`、`smokePassed: true`。
+
+正式 smoke 確認本次建置資源、私人 API 的未登入限制及測試入口封鎖；本輪未重新執行正式郵件登入或修改私人筆記。此文件補記使用 `[skip ci]`，避免重複發布。
