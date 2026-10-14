@@ -1,0 +1,372 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 15 tests using 1 worker
+
+[WebServer] 3:12:43 PM [vite] ws proxy error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+[WebServer] 3:12:43 PM [vite] ws proxy socket error:
+[WebServer] Error: write EPIPE
+[WebServer]     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+[WebServer]     at writeGeneric (node:internal/stream_base_commons:150:3)
+[WebServer]     at Socket._writeGeneric (node:net:966:11)
+[WebServer]     at Socket._write (node:net:978:8)
+[WebServer]     at writeOrBuffer (node:internal/streams/writable:572:12)
+[WebServer]     at _write (node:internal/streams/writable:501:10)
+[WebServer]     at Writable.write (node:internal/streams/writable:510:10)
+[WebServer]     at Socket.ondata (node:internal/streams/readable:1009:22)
+[WebServer]     at Socket.emit (node:events:519:28)
+[WebServer]     at addChunk (node:internal/streams/readable:561:12)
+  ✘   1 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (1.4s)
+  ✘   2 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (6.4s)
+  ✘   3 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (1.1s)
+  ✓   4 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (1.4s)
+  ✘   5 [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 (1.2s)
+  ✘   6 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (1.5s)
+  ✘   7 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (6.5s)
+  ✘   8 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (1.1s)
+  ✓   9 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (1.7s)
+  ✘  10 [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 (2.0s)
+  ✘  11 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 (2.5s)
+  ✘  12 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 (6.9s)
+  ✘  13 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 (1.3s)
+  ✓  14 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:152:1 › UX-19：輸入後立即換頁，修改保留並保存到雲端 (2.2s)
+  ✘  15 [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 (2.1s)
+
+
+  1) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ──────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      80 |   await arrive(page, b, "乙頁");
+      81 |   await expect(page.locator(".tiptap")).not.toContainText("甲的內容");
+    > 82 |   expect(await marked(page)).toBe(true);
+         |                              ^
+      83 |   expect(await header!.evaluate((element) => element.isConnected)).toBe(true);
+      84 |   await expect.poll(sockets).toBe(1);
+      85 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:82:30
+
+    Error Context: test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ───────
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 896
+    Received:    0
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      104 |   await expect
+      105 |     .poll(() => page.evaluate(() => Math.round(scrollY)))
+    > 106 |     .toBeGreaterThanOrEqual(before - 4);
+          |      ^
+      107 |   expect(await page.evaluate(() => Math.round(scrollY))).toBeLessThanOrEqual(
+      108 |     before + 4,
+      109 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:106:6
+
+    Error Context: test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ───────
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      121 |   await openPage(page, b);
+      122 |   await setText(page, "乙的內容");
+    > 123 |   await page.evaluate(
+          |              ^
+      124 |     async ([a, b]) => {
+      125 |       for (const id of [a, b, a, b]) {
+      126 |         document.querySelector<HTMLAnchorElement>(`a.note-link[href="/?page=${id}"]`)!.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:123:14
+
+    Error Context: test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ─
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      227 |   await clickNote(page, "甲頁");
+      228 |   await arrive(page, a, "甲頁");
+    > 229 |   expect(await marked(page)).toBe(true);
+          |                              ^
+      230 | });
+      231 |
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:229:30
+
+    Error Context: test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ───────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      80 |   await arrive(page, b, "乙頁");
+      81 |   await expect(page.locator(".tiptap")).not.toContainText("甲的內容");
+    > 82 |   expect(await marked(page)).toBe(true);
+         |                              ^
+      83 |   expect(await header!.evaluate((element) => element.isConnected)).toBe(true);
+      84 |   await expect.poll(sockets).toBe(1);
+      85 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:82:30
+
+    Error Context: test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ────────
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 896
+    Received:    0
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      104 |   await expect
+      105 |     .poll(() => page.evaluate(() => Math.round(scrollY)))
+    > 106 |     .toBeGreaterThanOrEqual(before - 4);
+          |      ^
+      107 |   expect(await page.evaluate(() => Math.round(scrollY))).toBeLessThanOrEqual(
+      108 |     before + 4,
+      109 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:106:6
+
+    Error Context: test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ────────
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      121 |   await openPage(page, b);
+      122 |   await setText(page, "乙的內容");
+    > 123 |   await page.evaluate(
+          |              ^
+      124 |     async ([a, b]) => {
+      125 |       for (const id of [a, b, a, b]) {
+      126 |         document.querySelector<HTMLAnchorElement>(`a.note-link[href="/?page=${id}"]`)!.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:123:14
+
+    Error Context: test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      227 |   await clickNote(page, "甲頁");
+      228 |   await arrive(page, a, "甲頁");
+    > 229 |   expect(await marked(page)).toBe(true);
+          |                              ^
+      230 | });
+      231 |
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:229:30
+
+    Error Context: test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ─────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      80 |   await arrive(page, b, "乙頁");
+      81 |   await expect(page.locator(".tiptap")).not.toContainText("甲的內容");
+    > 82 |   expect(await marked(page)).toBe(true);
+         |                              ^
+      83 |   expect(await header!.evaluate((element) => element.isConnected)).toBe(true);
+      84 |   await expect.poll(sockets).toBe(1);
+      85 | });
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:82:30
+
+    Error Context: test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-16：側欄切換頁面不重新載入，只保留一條同步連線-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ─────────
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 896
+    Received:    0
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      104 |   await expect
+      105 |     .poll(() => page.evaluate(() => Math.round(scrollY)))
+    > 106 |     .toBeGreaterThanOrEqual(before - 4);
+          |      ^
+      107 |   expect(await page.evaluate(() => Math.round(scrollY))).toBeLessThanOrEqual(
+      108 |     before + 4,
+      109 |   );
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:106:6
+
+    Error Context: test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-17：上一頁與下一頁回到對應頁面並還原捲動位置-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ─────────
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation
+
+      121 |   await openPage(page, b);
+      122 |   await setText(page, "乙的內容");
+    > 123 |   await page.evaluate(
+          |              ^
+      124 |     async ([a, b]) => {
+      125 |       for (const id of [a, b, a, b]) {
+      126 |         document.querySelector<HTMLAnchorElement>(`a.note-link[href="/?page=${id}"]`)!.click();
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:123:14
+
+    Error Context: test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-18：快速連續切換只開啟最後一頁且內容不混用-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ───
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      227 |   await clickNote(page, "甲頁");
+      228 |   await arrive(page, a, "甲頁");
+    > 229 |   expect(await marked(page)).toBe(true);
+          |                              ^
+      230 | });
+      231 |
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/spa-navigation.spec.ts:229:30
+
+    Error Context: test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/spa-navigation-UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12 failed
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ───────
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ────────
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ────────
+    [chromium-desktop] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ──
+    [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ────────
+    [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ─────────
+    [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ─────────
+    [chromium-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ───
+    [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:70:1 › UX-16：側欄切換頁面不重新載入，只保留一條同步連線 ──────────
+    [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:87:1 › UX-17：上一頁與下一頁回到對應頁面並還原捲動位置 ───────────
+    [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:114:1 › UX-18：快速連續切換只開啟最後一頁且內容不混用 ───────────
+    [webkit-mobile] › tests/e2e/spa-navigation.spec.ts:185:1 › UX-20：伺服器有新版時換頁改為整頁載入，查詢失敗仍站內切換 ─────
+  3 passed (46.2s)

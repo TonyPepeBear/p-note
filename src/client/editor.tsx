@@ -237,7 +237,7 @@ export function Editor({
           ? "離線，待同步"
           : blocked
             ? "登入或頁面權限已失效"
-            : session.checkAccess && !provider.shouldConnect
+            : session.checkAccess && !provider.shouldConnect && !connecting
               ? "連線失敗，可重試"
               : "同步中",
       );
@@ -382,9 +382,9 @@ export function Editor({
     };
     reconnect.current = online;
     setReady(true);
-    void flush();
     if (navigator.onLine && session.checkAccess && !provider.shouldConnect)
       online();
+    void flush();
     return () => {
       disposed = true;
       clearTimeout(retryTimer);
@@ -739,6 +739,40 @@ export function Editor({
   );
 }
 
+let booting: Promise<void> | undefined;
+
+function boot() {
+  booting ??= (async () => {
+    await navigator.serviceWorker.register("/sw.js");
+    if (navigator.onLine) {
+      const registration = await navigator.serviceWorker.ready;
+      const urls = performance
+        .getEntriesByType("resource")
+        .map((entry) => entry.name);
+      await new Promise<void>((resolve, reject) => {
+        const channel = new MessageChannel();
+        const timer = setTimeout(() => {
+          channel.port1.close();
+          reject(new Error("本機啟動資源下載失敗，請重試"));
+        }, 10000);
+        channel.port1.onmessage = (event) => {
+          clearTimeout(timer);
+          channel.port1.close();
+          if (event.data?.ok) resolve();
+          else reject(new Error("本機啟動資源下載失敗，請重試"));
+        };
+        registration.active!.postMessage({ type: "cache-resources", urls }, [
+          channel.port2,
+        ]);
+      });
+    }
+  })().catch((failure) => {
+    booting = undefined;
+    throw failure;
+  });
+  return booting;
+}
+
 export async function start(
   scope?: string[],
   checkAccess?: Session["checkAccess"],
@@ -750,29 +784,7 @@ export async function start(
     !["127.0.0.1", "localhost", "[::1]"].includes(location.hostname)
   )
     throw new Error("原型只限本機");
-  await navigator.serviceWorker.register("/sw.js");
-  if (navigator.onLine) {
-    const registration = await navigator.serviceWorker.ready;
-    const urls = performance
-      .getEntriesByType("resource")
-      .map((entry) => entry.name);
-    await new Promise<void>((resolve, reject) => {
-      const channel = new MessageChannel();
-      const timer = setTimeout(() => {
-        channel.port1.close();
-        reject(new Error("本機啟動資源下載失敗，請重試"));
-      }, 10000);
-      channel.port1.onmessage = (event) => {
-        clearTimeout(timer);
-        channel.port1.close();
-        if (event.data?.ok) resolve();
-        else reject(new Error("本機啟動資源下載失敗，請重試"));
-      };
-      registration.active!.postMessage({ type: "cache-resources", urls }, [
-        channel.port2,
-      ]);
-    });
-  }
+  await boot();
   const params = new URLSearchParams(location.search);
   scope ??= ["owner", "page", "generation"].map(
     (name, index) => params.get(name) ?? ["owner", "default", "g1"][index],
@@ -805,7 +817,8 @@ export async function start(
         : {}),
     },
   );
-  if (navigator.onLine && !localOnly && !isolated) {
+  // 已下載的正式頁面先以本機內容開啟，同步交給 Editor 在背景連線。
+  if (navigator.onLine && !localOnly && !isolated && !(downloaded && checkAccess)) {
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         provider.disconnect();

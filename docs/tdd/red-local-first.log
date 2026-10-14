@@ -1,0 +1,120 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 6 tests using 1 worker
+
+  ✘  1 [chromium-desktop] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (4.5s)
+  ✓  2 [chromium-desktop] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (4.9s)
+  ✘  3 [chromium-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (3.2s)
+  ✓  4 [chromium-mobile] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (4.7s)
+  ✘  5 [webkit-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 (4.1s)
+  ✓  6 [webkit-mobile] › tests/e2e/local-first.spec.ts:101:1 › UX-22：未下載的頁面等雲端內容到達後才可編輯 (4.5s)
+
+
+  1) [chromium-desktop] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ──────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 2000ms
+      - waiting for getByTestId('ready')
+
+
+      61 |   await delaySync(page, 3000);
+      62 |   await page.reload();
+    > 63 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      64 |     timeout: 2000,
+      65 |   });
+      66 |   await expect(page.locator(".tiptap")).toContainText("本機已有的內容");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:63:43
+
+    Error Context: test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-desktop/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ───────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 2000ms
+      - waiting for getByTestId('ready')
+
+
+      61 |   await delaySync(page, 3000);
+      62 |   await page.reload();
+    > 63 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      64 |     timeout: 2000,
+      65 |   });
+      66 |   await expect(page.locator(".tiptap")).toContainText("本機已有的內容");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:63:43
+
+    Error Context: test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-chromium-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ─────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ready')
+    Expected: "可編輯"
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ready') with timeout 2000ms
+      - waiting for getByTestId('ready')
+
+
+      61 |   await delaySync(page, 3000);
+      62 |   await page.reload();
+    > 63 |   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+         |                                           ^
+      64 |     timeout: 2000,
+      65 |   });
+      66 |   await expect(page.locator(".tiptap")).toContainText("本機已有的內容");
+        at /Users/tony.cheng/TonyPepe/project/p-note/tests/e2e/local-first.spec.ts:63:43
+
+    Error Context: test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-webkit-mobile/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-webkit-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/local-first-UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存-webkit-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-desktop] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ───────
+    [chromium-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ────────
+    [webkit-mobile] › tests/e2e/local-first.spec.ts:56:1 › UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景保存 ──────────
+  3 passed (32.3s)

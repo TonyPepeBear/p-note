@@ -36,9 +36,9 @@ for (const file of files) {
 assert.equal(ids.filter(id => !/^(DEPLOY|UI|UX|KEY)-/.test(id)).length, 47);
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
 assert.deepEqual(ids.filter(id => id.startsWith('UI-')).sort(), ['UI-01', 'UI-02', 'UI-03', 'UI-04', 'UI-05', 'UI-06']);
-assert.deepEqual(ids.filter(id => id.startsWith('UX-')).sort(), Array.from({ length: 20 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
-assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({length: 6}, (_, i) => `KEY-0${i + 1}`));
-assert.equal(new Set(ids).size, 83);
+assert.deepEqual(ids.filter(id => id.startsWith('UX-')).sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({ length: 6 }, (_, i) => `KEY-0${i + 1}`));
+assert.equal(new Set(ids).size, 85);
 const scope = await readFile('docs/v1-scope.md', 'utf8');
 for (const value of ['固定到期', '30×24 小時', '伺服器可讀內容', '已下載內文可離線', '10 分鐘', '60 秒', '最多 5 次', '最多 20 次', '10 MiB', '03:00', '0 19 * * *', '90×24 小時', 'Asia/Taipei', 'ZIP']) assert(scope.includes(value), `缺決策 ${value}`);
 const contracts = {

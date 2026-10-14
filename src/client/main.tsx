@@ -15,6 +15,7 @@ import { theme, resolver, Brand } from "./ui";
 import { Login } from "./login";
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import { Editor, start, type Session } from "./editor";
 import type { PageInfo } from "../shared/pages";
 import { api, navigate, saveDraft } from "./api";
@@ -40,9 +41,36 @@ function App() {
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
-  const [fresh] = useState(
-    () => new URLSearchParams(location.search).get("new") === "1",
-  );
+  const [route, setRoute] = useState(() => ({
+    serial: 0,
+    fresh: new URLSearchParams(location.search).get("new") === "1",
+    scrollY: undefined as number | undefined,
+  }));
+  useEffect(() => {
+    history.scrollRestoration = "manual";
+    const go = (fresh: boolean, scroll?: number) =>
+      // 同步卸載舊編輯器，避免換頁途中仍顯示前一頁的狀態。
+      flushSync(() => {
+        setSession(undefined);
+        setRoute((current) => ({
+          serial: current.serial + 1,
+          fresh,
+          scrollY: scroll,
+        }));
+      });
+    const pushed = (event: Event) => {
+      go((event as CustomEvent<{ fresh: boolean }>).detail.fresh);
+      scrollTo(0, 0);
+    };
+    const popped = (event: PopStateEvent) =>
+      go(false, (event.state as { scrollY?: number } | null)?.scrollY ?? 0);
+    addEventListener("p-note:navigate", pushed);
+    addEventListener("popstate", popped);
+    return () => {
+      removeEventListener("p-note:navigate", pushed);
+      removeEventListener("popstate", popped);
+    };
+  }, []);
   const [draftDismissed, setDraftDismissed] = useState(false);
   useEffect(() => {
     document.title = page ? page.title + " · p-note" : "p-note";
@@ -55,6 +83,13 @@ function App() {
     if (confirm) return;
     let disposed = false;
     let opened: Session | undefined;
+    setIsolated(undefined);
+    setRecovery(undefined);
+    setViewDraft(false);
+    setForking(false);
+    setVersions([]);
+    setDraftVersion("");
+    setError("");
     const localPage = (id: string, owner: string) => {
       try {
         const cached = cachedPage(id);
@@ -91,6 +126,7 @@ function App() {
       } catch {
         localOnly = true;
       }
+      if (disposed) return;
       if (response && response.status >= 500) {
         response = undefined;
         localOnly = true;
@@ -104,10 +140,11 @@ function App() {
           message: string;
           page?: PageInfo;
         };
+        if (disposed) return;
         setError(failure.message);
         if (failure.page) {
           setRecovery(failure.page);
-          history.replaceState(null, "", "/?page=" + failure.page.id);
+          history.replaceState(history.state, "", "/?page=" + failure.page.id);
         }
         if (id) {
           const owner =
@@ -118,13 +155,14 @@ function App() {
               }
             ).user?.id;
           const old = owner && localPage(id, owner);
-          if (old) await isolate(old);
+          if (old && !disposed) await isolate(old);
         }
         return;
       }
       const page = response
         ? ((await response.json()) as PageInfo)
         : cachedPage(id ?? undefined);
+      if (disposed) return;
       const draft = new URLSearchParams(location.search).get("draft");
       if (draft) {
         const version = cachedVersions(page).find(
@@ -155,7 +193,7 @@ function App() {
       } catch {
         setError("頁面資訊本機儲存失敗，離線開啟可能不可用；正文仍可儲存");
       }
-      history.replaceState(null, "", `/?page=${page.id}`);
+      history.replaceState(history.state, "", `/?page=${page.id}`);
       sessionStorage.setItem(
         "p-note-return-url",
         location.pathname + location.search,
@@ -205,21 +243,36 @@ function App() {
         return;
       }
       setSession(opened);
-    })().catch((failure) =>
+    })().catch((failure) => {
+      if (disposed) return;
       setError(
         failure instanceof Error &&
           /尚未下載|本機啟動資源/.test(failure.message)
           ? failure.message
           : "載入失敗，請連線後再試",
-      ),
-    );
+      );
+    });
     return () => {
       disposed = true;
       opened?.provider.destroy();
       void opened?.cache.destroy();
       opened?.doc.destroy();
     };
-  }, [confirm]);
+  }, [confirm, route.serial]);
+  useEffect(() => {
+    const target = route.scrollY;
+    if (!session || target === undefined) return;
+    let frame = 0;
+    let tries = 0;
+    // 正文由 Yjs 繪製後頁面才有足夠高度，需持續嘗試直到到位。
+    const restore = () => {
+      scrollTo(0, target);
+      if (Math.abs(scrollY - target) > 2 && tries++ < 60)
+        frame = requestAnimationFrame(restore);
+    };
+    frame = requestAnimationFrame(restore);
+    return () => cancelAnimationFrame(frame);
+  }, [session, route.scrollY]);
   if (confirm) return <Login confirm />;
   const fork = async () => {
     if (!isolated || !session || forking) return;
@@ -405,11 +458,12 @@ function App() {
       )}
       {session && page && (!isolated || viewDraft) ? (
         <Editor
+          key={session.room}
           session={session}
           title={page.title}
           kind={page.kind}
           rename={rename}
-          focusTitle={fresh}
+          focusTitle={route.fresh}
           readOnly={login || !!isolated}
         />
       ) : (

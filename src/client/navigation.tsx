@@ -120,7 +120,13 @@ export function Navigation({
   };
   useEffect(() => {
     void refresh().catch(() => error("無法載入頁面列表，請重新整理"));
-  }, []);
+    const ancestors = new Set(page.ancestors?.map((item) => item.id));
+    setCollapsed((items) => items.filter((id) => !ancestors.has(id)));
+    setPanel("");
+    setNavOpen(false);
+    setDate(page.journal_date ?? today(Date.now()));
+    setMonth((page.journal_date ?? today(Date.now())).slice(0, 7));
+  }, [page.id]);
   useEffect(() => {
     setTitle(page.title);
     setParent(page.parent_id ?? "");
@@ -478,7 +484,10 @@ export function Navigation({
       <Modal
         returnFocus={false}
         onExitTransitionEnd={() => {
-          if (!panel)
+          // 站內換頁後新頁面可能已取得焦點（例如新頁標題），只在焦點無處可去時才還原。
+          const settled =
+            document.activeElement && document.activeElement !== document.body;
+          if (!panel && !settled)
             (trigger.current?.isConnected
               ? trigger.current
               : document.querySelector<HTMLButtonElement>(
