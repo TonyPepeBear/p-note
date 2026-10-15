@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "re
 import { PwaControls } from "./pwa-controls";
 import { PageMenu, type PageAction } from "./page-menu";
 import {
-  Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Modal, NativeSelect,
+  Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Menu, Modal, NativeSelect,
   Stack, Text, TextInput,
 } from "@mantine/core";
 import {
@@ -38,6 +38,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const [panel, setPanel] = useState("");
   const [actionPage, setActionPage] = useState<PageRow>(page);
   const [navOpen, setNavOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [pwaHelpOpen, setPwaHelpOpen] = useState(false);
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -65,7 +66,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const navigationLockedRef = useRef(navigationLocked);
   navigationLockedRef.current = navigationLocked;
   useEffect(() => {
-    if (navigationLocked) setPanel("");
+    if (navigationLocked) { setPanel(""); setCreateOpen(false); }
   }, [navigationLocked]);
   const setSidebar = (closed: boolean) => {
     setSidebarCollapsed(closed);
@@ -101,6 +102,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     const ancestors = new Set(page.ancestors?.map((item) => item.id));
     setCollapsed((items) => items.filter((id) => !ancestors.has(id)));
     setPanel("");
+    setCreateOpen(false);
     setNavOpen(false);
     setPageMenuOpen(false);
     setDate(page.journal_date ?? today(Date.now()));
@@ -243,11 +245,6 @@ export function Navigation({ page, changed, error, backups, settings, images, im
       <nav aria-label="筆記頁面">
         {pages.some((item) => item.kind === "note") ? tree(null) : <div className="pn-sidebar-empty">還沒有筆記</div>}
       </nav>
-      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={newNote}><IconPlus size={18} /><span>新增筆記</span></button>
-      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={() => void run(async () => {
-        const database = await request("/api/databases", { title: "未命名資料庫" });
-        if (database) await navigate(database.id);
-      })}><IconDatabase size={18} /><span>新增資料庫</span></button>
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
       <PwaControls disabled={navigationLocked} onHelpOpenChange={setPwaHelpOpen} />
@@ -308,6 +305,21 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           </Breadcrumbs>
         </nav>
         <div className="pn-topbar-actions">
+          <Menu opened={createOpen} onChange={(opened) => setCreateOpen(opened && !busy && !navigationLockedRef.current)}
+            position="bottom-end" width={192} withinPortal withInitialFocusPlaceholder={false}>
+            <Menu.Target>
+              <button disabled={busy || navigationLocked} className="pn-icon-button pn-create-button" aria-label="新增" title="新增">
+                <IconPlus size={18} /><span>新增</span>
+              </button>
+            </Menu.Target>
+            <Menu.Dropdown className="pn-create-menu" aria-label="新增">
+              <Menu.Item disabled={busy || navigationLocked} leftSection={<IconFileText size={17} />} onClick={newNote}>新增筆記</Menu.Item>
+              <Menu.Item disabled={busy || navigationLocked} leftSection={<IconDatabase size={17} />} onClick={() => void run(async () => {
+                const database = await request("/api/databases", { title: "未命名資料庫" });
+                if (database) await navigate(database.id);
+              })}>新增資料庫</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
             onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"

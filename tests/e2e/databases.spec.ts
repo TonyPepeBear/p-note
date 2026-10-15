@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { openPrivate, showNavigation, saved, moveToTrash, gate, heldCount, release } from "./helpers";
+import { openPrivate, showNavigation, saved, moveToTrash, gate, heldCount, release, openCreateMenu } from "./helpers";
 import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from "@zip.js/zip.js";
 import { origin } from "./ports";
 
@@ -201,8 +201,8 @@ test("DB-12：兩端開啟的檢視草稿在背景更新後仍獨立保存", asy
 
 test("DB-01：建立資料庫、筆記與移入移出保留正文", async ({ page }) => {
   await openPrivate(page);
-  await showNavigation(page);
-  await page.getByRole("button", { name: "新增資料庫", exact: true }).click();
+  await openCreateMenu(page);
+  await page.getByRole("menuitem", { name: "新增資料庫", exact: true }).click();
   await expect(page.getByTestId("database-ready")).toBeVisible();
   const db = new URL(page.url()).searchParams.get("page")!;
   await page

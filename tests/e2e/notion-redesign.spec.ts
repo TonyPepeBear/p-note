@@ -128,9 +128,13 @@ test("UI-02：手機可開關導覽、新增筆記並繼續編輯且操作可觸
   await navigation.click();
   const drawer = page.getByRole("dialog", { name: "導覽", exact: true });
   await expect(drawer).toBeVisible();
-  const create = drawer.getByRole("button", { name: "新增筆記", exact: true });
+  await expect(drawer.getByRole("button", { name: /^新增/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "關閉導覽", exact: true }).click();
+  await page.getByRole("button", { name: "新增", exact: true }).click();
+  const create = page.getByRole("menuitem", { name: "新增筆記", exact: true });
   await touchTarget(create);
   await create.click();
+  await page.waitForURL((url) => url.searchParams.get("page") !== original);
   await expect(drawer).toBeHidden();
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
   expect(new URL(page.url()).searchParams.get("page")).not.toBe(original);
