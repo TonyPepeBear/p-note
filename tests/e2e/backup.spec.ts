@@ -155,97 +155,99 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
 });
 
 for (const backDuring of ["還原中", "中斷後"]) {
-test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
-  const previous = await openPrivate(page);
-  await showNavigation(page);
-  await page.getByRole("button", { name: "新增筆記", exact: true }).click();
-  await expect(page).not.toHaveURL(new RegExp(`page=${previous}$`));
-  await expect(page.getByTestId("ready")).toHaveText("可編輯");
-  await saved(page);
-  const currentUrl = page.url();
-  const currentHistory = await page.evaluate(() => history.state);
-  await showNavigation(page);
-  await page.getByRole("button", { name: "備份設定", exact: true }).click();
-  await page.getByRole("button", { name: "建立備份", exact: true }).click();
-  await expect(page.getByRole("button", { name: "選擇還原", exact: true })).toHaveCount(1);
-
-  // 故障注入只攔首次還原與其後的狀態讀取；重試交給真正的還原 API。
-  await page.evaluate(() => {
-    const original = window.fetch;
-    const state = {
-      requests: [] as string[],
-      release: () => {},
-      interrupted: false,
-      pending: undefined as { id: string; backup_id: string } | undefined,
-    };
-    (window as unknown as { backupFailure: typeof state }).backupFailure = state;
-    window.fetch = async (input, init) => {
-      const url = new URL(input instanceof Request ? input.url : String(input), location.href);
-      const method = init?.method ?? (input instanceof Request ? input.method : "GET");
-      if (method === "POST" && /^\/api\/backups\/[^/]+\/restore$/.test(url.pathname)) {
-        const body = JSON.parse(String(init?.body)) as { request_id: string };
-        state.requests.push(body.request_id);
-        if (state.requests.length === 1) {
-          state.pending = { id: body.request_id, backup_id: url.pathname.split("/")[3] };
-          await new Promise<void>((resolve) => { state.release = resolve; });
-          state.interrupted = true;
-          return Response.json({ message: "測試還原中斷，請重試原備份" }, { status: 503 });
-        }
-        state.interrupted = false;
-      }
-      const response = await original(input, init);
-      if (method === "GET" && url.pathname === "/api/backups" && state.interrupted) {
-        return Response.json({ ...await response.json(), restore: state.pending });
-      }
-      return response;
-    };
-  });
-
-  await page.getByRole("button", { name: "選擇還原", exact: true }).click();
-  await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
-  await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
-  const assertNavigationLocked = async () => {
-    await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
-    await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
+  test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
+    const previous = await openPrivate(page);
     await showNavigation(page);
-    for (const name of ["設定", "今天", "登出", "安裝 p-note"])
-      await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
-    const close = page.getByRole("button", { name: "關閉導覽", exact: true });
-    if (await close.isVisible()) await close.click();
-  };
-  const assertBackLocked = async () => {
-    // 真正走瀏覽器歷史，確保不是只測側欄或合成 popstate。
-    await page.goBack();
-    await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
-    await expect(page).toHaveURL(currentUrl);
-    expect(await page.evaluate(() => history.state)).toEqual(currentHistory);
-    await expect(page.locator(".tiptap")).toBeHidden();
+    await page.getByRole("button", { name: "新增筆記", exact: true }).click();
+    await expect(page).not.toHaveURL(new RegExp(`page=${previous}$`));
+    await expect(page.getByTestId("ready")).toHaveText("可編輯");
+    await saved(page);
+    const currentUrl = page.url();
+    const currentHistory = await page.evaluate(() => history.state);
+    await showNavigation(page);
+    await page.getByRole("navigation", { name: "工作區管理", exact: true }).getByRole("button", { name: "備份設定", exact: true }).click();
+    await page.getByRole("button", { name: "建立備份", exact: true }).click();
+    await expect(page.getByRole("button", { name: "選擇還原", exact: true })).toHaveCount(1);
+
+    // 故障注入只攔首次還原與其後的狀態讀取；重試交給真正的還原 API。
+    await page.evaluate(() => {
+      const original = window.fetch;
+      const state = {
+        requests: [] as string[],
+        release: () => {},
+        interrupted: false,
+        pending: undefined as { id: string; backup_id: string } | undefined,
+      };
+      (window as unknown as { backupFailure: typeof state }).backupFailure = state;
+      window.fetch = async (input, init) => {
+        const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+        const method = init?.method ?? (input instanceof Request ? input.method : "GET");
+        if (method === "POST" && /^\/api\/backups\/[^/]+\/restore$/.test(url.pathname)) {
+          const body = JSON.parse(String(init?.body)) as { request_id: string };
+          state.requests.push(body.request_id);
+          if (state.requests.length === 1) {
+            state.pending = { id: body.request_id, backup_id: url.pathname.split("/")[3] };
+            await new Promise<void>((resolve) => { state.release = resolve; });
+            state.interrupted = true;
+            return Response.json({ message: "測試還原中斷，請重試原備份" }, { status: 503 });
+          }
+          state.interrupted = false;
+        }
+        const response = await original(input, init);
+        if (method === "GET" && url.pathname === "/api/backups" && state.interrupted) {
+          return Response.json({ ...await response.json(), restore: state.pending });
+        }
+        return response;
+      };
+    });
+
+    await page.getByRole("button", { name: "選擇還原", exact: true }).click();
+    await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
+    await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
+    const assertNavigationLocked = async () => {
+      await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
+      await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
+      await showNavigation(page);
+      for (const name of ["設定", "今天", "登出", "安裝 p-note"])
+        await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
+      const close = page.getByRole("button", { name: "關閉導覽", exact: true });
+      if (await close.isVisible()) await close.click();
+    };
+    const assertBackLocked = async () => {
+      // 真正走瀏覽器歷史，確保不是只測側欄或合成 popstate。
+      for (let attempt = 0; attempt < 2; attempt++) {
+        await page.goBack();
+        await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
+        await expect(page).toHaveURL(currentUrl);
+        expect(await page.evaluate(() => history.state)).toEqual(currentHistory);
+        await expect(page.locator(".tiptap")).toBeHidden();
+        await assertNavigationLocked();
+      }
+    };
     await assertNavigationLocked();
-  };
-  await assertNavigationLocked();
-  if (backDuring === "還原中") await assertBackLocked();
+    if (backDuring === "還原中") await assertBackLocked();
 
-  await page.evaluate(() => {
-    (window as unknown as { backupFailure: { release: () => void } }).backupFailure.release();
+    await page.evaluate(() => {
+      (window as unknown as { backupFailure: { release: () => void } }).backupFailure.release();
+    });
+    await expect(page.getByRole("status")).toContainText("還原尚未完成，請重試相同備份");
+    await expect(page.getByRole("alert")).toContainText("測試還原中斷");
+    await assertNavigationLocked();
+    if (backDuring === "中斷後") await assertBackLocked();
+    await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
+    await expect(page.locator('.backup-card[aria-current="true"]')).toHaveCount(1);
+    await expect(page.locator(".tiptap")).toBeHidden();
+
+    const retried = page.waitForRequest((request) =>
+      request.method() === "POST" && /\/api\/backups\/[^/]+\/restore$/.test(request.url()));
+    const originalId = await page.evaluate(() =>
+      (window as unknown as { backupFailure: { requests: string[] } }).backupFailure.requests[0]);
+    await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
+    expect((await retried).postDataJSON()).toEqual({ request_id: originalId });
+    await expect(page.getByTestId("ready")).toHaveText("可編輯", { timeout: 15000 });
+    await expect(page.getByTestId("ready")).toBeVisible();
+    await saved(page);
+    await showNavigation(page);
+    await expect(page.getByRole("button", { name: "設定", exact: true })).toBeEnabled();
   });
-  await expect(page.getByRole("status")).toContainText("還原尚未完成，請重試相同備份");
-  await expect(page.getByRole("alert")).toContainText("測試還原中斷");
-  await assertNavigationLocked();
-  if (backDuring === "中斷後") await assertBackLocked();
-  await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
-  await expect(page.locator('.backup-card[aria-current="true"]')).toHaveCount(1);
-  await expect(page.locator(".tiptap")).toBeHidden();
-
-  const retried = page.waitForRequest((request) =>
-    request.method() === "POST" && /\/api\/backups\/[^/]+\/restore$/.test(request.url()));
-  const originalId = await page.evaluate(() =>
-    (window as unknown as { backupFailure: { requests: string[] } }).backupFailure.requests[0]);
-  await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
-  expect((await retried).postDataJSON()).toEqual({ request_id: originalId });
-  await expect(page.getByTestId("ready")).toHaveText("可編輯", { timeout: 15000 });
-  await expect(page.getByTestId("ready")).toBeVisible();
-  await saved(page);
-  await showNavigation(page);
-  await expect(page.getByRole("button", { name: "設定", exact: true })).toBeEnabled();
-});
 }

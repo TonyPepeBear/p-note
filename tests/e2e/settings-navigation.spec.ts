@@ -12,7 +12,7 @@ for (const settings of ["備份設定", "API key 設定"]) {
       await openPrivate(page);
       const currentUrl = page.url();
       await showNavigation(page);
-      await page.getByRole("button", { name: settings === "備份設定" ? settings : "設定", exact: true }).click();
+      await page.getByRole("navigation", { name: "工作區管理", exact: true }).getByRole("button", { name: settings === "備份設定" ? settings : "設定", exact: true }).click();
       const heading = page.getByRole("heading", { name: settings, exact: true });
       await expect(heading).toBeVisible();
       if (action === "登出") {
@@ -36,7 +36,8 @@ for (const settings of ["備份設定", "API key 設定"]) {
       await showNavigation(page);
       await page.getByRole("button", { name: action, exact: true }).click();
       const closeNavigation = page.getByRole("button", { name: "關閉導覽", exact: true });
-      if (await closeNavigation.isVisible()) await closeNavigation.click();
+      if (action === "登出" && await closeNavigation.isVisible()) await closeNavigation.click();
+      await expect(closeNavigation).toBeHidden();
       const alert = page.getByRole("alert").filter({ hasText: action === "登出" ? "登出失敗，請重試" : "本機儲存失敗" });
       await expect(alert).toBeVisible();
       await expect(heading).toBeVisible();

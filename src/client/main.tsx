@@ -15,7 +15,7 @@ import {
 import "@mantine/core/styles.css";
 import { theme, resolver, Brand } from "./ui";
 import { Login } from "./login";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { Editor, start, type Session } from "./editor";
@@ -45,6 +45,12 @@ function App() {
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
   const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
+  const backupNavigation = useRef<{ url: string; state: unknown } | null>(null);
+  useEffect(() => {
+    backupNavigation.current = backupNavigationLocked
+      ? { url: location.href, state: history.state }
+      : null;
+  }, [backupNavigationLocked]);
   useEffect(() => {
     if (login) {
       setSettings(false);
@@ -74,8 +80,15 @@ function App() {
       go((event as CustomEvent<{ fresh: boolean }>).detail.fresh);
       scrollTo(0, 0);
     };
-    const popped = (event: PopStateEvent) =>
+    const popped = (event: PopStateEvent) => {
+      const locked = backupNavigation.current;
+      if (locked) {
+        // popstate 發生時網址已改變；補回鎖定時的文件與狀態，保留還原實例。
+        history.pushState(locked.state, "", locked.url);
+        return;
+      }
       go(false, (event.state as { scrollY?: number } | null)?.scrollY ?? 0);
+    };
     const failed = (event: Event) =>
       setError((event as CustomEvent<string>).detail);
     addEventListener("p-note:navigate", pushed);
@@ -388,25 +401,25 @@ function App() {
     if (!response.ok) throw new Error(value.message ?? "標題保存失敗，請重試");
     setPage(value);
   };
+  const notice = error && (
+    <Alert
+      className="workspace-notice"
+      color="red"
+      role="alert"
+      mb="lg"
+      withCloseButton
+      closeButtonLabel="關閉提示"
+      onClose={() => setError("")}
+    >
+      {error}
+    </Alert>
+  );
   const content = (
     <>
       {login && (
         <div className="reauth-card">
           <Login embedded />
         </div>
-      )}
-      {error && (
-        <Alert
-          className="workspace-notice"
-          color="red"
-          role="alert"
-          mb="lg"
-          withCloseButton
-          closeButtonLabel="關閉提示"
-          onClose={() => setError("")}
-        >
-          {error}
-        </Alert>
       )}
       {!isolated && page && versions.length > 0 && !draftDismissed && (
         <Paper
@@ -584,6 +597,7 @@ function App() {
             );
         }}
       >
+        {notice}
         <div hidden={settings || apiSettings}>{content}</div>
         {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
         {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
@@ -592,6 +606,7 @@ function App() {
   return (
     <div className="app-loading">
       <Brand />
+      {notice}
       {content}
     </div>
   );
