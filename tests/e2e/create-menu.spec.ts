@@ -11,7 +11,7 @@ test("UI-CREATE-01：側欄無常駐新增按鈕，鍵盤選單可取消並建�
   await page.locator(".tiptap").fill("新增前保留的正文");
   await saved(page);
   const sidebar = page.getByRole("complementary", { name: "側邊欄" });
-  await expect(sidebar.getByRole("button", { name: /^新增(?:筆記|資料庫)$/ })).toHaveCount(0);
+  await expect(sidebar.getByRole("button", { name: /^新增(筆記|資料庫)$/ })).toHaveCount(0);
   const trigger = page.getByRole("button", { name: "新增", exact: true });
   const menu = page.getByRole("menu", { name: "新增", exact: true });
   await expect(menu).toBeHidden();
@@ -64,7 +64,7 @@ test("UI-CREATE-03：手機導覽無新增按鈕，頂端與選項可觸控且�
   await openPrivate(page);
   await page.getByRole("button", { name: "導覽", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "導覽", exact: true });
-  await expect(drawer.getByRole("button", { name: /^新增(?:筆記|資料庫)$/ })).toHaveCount(0);
+  await expect(drawer.getByRole("button", { name: /^新增(筆記|資料庫)$/ })).toHaveCount(0);
   await page.getByRole("button", { name: "關閉導覽", exact: true }).click();
   const trigger = page.getByRole("button", { name: "新增", exact: true });
   expect((await trigger.boundingBox())!.width).toBeGreaterThanOrEqual(44);
@@ -103,3 +103,46 @@ test("UI-CREATE-04：新增失敗保留原頁與正文並可重新開啟選單�
   await page.getByRole("menuitem", { name: "新增筆記", exact: true }).click();
   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("未命名");
 });
+
+for (const database of [false, true]) {
+  test(`UI-CREATE-05：私人頁面加號可取消並建立最上層${database ? "資料庫" : "筆記"}`, async ({ page, isMobile }) => {
+    await openPrivate(page);
+    await page.locator(".tiptap").fill("從私人頁面新增前的正文");
+    await saved(page);
+    if (isMobile) await page.getByRole("button", { name: "導覽", exact: true }).click();
+    const navigation = isMobile
+      ? page.getByRole("dialog", { name: "導覽", exact: true })
+      : page.getByRole("complementary", { name: "側邊欄" });
+    const trigger = navigation.locator(".pn-section-label").getByRole("button", { name: "新增私人頁面", exact: true });
+    await expect(trigger).toBeVisible();
+    await expect(navigation.getByRole("button", { name: /^新增(筆記|資料庫)$/ })).toHaveCount(0);
+    if (isMobile) {
+      const bounds = (await trigger.boundingBox())!;
+      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(bounds.height).toBeGreaterThanOrEqual(44);
+    }
+    const menu = page.getByRole("menu", { name: "新增私人頁面", exact: true });
+    await trigger.focus();
+    await trigger.press("Enter");
+    const noteItem = menu.getByRole("menuitem", { name: "新增筆記", exact: true });
+    await expect(noteItem).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(trigger).toBeFocused();
+    await expect(navigation).toBeVisible();
+    await expect(page.locator(".tiptap")).toContainText("從私人頁面新增前的正文");
+    await trigger.click();
+    await expect(menu).toHaveCount(1);
+    await menu.getByRole("menuitem", { name: database ? "新增資料庫" : "新增筆記", exact: true }).click();
+    if (isMobile) await expect(navigation).toBeHidden();
+    if (database) await expect(page.getByTestId("database-ready")).toBeVisible();
+    else {
+      await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("未命名");
+      await expect(page.getByLabel("文件標題", { exact: true })).toBeFocused();
+    }
+    const created = await (await page.request.get("/api/pages/" + new URL(page.url()).searchParams.get("page"))).json();
+    expect(created.parent_id).toBeNull();
+    expect(!!created.database_config).toBe(database);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  });
+}

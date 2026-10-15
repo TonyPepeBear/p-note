@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { CreateMenu } from "./create-menu";
 import { PwaControls } from "./pwa-controls";
 import { PageMenu, type PageAction } from "./page-menu";
 import {
-  Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Menu, Modal, NativeSelect,
+  Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Modal, NativeSelect,
   Stack, Text, TextInput,
 } from "@mantine/core";
 import {
   IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
   IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
-  IconDatabase, IconFileText, IconLogout, IconMenu2, IconPlus,
+  IconDatabase, IconFileText, IconLogout, IconMenu2,
   IconSearch, IconSettings, IconTrash, IconPhoto,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
@@ -262,8 +263,14 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     ]);
   const openJournals = (target: HTMLElement) => { open("journals", target); void run(() => loadMonth(month)); };
   const newNote = () => void run(async () => {
+    setNavOpen(false);
     const note = await request("/api/pages", { title: "未命名", parent_id: null });
     if (note) await navigate(note.id, true);
+  });
+  const newDatabase = () => void run(async () => {
+    setNavOpen(false);
+    const database = await request("/api/databases", { title: "未命名資料庫" });
+    if (database) await navigate(database.id);
   });
   const sidebar = <div className="pn-sidebar-content">
     <div className="pn-workspace-switcher">
@@ -281,7 +288,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
         <IconCalendar size={18} /><span>日記</span>
       </button>
     </nav>
-    <div className="pn-section-label"><span>私人頁面</span><span className="pn-note-count">{pages.filter((item) => item.kind === "note").length}</span></div>
+    <div className="pn-section-label"><span>私人頁面</span><div className="pn-section-actions">
+      <span className="pn-note-count">{pages.filter((item) => item.kind === "note").length}</span>
+      <CreateMenu key={"create-" + page.id} sidebar disabled={busy || navigationLocked} onNote={newNote} onDatabase={newDatabase} onOpenChange={setCreateOpen} />
+    </div></div>
     <div className="pn-notes-scroll">
       <nav aria-label="筆記頁面">
         {pages.some((item) => item.kind === "note") ? tree(null) : <div className="pn-sidebar-empty">還沒有筆記</div>}
@@ -313,7 +323,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
     <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
     <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
-      trapFocus={!pwaHelpOpen && !pageMenuOpen} closeOnEscape={!pwaHelpOpen && !pageMenuOpen}
+      trapFocus={!pwaHelpOpen && !pageMenuOpen && !createOpen} closeOnEscape={!pwaHelpOpen && !pageMenuOpen && !createOpen}
       closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
       {sidebar}
     </Drawer>
@@ -347,21 +357,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           </Breadcrumbs>
         </nav>
         <div className="pn-topbar-actions">
-          <Menu opened={createOpen} onChange={(opened) => setCreateOpen(opened && !busy && !navigationLockedRef.current)}
-            position="bottom-end" width={192} withinPortal withInitialFocusPlaceholder={false}>
-            <Menu.Target>
-              <button disabled={busy || navigationLocked} className="pn-icon-button pn-create-button" aria-label="新增" title="新增">
-                <IconPlus size={18} /><span>新增</span>
-              </button>
-            </Menu.Target>
-            <Menu.Dropdown className="pn-create-menu" aria-label="新增">
-              <Menu.Item disabled={busy || navigationLocked} leftSection={<IconFileText size={17} />} onClick={newNote}>新增筆記</Menu.Item>
-              <Menu.Item disabled={busy || navigationLocked} leftSection={<IconDatabase size={17} />} onClick={() => void run(async () => {
-                const database = await request("/api/databases", { title: "未命名資料庫" });
-                if (database) await navigate(database.id);
-              })}>新增資料庫</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <CreateMenu key={"create-" + page.id} disabled={busy || navigationLocked} onNote={newNote} onDatabase={newDatabase} onOpenChange={setCreateOpen} />
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
             onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"

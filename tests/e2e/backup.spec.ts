@@ -213,6 +213,7 @@ for (const backDuring of ["還原中", "中斷後"]) {
       await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
       await showNavigation(page);
+      await expect(page.getByRole("button", { name: "新增私人頁面", exact: true })).toBeDisabled();
       for (const name of ["設定", "今天", "登出", "安裝 p-note"])
         await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "頁面操作：未命名", exact: true })).toBeDisabled();
