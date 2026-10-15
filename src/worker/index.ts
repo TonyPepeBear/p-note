@@ -12,6 +12,8 @@ export class ProbeRoom extends YServer<Env> {
   static options = { hibernate: true };
   private tail: Promise<void> = Promise.resolve();
   protected async now(): Promise<number> { return Date.now(); }
+  protected async changing(): Promise<void> {}
+  protected async changed(): Promise<void> {}
 
   async onLoad(): Promise<Y.Doc> {
     const sql = this.ctx.storage.sql;
@@ -69,6 +71,7 @@ export class ProbeRoom extends YServer<Env> {
           candidate.destroy();
         }
         const modified = changed ? await this.now() : undefined;
+        if (changed) await this.changing();
         const checkpoint = this.ctx.storage.transactionSync(() => {
           this.ctx.storage.sql.exec('INSERT INTO updates (payload) VALUES (?)', update!);
           if (modified !== undefined) this.ctx.storage.sql.exec('INSERT INTO document_metadata VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET modified_at = MAX(modified_at, excluded.modified_at)', modified);
@@ -81,6 +84,8 @@ export class ProbeRoom extends YServer<Env> {
       if (typeof message === 'string') Y.applyUpdate(this.document, update!, connection);
       else super.onMessage(connection, message);
       if (update) {
+        // 自動歷史失敗不否定已落盤的正文；開啟歷史時會重試補最新快照。
+        try { await this.changed(); } catch { /* 保留已確認的正文。 */ }
         try {
           const pending = this.ctx.storage.sql.exec<{ count: number; bytes: number }>('SELECT count(*) AS count, COALESCE(SUM(length(payload)), 0) AS bytes FROM updates').one();
           if (pending.count >= 64 || pending.bytes >= 2 * 1024 * 1024) await this.compact();

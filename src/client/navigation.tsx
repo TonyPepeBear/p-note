@@ -8,7 +8,7 @@ import {
   IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
   IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
   IconDatabase, IconDots, IconFileText, IconLogout, IconMenu2, IconPlus,
-  IconSearch, IconSettings, IconTrash,
+  IconSearch, IconSettings, IconTrash, IconHistory,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
@@ -16,12 +16,13 @@ import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
 import "./navigation.css";
 
-export function Navigation({ page, changed, error, backups, settings, settingsView, databaseView, navigationLocked = false, children }: {
+export function Navigation({ page, changed, error, backups, settings, pageHistory, settingsView, databaseView, navigationLocked = false, children }: {
   page: PageInfo;
   changed: (page: PageInfo) => void;
   error: (message: string) => void;
   backups: () => void;
   settings: () => void;
+  pageHistory?: () => void;
   settingsView?: "backup" | "api";
   databaseView?: boolean;
   navigationLocked?: boolean;
@@ -365,6 +366,10 @@ export function Navigation({ page, changed, error, backups, settings, settingsVi
           </div>)}</div>
         </section>}
         {panel === "page" && <>
+          {pageHistory && !page.database_config && <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => {
+            setPanel("");
+            pageHistory();
+          }}><IconHistory size={18} />版本歷史</button>}
           <form onSubmit={(event) => {
             event.preventDefault();
             void run(async () => {

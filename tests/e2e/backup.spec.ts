@@ -156,6 +156,8 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
 
 for (const backDuring of ["還原中", "中斷後"]) {
   test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
+    // 多次瀏覽器返回、手機導覽與真實備份還原需完整流程時間；個別斷言仍保留原本逾時。
+    test.setTimeout(40000);
     const previous = await openPrivate(page);
     await showNavigation(page);
     await page.getByRole("button", { name: "新增筆記", exact: true }).click();

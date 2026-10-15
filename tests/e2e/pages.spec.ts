@@ -285,6 +285,8 @@ test("PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 
   page,
   request,
 }) => {
+  // 與上層垃圾桶情境相同，此流程多次換頁並重建連線，保留每步斷言的原本逾時。
+  test.setTimeout(45_000);
   await login(page, request);
   await openJournal(page);
   await page.getByLabel("日記日期", { exact: true }).fill("2024-01-01");
