@@ -288,6 +288,8 @@
   }
 
   .editor-document .save-status {
+    /* 固定獨立一列，避免保存文案變長時把工具列擠下去並改變歷史捲動位置。 */
+    flex-basis: 100%;
     min-height: 44px;
     gap: 6px;
   }

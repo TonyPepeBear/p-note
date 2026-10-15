@@ -183,7 +183,16 @@ test('SB-03：現有區塊、圖片、程式碼與筆記連結往返，貼入巢
   await page.keyboard.type('[['); await page.keyboard.insertText('同步內連結');
   await page.getByRole('option', { name: /同步內連結目標/ }).click(); await saved(page);
   await expect(content(references(page)).locator('a')).toHaveCount(2);
-  await content(references(page)).locator('p').last().click(); await page.keyboard.press('End');
+  // 段落已有可導覽的連結，將原生選取收合到尾端後再以真實鍵盤輸入，不點擊連結本身。
+  await content(references(page)).evaluate(element => {
+    const paragraphs = element.querySelectorAll('p');
+    const paragraph = paragraphs[paragraphs.length - 1];
+    (element as HTMLElement).focus();
+    const selection = getSelection();
+    selection?.selectAllChildren(paragraph);
+    selection?.collapseToEnd();
+    document.dispatchEvent(new Event('selectionchange'));
+  });
   await page.keyboard.type('[['); await page.keyboard.insertText('同步內連結');
   const iconOption = page.locator('.note-link-option-row').filter({ hasText: target.title });
   await iconOption.getByRole('button', { name: '新增「' + target.title + '」圖示', exact: true }).click();
@@ -391,9 +400,11 @@ test('SB-21：手機可直接點擊操作，鍵盤可開清單與解除同步，
   expect(await references(page).evaluate(element => Number.parseFloat(getComputedStyle(element).borderTopWidth))).toBeGreaterThan(0);
   const usage = references(page).getByRole('button', { name: /已在 1 個頁面使用/ });
   if (info.project.use.hasTouch) await usage.tap(); else { await usage.focus(); await page.keyboard.press('Enter'); }
-  await expect(page.getByRole('dialog')).toContainText('同步區塊 ID'); await page.keyboard.press('Escape');
+  const referencesDialog = page.getByRole('dialog', { name: '同步區塊引用', exact: true });
+  await expect(referencesDialog).toContainText('同步區塊 ID'); await page.keyboard.press('Escape');
+  await expect(referencesDialog).toBeHidden();
   await page.setViewportSize({ width: 390, height: 500 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await selectInnerText();
   const unlink = references(page).getByRole('button', { name: '解除同步', exact: true });
   await expect(unlink).toBeVisible();
