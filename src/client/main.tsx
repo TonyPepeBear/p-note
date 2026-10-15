@@ -23,6 +23,7 @@ import { Backlinks } from './note-links';
 import type { PageInfo } from "../shared/pages";
 import { api, navigate, saveDraft, signedOut } from "./api";
 import { BackupSettings } from "./backup-settings";
+import { MyImages } from "./my-images";
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
 import { readLocal, saveLocal } from "./cache";
@@ -44,6 +45,8 @@ function App() {
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
+  const [images, setImages] = useState(false);
+  const viewNavigation = useRef(0);
   const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
   const backupNavigation = useRef<{ url: string; state: unknown } | null>(null);
   useEffect(() => {
@@ -53,8 +56,10 @@ function App() {
   }, [backupNavigationLocked]);
   useEffect(() => {
     if (login) {
+      viewNavigation.current++;
       setSettings(false);
       setApiSettings(false);
+      setImages(false);
     }
   }, [login]);
   const [route, setRoute] = useState(() => ({
@@ -67,9 +72,11 @@ function App() {
     const go = (fresh: boolean, scroll?: number) =>
       // 同步卸載舊編輯器，避免換頁途中仍顯示前一頁的狀態。
       flushSync(() => {
+        viewNavigation.current++;
         setSession(undefined);
         setSettings(false);
         setApiSettings(false);
+        setImages(false);
         setRoute((current) => ({
           serial: current.serial + 1,
           fresh,
@@ -102,12 +109,12 @@ function App() {
   }, []);
   const [draftDismissed, setDraftDismissed] = useState(false);
   useEffect(() => {
-    document.title = page ? page.title + " · p-note" : "p-note";
+    document.title = images ? "我的圖片 · p-note" : page ? page.title + " · p-note" : "p-note";
     if (page)
       setDraftDismissed(
         sessionStorage.getItem("p-note-draft-dismissed") === page.id,
       );
-  }, [page?.id, page?.title]);
+  }, [page?.id, page?.title, images]);
   useEffect(() => {
     if (confirm) return;
     let disposed = false;
@@ -401,6 +408,20 @@ function App() {
     if (!response.ok) throw new Error(value.message ?? "標題保存失敗，請重試");
     setPage(value);
   };
+  const closeImages = () => { viewNavigation.current++; setImages(false); };
+  const openWorkspaceView = (view: "images" | "api" | "backup") => {
+    if (backupNavigationLocked) return;
+    const ticket = ++viewNavigation.current;
+    void saveDraft().then(() => {
+      // 保存期間可能已返回其他文件，舊切換不得重新打開工作區視圖。
+      if (ticket !== viewNavigation.current) return;
+      setImages(view === "images");
+      setApiSettings(view === "api");
+      setSettings(view === "backup");
+    }).catch(() => {
+      if (ticket === viewNavigation.current) setError("本機儲存失敗，請重試");
+    });
+  };
   const notice = error && (
     <Alert
       className="workspace-notice"
@@ -582,23 +603,17 @@ function App() {
         page={(page ?? recovery)!}
         changed={setPage}
         error={setError}
-        settingsView={apiSettings ? "api" : settings ? "backup" : undefined}
+        settingsView={images ? "images" : apiSettings ? "api" : settings ? "backup" : undefined}
         databaseView={!!page?.database_config}
         navigationLocked={backupNavigationLocked}
-        settings={() => { if (backupNavigationLocked) return; void saveDraft().then(() => { setSettings(false); setApiSettings(true); }).catch(() => setError("本機儲存失敗，請重試")); }}
-        backups={() => {
-          if (backupNavigationLocked) return;
-          void saveDraft()
-            .then(() => { setApiSettings(false); setSettings(true); })
-            .catch((failure) =>
-              setError(
-                failure instanceof Error ? failure.message : "本機儲存失敗",
-              ),
-            );
-        }}
+        images={() => openWorkspaceView("images")}
+        imagesClose={closeImages}
+        settings={() => openWorkspaceView("api")}
+        backups={() => openWorkspaceView("backup")}
       >
         {notice}
-        <div hidden={settings || apiSettings}>{content}</div>
+        <div hidden={settings || apiSettings || images}>{content}</div>
+        {images && <MyImages close={closeImages} unauthorized={() => { closeImages(); setLogin(true); }} />}
         {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
         {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
       </Navigation>

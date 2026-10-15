@@ -1,8 +1,17 @@
 import { IMAGE_LIMIT, IMAGE_RULE, IMAGE_TYPES, imageType } from '../shared/image';
+import { ASSET_PAGE_SIZE, type AssetList, type AssetSummary } from '../shared/assets';
 import { PageError } from './pages';
 
 type Asset = { id: string; object_key: string; original_name: string; mime_type: string; byte_size: number; checksum: string };
 const fail = (status: number, message = IMAGE_RULE): never => { throw new PageError(status, message); };
+
+function positiveParameter(params: URLSearchParams, name: string, fallback: number): number {
+  const values = params.getAll(name);
+  if (!values.length) return fallback;
+  const value = Number(values[0]);
+  if (values.length !== 1 || !/^[1-9]\d*$/.test(values[0]) || !Number.isSafeInteger(value)) fail(400, '無效分頁參數');
+  return value;
+}
 
 async function readImage(request: Request): Promise<Uint8Array> {
   const length = request.headers.get('Content-Length');
@@ -27,7 +36,22 @@ async function readImage(request: Request): Promise<Uint8Array> {
 }
 
 export async function handleAssets(request: Request, env: Env, owner: string, now: number): Promise<Response | null> {
-  const path = new URL(request.url).pathname;
+  const url = new URL(request.url); const path = url.pathname;
+  if (path === '/api/assets' && request.method === 'GET') {
+    const page = positiveParameter(url.searchParams, 'page', 1);
+    const pageSize = positiveParameter(url.searchParams, 'page_size', ASSET_PAGE_SIZE);
+    if (pageSize > 100) fail(400, '每頁圖片數須介於 1～100');
+    const offset = (page - 1) * pageSize;
+    if (!Number.isSafeInteger(offset)) fail(400, '無效分頁參數');
+    const results = await env.DB.batch([
+      env.DB.prepare('SELECT COUNT(*) AS total FROM assets WHERE owner_id = ?').bind(owner),
+      env.DB.prepare('SELECT id, original_name, mime_type, byte_size, created_at FROM assets WHERE owner_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?').bind(owner, pageSize, offset),
+    ]);
+    const total = (results[0].results as { total: number }[])[0].total;
+    const items = (results[1].results as Omit<AssetSummary, 'url'>[]).map(asset => ({ ...asset, url: `/api/assets/${asset.id}` }));
+    const result: AssetList = { items, page, page_size: pageSize, total, total_pages: Math.ceil(total / pageSize) };
+    return Response.json(result, { headers: { 'Cache-Control': 'no-store' } });
+  }
   if (path === '/api/assets' && request.method === 'POST') {
     const mime = request.headers.get('Content-Type')?.toLowerCase() ?? '';
     if (!IMAGE_TYPES.includes(mime)) fail(415);
