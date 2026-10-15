@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import * as Y from 'yjs';
 import { blocksToYDoc } from '@blocknote/core/yjs';
 import { authenticated, connect, commit, origin } from './helpers';
-import { blockEditor } from '../../src/worker/block-json';
+import { blockEditor, replaceBlocks } from '../../src/worker/block-json';
 import type { SyncedBlockInfo } from '../../src/shared/synced-blocks';
 
 const sockets: WebSocket[] = [];
@@ -150,7 +150,9 @@ it('SB-06：單一同步區塊保存失敗不污染原文，頁面仍可繼續�
   expect((await commit(client, doc, 'failed')).type).toBe('error');
   expect((await client.stub.capture(scope)).data).toEqual(original.data);
   const page = await connect(a.page, a.auth.cookie); sockets.push(page.socket);
-  const pageDoc = blocksToYDoc(blockEditor(), [{ type: 'paragraph', content: '頁面可獨立編輯' }], 'body');
+  const pageDoc = new Y.Doc();
+  Y.applyUpdate(pageDoc, (await page.stub.capture({ owner: a.page.owner_id, page: a.page.id, generation: a.page.sync_generation })).data);
+  replaceBlocks(pageDoc, [{ type: 'paragraph', content: '頁面可獨立編輯' }], blockEditor());
   expect((await commit(page, pageDoc, 'page-independent')).type).toBe('persisted');
   doc.destroy(); pageDoc.destroy();
 });
