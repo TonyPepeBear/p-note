@@ -12,6 +12,8 @@ test('CICD-01：master 才發布，建置失敗阻擋且發布不並行', () => 
   expect(workflow).toContain('group: cloudflare-production');
   expect(workflow).toContain('cancel-in-progress: false');
   const deploy = workflow.split('\n  deploy:')[1];
+  expect(deploy).toContain('npm install --global npm@11.21.0');
+  expect(deploy.indexOf('npm install --global npm@11.21.0')).toBeLessThan(deploy.indexOf('npm ci'));
   for (const command of ['npm ci', 'npm run check', 'npm run check:production', 'npm run build']) expect(deploy).toContain(command);
   expect(workflow).not.toMatch(/continue-on-error|if: always\(\)|pull_request_target/);
   const commands = ['npm run check', 'npm run build', '--dry-run', 'd1 migrations apply', ' deploy --config wrangler.production.jsonc\n'];
