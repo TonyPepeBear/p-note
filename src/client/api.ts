@@ -11,8 +11,10 @@ export function hasMetadataDrafts(): boolean {
   return [...metadataDrafts].some(entry => entry.dirty());
 }
 
-export async function api(path: string, body?: object, signal?: AbortSignal): Promise<Response> {
-  const response = await fetch(path, { ...(body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' as const }), ...(signal ? { signal } : {}) });
+export async function api(path: string, body?: object, signal?: AbortSignal, headers?: HeadersInit): Promise<Response> {
+  const requestHeaders = new Headers(headers);
+  if (body) requestHeaders.set('Content-Type', 'application/json');
+  const response = await fetch(path, { ...(body ? { method: 'POST', body: JSON.stringify(body) } : { cache: 'no-store' as const }), ...(body || headers ? { headers: requestHeaders } : {}), ...(signal ? { signal } : {}) });
   try {
     if (response.status === 401 || (path === '/api/logout' && response.ok)) localStorage.setItem(SIGNED_OUT, '1');
     else if (response.ok && !body && /^\/api\/(pages\/[\w-]+$|today(?:\?|$))/.test(path)) localStorage.removeItem(SIGNED_OUT);
