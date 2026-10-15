@@ -1,0 +1,22 @@
+.synced-block { width: 100%; min-width: 0; margin: 6px 0; border: 1.5px solid var(--mantine-color-blue-4); border-radius: 6px; background: var(--mantine-color-blue-0); overflow: visible; }
+.synced-block-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding: 5px 9px 0; }
+.synced-block-label { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--mantine-color-blue-8); }
+.synced-block-actions { padding: 3px 7px; border-bottom: 1px solid var(--mantine-color-blue-2); }
+.synced-block-editor { background: var(--mantine-color-body); border-radius: 0 0 6px 6px; padding: 6px 0; min-width: 0; }
+.synced-block-editor .bn-editor { padding-inline: 30px 16px; }
+.synced-block-status { padding: 3px 10px; }
+.synced-block-error { margin: 8px; }
+.synced-block .mantine-Button-label { white-space: normal; }
+@media (max-width: 48em) {
+  .synced-block-actions .mantine-Button-root, .synced-block-header .mantine-Button-root { min-height: 34px; }
+  .synced-block-editor .bn-editor { padding-inline: 22px 10px; }
+}
+
+@media (max-width: 47.99em) {
+  .editor-toolbar button,
+  .synced-block-header button,
+  .synced-block-actions button {
+    scroll-margin-top: 64px;
+    scroll-margin-bottom: 12px;
+  }
+}

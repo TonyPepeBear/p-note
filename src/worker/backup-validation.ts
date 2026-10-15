@@ -16,7 +16,7 @@ function file(value: BackupFile, path: string) {
 
 export function validateManifest(data: BackupManifest): void {
   if (!data || data.format !== 'p-note-backup' || data.version !== 1 || !identifier(data.id) || !identifier(data.owner?.id)
-    || !keys(data, ['format', 'version', 'id', 'owner', 'started_at', 'captured_until', 'completed_at', 'pages', 'assets'])
+    || !keys(data, ['format', 'version', 'id', 'owner', 'started_at', 'captured_until', 'completed_at', 'pages', 'assets', 'synced_blocks', 'page_synced_blocks'])
     || !keys(data.owner, ['id']) || !integer(data.started_at) || !integer(data.captured_until) || !integer(data.completed_at)
     || data.started_at > data.captured_until || data.captured_until > data.completed_at || !Array.isArray(data.pages) || !Array.isArray(data.assets)) invalid();
   const pages = new Map<string, BackupManifest['pages'][number]>(); const dates = new Set<string>();
@@ -56,6 +56,25 @@ export function validateManifest(data: BackupManifest): void {
   }
   for (let index = 0; index < roots.length; index++) for (const child of children.get(roots[index]) ?? []) roots.push(child);
   if (roots.length !== pages.size) invalid();
+  const synced = new Set<string>();
+  if ((data.synced_blocks === undefined) !== (data.page_synced_blocks === undefined)
+    || (data.synced_blocks !== undefined && !Array.isArray(data.synced_blocks))
+    || (data.page_synced_blocks !== undefined && !Array.isArray(data.page_synced_blocks))) invalid();
+  for (const item of data.synced_blocks ?? []) {
+    const b = item?.metadata;
+    if (!b || !identifier(b.id) || synced.has(b.id) || b.owner_id !== data.owner.id || !identifier(b.sync_generation)
+      || !integer(b.created_at) || !integer(b.updated_at) || !integer(item.checkpoint) || !integer(item.captured_at)
+      || item.captured_at < data.started_at || item.captured_at > data.captured_until
+      || !keys(item, ['metadata', 'checkpoint', 'captured_at', 'file'])
+      || !keys(b, ['id', 'owner_id', 'sync_generation', 'created_at', 'updated_at'])) invalid();
+    file(item.file, `synced-blocks/${b.id}.yjs`); synced.add(b.id);
+  }
+  const references = new Set<string>();
+  for (const reference of data.page_synced_blocks ?? []) {
+    if (!reference || !keys(reference, ['page_id', 'synced_block_id']) || !pages.has(reference.page_id) || !synced.has(reference.synced_block_id)) invalid();
+    const key = `${reference.page_id}/${reference.synced_block_id}`;
+    if (references.has(key)) invalid(); references.add(key);
+  }
   const assets = new Set<string>();
   for (const item of data.assets) {
     const a = item?.metadata;

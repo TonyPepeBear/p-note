@@ -70,13 +70,13 @@ test('PLUGIN-05：Email 跨分頁登入後回到同意畫面，拒絕不授權',
   await second.close();
 });
 
-test('PLUGIN-01：HTTP MCP 的 11 個工具與網站往返', async ({ page, baseURL }) => {
+test('PLUGIN-01：HTTP MCP 的 13 個工具與網站及同步區塊往返', async ({ page, baseURL }) => {
   const id = await openPrivate(page);
   const auth = await authorize(page, baseURL!);
   const init = await rpc(page.request, auth.access_token, 'initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'test', version: '1.0.0' } });
   expect((await init.json()).result.serverInfo.name).toBe('p-note');
   const tools = (await (await rpc(page.request, auth.access_token, 'tools/list')).json()).result.tools;
-  expect(tools.map((x: any) => x.name).sort()).toEqual(['create_page', 'get_content', 'get_page', 'list_journals', 'list_pages', 'move_page', 'open_journal', 'rename_page', 'search', 'set_page_icon', 'update_content']);
+  expect(tools.map((x: any) => x.name).sort()).toEqual(['create_page', 'get_content', 'get_page', 'get_synced_block_content', 'list_journals', 'list_pages', 'move_page', 'open_journal', 'rename_page', 'search', 'set_page_icon', 'update_content', 'update_synced_block_content']);
   const run = (name: string, args = {}) => call(page.request, auth.access_token, name, args);
   expect(data(await run('list_pages')).some((x: any) => x.id === id)).toBe(true);
   expect(data(await run('get_page', { page_id: id })).id).toBe(id);
@@ -96,6 +96,16 @@ test('PLUGIN-01：HTTP MCP 的 11 個工具與網站往返', async ({ page, base
   expect(JSON.stringify(data(await run('search', { query: '雲端 MCP' })))).toContain(id);
   await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '網站修改雲端正文' })); await saved(page);
   expect(JSON.stringify(data(await run('get_content', { page_id: id })))).toContain('網站修改雲端正文');
+  const shared = await page.request.post('/api/synced-blocks', { headers: { Origin: baseURL! }, data: { blocks: [{ type: 'paragraph', content: 'MCP 共用正文' }] } });
+  expect(shared.status()).toBe(200); const sharedId = (await shared.json()).id;
+  const content = data(await run('get_synced_block_content', { synced_block_id: sharedId }));
+  expect(JSON.stringify(content.blocks)).toContain('MCP 共用正文');
+  expect((await run('update_synced_block_content', { synced_block_id: sharedId, etag: content.etag, blocks: [{ type: 'paragraph', content: 'MCP 已修改同步區塊' }] })).isError).not.toBe(true);
+  expect(data(await run('update_synced_block_content', { synced_block_id: sharedId, etag: content.etag, blocks: [] })).status).toBe(412);
+  const pageContent = data(await run('get_content', { page_id: id }));
+  expect((await run('update_content', { page_id: id, etag: pageContent.etag, blocks: [{ type: 'syncedBlock', props: { syncedBlockId: sharedId } }] })).isError).not.toBe(true);
+  const expanded = data(await run('get_content', { page_id: id, expand_synced_blocks: true }));
+  expect(JSON.stringify(expanded.syncedBlocks[sharedId].blocks)).toContain('MCP 已修改同步區塊');
 });
 
 test('PLUGIN-02：版本衝突、無效參數與錯誤憑證不能覆蓋正文', async ({ page, baseURL }) => {

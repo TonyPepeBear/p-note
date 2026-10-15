@@ -15,6 +15,7 @@ import { handleAssets } from './assets';
 import { sendLoginMail } from './mail';
 import { cleanupBackups, createBackup, handleBackups } from './backups';
 import { RestoreCoordinator } from './restore';
+import { handleSyncedBlocks, syncedBlockInfo } from './synced-blocks';
 import { handleHistory } from './history';
 
 export { ProbeRoom, SyncRoom, RestoreCoordinator };
@@ -108,9 +109,30 @@ export async function handle(request: Request, env: Env, services: Services = { 
     if (assetResponse) return assetResponse;
     const databaseResponse = await handleDatabases(request, env, session.user.id, services.now());
     if (databaseResponse) return databaseResponse;
+    const syncedBlockResponse = await handleSyncedBlocks(request, env, session.user.id, services.now());
+    if (syncedBlockResponse) return syncedBlockResponse;
     const pageResponse = await handlePages(request, env, session.user.id, services.now());
     if (pageResponse) return pageResponse;
     if (path.startsWith('/parties/sync/')) {
+      const blockId = url.searchParams.get('syncedBlock');
+      if (blockId !== null) {
+        const block = await syncedBlockInfo(env, session.user.id, blockId);
+        if (!block) return error('找不到同步區塊', 404);
+        const page = url.searchParams.get('page'); const referencePage = page && await visiblePage(env.DB, session.user.id, page);
+        if (!referencePage || referencePage.sync_generation !== url.searchParams.get('pageGeneration')) return error('引用頁面世代已改變，本機內容已隔離', 409);
+        const reference = await env.SYNC.getByName(await roomName(session.user.id, referencePage.id, referencePage.sync_generation))
+          .hasSyncedBlockReference({ owner: session.user.id, page: referencePage.id, generation: referencePage.sync_generation }, block.id);
+        if (!reference || block.sync_generation !== url.searchParams.get('generation')) return error('同步區塊引用或世代已改變，本機內容已隔離', 409);
+        if (path !== `/parties/sync/${block.room}`) return error('無效房間', 403);
+        if (request.headers.get('Upgrade')?.toLowerCase() !== 'websocket' || origin !== env.BETTER_AUTH_URL) return error('無效同步請求', 400);
+        const headers = new Headers(request.headers);
+        for (const name of [...headers.keys()]) if (name.startsWith('x-partykit-') || name.startsWith('x-p-note-')) headers.delete(name);
+        headers.set('x-p-note-session', session.session.id); headers.set('x-p-note-owner', session.user.id);
+        headers.set('x-p-note-page', block.id); headers.set('x-p-note-generation', block.sync_generation);
+        headers.set('x-p-note-kind', 'syncedBlock'); headers.set('x-p-note-reference-page', page!);
+        headers.set('x-p-note-reference-generation', referencePage.sync_generation);
+        return await routePartykitRequest(new Request(request, { headers }), env) ?? error('找不到房間', 404);
+      }
       const page = await env.DB.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(url.searchParams.get('page'), session.user.id).first<PageRow>();
       if (!page) return error('找不到頁面', 404);
       if (!await visiblePage(env.DB, session.user.id, page.id) || page.sync_generation !== url.searchParams.get('generation')) return error('頁面狀態已改變，本機內容已隔離', 409);

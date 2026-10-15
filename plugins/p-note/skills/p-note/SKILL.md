@@ -11,5 +11,7 @@ description: 當使用者要搜尋、閱讀、建立、整理或修改 p-note �
 - 日記使用明確的 YYYY-MM-DD；「今天」依使用者時區換算，不用伺服器時區猜測。
 - get_content 回傳 BlockNote blocks 與 etag。修改前先讀取，保留未要求修改的區塊、props、inline 樣式、children、圖片及連結，再將完整 blocks 與原 etag 傳入 update_content。
 - update_content 是整份正文替換。412 表示版本已改變，重新讀取並合併；不能改用新 etag 盲目重送舊內容。網路失敗時先重新讀取確認結果，不自動重送寫入。
+- 頁面中的 syncedBlock 節點只保存 props.syncedBlockId，不能包含 content 或非空 children；update_content 只能新增或移除引用。get_content 可傳 expand_synced_blocks: true，另取得 syncedBlocks 對照表及各區塊自己的 etag。
+- 編輯共用內容使用 get_synced_block_content／update_synced_block_content，傳 synced_block_id 及該區塊自己的 etag。修改會影響每個引用頁面；保留未要求變更的內容，不得把同步區塊放進另一同步區塊。
 - 401 可能是連線已撤銷或到期，請重新登入授權；403 可能只有唯讀權限。403／404 不代表可以改用其他帳號、cookie 或路由繞過。
 - 此 plugin 提供現有 API 支援的功能，不能刪除、上傳新圖片、備份或還原。私人內容只用於目前任務，不轉送到其他服務。

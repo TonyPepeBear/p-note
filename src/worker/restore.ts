@@ -1,13 +1,15 @@
 import { DurableObject } from 'cloudflare:workers';
-import * as Y from 'yjs';
 import { createBackup, readFile, readManifest } from './backups';
 import type { BackupManifest } from '../shared/backup';
 import { roomName } from '../shared/room';
 import { imageType } from '../shared/image';
 import { PageError } from './pages';
+import { backupDocument, backupReferences, verifyBackupReferences } from './backup-content';
 
 type Operation = { id: string; backup_id: string; rollback_id: string | null; phase: 'pausing' | 'paused' | 'preparing' | 'resuming' };
-type Member = { page_id: string; generation: string; kind: 'old' | 'new' };
+type Member = { page_id: string; generation: string; kind: 'old' | 'new'; document_kind?: 'syncedBlock' };
+const memberScope = (owner: string, member: Member) => ({ owner, page: member.page_id, generation: member.generation, ...(member.document_kind ? { kind: member.document_kind } : {}) });
+const memberRoom = (owner: string, member: Member) => roomName(owner, member.document_kind ? `synced-block:${member.page_id}` : member.page_id, member.generation);
 
 export class RestoreCoordinator extends DurableObject<Env> {
   private tail: Promise<void> = Promise.resolve();
@@ -21,14 +23,18 @@ export class RestoreCoordinator extends DurableObject<Env> {
   private async verified(owner: string, backup: string, operation?: string): Promise<BackupManifest> {
     const manifest = await readManifest(this.env, owner, backup, await this.now(), operation);
     const prefix = `${owner}/${backup}/`;
+    const references: NonNullable<BackupManifest['page_synced_blocks']> = [];
     for (const page of manifest.pages) {
-      const bytes = await readFile(this.env, prefix, page.file); const doc = new Y.Doc();
-      try { Y.applyUpdate(doc, bytes); } finally { doc.destroy(); }
+      const doc = backupDocument(await readFile(this.env, prefix, page.file));
+      try { references.push(...backupReferences(doc, page.metadata.id)); } finally { doc.destroy(); }
     }
+    for (const block of manifest.synced_blocks ?? []) backupDocument(await readFile(this.env, prefix, block.file), true).destroy();
+    verifyBackupReferences(manifest, references);
     for (const asset of manifest.assets) if (imageType(await readFile(this.env, prefix, asset.file)) !== asset.metadata.mime_type) throw new Error('備份圖片格式無效');
     const collisions = await this.env.DB.batch([
       this.env.DB.prepare("SELECT 1 FROM pages WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.pages)),
       this.env.DB.prepare("SELECT 1 FROM assets WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.assets)),
+      this.env.DB.prepare("SELECT 1 FROM synced_blocks WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.synced_blocks ?? [])),
     ]);
     if (collisions.some(result => result.results.length)) throw new Error('備份識別與其他擁有者衝突');
     return manifest;
@@ -52,14 +58,17 @@ export class RestoreCoordinator extends DurableObject<Env> {
           SELECT ?, ?, ?, 'pausing', ? WHERE NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`)
           .bind(id, owner, backup, await this.now(), owner),
         db.prepare("INSERT INTO restore_members SELECT ?, id, sync_generation, 'old' FROM pages WHERE owner_id = ? AND EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, owner, id),
+        db.prepare("INSERT INTO restore_synced_block_members SELECT ?, id, sync_generation, 'old' FROM synced_blocks WHERE owner_id = ? AND EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, owner, id),
         ...target.pages.map(page => db.prepare("INSERT INTO restore_members SELECT ?, ?, ?, 'new' WHERE EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, page.metadata.id, crypto.randomUUID(), id)),
+        ...(target.synced_blocks ?? []).map(block => db.prepare("INSERT INTO restore_synced_block_members SELECT ?, ?, ?, 'new' WHERE EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, block.metadata.id, crypto.randomUUID(), id)),
       ];
       const result = await db.batch(initial); if (!result[0].meta.changes) throw new PageError(409, '頁面變更處理中');
       op = { id, backup_id: backup, rollback_id: null, phase: 'pausing' };
     }
-    const members = (await db.prepare('SELECT * FROM restore_members WHERE operation_id = ? ORDER BY page_id').bind(op.id).all<Member>()).results;
+    const members = (await db.prepare(`SELECT page_id, generation, kind, NULL AS document_kind FROM restore_members WHERE operation_id = ?
+      UNION ALL SELECT synced_block_id AS page_id, generation, kind, 'syncedBlock' AS document_kind FROM restore_synced_block_members WHERE operation_id = ? ORDER BY document_kind DESC, page_id`).bind(op.id, op.id).all<Member>()).results;
     if (op.phase === 'pausing') {
-      for (const member of members.filter(member => member.kind === 'old')) await this.env.SYNC.getByName(await roomName(owner, member.page_id, member.generation)).pause();
+      for (const member of members.filter(member => member.kind === 'old')) await this.env.SYNC.getByName(await memberRoom(owner, member)).pause();
       await db.prepare("UPDATE restore_operations SET phase = 'paused' WHERE id = ?").bind(op.id).run(); op.phase = 'paused';
     }
     if (op.phase === 'paused') {
@@ -68,7 +77,12 @@ export class RestoreCoordinator extends DurableObject<Env> {
       op.rollback_id = rollback.id; op.phase = 'preparing';
     }
     if (op.phase === 'preparing') {
-      const prefix = `${owner}/${backup}/`; const generations = new Map(members.filter(member => member.kind === 'new').map(member => [member.page_id, member.generation]));
+      const prefix = `${owner}/${backup}/`; const generations = new Map(members.filter(member => member.kind === 'new' && !member.document_kind).map(member => [member.page_id, member.generation]));
+      const blockGenerations = new Map(members.filter(member => member.kind === 'new' && member.document_kind).map(member => [member.page_id, member.generation]));
+      for (const block of target.synced_blocks ?? []) {
+        const generation = blockGenerations.get(block.metadata.id)!;
+        await this.env.SYNC.getByName(await roomName(owner, `synced-block:${block.metadata.id}`, generation)).prepare({ owner, page: block.metadata.id, generation, kind: 'syncedBlock' }, await readFile(this.env, prefix, block.file), block.checkpoint);
+      }
       for (const page of target.pages) {
         const generation = generations.get(page.metadata.id)!;
         await this.env.SYNC.getByName(await roomName(owner, page.metadata.id, generation)).prepare({ owner, page: page.metadata.id, generation }, await readFile(this.env, prefix, page.file), page.checkpoint);
@@ -86,8 +100,12 @@ export class RestoreCoordinator extends DurableObject<Env> {
       }
       await db.batch([
         db.prepare('DELETE FROM pages WHERE owner_id = ?').bind(owner),
+        db.prepare('DELETE FROM synced_blocks WHERE owner_id = ?').bind(owner),
+        ...(target.synced_blocks ?? []).map(({ metadata: b }) => db.prepare('INSERT INTO synced_blocks (id, owner_id, sync_generation, created_at, updated_at) VALUES (?, ?, ?, ?, ?)')
+          .bind(b.id, owner, blockGenerations.get(b.id)!, b.created_at, b.updated_at)),
         ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
           .bind(p.id, owner, p.kind, p.title, p.icon ?? null, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at, p.database_config ?? null, p.property_values ?? '{}')),
+        ...(target.page_synced_blocks ?? []).map(ref => db.prepare('INSERT INTO page_synced_blocks (page_id, synced_block_id) VALUES (?, ?)').bind(ref.page_id, ref.synced_block_id)),
         ...target.assets.map(({ metadata: a }) => db.prepare(`INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET object_key = excluded.object_key, original_name = excluded.original_name, mime_type = excluded.mime_type, byte_size = excluded.byte_size, checksum = excluded.checksum, created_at = excluded.created_at WHERE assets.owner_id = excluded.owner_id`)
           .bind(a.id, owner, `${owner}/${a.id}/restore/${op!.id}`, a.original_name, a.mime_type, a.byte_size, a.checksum, a.created_at)),
@@ -95,8 +113,8 @@ export class RestoreCoordinator extends DurableObject<Env> {
       ]); op.phase = 'resuming';
     }
     for (const member of members.filter(member => member.kind === 'new')) {
-      const room = this.env.SYNC.getByName(await roomName(owner, member.page_id, member.generation));
-      await room.reindex({ owner, page: member.page_id, generation: member.generation }); await room.resume();
+      const room = this.env.SYNC.getByName(await memberRoom(owner, member));
+      await room.reindex(memberScope(owner, member)); await room.resume();
     }
     await db.batch([
       db.prepare('INSERT INTO completed_restores VALUES (?, ?, ?, ?, ?)').bind(op.id, owner, backup, op.rollback_id!, await this.now()),

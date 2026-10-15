@@ -29,7 +29,7 @@ it('BACKUP-06：完整 ZIP 檔案集合／正文／原圖／校驗值一致，�
   await zip.close();
   const data = JSON.parse(new TextDecoder().decode(files.get('manifest.json'))) as BackupManifest;
   expect(data.owner.id).toBe(f.root.owner_id); expect(data.completed_at).toBe(backup.completed_at);
-  expect([...files.keys()].sort()).toEqual(['manifest.json', ...data.pages.map(page => page.file.path), ...data.assets.map(asset => asset.file.path)].sort());
+  expect([...files.keys()].sort()).toEqual(['manifest.json', ...data.pages.map(page => page.file.path), ...data.assets.map(asset => asset.file.path), ...data.pages.map(page => `readable/pages/${page.metadata.id}.md`)].sort());
   for (const page of data.pages) {
     expect(files.get(page.file.path)).toEqual(f.documents.get(page.metadata.id));
     expect(await hash(files.get(page.file.path)!)).toBe(page.file.checksum);

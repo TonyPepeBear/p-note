@@ -2,10 +2,11 @@ import { Alert, Badge, Button, Group, Loader, Modal, Paper, Stack, Text, Title }
 import { useMediaQuery } from "@mantine/hooks";
 import { IconHistory, IconPlus, IconRefresh } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
-import { useCreateBlockNote } from "@blocknote/react";
+import { createReactBlockSpec, useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
-import type { PartialBlock } from "@blocknote/core";
+import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
+import { syncedBlockConfig } from "../shared/block-schema";
 import type { PageInfo } from "../shared/pages";
 import type { PageVersion, PageHistory as VersionList, PageVersionPreview as Preview } from "../shared/history";
 import type { Session } from "./editor";
@@ -29,10 +30,25 @@ const date = (value: number) => new Intl.DateTimeFormat("zh-TW", {
   hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
 }).format(value);
 
+// 歷史版本只保存引用節點，使用獨立的靜態呈現器，避免預覽載入目前同步內容或開啟同步連線。
+const versionPreviewSchema = BlockNoteSchema.create({ blockSpecs: {
+  ...defaultBlockSpecs,
+  syncedBlock: createReactBlockSpec(syncedBlockConfig, {
+    render: ({ block }) => <Paper withBorder p="sm" radius="sm" my={6} contentEditable={false}
+      data-testid="history-synced-block" data-synced-block-id={block.props.syncedBlockId}
+      aria-label="歷史同步區塊引用" style={{ borderColor: "var(--mantine-color-blue-4)", width: "100%" }}>
+      <Text size="sm" fw={600}>同步區塊引用</Text>
+      <Text size="xs" c="dimmed" style={{ overflowWrap: "anywhere" }}>ID：{block.props.syncedBlockId}</Text>
+      <Text size="xs" c="dimmed" mt={4}>此版本只保存引用，不包含同步內容的歷史快照。預覽不會載入即時內容。</Text>
+    </Paper>,
+  })(),
+} });
+
 function VersionPreview({ preview }: { preview: Preview }) {
   const editor = useCreateBlockNote({
+    schema: versionPreviewSchema,
     dictionary: zhTW,
-    initialContent: preview.blocks.length ? preview.blocks as PartialBlock[] : [{ type: "paragraph" }],
+    initialContent: preview.blocks.length ? preview.blocks as typeof versionPreviewSchema.PartialBlock[] : [{ type: "paragraph" }],
   });
   return <section className="page-history-preview" aria-label="版本預覽">
     <div className="page-history-preview-heading">

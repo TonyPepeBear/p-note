@@ -77,7 +77,10 @@ test("BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖�
     [
       "manifest.json",
       ...manifest.pages.map((item) => item.file.path),
+      ...(manifest.synced_blocks ?? []).map((item) => item.file.path),
       ...manifest.assets.map((item) => item.file.path),
+      ...manifest.pages.map((item) => `readable/pages/${item.metadata.id}.md`),
+      ...(manifest.synced_blocks ?? []).map((item) => `readable/synced-blocks/${item.metadata.id}.md`),
     ].sort(),
   );
   const row = manifest.pages.find((item) => item.metadata.id === id)!;
@@ -88,7 +91,7 @@ test("BACKUP-06：設定頁建立成功備份並下載完整 ZIP，正文與圖�
   );
   expect(doc.getXmlFragment("body").toString()).toContain("const note");
   doc.destroy();
-  for (const item of [...manifest.pages, ...manifest.assets])
+  for (const item of [...manifest.pages, ...(manifest.synced_blocks ?? []), ...manifest.assets])
     expect(
       createHash("sha256").update(files.get(item.file.path)!).digest("hex"),
     ).toBe(item.file.checksum);

@@ -102,11 +102,8 @@ test("UX-17：上一頁與下一頁回到對應頁面並還原捲動位置", asy
   await page.goBack();
   await arrive(page, a, "長頁");
   await expect
-    .poll(() => page.evaluate(() => Math.round(scrollY)))
-    .toBeGreaterThanOrEqual(before - 4);
-  expect(await page.evaluate(() => Math.round(scrollY))).toBeLessThanOrEqual(
-    before + 4,
-  );
+    .poll(() => page.evaluate(before => Math.abs(scrollY - before), before))
+    .toBeLessThanOrEqual(4);
   await page.goForward();
   await arrive(page, b, "短頁");
 });

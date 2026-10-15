@@ -2,7 +2,7 @@ import { Button } from '@mantine/core';
 import { IconBook2, IconChevronDown, IconFileText, IconLink, IconSearch } from '@tabler/icons-react';
 import { useCallback, useEffect, useId, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
-import { SuggestionMenuController, useExtensionState, type SuggestionMenuProps } from '@blocknote/react';
+import { SuggestionMenuController, useBlockNoteEditor, useExtensionState, type SuggestionMenuProps } from '@blocknote/react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import { SuggestionMenu } from '@blocknote/core/extensions';
 import type { PageInfo, PageRow } from '../shared/pages';
@@ -17,6 +17,7 @@ import './note-links.css';
 type Item = { id?: string; title: string; detail: string; query?: string; page?: PageRow };
 function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: SuggestionMenuProps<Item>) {
   const state = useExtensionState(SuggestionMenu);
+  const editor = useBlockNoteEditor();
   const [updated, setUpdated] = useState<Record<string, PageInfo>>({});
   useEffect(() => {
     const metadata = (event: Event) => {
@@ -43,7 +44,8 @@ function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: Suggestio
           aria-label={(iconPage.icon ? '更換' : '新增') + '「' + iconPage.title + '」圖示'} aria-haspopup="dialog" disabled={!navigator.onLine}
           onClick={event => {
             event.stopPropagation();
-            window.dispatchEvent(new CustomEvent('p-note:pick-page-icon', { detail: iconPage }));
+            // 同頁可有多個同步編輯器，只有發出選單操作的視圖開啟選擇器。
+            window.dispatchEvent(new CustomEvent('p-note:pick-page-icon', { detail: { page: iconPage, editor } }));
           }}><PageIcon page={iconPage} size={17} /></button>}
         <button type="button" role="option" id={'bn-suggestion-menu-item-' + index}
         aria-selected={index === selectedIndex} className="note-link-option"
@@ -78,16 +80,16 @@ function cachedLinkPages(owner: string): PageRow[] {
   } catch { /* 禁用本機儲存時仍可使用已連線的筆記連結。 */ }
   return pages;
 }
-export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor; owner: string }) {
+export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor<any, any, any>; owner: string }) {
   const [iconTarget, setIconTarget] = useState<PageRow | null>(null);
   useEffect(() => {
     const pick = (event: Event) => {
-      const page = (event as CustomEvent<PageRow>).detail;
-      if (page?.owner_id === owner) setIconTarget(page);
+      const detail = (event as CustomEvent<{ page: PageRow; editor: BlockNoteEditor<any, any, any> }>).detail;
+      if (detail?.editor === editor && detail.page.owner_id === owner) setIconTarget(detail.page);
     };
     window.addEventListener('p-note:pick-page-icon', pick);
     return () => window.removeEventListener('p-note:pick-page-icon', pick);
-  }, [owner]);
+  }, [editor, owner]);
   const getItems = useCallback(async (query: string): Promise<Item[]> => {
     let pages: PageRow[];
     if (!navigator.onLine) {
@@ -116,7 +118,7 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
 
 /** 圖示使用編輯器裝飾，避免寫入筆記文字、同步內容或匯出資料。 */
 export function NoteLinkIcons({ editor, owner, controller, disabled = false }: {
-  editor: BlockNoteEditor; owner: string; controller: ReturnType<typeof createNoteLinkIconsExtension>; disabled?: boolean;
+  editor: BlockNoteEditor<any, any, any>; owner: string; controller: ReturnType<typeof createNoteLinkIconsExtension>; disabled?: boolean;
 }) {
   const [pages, setPages] = useState<PageRow[]>(() => cachedLinkPages(owner));
   const hosts = useSyncExternalStore(controller.subscribe, controller.getHosts);
@@ -164,7 +166,7 @@ export function NoteLinkIcons({ editor, owner, controller, disabled = false }: {
   })}</>;
 }
 
-export function selectNoteLinkSuggestion(event: React.KeyboardEvent<HTMLElement>, editor: BlockNoteEditor) {
+export function selectNoteLinkSuggestion(event: React.KeyboardEvent<HTMLElement>, editor: BlockNoteEditor<any, any, any>) {
   if (event.nativeEvent.isComposing || !['Enter', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(event.key)) return;
   const state = editor.getExtension(SuggestionMenu)?.store.state;
   if (!state?.show || state.triggerCharacter !== '[[') return;

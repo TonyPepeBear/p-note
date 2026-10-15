@@ -29,8 +29,8 @@ import {
   IconTrash,
   IconDots,
 } from "@tabler/icons-react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useCreateBlockNote } from "@blocknote/react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { getDefaultReactSlashMenuItems, SuggestionMenuController, useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
 import { withCollaboration } from "@blocknote/core/yjs";
@@ -49,6 +49,10 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
 import "./editor.css";
+import { ResponsiveFormattingToolbar, SyncedBlocksProvider, syncedEditorSchema, SYNCED_CLIPBOARD_PREFIX } from './synced-blocks';
+import { createSyncedBlock, type SyncedMetadata, type SyncedState } from './synced-block-session';
+import { api } from './api';
+import { useSafeRemoteNodeSelection } from './yjs-selection';
 
 export type Session = {
   doc: Y.Doc;
@@ -56,6 +60,9 @@ export type Session = {
   provider: YProvider;
   room: string;
   checkAccess?: () => Promise<boolean>;
+  ownerId: string;
+  pageId: string;
+  generation: string;
 };
 
 const cloudStates = {
@@ -213,6 +220,7 @@ export function Editor({
   const noteLinkIcons = useMemo(() => createNoteLinkIconsExtension(), []);
   const editor = useCreateBlockNote(
     withCollaboration({
+      schema: syncedEditorSchema,
       dictionary: zhTW,
       extensions: [noteLinkIcons.extension],
       collaboration: {
@@ -247,9 +255,38 @@ export function Editor({
         : {}),
     }),
   );
+  useSafeRemoteNodeSelection(editor, doc);
   const [local, setLocal] = useState("本機儲存中");
   const [cloud, setCloud] = useState("同步中");
   const [ready, setReady] = useState(false);
+  const [syncedStates, setSyncedStates] = useState<Record<string, SyncedState>>({});
+  const [syncedError, setSyncedError] = useState('');
+  const [creatingSynced, setCreatingSynced] = useState(false);
+  const [existingOpen, setExistingOpen] = useState(false);
+  const [existingBlocks, setExistingBlocks] = useState<SyncedMetadata[]>();
+  const [, setReferenceVersion] = useState(0);
+  const reportSynced = useCallback((id: string, state?: SyncedState) => setSyncedStates(previous => {
+    if (state && previous[id] === state) return previous;
+    const next = { ...previous };
+    if (state) next[id] = state; else delete next[id];
+    return next;
+  }), []);
+  useEffect(() => editor.onChange(() => setReferenceVersion(value => value + 1)), [editor]);
+  useEffect(() => editor.onBeforeChange(({ tr }) => {
+    let invalid = false;
+    tr.doc.descendants(node => {
+      if (node.type.name === 'blockContainer' && node.firstChild?.type.name === 'syncedBlock' && node.childCount > 1) invalid = true;
+    });
+    if (invalid) { setSyncedError('同步區塊不能包含巢狀區塊'); return false; }
+  }), [editor]);
+  const hasSynced = (blocks: { type: string; children?: any[] }[]): boolean => blocks.some(block => block.type === 'syncedBlock' || hasSynced(block.children ?? []));
+  const referenceIds = (blocks: { id: string; type: string; children?: any[] }[]): string[] => blocks.flatMap(block => block.type === 'syncedBlock' ? [block.id] : referenceIds(block.children ?? []));
+  const currentReferenceIds = referenceIds(editor.document);
+  const activeSynced = currentReferenceIds.map(id => syncedStates[id]);
+  const syncedLocal = activeSynced.some(value => value?.local.includes('失敗')) ? '本機儲存失敗' : activeSynced.some(value => !value || (value.ready && value.local !== '本機已儲存')) ? '本機儲存中' : undefined;
+  const syncedCloud = activeSynced.some(value => value?.error || value?.blocked) ? '同步區塊儲存或載入失敗' : activeSynced.some(value => !value || value.cloud !== '雲端已儲存') ? (!navigator.onLine ? '離線，待同步' : '同步中') : undefined;
+  const effectiveLocal = local.includes('失敗') ? local : syncedLocal ?? local;
+  const effectiveCloud = cloud === '雲端已儲存' ? syncedCloud ?? cloud : cloud;
   const reconnect = useRef(() => {});
   useEffect(() => {
     let revision = 0;
@@ -467,17 +504,17 @@ export function Editor({
   }, [doc, cache, provider, editor, room, readOnly]);
 
   const currentBlock = () => editor.getTextCursorPosition().block;
-  const state = cloudState(cloud, readOnly);
+  const state = cloudState(effectiveCloud, readOnly);
   const CloudIcon = cloudStates[state].icon;
   const retry =
     !readOnly &&
-    (state === "failed" || state === "offline" || local.includes("失敗"));
+    (state === "failed" || state === "offline" || effectiveLocal.includes("失敗"));
   const [announced, setAnnounced] = useState("");
   useEffect(() => {
-    if (local.includes("失敗")) setAnnounced(local);
+    if (effectiveLocal.includes("失敗")) setAnnounced(effectiveLocal);
     else if (state !== "syncing")
-      setAnnounced(readOnly ? "僅保留在本機" : cloud);
-  }, [cloud, local, state, readOnly]);
+      setAnnounced(readOnly ? "僅保留在本機" : effectiveCloud);
+  }, [effectiveCloud, effectiveLocal, state, readOnly]);
   const insert = (type: "paragraph" | "image") => {
     const [block] = editor.insertBlocks(
       [
@@ -545,7 +582,46 @@ export function Editor({
       setCopyError("複製失敗，請手動選取程式碼複製");
     }
   };
+  const addReference = (id: string) => {
+    const anchor = currentBlock();
+    const block = { type: 'syncedBlock' as const, props: { syncedBlockId: id } };
+    if (anchor.type === 'paragraph' && !anchor.content.length && !anchor.children.length) editor.replaceBlocks([anchor], [block]);
+    else editor.insertBlocks([block], anchor, 'after');
+  };
+  const createSynced = async (convert: boolean) => {
+    if (creatingSynced || readOnly) return;
+    setSyncedError('');
+    if (!navigator.onLine) { setSyncedError('離線時不能建立同步區塊'); return; }
+    const selected = convert ? editor.getSelection()?.blocks ?? [currentBlock()] : [];
+    if (hasSynced(selected)) { setSyncedError('同步區塊不能放在另一個同步區塊裡'); return; }
+    const snapshot = JSON.stringify(selected);
+    setCreatingSynced(true);
+    try {
+      const created = await createSyncedBlock(selected.length ? selected : [{ type: 'paragraph', content: [] }]);
+      if (selected.length) {
+        const current = selected.map(block => editor.getBlock(block.id));
+        if (JSON.stringify(current) !== snapshot) {
+          setSyncedError('選取內容已變更，請重新轉成同步區塊；剛建立的內容仍可從既有同步區塊清單取回');
+          return;
+        }
+        editor.replaceBlocks(selected, [{ type: 'syncedBlock', props: { syncedBlockId: created.id } }]);
+      } else addReference(created.id);
+    } catch (failure) { setSyncedError(failure instanceof Error ? failure.message : '同步區塊建立失敗，請重試'); }
+    finally { setCreatingSynced(false); }
+  };
+  const showExisting = async () => {
+    setExistingOpen(true); setSyncedError('');
+    if (!navigator.onLine) { setSyncedError('連線後可查看既有同步區塊'); return; }
+    try {
+      const response = await api('/api/synced-blocks', undefined, AbortSignal.timeout(8000));
+      if (!response.ok) throw new Error('同步區塊清單載入失敗，請重試');
+      const result = await response.json() as SyncedMetadata[] | { blocks: SyncedMetadata[] };
+      setExistingBlocks(Array.isArray(result) ? result : result.blocks);
+    } catch (failure) { setSyncedError(failure instanceof Error ? failure.message : '同步區塊清單載入失敗，請重試'); }
+  };
   return (
+    <SyncedBlocksProvider ownerId={session.ownerId} pageId={session.pageId} generation={session.generation}
+      checkAccess={session.checkAccess} readOnly={readOnly} report={reportSynced}>
     <section className="editor-document">
       <div className="document-heading">
         {icon && <div className="document-icon">{icon}</div>}
@@ -582,7 +658,7 @@ export function Editor({
             {ready ? (readOnly ? "僅供檢視" : "可編輯") : "載入中"}
           </span>
           <Text size="xs" c="dimmed" data-testid="local-status" className="editor-local-status">
-            {local}
+            {effectiveLocal}
           </Text>
           <Group
             gap={5}
@@ -593,7 +669,7 @@ export function Editor({
           >
             <CloudIcon size={15} aria-hidden="true" />
             <Text size="xs" data-testid="cloud-status">
-              {readOnly ? "僅保留在本機" : cloud}
+              {readOnly ? "僅保留在本機" : effectiveCloud}
             </Text>
           </Group>
           {retry && (
@@ -607,6 +683,7 @@ export function Editor({
                 if (!provider.wsconnected && navigator.onLine)
                   reconnect.current();
                 void window.probe?.flush();
+                window.dispatchEvent(new Event('p-note:synced-blocks-retry'));
               }}
             >
               重試儲存
@@ -618,6 +695,14 @@ export function Editor({
             <Text size="xs" c="dimmed" className="editor-shortcut">
               輸入 / 新增區塊
             </Text>
+            {title && <Menu position="bottom-end" width={230}>
+              <Menu.Target><Button variant="subtle" color="gray" size="compact-xs" aria-label="同步區塊操作">同步區塊</Button></Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item disabled={creatingSynced} onClick={() => void createSynced(false)}>新增同步區塊</Menu.Item>
+                <Menu.Item disabled={creatingSynced} onClick={() => void createSynced(true)}>轉成同步區塊</Menu.Item>
+                <Menu.Item onClick={() => void showExisting()}>引用既有同步區塊</Menu.Item>
+              </Menu.Dropdown>
+            </Menu>}
             {title && (
               <Tooltip label="插入圖片" withArrow={false}>
                 <ActionIcon
@@ -716,6 +801,7 @@ export function Editor({
                     )}
                   </>
                 )}
+                {title && <Menu.Item disabled={creatingSynced} onClick={() => void createSynced(true)}>轉成同步區塊</Menu.Item>}
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
@@ -745,6 +831,12 @@ export function Editor({
           </Group>
         )}
       </div>
+      {syncedError && <Alert className="editor-error" color="red" role="alert" my="sm">{syncedError}</Alert>}
+      <Modal opened={existingOpen} onClose={() => setExistingOpen(false)} title="引用既有同步區塊" centered>
+        <Stack>{existingBlocks?.map(block => <Button variant="default" key={block.id} onClick={() => { addReference(block.id); setExistingOpen(false); }}>{block.id}</Button>)}
+          {!existingBlocks?.length && <Text size="sm">目前沒有同步區塊</Text>}
+        </Stack>
+      </Modal>
       {copyError && (
         <Alert className="editor-error" color="red" role="alert" my="sm">
           {copyError}
@@ -762,9 +854,25 @@ export function Editor({
         className="writing-surface"
         data-active-block={toolsOpen ? activeBlock?.id : undefined}
         onClickCapture={(event) => followNoteLink(event, setLinkError)}
-        onKeyDownCapture={(event) => selectNoteLinkSuggestion(event, editor)}
+        onKeyDownCapture={(event) => {
+          if (!(event.target instanceof Element && event.target.closest('.synced-block'))) selectNoteLinkSuggestion(event, editor);
+        }}
+        onPasteCapture={event => {
+          if (readOnly || event.target instanceof Element && event.target.closest('.synced-block')) return;
+          const text = event.clipboardData.getData('text/plain').trim();
+          const id = text.startsWith(SYNCED_CLIPBOARD_PREFIX) ? text.slice(SYNCED_CLIPBOARD_PREFIX.length) : '';
+          if (!/^[\w-]{1,80}$/.test(id)) return;
+          event.preventDefault(); event.stopPropagation(); addReference(id);
+        }}
       >
-        <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly}>
+        <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly} slashMenu={false} formattingToolbar={false}>
+          <ResponsiveFormattingToolbar />
+          <SuggestionMenuController triggerCharacter="/" getItems={async query => {
+            const items = getDefaultReactSlashMenuItems(editor);
+            if (title && !readOnly) items.push({ title: '同步區塊', subtext: '建立可在多個頁面同步編輯的內容', group: '基本區塊', aliases: ['sync', 'synced', '同步'], onItemClick: () => void createSynced(false) });
+            const needle = query.toLocaleLowerCase();
+            return items.filter(item => item.title.toLocaleLowerCase().includes(needle) || item.aliases?.some(alias => alias.toLocaleLowerCase().includes(needle)));
+          }} />
           {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
           {ownerId && <NoteLinkIcons editor={editor} owner={ownerId} disabled={readOnly} controller={noteLinkIcons} />}
         </BlockNoteView>
@@ -833,6 +941,7 @@ export function Editor({
         </Modal>
       )}
     </section>
+    </SyncedBlocksProvider>
   );
 }
 
@@ -935,5 +1044,5 @@ export async function start(
       if (!checkAccess || !downloaded) throw failure;
     });
   }
-  return { doc, cache, provider, room, checkAccess };
+  return { doc, cache, provider, room, checkAccess, ownerId: scope[0], pageId: scope[1], generation: scope[2] };
 }

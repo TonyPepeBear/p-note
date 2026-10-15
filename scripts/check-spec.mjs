@@ -15,6 +15,7 @@ async function markdownFiles(dir) {
 
 const files = ['README.md', ...await markdownFiles('docs'), ...await markdownFiles('openspec')];
 const ids = [];
+const idSources = new Map();
 let links = 0;
 for (const file of files) {
   const text = await readFile(file, 'utf8');
@@ -27,14 +28,23 @@ for (const file of files) {
     const found = Array.from(text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g));
     assert.equal(found.length, Array.from(text.matchAll(/^#### Scenario:/gm)).length, `${file}: 情境缺驗證方法`);
     for (const [, id, method] of found) {
-      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|HIST|ICON)-\d{2}$/.test(id), id);
+      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB|HIST|ICON)-\d{2}$/.test(id), id);
       assert(method.includes('斷言') || method.includes('檢查'), `${id}: 缺機器斷言`);
-      ids.push(id);
+      const capability = file.match(/\/specs\/([^/]+)\//)?.[1];
+      const sources = idSources.get(id) ?? [];
+      // 主規格與同能力的單一變更可共用既有 ID，代表修改同一驗收情境。
+      if (sources.length) {
+        assert.equal(sources.length, 1, `${id}: 同時存在多份變更`);
+        assert.equal(sources[0].capability, capability, `${id}: 不同能力重複編號`);
+        assert.notEqual(sources[0].file.includes('/changes/'), file.includes('/changes/'), `${id}: 重複情境`);
+      } else ids.push(id);
+      sources.push({ file, capability }); idSources.set(id, sources);
     }
   }
 }
-assert.equal(ids.filter(id => !/^(DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|ASSET|HIST|ICON)-/.test(id)).length, 42);
-assert.deepEqual(ids.filter(id => id.startsWith('ASSET-')).sort(), Array.from({ length: 9 }, (_, i) => `ASSET-0${i + 1}`));
+for (const [prefix, count] of Object.entries({ AUTH: 8, PAGE: 8, EDIT: 5, SYNC: 12, ASSET: 9, BACKUP: 9 })) {
+  assert.deepEqual(ids.filter(id => id.startsWith(`${prefix}-`)).sort(), Array.from({ length: count }, (_, i) => `${prefix}-${String(i + 1).padStart(2, '0')}`));
+}
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Array.from({ length: 11 }, (_, i) => `UI-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UX-')))].sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
@@ -45,9 +55,12 @@ assert.deepEqual(ids.filter(id => id.startsWith('CICD-')).sort(), ['CICD-01', 'C
 assert.deepEqual(ids.filter(id => id.startsWith('LINK-')).sort(), Array.from({ length: 6 }, (_, i) => `LINK-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('PWA-')).sort(), Array.from({ length: 6 }, (_, i) => `PWA-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('PLUGIN-')).sort(), Array.from({ length: 8 }, (_, i) => `PLUGIN-0${i + 1}`));
+assert.deepEqual(ids.filter(id => id.startsWith('SB-')).sort(), Array.from({ length: 22 }, (_, i) => `SB-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('HIST-')).sort(), Array.from({ length: 6 }, (_, i) => `HIST-0${i + 1}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('ICON-')))].sort(), ['ICON-01', 'ICON-02', 'ICON-03', 'ICON-04']);
-assert.equal(new Set(ids).size, 146);
+// 依能力驗證完整編號，避免新增能力後仍被歷史情境總數擋住。
+assert.equal(new Set(ids).size, ids.length, '情境 ID 必須唯一');
+
 const scope = await readFile('docs/v1-scope.md', 'utf8');
 for (const value of ['固定到期', '30×24 小時', '伺服器可讀內容', '已下載內文可離線', '10 分鐘', '60 秒', '最多 5 次', '最多 20 次', '10 MiB', '03:00', '0 19 * * *', '90×24 小時', 'Asia/Taipei', 'ZIP']) assert(scope.includes(value), `缺決策 ${value}`);
 const contracts = {
