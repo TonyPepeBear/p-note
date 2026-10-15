@@ -15,6 +15,7 @@ import {
 import { IconArrowLeft, IconKey, IconPlus } from "@tabler/icons-react";
 import { api } from "./api";
 import { McpConnections } from './mcp-connections';
+import { LocalCacheSettings } from "./local-cache-settings";
 import "./settings.css";
 
 type KeyInfo = {
@@ -274,6 +275,7 @@ export function ApiKeySettings({
         </Stack>
       </section>
       <McpConnections unauthorized={unauthorized} />
+      <LocalCacheSettings />
 
       <Modal
         opened={!!selected}

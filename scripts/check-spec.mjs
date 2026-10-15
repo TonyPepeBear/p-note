@@ -46,7 +46,7 @@ for (const [prefix, count] of Object.entries({ AUTH: 8, PAGE: 8, EDIT: 5, SYNC: 
   assert.deepEqual(ids.filter(id => id.startsWith(`${prefix}-`)).sort(), Array.from({ length: count }, (_, i) => `${prefix}-${String(i + 1).padStart(2, '0')}`));
 }
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
-assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Array.from({ length: 10 }, (_, i) => `UI-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Array.from({ length: 11 }, (_, i) => `UI-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UX-')))].sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({ length: 6 }, (_, i) => `KEY-0${i + 1}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('LFN-')))].sort(), Array.from({ length: 7 }, (_, i) => `LFN-0${i + 1}`));
@@ -60,6 +60,7 @@ assert.deepEqual(ids.filter(id => id.startsWith('HIST-')).sort(), Array.from({ l
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('ICON-')))].sort(), ['ICON-01', 'ICON-02', 'ICON-03', 'ICON-04']);
 // 依能力驗證完整編號，避免新增能力後仍被歷史情境總數擋住。
 assert.equal(new Set(ids).size, ids.length, '情境 ID 必須唯一');
+
 const scope = await readFile('docs/v1-scope.md', 'utf8');
 for (const value of ['固定到期', '30×24 小時', '伺服器可讀內容', '已下載內文可離線', '10 分鐘', '60 秒', '最多 5 次', '最多 20 次', '10 MiB', '03:00', '0 19 * * *', '90×24 小時', 'Asia/Taipei', 'ZIP']) assert(scope.includes(value), `缺決策 ${value}`);
 const contracts = {
