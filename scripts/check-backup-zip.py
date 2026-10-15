@@ -9,8 +9,11 @@ for path in archives:
     with zipfile.ZipFile(path) as archive:
         assert archive.testzip() is None, 'CRC 校驗必須通過'
         manifest = json.loads(archive.read('manifest.json'))
-        files = [item['file'] for item in manifest['pages'] + manifest['assets']]
-        names = ['manifest.json'] + [file['path'] for file in files]
+        synced = manifest.get('synced_blocks', [])
+        files = [item['file'] for item in manifest['pages'] + synced + manifest['assets']]
+        names = (['manifest.json'] + [file['path'] for file in files]
+                 + [f"readable/pages/{item['metadata']['id']}.md" for item in manifest['pages']]
+                 + [f"readable/synced-blocks/{item['metadata']['id']}.md" for item in synced])
         assert len(names) == len(set(names)), '清單檔名不得重複'
         assert sorted(archive.namelist()) == sorted(names)
         for file in files:

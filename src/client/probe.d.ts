@@ -6,7 +6,7 @@ import type { Doc } from 'yjs';
 declare global {
   interface Window {
     probe?: {
-      editor: BlockNoteEditor;
+      editor: BlockNoteEditor<any, any, any>;
       doc: Doc;
       provider: YProvider;
       cache: IndexeddbPersistence;

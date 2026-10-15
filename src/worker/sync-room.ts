@@ -7,13 +7,18 @@ import { VISIBLE } from './pages';
 import { roomName } from '../shared/room';
 import * as Y from 'yjs';
 import { noteLinkId } from '../shared/note-links';
+import { syncedBlockIds } from '../shared/synced-blocks';
+import { fromBase64 } from 'lib0/buffer';
+import * as decoding from 'lib0/decoding';
 
-type Permission = { session: string; owner: string; page: string; generation: string; allowed: boolean };
-type Scope = Pick<Permission, 'owner' | 'page' | 'generation'>;
+type Permission = { session: string; owner: string; page: string; generation: string; allowed: boolean; kind?: 'syncedBlock'; referencePage?: string };
+export type Scope = Pick<Permission, 'owner' | 'page' | 'generation' | 'kind'>;
+const scopeRoomName = (scope: Scope) => roomName(scope.owner, scope.kind === 'syncedBlock' ? `synced-block:${scope.page}` : scope.page, scope.generation);
 
 export class SyncRoom extends ProbeRoom {
   private permissionTail: Promise<void> = Promise.resolve();
   private paused = false;
+  private confirmations: { connection: Connection; message: string }[] | undefined;
   protected async now(): Promise<number> { return Date.now(); }
   async onStart(): Promise<void> {
     this.paused = await this.ctx.storage.get<boolean>('page-paused') ?? false;
@@ -30,11 +35,24 @@ export class SyncRoom extends ProbeRoom {
 
   private async valid(state: Permission | null): Promise<boolean> {
     if (!state || this.paused) return false;
-    const row = await this.env.DB.prepare(`${VISIBLE} SELECT session.expiresAt FROM session JOIN user ON user.id = session.userId
+    const row = state.kind === 'syncedBlock'
+      ? await this.env.DB.prepare(`${VISIBLE} SELECT session.expiresAt FROM session JOIN user ON user.id = session.userId
+      JOIN synced_blocks block ON block.owner_id = user.id JOIN visible page ON page.owner_id = user.id
+      WHERE session.id = ? AND user.id = ? AND lower(user.email) = ?
+      AND block.id = ? AND block.sync_generation = ? AND page.id = ?`)
+      .bind(state.owner, state.session, state.owner, this.env.OWNER_EMAIL.toLowerCase(), state.page, state.generation, state.referencePage ?? '').first<{ expiresAt: string }>()
+      : await this.env.DB.prepare(`${VISIBLE} SELECT session.expiresAt FROM session JOIN user ON user.id = session.userId
       JOIN pages ON pages.owner_id = user.id WHERE session.id = ? AND user.id = ? AND user.email = ?
       AND pages.id = ? AND pages.sync_generation = ? AND pages.id IN (SELECT id FROM visible)`)
       .bind(state.owner, state.session, state.owner, this.env.OWNER_EMAIL.toLowerCase(), state.page, state.generation).first<{ expiresAt: string }>();
-    return !!row && new Date(row.expiresAt).getTime() > await this.now();
+    if (!row || new Date(row.expiresAt).getTime() <= await this.now()) return false;
+    if (state.kind === 'syncedBlock') {
+      const page = await this.env.DB.prepare(`${VISIBLE} SELECT sync_generation FROM visible WHERE id = ?`).bind(state.owner, state.referencePage ?? '').first<{ sync_generation: string }>();
+      if (!page) return false;
+      return this.env.SYNC.getByName(await roomName(state.owner, state.referencePage!, page.sync_generation))
+        .hasSyncedBlockReference({ owner: state.owner, page: state.referencePage!, generation: page.sync_generation }, state.page);
+    }
+    return true;
   }
 
   private async prune(): Promise<void> {
@@ -48,8 +66,10 @@ export class SyncRoom extends ProbeRoom {
 
   async onConnect(connection: Connection<Permission>, context: ConnectionContext): Promise<void> {
     const headers = context.request.headers;
-    connection.setState({ session: headers.get('x-p-note-session') ?? '', owner: headers.get('x-p-note-owner') ?? '', page: headers.get('x-p-note-page') ?? '', generation: headers.get('x-p-note-generation') ?? '', allowed: false });
-    await this.ctx.storage.put('scope', { owner: connection.state!.owner, page: connection.state!.page, generation: connection.state!.generation });
+    connection.setState({ session: headers.get('x-p-note-session') ?? '', owner: headers.get('x-p-note-owner') ?? '', page: headers.get('x-p-note-page') ?? '', generation: headers.get('x-p-note-generation') ?? '', allowed: false,
+      ...(headers.get('x-p-note-kind') === 'syncedBlock' ? { kind: 'syncedBlock', referencePage: headers.get('x-p-note-reference-page') ?? '' } : {}) });
+    const { owner, page, generation, kind } = connection.state!;
+    await this.ctx.storage.put('scope', { owner, page, generation, ...(kind ? { kind } : {}) });
     await this.prune(); if (connection.state?.allowed) super.onConnect(connection, context);
   }
 
@@ -57,11 +77,64 @@ export class SyncRoom extends ProbeRoom {
     const work = this.permissionTail.then(async () => {
       await this.prune();
       if (connection.state?.allowed) {
-        await super.onMessage(connection, message);
-        await this.index(connection.state).catch(() => {});
+        try { await this.validateUpdate(connection.state, message); }
+        catch {
+          let id: string | undefined;
+          try { if (typeof message === 'string' && message.startsWith('__YPS:')) id = JSON.parse(message.slice(6)).id; } catch { /* 保留無效訊息的拒絕回覆。 */ }
+          super.sendCustomMessage(connection, JSON.stringify({ type: 'error', id, message: '區塊內容或同步引用無效，更新未保存' })); return;
+        }
+        await this.prune(); if (!connection.state?.allowed) return;
+        this.confirmations = [];
+        try {
+          await super.onMessage(connection, message);
+          await this.index(connection.state).catch(() => {});
+          for (const reply of this.confirmations) super.sendCustomMessage(reply.connection, reply.message);
+        } finally { this.confirmations = undefined; }
       }
     });
     this.permissionTail = work.catch(() => {}); return work;
+  }
+
+  sendCustomMessage(connection: Connection, message: string): void {
+    if (this.confirmations && JSON.parse(message).type === 'persisted') this.confirmations.push({ connection, message });
+    else super.sendCustomMessage(connection, message);
+  }
+
+  private async validateUpdate(scope: Scope, message: string | ArrayBuffer): Promise<void> {
+    let update: Uint8Array | undefined;
+    if (typeof message === 'string') {
+      if (message.length > 512 * 1024 * 1.4 + 256 || !message.startsWith('__YPS:')) return;
+      const value = JSON.parse(message.slice(6));
+      if (value.type === 'commit' && typeof value.update === 'string') update = fromBase64(value.update);
+    } else {
+      if (message.byteLength > 512 * 1024 + 16) return;
+      const decoder = decoding.createDecoder(new Uint8Array(message));
+      if (decoding.readVarUint(decoder) === 0) {
+        const subtype = decoding.readVarUint(decoder);
+        if (subtype === 1 || subtype === 2) update = decoding.readVarUint8Array(decoder);
+      }
+    }
+    if (!update || update.byteLength > 512 * 1024) return;
+    const candidate = new Y.Doc();
+    try {
+      Y.applyUpdate(candidate, Y.encodeStateAsUpdate(this.document)); Y.applyUpdate(candidate, update);
+      const fragment = candidate.getXmlFragment('body');
+      const references = (nodes: unknown[]): boolean => nodes.some(node => node instanceof Y.XmlElement
+        && (node.nodeName === 'syncedBlock' || references(node.toArray())));
+      const hasReference = references(fragment.toArray());
+      // 舊頁面同步也接受 Y.Text；同步區塊正文則必須是可驗證的 XML 區塊。
+      if (fragment.toArray().some(node => !(node instanceof Y.XmlElement) && !(node instanceof Y.XmlText))) {
+        if (scope.kind === 'syncedBlock' || hasReference) throw new Error('同步區塊正文不是 XML 區塊');
+        return;
+      }
+      if (scope.kind === 'syncedBlock' || hasReference) {
+        const editor = blockEditor();
+        await validatedBlocks(readBlocks(candidate, editor), this.env, scope.owner, editor, { allowSyncedBlocks: scope.kind !== 'syncedBlock' });
+      }
+      const refs = syncedBlockIds(fragment);
+      if (scope.kind === 'syncedBlock' && refs.length) throw new Error('同步區塊不能巢狀引用');
+      for (const id of refs) if (!await this.env.DB.prepare('SELECT 1 FROM synced_blocks WHERE id = ? AND owner_id = ?').bind(id, scope.owner).first()) throw new Error('無效同步區塊引用');
+    } finally { candidate.destroy(); }
   }
 
   async onClose(connection: Connection, code: number, reason: string, wasClean: boolean): Promise<void> {
@@ -93,13 +166,29 @@ export class SyncRoom extends ProbeRoom {
     this.permissionTail = work.catch(() => {}); return work;
   }
 
+  async hasSyncedBlockReference(scope: Scope, id: string): Promise<boolean> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(async () => {
+      if (scope.kind || this.paused || await scopeRoomName(scope) !== this.name) return false;
+      const page = await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND sync_generation = ?`).bind(scope.owner, scope.page, scope.generation).first();
+      if (!page) return false;
+      const doc = await this.onLoad();
+      try { return syncedBlockIds(doc.getXmlFragment('body')).includes(id); } finally { doc.destroy(); }
+    });
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
   async content(scope: Scope, credential: ContentCredential, input?: { blocks: unknown; etag: string }): Promise<{ status: number; message?: string; blocks?: ReturnType<typeof readBlocks>; etag?: string }> {
     await this.setName(this.ctx.id.name!);
     const work = this.permissionTail.then(async () => {
       try {
         if (!await contentPermission(this.env, credential, scope.owner, !!input, await this.now())) return { status: 401, message: 'API key 無效或已撤銷' };
-        if (this.paused || await roomName(scope.owner, scope.page, scope.generation) !== this.name) return { status: 409, message: '頁面狀態已改變' };
-        const allowed = await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND sync_generation = ?
+        if (this.paused || await scopeRoomName(scope) !== this.name) return { status: 409, message: '頁面狀態已改變' };
+        const allowed = scope.kind === 'syncedBlock'
+          ? await this.env.DB.prepare(`SELECT 1 FROM synced_blocks WHERE owner_id = ? AND id = ? AND sync_generation = ?
+          AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
+          AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(scope.owner, scope.page, scope.generation, scope.owner, scope.owner).first()
+          : await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND sync_generation = ?
           AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
           AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(scope.owner, scope.page, scope.generation, scope.owner, scope.owner).first();
         if (!allowed) return { status: 409, message: '頁面狀態已改變' };
@@ -110,7 +199,7 @@ export class SyncRoom extends ProbeRoom {
           const etag = '"' + scope.generation + ':' + await keyHash(Array.from(before).join(',')) + '"';
           if (!input) return { status: 200, blocks: readBlocks(doc, editor), etag };
           if (input.etag !== etag) return { status: 412, message: '正文已更新，請重新讀取後再修改' };
-          const blocks = await validatedBlocks(input.blocks, this.env, scope.owner, editor);
+          const blocks = await validatedBlocks(input.blocks, this.env, scope.owner, editor, { allowSyncedBlocks: scope.kind !== 'syncedBlock' });
           const vector = Y.encodeStateVector(doc);
           replaceBlocks(doc, blocks, editor);
           const output = readBlocks(doc, editor);
@@ -141,8 +230,8 @@ export class SyncRoom extends ProbeRoom {
   async capture(scope: Scope): Promise<{ data: Uint8Array; checkpoint: number; generation: string; capturedAt: number }> {
     await this.setName(this.ctx.id.name!);
     const work = this.permissionTail.then(async () => {
-      const matches = async () => await roomName(scope.owner, scope.page, scope.generation) === this.name
-        && !!await this.env.DB.prepare(`SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?
+      const matches = async () => await scopeRoomName(scope) === this.name
+        && !!await this.env.DB.prepare(`SELECT 1 FROM ${scope.kind === 'syncedBlock' ? 'synced_blocks' : 'pages'} WHERE id = ? AND owner_id = ? AND sync_generation = ?
           AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(scope.page, scope.owner, scope.generation, scope.owner).first();
       if (!await matches()) throw new Error('備份頁面世代或結構已變更');
       await this.ctx.storage.sync();
@@ -162,8 +251,8 @@ export class SyncRoom extends ProbeRoom {
   async prepare(scope: Scope, data: Uint8Array, checkpoint: number): Promise<void> {
     await this.setName(this.ctx.id.name!);
     const work = this.permissionTail.then(async () => {
-      if (await roomName(scope.owner, scope.page, scope.generation) !== this.name
-        || await this.env.DB.prepare('SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?').bind(scope.page, scope.owner, scope.generation).first()) throw new Error('不能覆寫活躍房間');
+      if (await scopeRoomName(scope) !== this.name
+        || await this.env.DB.prepare(`SELECT 1 FROM ${scope.kind === 'syncedBlock' ? 'synced_blocks' : 'pages'} WHERE id = ? AND owner_id = ? AND sync_generation = ?`).bind(scope.page, scope.owner, scope.generation).first()) throw new Error('不能覆寫活躍房間');
       const candidate = new Y.Doc(); let expected: Uint8Array;
       try { Y.applyUpdate(candidate, data); expected = Y.encodeStateAsUpdate(candidate); } finally { candidate.destroy(); }
       const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', expected)), value => value.toString(16).padStart(2, '0')).join('');
@@ -184,9 +273,9 @@ export class SyncRoom extends ProbeRoom {
   }
 
   private async index(scope: Scope): Promise<void> {
-    if (await roomName(scope.owner, scope.page, scope.generation) !== this.name) return;
+    if (await scopeRoomName(scope) !== this.name) return;
     const modified = this.ctx.storage.sql.exec<{ modified_at: number }>('SELECT modified_at FROM document_metadata WHERE id = 1').toArray()[0]?.modified_at;
-    if (modified !== undefined) await this.env.DB.prepare('UPDATE pages SET updated_at = MAX(updated_at, ?) WHERE id = ? AND owner_id = ? AND sync_generation = ?')
+    if (modified !== undefined) await this.env.DB.prepare(`UPDATE ${scope.kind === 'syncedBlock' ? 'synced_blocks' : 'pages'} SET updated_at = MAX(updated_at, ?) WHERE id = ? AND owner_id = ? AND sync_generation = ?`)
       .bind(modified, scope.page, scope.owner, scope.generation).run();
     const fragment = this.document.getXmlFragment('body');
     const linked = new Set<string>();
@@ -199,10 +288,29 @@ export class SyncRoom extends ProbeRoom {
     const plain = Array.from(fragment.createTreeWalker(node => node instanceof Y.XmlText))
       .map(node => (node as Y.XmlText).toDelta().map((part: { insert: unknown }) => typeof part.insert === 'string' ? part.insert : '').join('')).join('\n').normalize('NFC');
     const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
-    await this.env.DB.prepare(`INSERT INTO page_search (page_id, owner_id, plain_text, summary, indexed_generation, indexed_checkpoint, linked_pages) SELECT ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?)
+    if (scope.kind === 'syncedBlock') {
+      await this.env.DB.prepare(`INSERT INTO synced_block_search (synced_block_id, owner_id, plain_text, linked_pages, indexed_generation, indexed_checkpoint)
+        SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM synced_blocks WHERE id = ? AND owner_id = ? AND sync_generation = ?)
+        ON CONFLICT(synced_block_id) DO UPDATE SET plain_text = excluded.plain_text, linked_pages = excluded.linked_pages,
+          indexed_generation = excluded.indexed_generation, indexed_checkpoint = excluded.indexed_checkpoint
+        WHERE excluded.indexed_generation <> synced_block_search.indexed_generation OR excluded.indexed_checkpoint >= synced_block_search.indexed_checkpoint`)
+        .bind(scope.page, scope.owner, plain, JSON.stringify([...linked].sort()), scope.generation, checkpoint, scope.page, scope.owner, scope.generation).run();
+      return;
+    }
+    const refs = syncedBlockIds(fragment);
+    await this.env.DB.batch([this.env.DB.prepare(`INSERT INTO page_search (page_id, owner_id, plain_text, summary, indexed_generation, indexed_checkpoint, linked_pages) SELECT ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?)
       ON CONFLICT(page_id) DO UPDATE SET plain_text = excluded.plain_text, summary = excluded.summary, indexed_generation = excluded.indexed_generation, indexed_checkpoint = excluded.indexed_checkpoint, linked_pages = excluded.linked_pages
       WHERE excluded.indexed_generation <> page_search.indexed_generation OR excluded.indexed_checkpoint >= page_search.indexed_checkpoint`)
-      .bind(scope.page, scope.owner, plain, plain.slice(0, 160), scope.generation, checkpoint, JSON.stringify([...linked].sort()), scope.page, scope.owner, scope.generation).run();
+      .bind(scope.page, scope.owner, plain, plain.slice(0, 160), scope.generation, checkpoint, JSON.stringify([...linked].sort()), scope.page, scope.owner, scope.generation),
+    this.env.DB.prepare(`DELETE FROM page_synced_blocks WHERE page_id = ? AND EXISTS
+      (SELECT 1 FROM page_search JOIN pages ON pages.id = page_search.page_id WHERE pages.id = ? AND pages.owner_id = ?
+      AND pages.sync_generation = ? AND page_search.indexed_generation = ? AND page_search.indexed_checkpoint = ?)`)
+      .bind(scope.page, scope.page, scope.owner, scope.generation, scope.generation, checkpoint),
+    this.env.DB.prepare(`INSERT INTO page_synced_blocks (page_id, synced_block_id) SELECT ?, json_each.value FROM json_each(?)
+      JOIN synced_blocks ON synced_blocks.id = json_each.value AND synced_blocks.owner_id = ? WHERE EXISTS
+      (SELECT 1 FROM page_search JOIN pages ON pages.id = page_search.page_id WHERE pages.id = ? AND pages.owner_id = ?
+      AND pages.sync_generation = ? AND page_search.indexed_generation = ? AND page_search.indexed_checkpoint = ?)`)
+      .bind(scope.page, JSON.stringify(refs), scope.owner, scope.page, scope.owner, scope.generation, scope.generation, checkpoint)]);
   }
 }
 function equal(a: Uint8Array, b: Uint8Array): boolean { return a.length === b.length && a.every((value, index) => value === b[index]); }

@@ -124,8 +124,12 @@ export async function handlePages(request: Request, env: Env, owner: string, now
       if (!await visiblePage(db, owner, backlinks[1])) fail(404, '找不到頁面');
       return json((await db.prepare(`${VISIBLE} SELECT p.id, p.title, p.kind, p.journal_date FROM visible p
         JOIN page_search s ON s.page_id = p.id AND s.owner_id = p.owner_id AND s.indexed_generation = p.sync_generation
-        WHERE p.id <> ? AND EXISTS (SELECT 1 FROM json_each(s.linked_pages) WHERE value = ?)
-        ORDER BY p.updated_at DESC, p.id`).bind(owner, backlinks[1], backlinks[1]).all()).results);
+        WHERE p.id <> ? AND (EXISTS (SELECT 1 FROM json_each(s.linked_pages) WHERE value = ?)
+          OR EXISTS (SELECT 1 FROM page_synced_blocks r
+            JOIN synced_blocks b ON b.id = r.synced_block_id AND b.owner_id = p.owner_id
+            JOIN synced_block_search bs ON bs.synced_block_id = b.id AND bs.owner_id = b.owner_id AND bs.indexed_generation = b.sync_generation
+            WHERE r.page_id = p.id AND EXISTS (SELECT 1 FROM json_each(bs.linked_pages) WHERE value = ?)))
+        ORDER BY p.updated_at DESC, p.id`).bind(owner, backlinks[1], backlinks[1], backlinks[1]).all()).results);
     }
     if (path === '/api/pages') return json((await db.prepare(`${VISIBLE} SELECT * FROM visible ORDER BY created_at, id`).bind(owner).all<PageRow>()).results);
     if (path === '/api/trash') return json((await db.prepare('SELECT * FROM pages WHERE owner_id = ? AND deleted_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE page_id = pages.id) ORDER BY deleted_at DESC, id').bind(owner).all<PageRow>()).results);
@@ -138,8 +142,18 @@ export async function handlePages(request: Request, env: Env, owner: string, now
       const q = (url.searchParams.get('q') ?? '').trim().normalize('NFC');
       if (q.length > 200) fail(400, '搜尋最多 200 個字元');
       if (!q) return json([]);
-      return json((await db.prepare(`${VISIBLE} SELECT p.*, COALESCE(s.summary, '') AS summary FROM visible p LEFT JOIN page_search s ON s.page_id = p.id AND s.owner_id = p.owner_id AND s.indexed_generation = p.sync_generation
-        WHERE instr(lower(p.title), lower(?)) > 0 OR instr(lower(s.plain_text), lower(?)) > 0 ORDER BY p.updated_at DESC, p.id`).bind(owner, q, q).all()).results);
+      return json((await db.prepare(`${VISIBLE}, synced_text AS (
+          SELECT r.page_id, group_concat(bs.plain_text, char(10)) AS plain_text FROM page_synced_blocks r
+          JOIN visible vp ON vp.id = r.page_id
+          JOIN page_search ps ON ps.page_id = vp.id AND ps.owner_id = vp.owner_id AND ps.indexed_generation = vp.sync_generation
+          JOIN synced_blocks b ON b.id = r.synced_block_id AND b.owner_id = vp.owner_id
+          JOIN synced_block_search bs ON bs.synced_block_id = b.id AND bs.owner_id = b.owner_id AND bs.indexed_generation = b.sync_generation
+          GROUP BY r.page_id
+        ) SELECT p.*, CASE WHEN instr(lower(st.plain_text), lower(?)) > 0 THEN substr(st.plain_text, 1, 160) ELSE COALESCE(s.summary, '') END AS summary
+        FROM visible p LEFT JOIN page_search s ON s.page_id = p.id AND s.owner_id = p.owner_id AND s.indexed_generation = p.sync_generation
+        LEFT JOIN synced_text st ON st.page_id = p.id
+        WHERE instr(lower(p.title), lower(?)) > 0 OR instr(lower(s.plain_text), lower(?)) > 0 OR instr(lower(st.plain_text), lower(?)) > 0
+        ORDER BY p.updated_at DESC, p.id`).bind(owner, q, q, q, q).all()).results);
     }
   }
   const match = path.match(/^\/api\/pages\/([\w-]{1,80})(?:\/(title|move|delete|restore))?$/);

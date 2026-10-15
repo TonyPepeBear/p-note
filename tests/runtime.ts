@@ -5,6 +5,7 @@ import keysMigration from '../migrations/0005_api_keys.sql';
 import mcpMigration from '../migrations/0008_mcp_grants.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
+import syncedBlocksMigration from '../migrations/0009_synced_blocks.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
@@ -47,7 +48,10 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  // E2E reset 只清資料；避免每次引用輪詢重跑整份 DDL，阻塞同一個本機 D1。
+  // Workers reset 會清空 schema，下一個請求仍會完整初始化。
+  if (await env.DB.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'test_schema_ready_v9'").first()) return;
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration + syncedBlocksMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
@@ -58,13 +62,14 @@ async function setup(env: Env) {
   if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('page_search') WHERE name = 'linked_pages'").first()) {
     await env.DB.prepare(linksMigration.trim().replace(/;$/, '')).run();
   }
+  await env.DB.exec('CREATE TABLE IF NOT EXISTS test_schema_ready_v9 (id INTEGER PRIMARY KEY)');
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (!['127.0.0.1', 'localhost'].includes(new URL(request.url).hostname)) return new Response('僅本機測試', { status: 403 });
-    await setup(env);
     const path = new URL(request.url).pathname;
+    await setup(env);
     if (path.startsWith('/__test/')) {
       if (path === '/__test/storage-failure' && request.method === 'POST') {
         const { room, fail } = await request.json<{ room: string; fail: boolean }>();
@@ -73,8 +78,9 @@ export default {
       }
       if (path === '/__test/clear-product' && request.method === 'POST') {
         const pages = (await env.DB.prepare('SELECT id, owner_id, sync_generation FROM pages').all<{ id: string; owner_id: string; sync_generation: string }>()).results;
-        await env.DB.batch(['page_search', 'pages', 'assets'].map(table => env.DB.prepare(`DELETE FROM ${table}`)));
-        for (const page of pages) {
+        const synced = (await env.DB.prepare('SELECT id, owner_id, sync_generation FROM synced_blocks').all<{ id: string; owner_id: string; sync_generation: string }>()).results;
+        await env.DB.batch(['page_synced_blocks', 'synced_block_search', 'page_search', 'pages', 'synced_blocks', 'assets'].map(table => env.DB.prepare(`DELETE FROM ${table}`)));
+        for (const page of [...pages, ...synced.map(block => ({ ...block, id: `synced-block:${block.id}` }))]) {
           const room = await roomName(page.owner_id, page.id, page.sync_generation);
           await env.SYNC.getByName(room).fetch('http://127.0.0.1/__test/clear-storage').catch(() => {});
         }

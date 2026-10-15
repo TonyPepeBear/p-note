@@ -1,9 +1,10 @@
-import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
+import { BlockNoteEditor } from '@blocknote/core';
 import { blocksToYDoc, yDocToBlocks } from '@blocknote/core/yjs';
 import * as Y from 'yjs';
 import { PageError } from './pages';
+import { blockSchema, type AppPartialBlock } from '../shared/block-schema';
 
-export function blockEditor() { return BlockNoteEditor.create(); }
+export function blockEditor() { return BlockNoteEditor.create({ schema: blockSchema }); }
 const invalid = (): never => { throw new PageError(400, '無效區塊 JSON、屬性或圖片引用'); };
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid();
@@ -11,8 +12,8 @@ function object(value: unknown): Record<string, unknown> {
 }
 function only(value: Record<string, unknown>, keys: string[]) { if (Object.keys(value).some(k => !keys.includes(k))) invalid(); }
 function link(value: unknown) { if (typeof value !== 'string' || !/^(https?:\/\/|mailto:|\/[^/]|#)/i.test(value)) invalid(); }
-export async function validatedBlocks(value: unknown, env: Env, owner: string, editor: ReturnType<typeof blockEditor>): Promise<PartialBlock[]> {
-  let count = 0; const ids = new Set<string>(); const assets = new Set<string>();
+export async function validatedBlocks(value: unknown, env: Env, owner: string, editor: ReturnType<typeof blockEditor>, options: { allowSyncedBlocks?: boolean } = {}): Promise<AppPartialBlock[]> {
+  let count = 0; const ids = new Set<string>(); const assets = new Set<string>(); const syncedBlocks = new Set<string>();
   function inline(content: unknown, links = true): void {
     if (typeof content === 'string') return;
     if (!Array.isArray(content)) return invalid();
@@ -38,6 +39,12 @@ export async function validatedBlocks(value: unknown, env: Env, owner: string, e
       if (b.props !== undefined) for (const [name, v] of Object.entries(object(b.props))) {
         const prop = (schema.propSchema as Record<string, { default?: unknown; type?: string; values?: readonly unknown[] }>)[name];
         if (!prop || typeof v !== (prop.type ?? typeof prop.default) || (prop.values && !prop.values.includes(v)) || (typeof v === 'number' && !Number.isFinite(v))) invalid();
+      }
+      if (b.type === 'syncedBlock') {
+        if (options.allowSyncedBlocks === false || b.content !== undefined || (b.children !== undefined && (!Array.isArray(b.children) || b.children.length > 0))) invalid();
+        const id = b.props ? object(b.props).syncedBlockId : undefined;
+        if (typeof id !== 'string' || !/^[\w-]{1,80}$/.test(id)) invalid();
+        syncedBlocks.add(id as string);
       }
       if (['image', 'file', 'audio', 'video'].includes(b.type as string)) {
         const url = b.props ? object(b.props).url : undefined;
@@ -65,9 +72,11 @@ export async function validatedBlocks(value: unknown, env: Env, owner: string, e
   }
   walk(value, 0);
   for (const id of assets) if (!await env.DB.prepare('SELECT 1 FROM assets WHERE id = ? AND owner_id = ?').bind(id, owner).first()) invalid();
-  return value as PartialBlock[];
+  for (const id of syncedBlocks) if (!await env.DB.prepare(`SELECT 1 FROM synced_blocks WHERE id = ? AND owner_id = ?
+    AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)`).bind(id, owner, owner).first()) invalid();
+  return value as AppPartialBlock[];
 }
-export function replaceBlocks(doc: Y.Doc, blocks: PartialBlock[], editor: ReturnType<typeof blockEditor>) {
+export function replaceBlocks(doc: Y.Doc, blocks: AppPartialBlock[], editor: ReturnType<typeof blockEditor>) {
   // 在複製的文件替換 body，保留原 Yjs 歷史；成功落盤前不觸碰在線文件。
   const source = blocksToYDoc(editor, blocks.length ? blocks : [{ type: 'paragraph', content: '' }], 'body');
   try { const body = doc.getXmlFragment('body'); doc.transact(() => { body.delete(0, body.length); body.insert(0, source.getXmlFragment('body').toArray().map(node => { if (!(node instanceof Y.XmlElement) && !(node instanceof Y.XmlText)) return invalid(); return node.clone(); })); }); }

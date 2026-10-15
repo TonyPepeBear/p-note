@@ -24,6 +24,9 @@ Base URL：`https://note.tonypepe.com/api/v1`
 | GET | `/search?q=關鍵字` | 中文標題與正文搜尋，排除垃圾桶 |
 | GET | `/pages/:id/content` | 回傳 `{"blocks":[...]}` 及 ETag |
 | PUT | `/pages/:id/content` | 以 `{"blocks":[...]}` 更新正文，必須提供 `If-Match` |
+| GET | `/pages/:id/content?expandSyncedBlocks=true` | 保留頁面引用節點，另回傳 `syncedBlocks` 正文與各自 ETag |
+| GET | `/synced-blocks/:id/content` | 讀取單一同步區塊，回傳 `{"blocks":[...]}` 及該區塊 ETag |
+| PUT | `/synced-blocks/:id/content` | 以 `{"blocks":[...]}` 更新共用正文，必須提供該區塊的 `If-Match` |
 
 ## 正文範例
 
@@ -43,12 +46,64 @@ API 更新會通知正在開啟的網頁。PUT 是有版本保護的正文替換
 
 單次 JSON 最多 256 KiB、1,000 區塊、20 層 children。空 blocks 轉為空白段落。圖片等資產區塊只能使用帳號內已上傳的 `/api/assets/:id`，不支援用 API 上傳新圖。一般連結允許 HTTP(S)、mailto、站內路徑及錨點。
 
+## 同步區塊正文與引用
+
+頁面正文的同步區塊只保存引用節點。同一個同步 ID 可在同頁出現多次，各引用節點使用不同的節點 ID：
+
+```json
+{
+  "blocks": [
+    {"id":"reference-example","type":"syncedBlock","props":{"syncedBlockId":"shared-example"},"children":[]}
+  ]
+}
+```
+
+`PUT /pages/:id/content` 只接受 `blocks`，能新增或移除自己已有同步區塊的引用；不能夾帶 `syncedBlocks`、在引用節點加上 `content` 或非空 `children`，也不能使用未知或其他擁有者的同步 ID。移除引用保留共用正文。
+
+明確傳入 `expandSyncedBlocks=true` 時，回應仍保留原本的 `blocks`，並在 `syncedBlocks` 中按同步 ID 去重提供正文：
+
+```json
+{
+  "blocks": [
+    {"id":"reference-example","type":"syncedBlock","props":{"syncedBlockId":"shared-example"},"children":[]}
+  ],
+  "syncedBlocks": {
+    "shared-example": {
+      "blocks": [{"type":"paragraph","content":"共用內容"}],
+      "etag": "\"generation:hash\""
+    }
+  }
+}
+```
+
+HTTP `ETag` 標頭保護頁面正文與引用關係；展開項目的 `etag` 各自保護共用正文。共用正文應先以 `GET /synced-blocks/:id/content` 讀取，再使用該區塊的 ETag 呼叫相同路徑的 PUT。PUT 只接受 `{"blocks":[...]}`，不能巢狀同步區塊；成功後所有引用頁面都會同步更新。過時 ETag 回應 412，缺少 `If-Match` 回應 428。
+
+無法讀取某一個共用正文時，頁面與其他展開項目仍可取得；該項目改為 `{"status":404,"message":"找不到同步區塊"}` 等明確錯誤，不包含 `blocks`。用戶端不能把它當成空正文寫回。
+
+`syncedBlocks` 的 UTF-8 JSON 展開總量最多 8 MiB，包含同步 ID、ETag 與錯誤項目。第一個超出剩餘預算的項目及後續未讀取項目均回傳 `{"status":413,"message":"同步內容展開超過 8 MiB 限制，請分別讀取同步區塊"}`，不包含 `blocks`，並停止後續同步正文 RPC。頁面回應仍為 HTTP 200；需要這些內容時，分別使用單一同步區塊 GET 入口讀取。
+
+## 遠端 MCP
+
+遠端 MCP 共提供 12 個工具。同步區塊使用相同權限、JSON 驗證與版本保護：
+
+| 工具 | 參數與結果 |
+| --- | --- |
+| `get_content` | `page_id`；可加 `expand_synced_blocks: true` 取得上述 `syncedBlocks` 對照表及各項目錯誤 |
+| `update_content` | `page_id`、頁面 `etag`、完整 `blocks`；同步區塊只能增刪引用 |
+| `get_synced_block_content` | `synced_block_id`；回傳共用 `blocks` 與該區塊的 `etag` |
+| `update_synced_block_content` | `synced_block_id`、該區塊 `etag`、完整 `blocks`；更新所有引用處的共用內容 |
+
+讀取需要 `notes:read`，更新另外需要 `notes:write`；token 與仍有效的授權紀錄都必須具備所需 scope。412 時重新讀取並合併，網路失敗時先讀取確認結果，不盲目重送寫入。其餘工具與 OAuth 連線方式見 [plugin 說明](../plugins/p-note/README.md)。
+
+## 錯誤回應
+
 - 400：格式、日期、區塊或大小不符。
 - 401：缺少、無效或已撤銷 key。
 - 403：不允許的路由或來源。
-- 404：頁面不存在、不屬於自己或已刪除。
+- 404：頁面或同步區塊不存在、不屬於自己，或頁面已刪除。
 - 409：頁面結構／世代處理中，或 key 已達上限。
 - 412：正文版本已改變。
+- 413：展開項目超過總量限制，出現在 `syncedBlocks` 個別項目的 `status`。
 - 428：缺少 If-Match。
 - 503：還原處理中或服務暫時不可用。
 

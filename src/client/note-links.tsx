@@ -33,7 +33,7 @@ function LinkMenu({ items, selectedIndex, onItemClick, loadingState }: Suggestio
     </div>
   </div>;
 }
-export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor; owner: string }) {
+export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor<any, any, any>; owner: string }) {
   const getItems = useCallback(async (query: string): Promise<Item[]> => {
     let pages: PageRow[];
     if (!navigator.onLine) {
@@ -65,7 +65,7 @@ export function NoteLinkSuggestions({ editor, owner }: { editor: BlockNoteEditor
     }} />;
 }
 
-export function selectNoteLinkSuggestion(event: React.KeyboardEvent<HTMLElement>, editor: BlockNoteEditor) {
+export function selectNoteLinkSuggestion(event: React.KeyboardEvent<HTMLElement>, editor: BlockNoteEditor<any, any, any>) {
   if (event.nativeEvent.isComposing || !['Enter', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(event.key)) return;
   const state = editor.getExtension(SuggestionMenu)?.store.state;
   if (!state?.show || state.triggerCharacter !== '[[') return;

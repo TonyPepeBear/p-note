@@ -1,6 +1,6 @@
 # p-note
 
-個人筆記／日記系統。提供筆記資料庫、自訂欄位與表格／清單檢視、階層筆記、每日一篇與日期補寫、區塊編輯、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。介面使用 Mantine，開發使用 OpenSpec 與 TDD；正式網站為 [note.tonypepe.com](https://note.tonypepe.com)。
+個人筆記／日記系統。提供筆記資料庫、自訂欄位與表格／清單檢視、階層筆記、每日一篇與日期補寫、區塊編輯、跨頁同步區塊、中文搜尋、垃圾桶、私有原圖、即時與離線同步、90 天備份、完整 ZIP 匯出及覆蓋還原。舊裝置草稿隔離後可檢視或另存。介面使用 Mantine，開發使用 OpenSpec 與 TDD；正式網站為 [note.tonypepe.com](https://note.tonypepe.com)。
 
 ## 自動化驗證
 
@@ -21,7 +21,7 @@ git diff --check
 
 全程機器斷言，沒有人工驗收。Workers 測試檔案依序執行；各案例內的併發操作仍使用真實同步屏障與連線。`test:build` 需要 OpenSSL，會自動產生並清理測試憑證，以真實 dist 和本機 HTTPS Worker 驗證登入、wss 與離線刷新，使用假的寄件匣與隔離儲存。
 
-`npm run test:spec-coverage` 比對 47 個正式情境及 129 個必需環境結果，缺漏、重複、skip 或失敗均拒絕。`--probe` 只檢查原型，不能代替完整產品驗收。
+`npm run test:spec-coverage` 依現行規格逐項比對測試報告，缺漏、重複、skip 或失敗均拒絕。`--probe` 只檢查原型，不能代替完整產品驗收。同步區塊的 SB-01～SB-22 可用 `--synced-blocks` 單獨檢查。
 
 `npm run test:spec-coverage -- --auth` 比對本輪 AUTH-01～08 的 Workers 與三種瀏覽器結果。先執行完整 `npm test`，避免以篩選執行的報告作完整覆蓋。
 
@@ -69,3 +69,4 @@ npm run dev
 - [Codex plugin 安裝與設定](plugins/p-note/README.md)
 - [筆記資料庫、自訂欄位與儲存檢視](docs/note-databases.md)
 - [筆記連結與反向連結](docs/note-links.md)
+- [同步區塊操作與資料格式](docs/synced-blocks.md)

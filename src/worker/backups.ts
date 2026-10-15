@@ -1,11 +1,13 @@
 import type { AssetRow, BackupCatalog, BackupFile, BackupManifest } from '../shared/backup';
 import type { PageRow } from '../shared/pages';
+import type { SyncedBlockRow } from '../shared/synced-blocks';
 import { IMAGE_LIMIT } from '../shared/image';
 import { roomName } from '../shared/room';
 import { PageError } from './pages';
 import { validateManifest } from './backup-validation';
 import { exportBackup } from './backup-export';
 import { body } from './request';
+import { backupDocument, backupReferences, verifyBackupReferences } from './backup-content';
 
 export const BACKUP_RETENTION = 90 * 86400000;
 type StoredBackup = BackupCatalog & { owner_id: string; manifest_checksum: string | null; manifest_size: number | null };
@@ -39,15 +41,28 @@ export async function createBackup(env: Env, owner: string, now: () => number | 
     const rows = await env.DB.batch([
       env.DB.prepare('SELECT * FROM pages WHERE owner_id = ? ORDER BY id').bind(owner),
       env.DB.prepare('SELECT * FROM assets WHERE owner_id = ? ORDER BY id').bind(owner),
+      env.DB.prepare('SELECT * FROM synced_blocks WHERE owner_id = ? ORDER BY id').bind(owner),
     ]);
     const pages = rows[0].results as PageRow[]; const assets = rows[1].results as AssetRow[];
-    const manifest: Omit<BackupManifest, 'completed_at'> = { format: 'p-note-backup', version: 1, id, owner: { id: owner }, started_at: started, captured_until: started, pages: [], assets: [] };
+    const synced = rows[2].results as SyncedBlockRow[];
+    const manifest: Omit<BackupManifest, 'completed_at'> = { format: 'p-note-backup', version: 1, id, owner: { id: owner }, started_at: started, captured_until: started, pages: [], assets: [], synced_blocks: [], page_synced_blocks: [] };
     for (const page of pages) {
       const snapshot = await env.SYNC.getByName(await roomName(owner, page.id, page.sync_generation)).capture({ owner, page: page.id, generation: page.sync_generation });
       if (snapshot.generation !== page.sync_generation) fail();
+      const doc = backupDocument(snapshot.data);
+      try { manifest.page_synced_blocks!.push(...backupReferences(doc, page.id)); } finally { doc.destroy(); }
       const file = await writeFile(env, prefix, `pages/${page.id}.yjs`, snapshot.data);
       manifest.pages.push({ metadata: page, checkpoint: snapshot.checkpoint, captured_at: snapshot.capturedAt, file });
     }
+    for (const block of synced) {
+      const snapshot = await env.SYNC.getByName(await roomName(owner, `synced-block:${block.id}`, block.sync_generation))
+        .capture({ owner, page: block.id, generation: block.sync_generation, kind: 'syncedBlock' });
+      if (snapshot.generation !== block.sync_generation) fail();
+      backupDocument(snapshot.data, true).destroy();
+      const file = await writeFile(env, prefix, `synced-blocks/${block.id}.yjs`, snapshot.data);
+      manifest.synced_blocks!.push({ metadata: block, checkpoint: snapshot.checkpoint, captured_at: snapshot.capturedAt, file });
+    }
+    verifyBackupReferences(manifest, manifest.page_synced_blocks!);
     for (const asset of assets) {
       const object = await env.ASSETS.get(asset.object_key);
       if (!object || object.size !== asset.byte_size || object.size > IMAGE_LIMIT) return fail();
@@ -56,7 +71,10 @@ export async function createBackup(env: Env, owner: string, now: () => number | 
     }
     const current = (await env.DB.prepare('SELECT id, sync_generation FROM pages WHERE owner_id = ?').bind(owner).all<Pick<PageRow, 'id' | 'sync_generation'>>()).results;
     const generations = new Map(current.map(page => [page.id, page.sync_generation]));
+    const currentSynced = (await env.DB.prepare('SELECT id, sync_generation FROM synced_blocks WHERE owner_id = ?').bind(owner).all<Pick<SyncedBlockRow, 'id' | 'sync_generation'>>()).results;
+    const syncedGenerations = new Map(currentSynced.map(block => [block.id, block.sync_generation]));
     if (pages.some(page => generations.get(page.id) !== page.sync_generation)
+      || synced.some(block => syncedGenerations.get(block.id) !== block.sync_generation)
       || await env.DB.prepare('SELECT 1 FROM page_operations WHERE owner_id = ?').bind(owner).first()) fail();
     manifest.captured_until = await now();
     const encoded = new TextEncoder().encode(JSON.stringify(manifest));
@@ -70,8 +88,11 @@ export async function createBackup(env: Env, owner: string, now: () => number | 
       AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = backups.owner_id AND (id <> ? OR phase <> 'paused'))
       AND NOT EXISTS (SELECT 1 FROM json_each(?) AS expected LEFT JOIN pages
         ON pages.id = json_extract(expected.value, '$.id') AND pages.owner_id = backups.owner_id
-        WHERE pages.id IS NULL OR pages.sync_generation <> json_extract(expected.value, '$.sync_generation'))`)
-      .bind(completed, file.checksum, file.byte_size, id, owner, restore ?? '', JSON.stringify(pages.map(page => ({ id: page.id, sync_generation: page.sync_generation })))).run();
+        WHERE pages.id IS NULL OR pages.sync_generation <> json_extract(expected.value, '$.sync_generation'))
+      AND NOT EXISTS (SELECT 1 FROM json_each(?) AS expected LEFT JOIN synced_blocks
+        ON synced_blocks.id = json_extract(expected.value, '$.id') AND synced_blocks.owner_id = backups.owner_id
+        WHERE synced_blocks.id IS NULL OR synced_blocks.sync_generation <> json_extract(expected.value, '$.sync_generation'))`)
+      .bind(completed, file.checksum, file.byte_size, id, owner, restore ?? '', JSON.stringify(pages.map(page => ({ id: page.id, sync_generation: page.sync_generation }))), JSON.stringify(synced.map(block => ({ id: block.id, sync_generation: block.sync_generation })))).run();
     if (!published.meta.changes) fail();
     return { id, status: 'success', started_at: started, completed_at: completed, error: null };
   } catch {
