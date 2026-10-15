@@ -244,7 +244,7 @@ test("UX-05：新筆記與子頁面以未命名建立並可立即輸入標題", 
   await page.keyboard.press("Enter");
   await expect.poll(() => apiTitle(page, parent)).toBe("我的新筆記");
   await openPageActions(page);
-  await page.getByRole("button", { name: "新增子頁面", exact: true }).click();
+  await page.getByRole("menuitem", { name: "新增子頁面", exact: true }).click();
   await page.waitForURL((url) => url.searchParams.get("page") !== parent);
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
   const child = new URL(page.url()).searchParams.get("page")!;
@@ -476,11 +476,11 @@ test("UX-12：移動選項依階層並排除子孫，Ctrl/Meta+K 開啟搜尋", 
     path.getByRole("button", { name: "筆記列表", exact: true }),
   ).toBeVisible();
   await openPageActions(page);
-  const options = await page
+  await page.getByRole("menuitem", { name: "移動頁面", exact: true }).click();
+  const options = page
     .getByLabel("移動至上層", { exact: true })
-    .locator("option")
-    .allTextContents();
-  expect(options).toEqual(["最上層", "丁頁", "　戊頁"]);
+    .locator("option");
+  await expect(options).toHaveText(["最上層", "丁頁", "　戊頁"]);
   await page.keyboard.press("Escape");
   await page.locator(".tiptap").click();
   await page.keyboard.press("ControlOrMeta+k");

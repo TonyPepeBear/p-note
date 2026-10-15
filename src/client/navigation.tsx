@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { PwaControls } from "./pwa-controls";
+import { PageMenu, type PageAction } from "./page-menu";
 import {
   Alert, Anchor, Breadcrumbs, Button, Drawer, Group, Modal, NativeSelect,
   Stack, Text, TextInput,
@@ -7,8 +8,8 @@ import {
 import {
   IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
   IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
-  IconDatabase, IconDots, IconFileText, IconLogout, IconMenu2, IconPlus,
-  IconSearch, IconSettings, IconTrash, IconPhoto, IconHistory,
+  IconDatabase, IconFileText, IconLogout, IconMenu2, IconPlus,
+  IconSearch, IconSettings, IconTrash, IconPhoto,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
@@ -35,8 +36,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const [journals, setJournals] = useState<PageRow[]>([]);
   const [results, setResults] = useState<PageInfo[]>([]);
   const [panel, setPanel] = useState("");
+  const [actionPage, setActionPage] = useState<PageRow>(page);
   const [navOpen, setNavOpen] = useState(false);
   const [pwaHelpOpen, setPwaHelpOpen] = useState(false);
+  const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem("p-note-sidebar-collapsed") === "true"; }
     catch { return false; }
@@ -99,12 +102,11 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     setCollapsed((items) => items.filter((id) => !ancestors.has(id)));
     setPanel("");
     setNavOpen(false);
+    setPageMenuOpen(false);
     setDate(page.journal_date ?? today(Date.now()));
     setMonth((page.journal_date ?? today(Date.now())).slice(0, 7));
   }, [page.id]);
   useEffect(() => {
-    setTitle(page.title);
-    setParent(page.parent_id ?? "");
     setPages((items) => items.map((item) => item.id === page.id
       ? { ...item, title: page.title, parent_id: page.parent_id } : item));
   }, [page.title, page.parent_id]);
@@ -163,12 +165,40 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     setFailure("");
     setNotice("");
   };
+  const pageAction = (action: PageAction, item: PageRow, target: HTMLButtonElement | null) => {
+    if (navigationLockedRef.current || busy) return;
+    setActionPage(item);
+    setTitle(item.title);
+    setParent(item.parent_id ?? "");
+    if (action === "history") {
+      setNavOpen(false);
+      pageHistory?.();
+    } else if (action === "child" || action === "database") {
+      setNavOpen(false);
+      void run(async () => {
+        await saveDraft();
+        const child = await request(action === "child" ? "/api/pages" : "/api/databases", {
+          title: action === "child" ? "未命名" : "未命名資料庫", parent_id: item.id,
+        });
+        if (child) await navigate(child.id, action === "child");
+      });
+    } else open(action, target ?? undefined);
+  };
+  const updatePage = async (updated?: PageInfo) => {
+    if (updated?.id === page.id) changed(updated);
+    else if (page.ancestors?.some((item) => item.id === actionPage.id)) {
+      const current = await request(`/api/pages/${page.id}`);
+      if (current) changed(current);
+    }
+    await refresh();
+    setPanel("");
+  };
   const notesUnder = (parentId: string | null) => pages.filter((item) => item.kind === "note" && item.parent_id === parentId);
   const tree = (parentId: string | null, depth = 0): ReactNode => notesUnder(parentId).map((item) => {
     const nested = notesUnder(item.id).length > 0;
     const closed = collapsed.includes(item.id);
     return <div key={item.id} className="pn-tree-branch" style={{ paddingLeft: depth ? 14 : 0 }}>
-      <div className="pn-note-row" data-disabled={navigationLocked || undefined} data-active={!settingsView && item.id === page.id || undefined}>
+      <PageMenu page={item} disabled={busy || navigationLocked} active={!settingsView && item.id === page.id} history={!!pageHistory && item.id === page.id} onAction={pageAction} onOpenChange={setPageMenuOpen}>
         {nested ? <button type="button" className="pn-tree-toggle"
           aria-label={(closed ? "展開 " : "收合 ") + item.title} aria-expanded={!closed} onClick={() => toggle(item.id)}>
           {closed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
@@ -179,12 +209,12 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           {item.database_config ? <IconDatabase size={17} /> : <IconFileText size={17} />}
           <span>{item.title}</span>
         </a>
-      </div>
+      </PageMenu>
       {!closed && tree(item.id, depth + 1)}
     </div>;
   });
   const parents = (parentId: string | null, depth = 0): { value: string; label: string }[] => notesUnder(parentId)
-    .filter((item) => item.id !== page.id).flatMap((item) => [
+    .filter((item) => item.id !== actionPage.id).flatMap((item) => [
       { value: item.id, label: "　".repeat(depth) + item.title }, ...parents(item.id, depth + 1),
     ]);
   const openJournals = (target: HTMLElement) => { open("journals", target); void run(() => loadMonth(month)); };
@@ -241,11 +271,11 @@ export function Navigation({ page, changed, error, backups, settings, images, im
       })}><IconLogout size={17} /><span>登出</span></button>
     </nav>
   </div>;
-  const panelTitle = ({ search: "搜尋筆記", journals: "日記回顧", trash: "垃圾桶", page: "頁面操作", delete: "移到垃圾桶？" } as Record<string, string>)[panel] ?? "";
+  const panelTitle = ({ search: "搜尋筆記", journals: "日記回顧", trash: "垃圾桶", rename: "重新命名頁面", move: "移動頁面", delete: "移到垃圾桶？" } as Record<string, string>)[panel] ?? "";
   return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
     <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
     <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
-      trapFocus={!pwaHelpOpen} closeOnEscape={!pwaHelpOpen}
+      trapFocus={!pwaHelpOpen && !pageMenuOpen} closeOnEscape={!pwaHelpOpen && !pageMenuOpen}
       closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
       {sidebar}
     </Drawer>
@@ -282,8 +312,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
             onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"
             onClick={() => { if (!navigationLockedRef.current) backups(); }}><IconCloud size={18} /></button>
-          {!settingsView && <button disabled={navigationLocked} className="pn-icon-button" aria-label="頁面操作" title="頁面操作" aria-haspopup="dialog" aria-expanded={panel === "page"}
-            onClick={(event) => open("page", event.currentTarget)}><IconDots size={20} /></button>}
+          {!settingsView && <PageMenu key={page.id} page={page} disabled={busy || navigationLocked} history={!!pageHistory} onAction={pageAction} onOpenChange={setPageMenuOpen} />}
         </div>
       </header>
       <div className={"pn-document-shell document-shell" + (settingsView ? " pn-settings-shell" : databaseView ? " pn-database-shell" : "")}>{children}</div>
@@ -371,18 +400,13 @@ export function Navigation({ page, changed, error, backups, settings, images, im
             }}>還原</Button>
           </div>)}</div>
         </section>}
-        {panel === "page" && <>
-          {pageHistory && !page.database_config && <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => {
-            setPanel("");
-            pageHistory();
-          }}><IconHistory size={18} />版本歷史</button>}
+        {panel === "rename" && <>
           <form onSubmit={(event) => {
             event.preventDefault();
             void run(async () => {
-              const updated = await request(`/api/pages/${page.id}/title`, { title });
-              if (updated) changed(updated);
-              await refresh();
-              setPanel("");
+              await saveDraft();
+              const updated = await request(`/api/pages/${actionPage.id}/title`, { title });
+              await updatePage(updated);
             });
           }}>
             <Stack gap={10}>
@@ -390,24 +414,15 @@ export function Navigation({ page, changed, error, backups, settings, images, im
               <Group justify="end"><Button type="submit" loading={busy} disabled={navigationLocked}>儲存標題</Button></Group>
             </Stack>
           </form>
-          {page.kind === "note" && <>
-            <div className="pn-panel-section"><div className="pn-list-caption">新增至此頁面</div>
-              <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
-                const child = await request("/api/pages", { title: "未命名", parent_id: page.id });
-                if (child) await navigate(child.id, true);
-              })}><IconPlus size={18} />新增子頁面</button>
-              {!page.database_config && <button className="pn-menu-action" disabled={busy || navigationLocked} onClick={() => void run(async () => {
-                const database = await request("/api/databases", { title: "未命名資料庫", parent_id: page.id });
-                if (database) await navigate(database.id);
-              })}><IconDatabase size={18} />新增子資料庫</button>}
-            </div>
-            <form className="pn-panel-section" onSubmit={(event) => {
+        </>}
+        {panel === "move" && <>
+            <Text size="sm" truncate title={actionPage.title}>{actionPage.title}</Text>
+            <form onSubmit={(event) => {
               event.preventDefault();
               void run(async () => {
-                const moved = await request(`/api/pages/${page.id}/move`, { parent_id: parent || null });
-                if (moved) changed(moved);
-                await refresh();
-                setPanel("");
+                await saveDraft();
+                const moved = await request(`/api/pages/${actionPage.id}/move`, { parent_id: parent || null });
+                await updatePage(moved);
               });
             }}>
               <div className="pn-inline-form">
@@ -416,20 +431,18 @@ export function Navigation({ page, changed, error, backups, settings, images, im
                 <Button variant="default" type="submit" loading={busy} disabled={navigationLocked}>移動頁面</Button>
               </div>
             </form>
-          </>}
-          <div className="pn-panel-section"><button className="pn-menu-action pn-danger-action" disabled={busy || navigationLocked} onClick={() => setPanel("delete")}>
-            <IconTrash size={18} />移到垃圾桶</button></div>
         </>}
         {panel === "delete" && <>
           <div className="pn-delete-copy"><IconTrash size={24} stroke={1.5} /><Text size="sm">
-            「{page.title}」會移到垃圾桶，之後可以還原。{page.kind === "note" && "子頁面也會一起隱藏。"}
+            「{actionPage.title}」會移到垃圾桶，之後可以還原。{actionPage.kind === "note" && "子頁面也會一起隱藏。"}
           </Text></div>
           <Group justify="end" gap={8} mt={8}>
             <Button variant="default" onClick={() => setPanel("")}>取消</Button>
             <Button color="red" loading={busy} disabled={navigationLocked} onClick={() => void run(async () => {
               await saveDraft();
-              await request(`/api/pages/${page.id}/delete`, {});
-              await navigate();
+              await request(`/api/pages/${actionPage.id}/delete`, {});
+              if (actionPage.id === page.id || page.ancestors?.some((item) => item.id === actionPage.id)) await navigate();
+              else { await refresh(); setPanel(""); }
             })}>確認移到垃圾桶</Button>
           </Group>
         </>}

@@ -128,12 +128,13 @@ test("UI-09：區塊選單與編輯器工具使用淺色，危險操作保留紅
   expect((await appearance(format)).contrast).toBeGreaterThanOrEqual(4.5);
 });
 
-test("UI-10：停用操作無 hover 回饋且鍵盤焦點可見", async ({ page }) => {
+test("UI-10：停用操作無 hover 回饋且鍵盤焦點可見", async ({ page, browserName }) => {
   await openPrivate(page);
   const trigger = button(page, "插入圖片");
   await trigger.focus();
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Shift+Tab");
+  // WebKit 以 Option+Tab 巡覽包含按鈕的完整控制項。
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Shift+Tab" : "Shift+Tab");
   await expect(trigger).toBeFocused();
   const outline = await trigger.evaluate(e => ({ style: getComputedStyle(e).outlineStyle, width: parseFloat(getComputedStyle(e).outlineWidth) }));
   expect(outline.style).not.toBe("none");
