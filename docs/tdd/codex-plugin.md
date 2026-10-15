@@ -20,4 +20,6 @@
 
 正式發布由 master 的 Actions 套用 migration 0008 並部署同一 Worker。實際 Codex／ChatGPT 雲端帳號仍需以新版 [plugin](../../plugins/p-note/README.md) 發起一次 OAuth；自動測試不代表該帳號已完成連線。
 
-完整回歸本輪為 434 通過、4 失敗：既有 WebKit UI-10，以及三種瀏覽器的 PWA-06。後者原本由測試 Worker fetch 本機 preview，與公開網路 fetch 限制衝突；fixture 已改由本機 preview 讀取建置檔提供，Chromium 先驗證通過，後續再補三瀏覽器驗證。正式 Worker 不提供此測試 fixture。
+完整回歸本輪為 434 通過、4 失敗：既有 WebKit UI-10，以及三種瀏覽器的 PWA-06。後者原本由測試 Worker fetch 本機 preview，改用 HTTPS 後該測試 fetch 失敗；fixture 已改由本機 preview 讀取建置檔提供，Chromium 先驗證通過。正式 Worker 不提供此測試 fixture。
+
+整合最新 master（6f17c8d）後，plugin／PWA／settings-navigation／backup 共 72 個三瀏覽器案例全部通過，包含 24 個 MCP 結果與 3 個真實 PWA 更新結果。完整回歸與針對性重跑分開記錄；目前保留的既有失敗為 WebKit UI-10 鍵盤焦點斷言，沒有跳過或放寬其測試。

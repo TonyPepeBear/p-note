@@ -169,5 +169,25 @@
     "passed": 1,
     "failed": 0
   },
-  "actualCloudAccountAuthorizationVerified": false
+  "actualCloudAccountAuthorizationVerified": false,
+  "rebasedFocusedE2E": {
+    "base": "6f17c8d",
+    "passed": 72,
+    "failed": 0,
+    "scope": [
+      "plugin",
+      "pwa",
+      "settings-navigation",
+      "backup"
+    ]
+  },
+  "remainingKnownFailure": {
+    "id": "UI-10",
+    "project": "webkit-mobile",
+    "keyboardFocusAssertion": true
+  },
+  "buildSmoke": {
+    "passed": 2,
+    "failed": 0
+  }
 }
