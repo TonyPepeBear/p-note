@@ -5,11 +5,12 @@ import keysMigration from '../migrations/0005_api_keys.sql';
 import mcpMigration from '../migrations/0008_mcp_grants.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
+import databaseRevisionsMigration from '../migrations/0009_database_revisions.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
 import restoreMigration from '../migrations/0004.sql';
-import historyMigration from '../migrations/0009_page_history.sql';
+import historyMigration from '../migrations/0010_page_history.sql';
 import { roomName } from '../src/shared/room';
 import * as Y from 'yjs';
 import { toBase64 } from 'lib0/buffer';
@@ -58,6 +59,10 @@ async function setup(env: Env) {
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_asset_control (id INTEGER PRIMARY KEY, fail INTEGER)');
   if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('page_search') WHERE name = 'linked_pages'").first()) {
     await env.DB.prepare(linksMigration.trim().replace(/;$/, '')).run();
+  }
+  if (!await env.DB.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'database_revisions'").first()) {
+    // 觸發器內含分號；以完整陳述式之間的空白行分組。
+    await env.DB.batch(databaseRevisionsMigration.trim().split(/\n\s*\n/).map(sql => env.DB.prepare(sql)));
   }
 }
 

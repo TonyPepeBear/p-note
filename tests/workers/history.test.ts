@@ -194,3 +194,31 @@ it('HIST-06：整站備份還原保留原有頁面歷史與快照', async () => 
   expect(JSON.stringify((await f.preview(newer.id)).blocks)).toContain('備份之後的正文');
   const history = await f.list(); expect(history.versions.map(version => version.id)).toEqual(expect.arrayContaining([old.id, newer.id])); f.doc.destroy();
 });
+
+it('HIST-01 HIST-03 DB-11：表格改名與歷史還原使母資料庫 ETag 失效，建立歷史不使快取失效', async () => {
+  const auth = await authenticated();
+  const containerResponse = await auth.post('/api/databases', { title: '版本歷史條件讀取' }); expect(containerResponse.status).toBe(200);
+  const container = await containerResponse.json<PageInfo>();
+  const child = await auth.result(auth.post('/api/pages', { title: '還原目標標題', parent_id: container.id }));
+  const database = (etag?: string) => exports.default.fetch(`${origin}/api/databases/${container.id}`, {
+    headers: { Cookie: auth.cookie, ...(etag ? { 'If-None-Match': etag } : {}) },
+  });
+  const initial = await database(); expect(initial.status).toBe(200); const initialTag = initial.headers.get('ETag'); expect(initialTag).toBeTruthy();
+  expect((await database(initialTag!)).status).toBe(304);
+  const history = await (await auth.get(`/api/pages/${child.id}/history`)).json<PageHistory>(); const original = history.versions[0];
+  expect(original.title).toBe('還原目標標題');
+  expect((await database(initialTag!)).status).toBe(304);
+  expect((await auth.post(`/api/pages/${child.id}/properties`, { property: 'title', value: '表格修改後標題', generation: child.sync_generation })).status).toBe(200);
+  const renamed = await database(initialTag!); expect(renamed.status).toBe(200); const renamedTag = renamed.headers.get('ETag'); expect(renamedTag).not.toBe(initialTag);
+  expect((await renamed.json<{ rows: PageInfo[] }>()).rows[0].title).toBe('表格修改後標題');
+  expect((await auth.post(`/api/pages/${child.id}/history`, {})).status).toBe(201);
+  expect((await database(renamedTag!)).status).toBe(304);
+  const restore = await auth.post(`/api/pages/${child.id}/history/${original.id}/restore`, { request_id: crypto.randomUUID() }); expect(restore.status).toBe(200);
+  const result = await restore.json<PageVersionRestore>();
+  const restored = await database(renamedTag!); expect(restored.status).toBe(200); const restoredTag = restored.headers.get('ETag'); expect(restoredTag).not.toBe(renamedTag);
+  const current = await restored.json<{ page: PageInfo; rows: PageInfo[] }>();
+  expect(current.page.database_config).toBe(container.database_config);
+  expect(current.rows[0]).toMatchObject({ id: child.id, title: original.title, parent_id: container.id, sync_generation: result.page.sync_generation });
+  expect(current.rows[0].sync_generation).not.toBe(child.sync_generation);
+  expect((await database(restoredTag!)).status).toBe(304);
+});

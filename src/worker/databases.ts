@@ -9,12 +9,57 @@ import { PageError, visiblePage, VISIBLE } from "./pages";
 import { body } from "./request";
 import type { PageRow } from "../shared/pages";
 import { roomName } from '../shared/room';
+import { mergeConfig, sameConfigValue } from './database-config';
 const json = (v: unknown) =>
   Response.json(v, { headers: { "Cache-Control": "no-store" } });
 const fail = (status: number, message: string): never => {
   throw new PageError(status, message);
 };
 const unlocked = `NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?) AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)`;
+// 只走目標到根節點的祖先鏈；UNION 同時讓損壞的循環結構安全地判定為不可見。
+const DATABASE = `WITH RECURSIVE target AS (SELECT * FROM pages WHERE id = ? AND owner_id = ?),
+  ancestors(id, owner_id, parent_id, deleted_at) AS (
+    SELECT id, owner_id, parent_id, deleted_at FROM target
+    UNION SELECT parent.id, parent.owner_id, parent.parent_id, parent.deleted_at
+      FROM pages parent JOIN ancestors child ON parent.id = child.parent_id AND parent.owner_id = child.owner_id
+  ), visible_database AS (
+    SELECT * FROM target WHERE database_config IS NOT NULL
+      AND EXISTS (SELECT 1 FROM ancestors WHERE parent_id IS NULL)
+      AND NOT EXISTS (SELECT 1 FROM ancestors WHERE deleted_at IS NOT NULL)
+      AND NOT EXISTS (SELECT 1 FROM ancestors JOIN page_operation_members member ON member.page_id = ancestors.id)
+      AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = target.owner_id)
+  )`;
+const version = `COALESCE((SELECT revision FROM database_revisions WHERE page_id = visible_database.id), 0) AS database_revision`;
+type DatabaseVersion = Pick<PageRow, 'id' | 'sync_generation'> & { database_revision: number };
+const tag = (page: DatabaseVersion) => `"database-v1-${page.id}-${page.sync_generation}-${page.database_revision}"`;
+const matches = (request: Request, etag: string) => request.headers.get('If-None-Match')?.split(',').some(value => {
+  const candidate = value.trim().replace(/^W\//, '');
+  return candidate === '*' || candidate === etag;
+});
+const cacheHeaders = (etag: string) => ({ ETag: etag, 'Cache-Control': 'private, no-cache', Vary: 'Cookie' });
+const visibleDatabase = (db: D1Database, owner: string, id: string) =>
+  db.prepare(`${DATABASE} SELECT * FROM visible_database`).bind(id, owner).first<PageRow>();
+
+async function readDatabase(request: Request, db: D1Database, owner: string, id: string): Promise<Response> {
+  const current = await db.prepare(`${DATABASE} SELECT id, sync_generation, ${version} FROM visible_database`).bind(id, owner).first<DatabaseVersion>();
+  if (!current) return fail(404, '找不到資料庫');
+  if (matches(request, tag(current))) return new Response(null, { status: 304, headers: cacheHeaders(tag(current)) });
+  // 版本與本文必須來自同一交易，避免查詢間的異動讓舊版本標籤配上新資料。
+  const [snapshot, children] = await db.batch<PageRow & { database_revision: number }>([
+    db.prepare(`${DATABASE} SELECT *, ${version} FROM visible_database`).bind(id, owner),
+    db.prepare(`${DATABASE} SELECT child.* FROM pages child JOIN visible_database container
+      ON child.parent_id = container.id AND child.owner_id = container.owner_id
+      WHERE child.deleted_at IS NULL AND child.database_config IS NULL
+        AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE page_id = child.id)
+      ORDER BY child.created_at, child.id`).bind(id, owner),
+  ]);
+  const result = snapshot.results[0];
+  if (!result) return fail(404, '找不到資料庫');
+  const etag = tag(result);
+  if (matches(request, etag)) return new Response(null, { status: 304, headers: cacheHeaders(etag) });
+  const { database_revision: _revision, ...page } = result;
+  return Response.json({ page, config: readConfig(page.database_config!), rows: children.results }, { headers: cacheHeaders(etag) });
+}
 async function input(request: Request, limit = 4096) {
   try { return await body(request, limit); }
   catch { return fail(400, '資料格式無效或內容超過上限'); }
@@ -132,68 +177,42 @@ export async function handleDatabases(
   }
   const match = path.match(/^\/api\/databases\/([\w-]{1,80})(?:\/(config))?$/);
   if (!match) return null;
-  const page = await visiblePage(db, owner, match[1]);
+  if (request.method === "GET" && !match[2]) return readDatabase(request, db, owner, match[1]);
+  let page = await visibleDatabase(db, owner, match[1]);
   if (!page?.database_config) return fail(404, "找不到資料庫");
-  if (request.method === "GET" && !match[2]) {
-    const rows = (
-      await db
-        .prepare(
-          `${VISIBLE} SELECT * FROM visible WHERE parent_id = ? AND database_config IS NULL ORDER BY created_at, id`,
-        )
-        .bind(owner, page.id)
-        .all<PageRow>()
-    ).results;
-    return json({ page, config: readConfig(page.database_config), rows });
-  }
   if (request.method !== "POST" || !match[2]) return null;
   const data = await input(request, 256 * 1024);
   if (!validConfig(data.config)) return fail(400, "資料庫設定無效");
-  if (data.generation !== page.sync_generation)
-    fail(409, "資料庫版本已改變，請重新載入");
-  if (data.previous !== page.database_config)
-    fail(409, "設定已被其他裝置修改，請重新載入");
-  const old = readConfig(page.database_config);
-  const rows = (
-    await db
-      .prepare(
-        "SELECT id, property_values FROM pages WHERE parent_id = ? AND owner_id = ?",
-      )
-      .bind(page.id, owner)
-      .all<Pick<PageRow, "id" | "property_values">>()
-  ).results;
-  for (const p of data.config.properties) {
-    const original = old.properties.find((o) => o.id === p.id);
-    if (
-      rows.some((row) => {
-        const value = readValues(row.property_values)[p.id];
-        return (
-          value !== undefined &&
-          value !== null &&
-          ((original && original.type !== p.type) || !validValue(p, value))
-        );
-      })
-    )
-      fail(409, "欄位已有不相容資料，請新增欄位或保留已使用選項");
+  let previous;
+  try { previous = typeof data.previous === 'string' ? readConfig(data.previous) : null; }
+  catch { previous = null; }
+  if (!previous) return fail(409, '原始設定無效，請重新載入');
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (!page?.database_config || data.generation !== page.sync_generation)
+      return fail(409, '資料庫版本已改變，請重新載入');
+    const current = readConfig(page.database_config);
+    const merged = mergeConfig(previous, current, data.config);
+    if (!merged) return fail(409, '設定已被其他裝置修改，請重新載入');
+    const propertiesChanged = !sameConfigValue(current.properties, merged.properties);
+    const rows = propertiesChanged ? (await db.prepare('SELECT id, property_values FROM pages WHERE parent_id = ? AND owner_id = ?')
+      .bind(page.id, owner).all<Pick<PageRow, 'id' | 'property_values'>>()).results : [];
+    for (const property of merged.properties) {
+      const original = current.properties.find(item => item.id === property.id);
+      if (rows.some(row => {
+        const value = readValues(row.property_values)[property.id];
+        return value !== undefined && value !== null && ((original && original.type !== property.type) || !validValue(property, value));
+      })) return fail(409, '欄位已有不相容資料，請新增欄位或保留已使用選項');
+    }
+    const changed = await db.prepare(`${DATABASE} UPDATE pages SET database_config = ?, metadata_revision = metadata_revision + 1, updated_at = ?
+      WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible_database)
+        AND database_config = ? AND sync_generation = ? AND ${unlocked}
+        ${propertiesChanged ? `AND NOT EXISTS (SELECT 1 FROM pages child LEFT JOIN json_each(?) expected ON json_extract(expected.value, '$.id') = child.id
+          WHERE child.parent_id = ? AND child.owner_id = ? AND (expected.value IS NULL OR child.property_values <> json_extract(expected.value, '$.property_values')))` : ''}`)
+      .bind(page.id, owner, JSON.stringify(merged), now, page.id, owner, page.database_config, page.sync_generation, owner, owner,
+        ...(propertiesChanged ? [JSON.stringify(rows), page.id, owner] : [])).run();
+    if (changed.meta.changes) return json(await visibleDatabase(db, owner, page.id));
+    // 原子比較失敗時重讀並再合併，讓同時修改不同檢視的請求也能成功。
+    page = await visibleDatabase(db, owner, match[1]);
   }
-  const changed = await db
-    .prepare(
-      `${VISIBLE} UPDATE pages SET database_config = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND database_config = ? AND sync_generation = ? AND ${unlocked} AND NOT EXISTS (SELECT 1 FROM pages child LEFT JOIN json_each(?) expected ON json_extract(expected.value, '$.id') = child.id WHERE child.parent_id = ? AND child.owner_id = ? AND (expected.value IS NULL OR child.property_values <> json_extract(expected.value, '$.property_values')))`,
-    )
-    .bind(
-      owner,
-      JSON.stringify(data.config),
-      now,
-      page.id,
-      owner,
-      data.previous,
-      page.sync_generation,
-      owner,
-      owner,
-      JSON.stringify(rows),
-      page.id,
-      owner,
-    )
-    .run();
-  if (!changed.meta.changes) fail(409, "設定已變更，請重新載入");
-  return json(await visiblePage(db, owner, page.id));
+  return fail(409, '設定已變更，請重新載入');
 }

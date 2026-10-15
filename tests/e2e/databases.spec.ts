@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { openPrivate, showNavigation, saved, moveToTrash } from "./helpers";
+import { openPrivate, showNavigation, saved, moveToTrash, gate, heldCount, release } from "./helpers";
 import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from "@zip.js/zip.js";
 import { origin } from "./ports";
 
@@ -69,6 +69,135 @@ async function openDB(page: Page, id: string) {
   await page.goto("/?page=" + id);
   await expect(page.getByTestId("database-ready")).toBeVisible();
 }
+
+test("DB-11：條件讀取回空 304，列異動與祖先刪除使快取失效", async ({ page }) => {
+  await openPrivate(page);
+  const parent = await (await post(page, "/api/pages", { title: "上層" })).json();
+  const db = await (await post(page, "/api/databases", { title: "條件讀取", parent_id: parent.id })).json();
+  const path = "/api/databases/" + db.id;
+  const first = await page.request.get(path);
+  const etag = first.headers().etag;
+  expect(etag).toBeTruthy();
+  const unchanged = await page.request.get(path, { headers: { "If-None-Match": etag } });
+  expect(unchanged.status()).toBe(304);
+  expect(await unchanged.body()).toHaveLength(0);
+  const record = await row(page, db, "新增列");
+  const inserted = await page.request.get(path, { headers: { "If-None-Match": etag } });
+  expect(inserted.status()).toBe(200);
+  expect(inserted.headers().etag).not.toBe(etag);
+  expect((await inserted.json()).rows.map((r: { id: string }) => r.id)).toEqual([record.id]);
+  await values(page, record, "title", "修改列");
+  const edited = await page.request.get(path, { headers: { "If-None-Match": inserted.headers().etag } });
+  expect(edited.status()).toBe(200);
+  expect((await edited.json()).rows[0].title).toBe("修改列");
+  await post(page, "/api/pages/" + parent.id + "/delete", {});
+  expect((await page.request.get(path, { headers: { "If-None-Match": edited.headers().etag } })).status()).toBe(404);
+});
+
+test("DB-11：背景暫停輪詢，恢復可見立即以 ETag 更新", async ({ page }) => {
+  await openPrivate(page);
+  const db = await create(page);
+  await row(page, db, "前景列");
+  const path = "/api/databases/" + db.id;
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === path && request.method() === "GET") requests.push(request.headers()["if-none-match"] ?? "");
+  });
+  await openDB(page, db.id);
+  await expect(page.getByTestId("database-rows")).toContainText("前景列");
+  await page.evaluate((path) => {
+    const counter = { count: 0 };
+    (window as unknown as { databaseGetCounter: typeof counter }).databaseGetCounter = counter;
+    const original = window.fetch;
+    window.fetch = (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+      if (url.pathname === path && (init?.method ?? "GET") === "GET") counter.count++;
+      return original(input, init);
+    };
+  }, path);
+  await page.clock.install();
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.runFor(9100);
+  expect(await page.evaluate(() => (window as unknown as { databaseGetCounter: { count: number } }).databaseGetCounter.count)).toBe(0);
+  const response = page.waitForResponse(r => new URL(r.url()).pathname === path);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  const unchanged = await response;
+  expect(requests.at(-1)).toBeTruthy();
+  expect(unchanged.headers().etag).toBe(requests.at(-1));
+  // WebKit 會將重新驗證的 304 呈現為快取 200，因此斷言實際沒有傳輸本文。
+  expect((await unchanged.request().sizes()).responseBodySize).toBe(0);
+  await row(page, db, "背景新增");
+  const updated = page.waitForResponse(r => new URL(r.url()).pathname === path && r.status() === 200);
+  await page.clock.runFor(3100);
+  await updated;
+  await expect(page.getByTestId("database-rows")).toContainText("背景新增");
+});
+
+test("DB-11：慢速讀取跨過輪詢週期仍只發一個請求並完成載入", async ({ page }) => {
+  await openPrivate(page);
+  const db = await create(page);
+  await row(page, db, "慢速列");
+  const pattern = "^/api/databases/" + db.id + "$";
+  await gate(page, [{ pattern, hold: true }], true);
+  await page.goto("/?page=" + db.id);
+  await expect(page.getByTestId("database-loading")).toBeVisible();
+  await expect.poll(() => heldCount(page, pattern)).toBe(1);
+  await page.clock.install();
+  await page.clock.runFor(9100);
+  expect(await heldCount(page, pattern)).toBe(1);
+  await release(page, pattern);
+  await expect(page.getByTestId("database-ready")).toBeVisible();
+  await expect(page.getByTestId("database-rows")).toContainText("慢速列");
+});
+
+test("DB-12：不同檢視的過期設定合併，同檢視衝突仍拒絕", async ({ page }) => {
+  await openPrivate(page);
+  const db = await create(page);
+  const record = await row(page, db, "併發列");
+  const base = { properties: fields, views: [view("a", "甲"), view("b", "乙")] };
+  const saved = await config(page, db, base);
+  const save = (next: object) => post(page, "/api/databases/" + db.id + "/config", {
+    previous: saved.database_config, generation: saved.sync_generation, config: next,
+  });
+  expect((await save({ ...base, views: [view("a", "甲修改"), base.views[1]] })).status()).toBe(200);
+  await values(page, record, "score", 7);
+  const second = await save({ ...base, views: [base.views[0], view("b", "乙修改")] });
+  expect(second.status()).toBe(200);
+  expect(JSON.parse((await second.json()).database_config).views.map((v: { name: string }) => v.name)).toEqual(["甲修改", "乙修改"]);
+  expect((await save({ ...base, views: [view("a", "甲衝突"), base.views[1]] })).status()).toBe(409);
+  expect(JSON.parse((await (await page.request.get("/api/pages/" + record.id)).json()).property_values).score).toBe(7);
+});
+
+test("DB-12：兩端開啟的檢視草稿在背景更新後仍獨立保存", async ({ page, browser }) => {
+  await openPrivate(page);
+  const db = await create(page);
+  await config(page, db, { properties: [], views: [view("a", "甲檢視"), view("b", "乙檢視")] });
+  await openDB(page, db.id);
+  const other = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });
+  try {
+    const p2 = await other.newPage();
+    await openDB(p2, db.id);
+    await p2.getByLabel("目前檢視", { exact: true }).selectOption("b");
+    for (const p of [page, p2]) await p.getByRole("button", { name: "檢視設定", exact: true }).click();
+    await page.getByLabel("檢視名稱", { exact: true }).fill("甲端保存");
+    await p2.getByLabel("檢視名稱", { exact: true }).fill("乙端保存");
+    await page.getByRole("button", { name: "儲存檢視", exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "檢視設定", exact: true })).toBeHidden();
+    const refresh = p2.waitForResponse(r => new URL(r.url()).pathname === "/api/databases/" + db.id && r.status() === 200);
+    await p2.evaluate(() => dispatchEvent(new Event("focus")));
+    await refresh;
+    await p2.getByRole("button", { name: "儲存檢視", exact: true }).click();
+    await expect(p2.getByRole("dialog", { name: "檢視設定", exact: true })).toBeHidden();
+    const saved = await (await p2.request.get("/api/databases/" + db.id)).json();
+    expect(saved.config.views.map((v: { name: string }) => v.name)).toEqual(["甲端保存", "乙端保存"]);
+  } finally { await other.close(); }
+});
 
 test("DB-01：建立資料庫、筆記與移入移出保留正文", async ({ page }) => {
   await openPrivate(page);
