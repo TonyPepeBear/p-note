@@ -15,6 +15,7 @@ async function markdownFiles(dir) {
 
 const files = ['README.md', ...await markdownFiles('docs'), ...await markdownFiles('openspec')];
 const ids = [];
+const idSources = new Map();
 let links = 0;
 for (const file of files) {
   const text = await readFile(file, 'utf8');
@@ -29,7 +30,15 @@ for (const file of files) {
     for (const [, id, method] of found) {
       assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB)-\d{2}$/.test(id), id);
       assert(method.includes('斷言') || method.includes('檢查'), `${id}: 缺機器斷言`);
-      ids.push(id);
+      const capability = file.match(/\/specs\/([^/]+)\//)?.[1];
+      const sources = idSources.get(id) ?? [];
+      // 主規格與同能力的單一變更可共用既有 ID，代表修改同一驗收情境。
+      if (sources.length) {
+        assert.equal(sources.length, 1, `${id}: 同時存在多份變更`);
+        assert.equal(sources[0].capability, capability, `${id}: 不同能力重複編號`);
+        assert.notEqual(sources[0].file.includes('/changes/'), file.includes('/changes/'), `${id}: 重複情境`);
+      } else ids.push(id);
+      sources.push({ file, capability }); idSources.set(id, sources);
     }
   }
 }

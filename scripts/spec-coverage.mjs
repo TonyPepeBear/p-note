@@ -12,8 +12,12 @@ export function checkCoverage(required, actual) {
 export function reportCases(report, environment) {
   const cases = [];
   const add = (title, status, context) => {
-    const id = title.match(/^((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN|DB|LINK|PWA|SB)-\d{2})[：:]/)?.[1];
-    if (id) cases.push({ id: `${id}@${context}`, status, title });
+    const prefix = title.split(/[：:]/, 1)[0];
+    // 同一實際案例可同時驗證多個契約，但只解析標題開頭的情境編號。
+    if (!/^(?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN|DB|LINK|PWA|SB)-\d{2}/.test(prefix)) return;
+    for (const [, id] of prefix.matchAll(/\b((?:PROBE-)?(?:EDIT|SYNC|ORDER|BOUNDARY|LOAD|CHECKPOINT|AUTH|PAGE|ASSET|BACKUP|UI|UX|LFN|DB|LINK|PWA|SB)-\d{2})\b/g)) {
+      cases.push({ id: `${id}@${context}`, status, title });
+    }
   };
   if (Array.isArray(report.testResults)) {
     for (const file of report.testResults) for (const test of file.assertionResults) add(test.title, test.status, environment);
