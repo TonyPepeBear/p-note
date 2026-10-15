@@ -212,6 +212,11 @@ for (const backDuring of ["還原中", "中斷後"]) {
       await showNavigation(page);
       for (const name of ["設定", "今天", "登出", "安裝 p-note"])
         await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
+      await expect(page.getByRole("button", { name: "頁面操作：未命名", exact: true })).toBeDisabled();
+      const note = page.getByRole("navigation", { name: "筆記頁面" }).getByRole("link", { name: "未命名", exact: true });
+      await expect(note).toBeInViewport({ ratio: 1 });
+      await note.click({ button: "right", force: true });
+      await expect(page.getByRole("menu", { name: /^頁面操作/ })).toHaveCount(0);
       const close = page.getByRole("button", { name: "關閉導覽", exact: true });
       if (await close.isVisible()) await close.click();
     };

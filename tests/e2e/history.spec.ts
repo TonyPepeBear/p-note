@@ -10,7 +10,7 @@ test.beforeEach(async ({ request }) => {
 
 async function history(page: Page) {
   await openPageActions(page);
-  await page.getByRole('button', { name: '版本歷史', exact: true }).click();
+  await page.getByRole('menuitem', { name: '版本歷史', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '版本歷史', exact: true });
   await expect(dialog).toBeVisible();
   return dialog;
