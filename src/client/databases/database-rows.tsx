@@ -1,18 +1,20 @@
 import { Anchor, Table, Text } from "@mantine/core";
-import { IconExternalLink, IconFileText } from "@tabler/icons-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import type { PageRow } from "../../shared/pages";
 import { BUILTIN, displayValue, readValues, type DatabaseConfig, type DatabaseView } from "../../shared/databases";
 import { FieldInput, PropertyIcon } from "./fields";
+import { PageIconPicker } from "../page-icon";
 
 type Props = {
   config: DatabaseConfig;
   view: DatabaseView;
   rows: PageRow[];
   readOnly: boolean;
+  iconDisabled: boolean;
   onStatus: (value: string) => void;
   onOpen: (id: string) => void;
 };
-export function DatabaseRows({ config, view, rows, readOnly, onStatus, onOpen }: Props) {
+export function DatabaseRows({ config, view, rows, readOnly, iconDisabled, onStatus, onOpen }: Props) {
   const fields = [...BUILTIN, ...config.properties];
   return (
       <div className="database-scroll" id="database-view-panel" role="tabpanel" aria-labelledby={"database-view-" + view.id} data-testid="database-rows">
@@ -37,7 +39,7 @@ export function DatabaseRows({ config, view, rows, readOnly, onStatus, onOpen }:
                     <Table.Td key={id}>
                       {id === "title" ? (
                         <div className="database-title-cell">
-                          <IconFileText className="database-row-icon" size={16} stroke={1.6} aria-hidden="true" />
+                          <PageIconPicker page={row} className="database-row-icon" disabled={iconDisabled} />
                           <FieldInput
                             row={row}
                             property={{
@@ -87,17 +89,19 @@ export function DatabaseRows({ config, view, rows, readOnly, onStatus, onOpen }:
           <div className="database-list">
             {rows.map((row) => (
               <div className="database-list-row" key={row.id} data-testid="database-row">
-                <Anchor
-                  className="database-list-title"
-                  href={"/?page=" + row.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onOpen(row.id);
-                  }}
-                >
-                  <IconFileText size={17} stroke={1.6} aria-hidden="true" />
-                  <span>{row.title}</span>
-                </Anchor>
+                <div className="database-list-title">
+                  <PageIconPicker page={row} className="database-row-icon" disabled={iconDisabled} />
+                  <Anchor
+                    className="database-list-link"
+                    href={"/?page=" + row.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onOpen(row.id);
+                    }}
+                  >
+                    <span>{row.title}</span>
+                  </Anchor>
+                </div>
                 <div className="database-list-values">
                 {view.columns
                   .filter((id) => id !== "title")

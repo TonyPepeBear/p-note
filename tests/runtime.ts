@@ -4,6 +4,7 @@ import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
 import mcpMigration from '../migrations/0008_mcp_grants.sql';
 import assetListingMigration from '../migrations/0011_asset_listing.sql';
+import iconMigration from '../migrations/0012_page_icons.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
 import databaseRevisionsMigration from '../migrations/0009_database_revisions.sql';
@@ -64,6 +65,9 @@ async function setup(env: Env) {
   if (!await env.DB.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'database_revisions'").first()) {
     // 觸發器內含分號；以完整陳述式之間的空白行分組。
     await env.DB.batch(databaseRevisionsMigration.trim().split(/\n\s*\n/).map(sql => env.DB.prepare(sql)));
+  }
+  if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('pages') WHERE name = 'icon'").first()) {
+    await env.DB.batch(iconMigration.trim().split(/\n\s*\n/).map(sql => env.DB.prepare(sql)));
   }
 }
 

@@ -103,9 +103,10 @@
   .pn-note-row:hover .pn-page-menu-trigger, .pn-note-row:focus-within .pn-page-menu-trigger,
   .pn-page-menu-trigger[data-expanded] { opacity: 1; }
 }
+.pn-note-row .pn-note-icon { flex: none; }
 .pn-tree-toggle { display: flex; align-items: center; justify-content: center; width: 22px; height: 28px; flex: none; padding: 0; border: 0; border-radius: 3px; background: transparent; color: #91918e; cursor: pointer; }
 .pn-tree-spacer { width: 12px; flex: none; }
-.pn-note-link { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; min-height: 32px; padding: 5px 7px 5px 0; color: #5f5e5b; text-decoration: none; font-size: 13px; line-height: 22px; border-radius: 3px; }
+.pn-note-link { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; min-height: 32px; padding: 5px 7px 5px 4px; color: #5f5e5b; text-decoration: none; font-size: 13px; line-height: 22px; border-radius: 3px; }
 .pn-note-link svg { flex: none; color: #91918e; stroke-width: 1.6; }
 .pn-note-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pn-note-link[aria-current] { color: #37352f; font-weight: 550; }
@@ -136,6 +137,8 @@
 .pn-create-menu { color: #37352f; border-color: #e9e9e7; border-radius: 6px; }
 .pn-create-menu .mantine-Menu-item { min-height: 34px; font-size: 13px; }
 .pn-create-menu .mantine-Menu-itemSection { color: #91918e; }
+.pn-breadcrumb-page { display: inline-flex; align-items: center; gap: 3px; min-width: 0; max-width: 100%; }
+.pn-breadcrumb-page > .mantine-Anchor-root { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .pn-topbar-actions { display: flex; align-items: center; flex: none; gap: 2px; }
 .pn-document-shell.document-shell { max-width: 960px; margin: 0 auto; padding: 48px 64px 120px; }
 .pn-settings-shell.document-shell { max-width: 1040px; padding: 0 24px; }
@@ -162,6 +165,9 @@
 .pn-result-row { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 4px; color: #37352f; text-decoration: none; }
 .pn-result-row > svg { flex: none; color: #91918e; }
 .pn-result-row > div { flex: 1; min-width: 0; }
+.pn-result-link { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; align-self: stretch; color: inherit; text-decoration: none; }
+.pn-result-link > div { flex: 1; min-width: 0; }
+.pn-result-link > svg { flex: none; color: #91918e; }
 .pn-result-title, .pn-result-summary { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pn-result-title { font-size: 14px; font-weight: 500; }
 .pn-result-summary { margin-top: 3px; font-size: 12px; color: #6f6e69; }
@@ -176,6 +182,8 @@
 .pn-journal-day { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; flex: none; background: #f7f7f5; border: 1px solid #e9e9e7; border-radius: 4px; font-size: 13px; font-weight: 550; font-variant-numeric: tabular-nums; }
 .pn-journal-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .pn-journal-row > svg { color: #91918e; flex: none; }
+.pn-journal-link { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; align-self: stretch; color: inherit; text-decoration: none; }
+.pn-journal-link > svg { color: #91918e; flex: none; }
 .pn-trash-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #efefed; }
 .pn-trash-row:last-child { border-bottom: 0; }
 .pn-trash-row > svg { color: #91918e; flex: none; }
@@ -247,6 +255,8 @@
     text-overflow: ellipsis;
     line-height: 44px;
   }
+  .pn-breadcrumbs .pn-ancestor .pn-breadcrumb-page { display: flex; }
+  .pn-breadcrumbs .pn-ancestor .pn-breadcrumb-page > .mantine-Anchor-root { flex: 1; }
   .pn-breadcrumbs .mantine-Breadcrumbs-separator { flex: none; }
   .pn-breadcrumbs .pn-current-page { flex: 1 1 56px; min-width: 0; max-width: none; font-size: 13px; }
   .pn-current-page > span { min-width: 0; }
@@ -280,7 +290,8 @@
 .pn-icon-button:disabled, .pn-nav-item:disabled,
 .pn-breadcrumbs .mantine-Anchor-root:disabled,
 .pn-note-link[aria-disabled="true"], .pn-result-row[aria-disabled="true"],
-.pn-journal-row[aria-disabled="true"], .pn-breadcrumbs [aria-disabled="true"] {
+.pn-journal-row[aria-disabled="true"], .pn-result-link[aria-disabled="true"],
+.pn-journal-link[aria-disabled="true"], .pn-breadcrumbs [aria-disabled="true"] {
   opacity: .45;
   cursor: not-allowed;
 }

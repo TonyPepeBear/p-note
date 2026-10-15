@@ -36,8 +36,14 @@ test('SYNC-RECONNECT-02：每次重連先重驗權限；重驗故障期間只保
   await expect(page.getByTestId('cloud-status')).toHaveText('連線失敗，可重試');
   await page.evaluate(()=>{const editor=window.probe!.editor;editor.updateBlock(editor.document[0],{content:'等待重驗的本機草稿'});});
   await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
-  await page.evaluate(()=>dispatchEvent(new Event('fixture-backend-ready')));
-  await page.getByRole('button',{name:'重試儲存',exact:true}).click(); await saved(page);
+  await page.evaluate(() => {
+    // 還原服務與手動重試在同一回合完成，避免自動重連先移除按鈕。
+    dispatchEvent(new Event('fixture-backend-ready'));
+    const retry = [...document.querySelectorAll('button')].find(button => button.textContent?.trim() === '重試儲存');
+    if (retry) { retry.click(); return; }
+    if (document.querySelector('[data-testid="cloud-status"]')?.textContent?.trim() !== '雲端已儲存') throw new Error('尚未儲存且找不到重試按鈕');
+  });
+  await saved(page);
   expect(JSON.stringify(await blocks(page))).toContain('等待重驗的本機草稿');
 });
 

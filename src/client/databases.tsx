@@ -3,7 +3,6 @@ import { Alert, Button, NativeSelect, Text, TextInput } from "@mantine/core";
 import {
   IconArrowsSort,
   IconChevronDown,
-  IconDatabase,
   IconFileText,
   IconFilter,
   IconLayoutList,
@@ -15,6 +14,7 @@ import {
 } from "@tabler/icons-react";
 import "./databases.css";
 import { navigate } from "./api";
+import { PageIconPicker, publishPageMetadata } from "./page-icon";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { initialView, readConfig, selectRows, type DatabaseView } from "../shared/databases";
 import { DatabaseRows } from "./databases/database-rows";
@@ -44,6 +44,13 @@ export function DatabasePage({
   const [propertySession, setPropertySession] = useState<ConfigSession>();
   const [viewSession, setViewSession] = useState<ViewSession>();
   useEffect(() => setTitle(page.title), [page.title]);
+  useEffect(() => {
+    const next = data?.page;
+    if (!next || next.id !== page.id || next.owner_id !== page.owner_id
+      || next.sync_generation !== page.sync_generation || next.metadata_revision <= page.metadata_revision) return;
+    // 資料庫沒有正文同步連線，沿用資料庫輪詢更新目前頁面的 metadata。
+    publishPageMetadata({ ...page, ...next, room: page.room, ancestors: page.ancestors, summary: page.summary });
+  }, [data?.page, page]);
   const config = data?.config ?? readConfig(page.database_config!);
   const view = config.views.find((v) => v.id === selected) ?? config.views[0];
   const rows = selectRows(data?.rows ?? [], view, query);
@@ -88,7 +95,12 @@ export function DatabasePage({
       data-testid={data ? "database-ready" : "database-loading"}
     >
       <header className="database-heading">
-        <IconDatabase className="database-page-icon" size={38} stroke={1.4} aria-hidden="true" />
+        <PageIconPicker
+          page={data?.page ?? page}
+          className="database-page-icon"
+          size="large"
+          disabled={disabled}
+        />
         <TextInput
           aria-label="資料庫標題"
           className="database-title"
@@ -240,6 +252,7 @@ export function DatabasePage({
         view={view}
         rows={rows}
         readOnly={readOnly}
+        iconDisabled={disabled}
         onStatus={setStatus}
         onOpen={(id) => void run(() => navigate(id))}
       />
