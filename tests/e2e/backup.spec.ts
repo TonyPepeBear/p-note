@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from "@zip.js/zip.js";
 import * as Y from "yjs";
-import { openPrivate, saved, openImageUpload, moveToTrash, showNavigation } from "./helpers";
+import { openPrivate, saved, openImageUpload, moveToTrash, showNavigation, openCreateMenu } from "./helpers";
 import type { BackupManifest } from "../../src/shared/backup";
 import { images } from "../fixtures/images";
 
@@ -157,8 +157,8 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
 for (const backDuring of ["還原中", "中斷後"]) {
   test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
     const previous = await openPrivate(page);
-    await showNavigation(page);
-    await page.getByRole("button", { name: "新增筆記", exact: true }).click();
+    await openCreateMenu(page);
+    await page.getByRole("menuitem", { name: "新增筆記", exact: true }).click();
     await expect(page).not.toHaveURL(new RegExp(`page=${previous}$`));
     await expect(page.getByTestId("ready")).toHaveText("可編輯");
     await saved(page);
@@ -205,6 +205,7 @@ for (const backDuring of ["還原中", "中斷後"]) {
     await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
     await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
     const assertNavigationLocked = async () => {
+      await expect(page.getByRole("button", { name: "新增", exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
       await showNavigation(page);

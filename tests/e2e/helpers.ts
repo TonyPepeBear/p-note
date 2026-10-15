@@ -66,6 +66,13 @@ export async function showNavigation(page: Page) {
     await trigger.click();
 }
 
+export async function openCreateMenu(page: Page) {
+  const close = page.getByRole("button", { name: "關閉導覽", exact: true });
+  if (await close.isVisible()) await close.click();
+  await page.getByRole("button", { name: "新增", exact: true }).click();
+  await expect(page.getByRole("menu", { name: "新增", exact: true })).toBeVisible();
+}
+
 export async function openJournal(page: Page) {
   await showNavigation(page);
   await page.getByRole("button", { name: "日記", exact: true }).click();

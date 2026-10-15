@@ -102,7 +102,6 @@
 .pn-note-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pn-note-link[aria-current] { color: #37352f; font-weight: 550; }
 .pn-sidebar-empty { padding: 8px 12px; color: #6f6e69; font-size: 12px; }
-.pn-add-page { color: #6f6e69; }
 .pn-sidebar-footer { border-top: 1px solid #e9e9e7; padding: 8px; }
 .pn-main { min-width: 0; margin-left: 240px; }
 .pn-topbar {
@@ -125,6 +124,10 @@
 .pn-current-page { display: flex; align-items: center; gap: 6px; max-width: 300px; color: #37352f; font-size: 13px; }
 .pn-current-page > svg { color: #91918e; flex: none; }
 .pn-current-page > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pn-create-button { width: auto; padding: 0 8px; gap: 4px; font-size: 13px; }
+.pn-create-menu { color: #37352f; border-color: #e9e9e7; border-radius: 6px; }
+.pn-create-menu .mantine-Menu-item { min-height: 34px; font-size: 13px; }
+.pn-create-menu .mantine-Menu-itemSection { color: #91918e; }
 .pn-topbar-actions { display: flex; align-items: center; flex: none; gap: 2px; }
 .pn-document-shell.document-shell { max-width: 960px; margin: 0 auto; padding: 48px 64px 120px; }
 .pn-settings-shell.document-shell { max-width: 1040px; padding: 0 24px; }
@@ -214,6 +217,9 @@
   .pn-topbar { height: 52px; padding: 0 4px; gap: 0; border-bottom: 1px solid #efefed; }
   .pn-icon-button { width: 44px; height: 44px; }
   .pn-topbar-actions { gap: 0; }
+  .pn-create-button { width: 44px; padding: 0; }
+  .pn-create-button > span { display: none; }
+  .pn-create-menu .mantine-Menu-item { min-height: 44px; font-size: 14px; }
   .pn-breadcrumbs .mantine-Breadcrumbs-root { gap: 3px; min-width: 0; }
   .pn-breadcrumbs .mantine-Breadcrumbs-breadcrumb:first-child {
     display: inline-flex;

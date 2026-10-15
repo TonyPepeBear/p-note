@@ -5,6 +5,7 @@ import {
   openPrivate,
   saved,
   showNavigation,
+  openCreateMenu,
 } from "./helpers";
 import { origin } from "./ports";
 
@@ -224,9 +225,9 @@ test("UX-05：新筆記與子頁面以未命名建立並可立即輸入標題", 
   page,
 }) => {
   await openPrivate(page);
-  await showNavigation(page);
+  await openCreateMenu(page);
   const today = new URL(page.url()).searchParams.get("page");
-  await page.getByRole("button", { name: "新增筆記", exact: true }).click();
+  await page.getByRole("menuitem", { name: "新增筆記", exact: true }).click();
   await page.waitForURL((url) => url.searchParams.get("page") !== today);
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
   const parent = new URL(page.url()).searchParams.get("page")!;
