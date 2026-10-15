@@ -1,16 +1,17 @@
 # Tasks
 
-## 1. MCP 連線
+## 1. OAuth 與登入
 
-- [ ] 1.1 先以 PLUGIN-01／02 E2E 重現缺少 plugin 的 Red，再實作工具與 API 對接，相關 Chromium 測試通過。
-- [ ] 1.2 實作私人設定、輸入與安全入口驗證，PLUGIN-03 斷言錯誤及重新導向不洩漏 key。
+- [ ] 1.1 新增 PLUGIN-05／06 Chromium E2E 取得正確 Red，實作同 Worker discovery、PKCE、Email 登入返回及明確同意，相關測試通過。
+- [ ] 1.2 加入隔離 OAuth KV 與 mcp_grants migration，實作連線 scope／到期／撤銷及網站設定，PLUGIN-07／08 通過並更新文件。
 
-## 2. 封裝與文件
+## 2. 遠端 MCP 與封裝
 
-- [ ] 2.1 提供 manifests、marketplace、技能、安裝文件與 ZIP 命令，以 PLUGIN-04 驗證引用、封裝內容與解壓後啟動。
-- [ ] 2.2 完整三瀏覽器驗收、型別與 OpenSpec 驗證通過，記錄必要的 TDD 結果。
+- [ ] 2.1 改寫 PLUGIN-01／02／03 為 HTTP MCP，保留 10 個工具，與 API key 共用正文處理及保存前權限驗證；相關 Chromium 與 Workers 測試通過。
+- [ ] 2.2 plugin 改為遠端 OAuth、移除本機執行組件，更新安裝及技能文件；PLUGIN-04 與封裝檢查通過。
 
-## 3. 整合
+## 3. 整體驗收
 
-- [ ] 3.1 封存同步主規格並提交，檢查提交內容與 noreply 身分，推送並建立／立即合併 PR。
-- [ ] 3.2 確認 master Actions 的資料遷移與發布成功，不另做正式 HTTP 檢查。
+- [ ] 3.1 MCP 的三瀏覽器案例、型別、規格與整合檢查通過；完整 E2E 執行並如實記錄既有 UI-10 結果與本次 TDD 證據。
+
+完成後依 AGENTS.md 封存同步主規格並提交，推送、建立及立即合併 PR，再確認 Actions migration 與發布結果。不能預先宣稱雲端平台已完成實際連線。
