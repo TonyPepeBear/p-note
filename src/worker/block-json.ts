@@ -1,6 +1,7 @@
 import { BlockNoteEditor } from '@blocknote/core';
 import { blocksToYDoc, yDocToBlocks } from '@blocknote/core/yjs';
 import * as Y from 'yjs';
+import { yXmlFragmentToProsemirrorJSON } from 'y-prosemirror';
 import { PageError } from './pages';
 import { blockSchema, type AppPartialBlock } from '../shared/block-schema';
 
@@ -82,4 +83,12 @@ export function replaceBlocks(doc: Y.Doc, blocks: AppPartialBlock[], editor: Ret
   try { const body = doc.getXmlFragment('body'); doc.transact(() => { body.delete(0, body.length); body.insert(0, source.getXmlFragment('body').toArray().map(node => { if (!(node instanceof Y.XmlElement) && !(node instanceof Y.XmlText)) return invalid(); return node.clone(); })); }); }
   catch { invalid(); } finally { source.destroy(); }
 }
-export function readBlocks(doc: Y.Doc, editor: ReturnType<typeof blockEditor>) { return doc.getXmlFragment('body').length ? yDocToBlocks(editor, doc, 'body') : []; }
+export function readBlocks(doc: Y.Doc, editor: ReturnType<typeof blockEditor>) {
+  const fragment = doc.getXmlFragment('body');
+  if (!fragment.length) return [];
+  try {
+    // 先檢查原始 XML；BlockNote 轉換會忽略未知節點，不能將遺失內容當作成功讀取。
+    editor.pmSchema.nodeFromJSON(yXmlFragmentToProsemirrorJSON(fragment)).check();
+    return yDocToBlocks(editor, doc, 'body');
+  } catch { return invalid(); }
+}

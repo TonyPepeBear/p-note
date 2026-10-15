@@ -166,7 +166,7 @@ async function open(scope: SyncedScope, id: string): Promise<SyncedSession> {
   }
   const provider = new YProvider(location.host, room, doc, {
     party: 'sync', connect: false, disableBc: true, protocol: location.protocol === 'https:' ? 'wss' : 'ws',
-    params: { syncedBlock: id, page: scope.pageId, generation: metadata.sync_generation },
+    params: { syncedBlock: id, page: scope.pageId, generation: metadata.sync_generation, pageGeneration: scope.generation },
   });
   const session = new SyncedSession(scope, metadata, doc, cache, provider);
   if (downloaded) { session.publish({ ready: true, local: '本機已儲存', cloud: navigator.onLine ? '同步中' : '離線，待同步' }); }

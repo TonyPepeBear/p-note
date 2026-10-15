@@ -29,7 +29,7 @@ it('SB-18：引用改目標並關閉舊房間後，孤立同步區塊正文仍�
   expect((await send(pagePath, references(original.id), initial.headers.get('etag')!)).status).toBe(200);
   const parent = await connect(page, auth.cookie); sockets.push(parent.socket);
   const openBlock = async (block: SyncedBlockInfo) => {
-    const response = await exports.default.fetch(`${origin}/parties/sync/${block.room}?syncedBlock=${block.id}&page=${page.id}&generation=${block.sync_generation}`, { headers: { Cookie: auth.cookie, Origin: origin, Upgrade: 'websocket' } });
+    const response = await exports.default.fetch(`${origin}/parties/sync/${block.room}?syncedBlock=${block.id}&page=${page.id}&pageGeneration=${page.sync_generation}&generation=${block.sync_generation}`, { headers: { Cookie: auth.cookie, Origin: origin, Upgrade: 'websocket' } });
     expect(response.status).toBe(101); const socket = response.webSocket!; socket.binaryType = 'arraybuffer'; socket.accept(); sockets.push(socket);
     return { socket };
   };

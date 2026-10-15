@@ -1,6 +1,7 @@
 import * as Y from 'yjs';
 import type { BackupManifest } from '../shared/backup';
 import { PageError } from './pages';
+import { blockEditor, readBlocks } from './block-json';
 
 const invalid = (): never => { throw new PageError(503, '備份同步區塊或引用關係無效'); };
 function fenceLength(text: string, minimum: number): number {
@@ -13,14 +14,20 @@ export function backupDocument(bytes: Uint8Array, syncedBlock = false): Y.Doc {
   const doc = new Y.Doc();
   try {
     Y.applyUpdate(doc, bytes);
+    let hasReferences = false;
     for (const node of doc.getXmlFragment('body').createTreeWalker(() => true)) {
       if (!(node instanceof Y.XmlElement) || node.nodeName !== 'syncedBlock') continue;
+      hasReferences = true;
       const id = node.getAttribute('syncedBlockId');
       if (syncedBlock || typeof id !== 'string' || !/^[\w-]{1,80}$/.test(id) || node.length) invalid();
       // BlockNote 的 children 是內容節點旁的 blockGroup，不在內容節點內。
       const parent = node.parent;
       if (parent instanceof Y.XmlElement && parent.nodeName === 'blockContainer'
         && parent.toArray().some(child => child instanceof Y.XmlElement && child.nodeName === 'blockGroup' && child.length > 0)) invalid();
+    }
+    // 同步文件使用嚴格 schema，避免未知 XML 轉換時被當成空正文；舊一般頁面仍保留原格式相容性。
+    if (syncedBlock || hasReferences) {
+      try { readBlocks(doc, blockEditor()); } catch { invalid(); }
     }
     return doc;
   } catch (error) { doc.destroy(); throw error; }
@@ -77,7 +84,7 @@ async function* documentText(bytes: Uint8Array, loadBlock: (id: string) => Promi
       case 'heading': before = '#'.repeat(Math.min(6, Math.max(1, Number(node.getAttribute('level')) || 1))) + ' '; after = '\n\n'; break;
       case 'bulletListItem': before = '- '; after = '\n'; break;
       case 'numberedListItem': before = '1. '; after = '\n'; break;
-      case 'checkListItem': before = `- [${node.getAttribute('checked') === 'true' ? 'x' : ' '}] `; after = '\n'; break;
+      case 'checkListItem': before = `- [${String(node.getAttribute('checked')) === 'true' ? 'x' : ' '}] `; after = '\n'; break;
       case 'paragraph': after = '\n\n'; break;
       case 'tableCell': case 'tableHeader': after = ' | '; break;
       case 'tableRow': before = '| '; after = '\n'; break;

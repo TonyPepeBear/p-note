@@ -16,6 +16,7 @@ import { sendLoginMail } from './mail';
 import { cleanupBackups, createBackup, handleBackups } from './backups';
 import { RestoreCoordinator } from './restore';
 import { handleSyncedBlocks, syncedBlockInfo } from './synced-blocks';
+import { handleHistory } from './history';
 
 export { ProbeRoom, SyncRoom, RestoreCoordinator };
 
@@ -99,6 +100,9 @@ export async function handle(request: Request, env: Env, services: Services = { 
     const connectionsResponse = await handleConnections(request, env, session.user.id, services);
     if (connectionsResponse) return connectionsResponse;
     if (!path.startsWith('/api/backups') && await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(session.user.id).first()) return error('還原處理中，請重試原備份', 503);
+    if (path !== '/api/history-restore' && !/^\/api\/pages\/[\w-]{1,80}\/history(?:\/|$)/.test(path) && await env.DB.prepare('SELECT 1 FROM page_history_restores WHERE owner_id = ?').bind(session.user.id).first()) return error('版本還原處理中，請重試原版本', 503);
+    const historyResponse = await handleHistory(request, env, session.user.id);
+    if (historyResponse) return historyResponse;
     const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());
@@ -115,7 +119,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
         const block = await syncedBlockInfo(env, session.user.id, blockId);
         if (!block) return error('找不到同步區塊', 404);
         const page = url.searchParams.get('page'); const referencePage = page && await visiblePage(env.DB, session.user.id, page);
-        const reference = referencePage && await env.SYNC.getByName(await roomName(session.user.id, referencePage.id, referencePage.sync_generation))
+        if (!referencePage || referencePage.sync_generation !== url.searchParams.get('pageGeneration')) return error('引用頁面世代已改變，本機內容已隔離', 409);
+        const reference = await env.SYNC.getByName(await roomName(session.user.id, referencePage.id, referencePage.sync_generation))
           .hasSyncedBlockReference({ owner: session.user.id, page: referencePage.id, generation: referencePage.sync_generation }, block.id);
         if (!reference || block.sync_generation !== url.searchParams.get('generation')) return error('同步區塊引用或世代已改變，本機內容已隔離', 409);
         if (path !== `/parties/sync/${block.room}`) return error('無效房間', 403);
@@ -125,6 +130,7 @@ export async function handle(request: Request, env: Env, services: Services = { 
         headers.set('x-p-note-session', session.session.id); headers.set('x-p-note-owner', session.user.id);
         headers.set('x-p-note-page', block.id); headers.set('x-p-note-generation', block.sync_generation);
         headers.set('x-p-note-kind', 'syncedBlock'); headers.set('x-p-note-reference-page', page!);
+        headers.set('x-p-note-reference-generation', referencePage.sync_generation);
         return await routePartykitRequest(new Request(request, { headers }), env) ?? error('找不到房間', 404);
       }
       const page = await env.DB.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(url.searchParams.get('page'), session.user.id).first<PageRow>();

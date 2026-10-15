@@ -28,7 +28,7 @@ for (const file of files) {
     const found = Array.from(text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g));
     assert.equal(found.length, Array.from(text.matchAll(/^#### Scenario:/gm)).length, `${file}: 情境缺驗證方法`);
     for (const [, id, method] of found) {
-      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB)-\d{2}$/.test(id), id);
+      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB|HIST)-\d{2}$/.test(id), id);
       assert(method.includes('斷言') || method.includes('檢查'), `${id}: 缺機器斷言`);
       const capability = file.match(/\/specs\/([^/]+)\//)?.[1];
       const sources = idSources.get(id) ?? [];
@@ -42,7 +42,7 @@ for (const file of files) {
     }
   }
 }
-for (const [prefix, count] of Object.entries({ AUTH: 8, PAGE: 8, EDIT: 5, SYNC: 12, ASSET: 5, BACKUP: 9 })) {
+for (const [prefix, count] of Object.entries({ AUTH: 8, PAGE: 8, EDIT: 5, SYNC: 12, ASSET: 9, BACKUP: 9 })) {
   assert.deepEqual(ids.filter(id => id.startsWith(`${prefix}-`)).sort(), Array.from({ length: count }, (_, i) => `${prefix}-${String(i + 1).padStart(2, '0')}`));
 }
 assert.deepEqual(ids.filter(id => id.startsWith('DEPLOY-')).sort(), ['DEPLOY-01', 'DEPLOY-02', 'DEPLOY-03', 'DEPLOY-04']);
@@ -50,12 +50,13 @@ assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Ar
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UX-')))].sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({ length: 6 }, (_, i) => `KEY-0${i + 1}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('LFN-')))].sort(), Array.from({ length: 7 }, (_, i) => `LFN-0${i + 1}`));
-assert.deepEqual([...new Set(ids.filter(id => id.startsWith('DB-')))].sort(), Array.from({ length: 10 }, (_, i) => `DB-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual([...new Set(ids.filter(id => id.startsWith('DB-')))].sort(), Array.from({ length: 12 }, (_, i) => `DB-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('CICD-')).sort(), ['CICD-01', 'CICD-02', 'CICD-03']);
 assert.deepEqual(ids.filter(id => id.startsWith('LINK-')).sort(), Array.from({ length: 6 }, (_, i) => `LINK-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('PWA-')).sort(), Array.from({ length: 6 }, (_, i) => `PWA-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('PLUGIN-')).sort(), Array.from({ length: 8 }, (_, i) => `PLUGIN-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('SB-')).sort(), Array.from({ length: 22 }, (_, i) => `SB-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual(ids.filter(id => id.startsWith('HIST-')).sort(), Array.from({ length: 6 }, (_, i) => `HIST-0${i + 1}`));
 // 依能力驗證完整編號，避免新增能力後仍被歷史情境總數擋住。
 assert.equal(new Set(ids).size, ids.length, '情境 ID 必須唯一');
 const scope = await readFile('docs/v1-scope.md', 'utf8');

@@ -20,6 +20,8 @@ async function fixture() {
     { type: 'paragraph', content: '備份同步正文' },
     { type: 'paragraph', content: [{ type: 'link', href: '/?page=' + page.id, content: [{ type: 'text', text: '筆記連結', styles: { bold: true } }] }] },
     { type: 'codeBlock', props: { language: 'javascript' }, content: 'const sample = "保存";' },
+    { type: 'checkListItem', props: { checked: true }, content: '已完成事項' },
+    { type: 'checkListItem', props: { checked: false }, content: '未完成事項' },
   ] });
   expect(added.status).toBe(200); const block = await added.json<Synced>();
   const orphan = await (await auth.post('/api/synced-blocks', { blocks: [{ type: 'paragraph', content: '保留無引用正文' }] })).json<Synced>();
@@ -45,6 +47,7 @@ it('SB-16：備份與 ZIP 保存共用正文、無引用正文與關係，可讀
   const readable = new TextDecoder().decode(files.get(`readable/pages/${f.page.id}.md`));
   expect(readable.split('備份同步正文')).toHaveLength(3); expect(readable.split(f.block.id)).toHaveLength(3);
   expect(readable).toContain(`[**筆記連結**](/?page=${f.page.id})`); expect(readable).toContain('```javascript\nconst sample = "保存";\n```');
+  expect(readable).toContain('- [x] 已完成事項'); expect(readable).toContain('- [ ] 未完成事項');
   expect(new TextDecoder().decode(files.get(`readable/synced-blocks/${f.orphan.id}.md`))).toContain('保留無引用正文');
 }, 30000);
 
@@ -81,13 +84,17 @@ it('SB-17：損毀的共用正文、巢狀引用或不符正文的關係在暫�
   const original = new Uint8Array(await (await env.BACKUPS.get(prefix + entry.file.path))!.arrayBuffer());
   const nested = blocksToYDoc(blockEditor(), [{ type: 'syncedBlock' as never, props: { syncedBlockId: f.orphan.id } }], 'body');
   const invalid = Y.encodeStateAsUpdate(nested); nested.destroy();
-  for (const bytes of [new Uint8Array([255, 255, 255]), invalid]) {
+  const unknownDoc = new Y.Doc(); const unknown = new Y.XmlElement('unsupportedBackupNode'); unknown.insert(0, [new Y.XmlText('不應被靜默丟棄的內容')]); unknownDoc.getXmlFragment('body').insert(0, [unknown]);
+  const unknownBytes = Y.encodeStateAsUpdate(unknownDoc); unknownDoc.destroy();
+  for (const bytes of [new Uint8Array([255, 255, 255]), invalid, unknownBytes]) {
     await env.BACKUPS.put(prefix + entry.file.path, bytes); entry.file.byte_size = bytes.length; entry.file.checksum = await hash(bytes);
     const encoded = new TextEncoder().encode(JSON.stringify(manifest)); await env.BACKUPS.put(prefix + 'manifest.json', encoded);
     await env.DB.prepare('UPDATE backups SET manifest_checksum = ?, manifest_size = ? WHERE id = ?').bind(await hash(encoded), encoded.length, backup.id).run();
     expect((await request(f.auth, `/api/backups/${backup.id}/restore`, env, 'POST')).status).toBe(503);
     expect((await f.auth.get(`/api/pages/${f.page.id}`)).status).toBe(200);
     expect(await env.DB.prepare('SELECT COUNT(*) AS n FROM restore_operations').first('n')).toBe(0);
+    expect(await env.DB.prepare('SELECT sync_generation FROM pages WHERE id = ?').bind(f.page.id).first('sync_generation')).toBe(f.page.sync_generation);
+    expect(await env.DB.prepare('SELECT sync_generation FROM synced_blocks WHERE id = ?').bind(f.block.id).first('sync_generation')).toBe(f.block.sync_generation);
   }
   await env.BACKUPS.put(prefix + entry.file.path, original); entry.file.byte_size = original.length; entry.file.checksum = await hash(original);
   manifest.page_synced_blocks = [];
@@ -104,6 +111,17 @@ it('SB-17：損毀的共用正文、巢狀引用或不符正文的關係在暫�
   expect((await request(f.auth, `/api/backups/${backup.id}/restore`, env, 'POST')).status).toBe(503);
   expect((await f.auth.get(`/api/pages/${f.page.id}`)).status).toBe(200);
   expect(await env.DB.prepare('SELECT COUNT(*) AS n FROM restore_operations').first('n')).toBe(0);
+  const unknownPage = blocksToYDoc(blockEditor(), [{ type: 'syncedBlock' as never, props: { syncedBlockId: f.block.id } }], 'body');
+  unknownPage.getXmlFragment('body').push([new Y.XmlElement('unsupportedBackupNode')]);
+  const unknownPageBytes = Y.encodeStateAsUpdate(unknownPage); unknownPage.destroy();
+  await env.BACKUPS.put(prefix + pageEntry.file.path, unknownPageBytes); pageEntry.file.byte_size = unknownPageBytes.length; pageEntry.file.checksum = await hash(unknownPageBytes);
+  const unknownManifest = new TextEncoder().encode(JSON.stringify(manifest)); await env.BACKUPS.put(prefix + 'manifest.json', unknownManifest);
+  await env.DB.prepare('UPDATE backups SET manifest_checksum = ?, manifest_size = ? WHERE id = ?').bind(await hash(unknownManifest), unknownManifest.length, backup.id).run();
+  expect((await request(f.auth, `/api/backups/${backup.id}/restore`, env, 'POST')).status).toBe(503);
+  expect((await f.auth.get(`/api/pages/${f.page.id}`)).status).toBe(200);
+  expect(await env.DB.prepare('SELECT COUNT(*) AS n FROM restore_operations').first('n')).toBe(0);
+  expect(await env.DB.prepare('SELECT sync_generation FROM pages WHERE id = ?').bind(f.page.id).first('sync_generation')).toBe(f.page.sync_generation);
+  expect(await env.DB.prepare('SELECT sync_generation FROM synced_blocks WHERE id = ?').bind(f.block.id).first('sync_generation')).toBe(f.block.sync_generation);
 }, 30000);
 
 it('SB-17：共用正文切換失敗時頁面與同步區塊一起回滾，重啟後沿原操作完成', async () => {

@@ -21,7 +21,7 @@ async function reference(a: Awaited<ReturnType<typeof setup>>, page = a.page, co
   expect((await commit(client, doc, 'reference')).type).toBe('persisted'); doc.destroy();
 }
 async function blockSocket(a: Awaited<ReturnType<typeof setup>>, page = a.page) {
-  const response = await exports.default.fetch(`${origin}/parties/sync/${a.block.room}?syncedBlock=${a.block.id}&page=${page.id}&generation=${a.block.sync_generation}`, { headers: { Cookie: a.auth.cookie, Origin: origin, Upgrade: 'websocket' } });
+  const response = await exports.default.fetch(`${origin}/parties/sync/${a.block.room}?syncedBlock=${a.block.id}&page=${page.id}&pageGeneration=${page.sync_generation}&generation=${a.block.sync_generation}`, { headers: { Cookie: a.auth.cookie, Origin: origin, Upgrade: 'websocket' } });
   expect(response.status).toBe(101); const socket = response.webSocket!; socket.binaryType = 'arraybuffer'; socket.accept(); sockets.push(socket); const messages: (string | ArrayBuffer)[] = [];
   let closed = false; socket.addEventListener('close', () => { closed = true; });
   socket.addEventListener('message', event => { messages.push(event.data); }); return { socket, messages, stub: env.SYNC.getByName(a.block.room), get closed() { return closed; } };
@@ -45,7 +45,7 @@ it('SB-12：建立共用正文且同頁重複引用只算一頁，垃圾桶不�
   await a.auth.post(`/api/pages/${second.id}/restore`, {}); expect(await refs()).toMatchObject({ count: 2 });
 });
 it('SB-15：沒有引用、錯誤世代及外部來源拒絕同步連線', async () => {
-  const a = await setup(); const send = (generation: string, originValue = origin) => exports.default.fetch(`${origin}/parties/sync/${a.block.room}?syncedBlock=${a.block.id}&page=${a.page.id}&generation=${generation}`, { headers: { Cookie: a.auth.cookie, Origin: originValue, Upgrade: 'websocket' } });
+  const a = await setup(); const send = (generation: string, originValue = origin) => exports.default.fetch(`${origin}/parties/sync/${a.block.room}?syncedBlock=${a.block.id}&page=${a.page.id}&pageGeneration=${a.page.sync_generation}&generation=${generation}`, { headers: { Cookie: a.auth.cookie, Origin: originValue, Upgrade: 'websocket' } });
   expect((await send(a.block.sync_generation)).status).toBe(409); await reference(a);
   expect((await send('old-generation')).status).toBe(409); expect((await send(a.block.sync_generation, 'https://other.example.test')).status).toBe(403);
 });
@@ -89,6 +89,24 @@ it('SB-04：任一引用提交後其他引用即時收到持久保存的 Yjs 更
   await vi.waitFor(() => expect(peer.messages.some(message => typeof message !== 'string' && new Uint8Array(message)[1] === 2)).toBe(true));
   const captured = new Y.Doc(); Y.applyUpdate(captured, (await first.stub.capture(scope)).data);
   expect(captured.getXmlFragment('body').toString()).toContain('兩頁一致共用內容'); doc.destroy(); captured.destroy();
+});
+it('SB-03：未知 XML 區塊拒絕保存並保留原文，相同形狀的支援區塊可正常保存', async () => {
+  const a = await setup(); await reference(a); const client = await blockSocket(a); const scope = blockScope(a);
+  const original = await client.stub.capture(scope);
+  const candidate = (type: string) => {
+    const doc = new Y.Doc(); Y.applyUpdate(doc, original.data);
+    const group = doc.getXmlFragment('body').get(0) as Y.XmlElement;
+    const container = new Y.XmlElement('blockContainer'); container.setAttribute('id', 'raw-xml-block');
+    const content = new Y.XmlElement(type); content.insert(0, [new Y.XmlText('原始 XML 內容')]);
+    container.insert(0, [content]); group.insert(group.length, [container]); return doc;
+  };
+  const unknown = candidate('unsupportedType');
+  expect((await commit(client, unknown, 'unknown-xml')).type).toBe('error'); unknown.destroy();
+  expect((await client.stub.capture(scope)).data).toEqual(original.data);
+  const supported = candidate('paragraph');
+  expect((await commit(client, supported, 'supported-xml')).type).toBe('persisted'); supported.destroy();
+  const saved = new Y.Doc(); Y.applyUpdate(saved, (await client.stub.capture(scope)).data);
+  expect(saved.getXmlFragment('body').toString()).toContain('原始 XML 內容'); saved.destroy();
 });
 it('SB-05：同步區塊保存故障不確認不廣播，重試後才持久保存並同步', async () => {
   const a = await setup(); await reference(a); const client = await blockSocket(a); const peer = await blockSocket(a);
