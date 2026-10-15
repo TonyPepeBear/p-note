@@ -11,7 +11,7 @@ test("UI-CREATE-01：側欄無常駐新增按鈕，鍵盤選單可取消並建�
   await page.locator(".tiptap").fill("新增前保留的正文");
   await saved(page);
   const sidebar = page.getByRole("complementary", { name: "側邊欄" });
-  await expect(sidebar.getByRole("button", { name: /^新增/ })).toHaveCount(0);
+  await expect(sidebar.getByRole("button", { name: /^新增(?:筆記|資料庫)$/ })).toHaveCount(0);
   const trigger = page.getByRole("button", { name: "新增", exact: true });
   const menu = page.getByRole("menu", { name: "新增", exact: true });
   await expect(menu).toBeHidden();
@@ -64,7 +64,7 @@ test("UI-CREATE-03：手機導覽無新增按鈕，頂端與選項可觸控且�
   await openPrivate(page);
   await page.getByRole("button", { name: "導覽", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "導覽", exact: true });
-  await expect(drawer.getByRole("button", { name: /^新增/ })).toHaveCount(0);
+  await expect(drawer.getByRole("button", { name: /^新增(?:筆記|資料庫)$/ })).toHaveCount(0);
   await page.getByRole("button", { name: "關閉導覽", exact: true }).click();
   const trigger = page.getByRole("button", { name: "新增", exact: true });
   expect((await trigger.boundingBox())!.width).toBeGreaterThanOrEqual(44);

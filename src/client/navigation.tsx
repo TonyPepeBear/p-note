@@ -15,6 +15,7 @@ import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
 import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
+import { PageIcon, PageIconPicker } from "./page-icon";
 import "./navigation.css";
 
 export function Navigation({ page, changed, error, backups, settings, images, imagesClose, pageHistory, settingsView, databaseView, navigationLocked = false, children }: {
@@ -95,8 +96,40 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const refresh = async () => {
     const response = await api("/api/pages");
     if (!response.ok) throw new Error("無法載入頁面列表");
-    setPages((await response.json()) as PageRow[]);
+    const incoming = (await response.json()) as PageRow[];
+    setPages((items) => incoming.map((item) => {
+      const current = items.find((value) => value.id === item.id);
+      return current && current.sync_generation === item.sync_generation && current.metadata_revision > item.metadata_revision ? current : item;
+    }));
+    const merge = <T extends PageRow>(items: T[]): T[] => items.map((item) => {
+      const updated = incoming.find((value) => value.id === item.id);
+      return updated && (item.sync_generation !== updated.sync_generation || updated.metadata_revision >= item.metadata_revision)
+        ? { ...item, ...updated } : item;
+    });
+    setJournals(merge); setResults(merge);
   };
+  useEffect(() => {
+    const metadata = (event: Event) => {
+      const updated = (event as CustomEvent<PageInfo>).detail;
+      if (!updated || updated.owner_id !== page.owner_id) return;
+      const merge = <T extends PageRow>(items: T[]): T[] => items.map((item) => item.id === updated.id
+        && (item.sync_generation !== updated.sync_generation || updated.metadata_revision >= item.metadata_revision) ? { ...item, ...updated } : item);
+      setPages(merge); setTrash(merge); setJournals(merge); setResults(merge);
+    };
+    const refreshVisible = () => {
+      if (navigator.onLine && document.visibilityState !== "hidden") void refresh().catch(() => {});
+    };
+    const timer = setInterval(refreshVisible, 3000);
+    window.addEventListener("p-note:page-metadata", metadata);
+    window.addEventListener("focus", refreshVisible);
+    window.addEventListener("online", refreshVisible);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("p-note:page-metadata", metadata);
+      window.removeEventListener("focus", refreshVisible);
+      window.removeEventListener("online", refreshVisible);
+    };
+  }, [page.owner_id]);
   useEffect(() => {
     void refresh().catch(() => error("無法載入頁面列表，請重新整理"));
     const ancestors = new Set(page.ancestors?.map((item) => item.id));
@@ -109,9 +142,14 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     setMonth((page.journal_date ?? today(Date.now())).slice(0, 7));
   }, [page.id]);
   useEffect(() => {
+    if (actionPage.id !== page.id) return;
+    setTitle(page.title);
+    setParent(page.parent_id ?? "");
+  }, [actionPage.id, page.id, page.title, page.parent_id]);
+  useEffect(() => {
     setPages((items) => items.map((item) => item.id === page.id
-      ? { ...item, title: page.title, parent_id: page.parent_id } : item));
-  }, [page.title, page.parent_id]);
+      ? { ...item, title: page.title, parent_id: page.parent_id, icon: page.icon, metadata_revision: page.metadata_revision } : item));
+  }, [page.id, page.title, page.parent_id, page.icon, page.metadata_revision]);
   useEffect(() => {
     const search = (event: KeyboardEvent) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;
@@ -156,7 +194,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     void run(() => navigate(id));
   };
   const pageLink = (item: PageRow, label = item.title) => (
-    <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
+    <span className="pn-breadcrumb-page">
+      <PageIconPicker page={pages.find((value) => value.id === item.id) ?? item} size={15} disabled={navigationLocked} />
+      <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
+    </span>
   );
   const open = (name: string, target?: HTMLElement) => {
     if (navigationLockedRef.current) return;
@@ -205,10 +246,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           aria-label={(closed ? "展開 " : "收合 ") + item.title} aria-expanded={!closed} onClick={() => toggle(item.id)}>
           {closed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
         </button> : <span className="pn-tree-spacer" />}
+        <PageIconPicker page={item} size={17} disabled={navigationLocked} className="pn-note-icon" />
         <a href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} className="pn-note-link note-link"
           aria-current={!settingsView && item.id === page.id ? "page" : undefined}
           onClick={(event) => link(event, item.id)} title={item.title}>
-          {item.database_config ? <IconDatabase size={17} /> : <IconFileText size={17} />}
           <span>{item.title}</span>
         </a>
       </PageMenu>
@@ -299,7 +340,8 @@ export function Navigation({ page, changed, error, backups, settings, images, im
             {!settingsView && page.ancestors?.map((item, index) => <span key={item.id} className="pn-ancestor"
               data-direct-parent={index === (page.ancestors?.length ?? 0) - 1 || undefined}>{pageLink(item)}</span>)}
             <span className="pn-current-page" title={settingsView ? undefined : page.title}>
-              {settingsView === "images" ? <IconPhoto size={15} /> : settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
+              {settingsView === "images" ? <IconPhoto size={15} /> : settingsView ? <IconSettings size={15} /> : <PageIconPicker page={page} size={15} disabled={navigationLocked}
+                fallback={page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />} />}
               <span>{settingsView === "images" ? "我的圖片" : settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
             </span>
           </Breadcrumbs>
@@ -359,11 +401,13 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           {searched ? <section aria-label="搜尋結果" className="pn-result-list">
             <div className="pn-list-caption">{results.length} 個搜尋結果</div>
             {!results.length ? <div className="pn-empty-state"><IconSearch size={28} stroke={1.4} /><Text>沒有符合的頁面</Text><Text size="sm" c="dimmed">試試其他關鍵字。</Text></div>
-              : results.map((item) => <a key={item.id} className="pn-result-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
-                {item.kind === "journal" ? <IconCalendar size={19} /> : item.database_config ? <IconDatabase size={19} /> : <IconFileText size={19} />}
-                <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
-                <IconArrowRight size={16} className="pn-result-arrow" />
-              </a>)}
+              : results.map((item) => <div key={item.id} className="pn-result-row">
+                <PageIconPicker page={item} size={19} disabled={navigationLocked} fallback={item.kind === "journal" ? <IconCalendar size={19} /> : undefined} />
+                <a className="pn-result-link" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
+                  <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
+                  <IconArrowRight size={16} className="pn-result-arrow" />
+                </a>
+              </div>)}
           </section> : <div className="pn-search-help"><IconSearch size={26} stroke={1.4} /><Text size="sm">搜尋你的筆記與日記</Text><Text size="xs" c="dimmed">可搜尋標題及已同步的內容</Text></div>}
           <div className="pn-dialog-footer"><span><kbd>Esc</kbd> 關閉</span><span><kbd>Enter</kbd> 搜尋</span></div>
         </>}
@@ -387,12 +431,15 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           </div>
           <section aria-label="月份日記" className="pn-result-list">
             <div className="pn-list-caption">{month.replace("-", " 年 ")} 月 · {journals.length} 篇日記</div>
-            {journals.length ? journals.map((item) => <a key={item.id} className="pn-journal-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
-              onClick={(event) => link(event, item.id)}>
-              <span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>
-              <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
-              <IconChevronRight size={15} />
-            </a>) : <div className="pn-empty-state"><IconCalendar size={28} stroke={1.4} /><Text size="sm">這個月還沒有日記</Text><Text size="xs" c="dimmed">選擇日期，開始記錄。</Text></div>}
+            {journals.length ? journals.map((item) => <div key={item.id} className="pn-journal-row">
+              <PageIconPicker page={item} size={19} disabled={navigationLocked}
+                fallback={<span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>} />
+              <a className="pn-journal-link" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
+                onClick={(event) => link(event, item.id)}>
+                <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
+                <IconChevronRight size={15} />
+              </a>
+            </div>) : <div className="pn-empty-state"><IconCalendar size={28} stroke={1.4} /><Text size="sm">這個月還沒有日記</Text><Text size="xs" c="dimmed">選擇日期，開始記錄。</Text></div>}
           </section>
         </>}
         {panel === "trash" && <section aria-label="垃圾桶內容">
@@ -400,7 +447,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           {notice && <Alert color="gray" role="status" mb={12}>{notice}</Alert>}
           {!trash.length && <div className="pn-empty-state"><IconTrash size={30} stroke={1.4} /><Text fw={500}>垃圾桶是空的</Text></div>}
           <div className="pn-trash-list">{trash.map((item) => <div className="pn-trash-row" key={item.id}>
-            <IconFileText size={18} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
+            <PageIcon page={item} size={18} fallback={<IconFileText size={18} />} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
             <Button variant="default" disabled={busy || navigationLocked} aria-label={"還原 " + item.title} onClick={() => {
               setNotice("");
               void run(async () => {

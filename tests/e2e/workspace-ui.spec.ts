@@ -120,7 +120,7 @@ test("UI-02：正文優先、導覽可觸控且手機無水平溢出", async ({
       page.getByRole("dialog", { name: "導覽", exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("dialog", { name: "導覽", exact: true }).getByRole("button", { name: /^新增/ }),
+      page.getByRole("dialog", { name: "導覽", exact: true }).getByRole("button", { name: /^新增(?:筆記|資料庫)$/ }),
     ).toHaveCount(0);
     await screenshot(page, "navigation", info.project.name);
     await page.getByRole("button", { name: "關閉導覽", exact: true }).click();

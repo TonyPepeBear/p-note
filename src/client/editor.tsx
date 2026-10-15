@@ -29,7 +29,7 @@ import {
   IconTrash,
   IconDots,
 } from "@tabler/icons-react";
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
@@ -44,7 +44,7 @@ import { roomName } from "../shared/room";
 import { IMAGE_TYPES, IMAGE_RULE } from "../shared/image";
 import { uploadImage } from "./assets";
 import { registerDraft } from "./api";
-import { NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
+import { createNoteLinkIconsExtension, NoteLinkIcons, NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
@@ -184,6 +184,7 @@ export function Editor({
   focusTitle = false,
   readOnly = false,
   properties,
+  icon,
   ownerId,
 }: {
   session: Session;
@@ -193,6 +194,7 @@ export function Editor({
   focusTitle?: boolean;
   readOnly?: boolean;
   properties?: ReactNode;
+  icon?: ReactNode;
   ownerId?: string;
 }) {
   const { doc, cache, provider, room } = session;
@@ -207,9 +209,12 @@ export function Editor({
     id: string;
     code: boolean;
   }>();
+  // 初始化時加入裝飾插件，避免動態重設插件破壞協作復原紀錄。
+  const noteLinkIcons = useMemo(() => createNoteLinkIconsExtension(), []);
   const editor = useCreateBlockNote(
     withCollaboration({
       dictionary: zhTW,
+      extensions: [noteLinkIcons.extension],
       collaboration: {
         fragment: doc.getXmlFragment("body"),
         provider,
@@ -543,6 +548,7 @@ export function Editor({
   return (
     <section className="editor-document">
       <div className="document-heading">
+        {icon && <div className="document-icon">{icon}</div>}
         <div className="document-kind">
           {kind === "journal" ? <IconBook2 size={18} /> : <IconFileText size={18} />}
           <span>{kind === "journal" ? "日記" : "筆記"}</span>
@@ -760,6 +766,7 @@ export function Editor({
       >
         <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly}>
           {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
+          {ownerId && <NoteLinkIcons editor={editor} owner={ownerId} disabled={readOnly} controller={noteLinkIcons} />}
         </BlockNoteView>
       </div>
       {title && !readOnly && (

@@ -21,6 +21,9 @@ async function login(page: Page, request: APIRequestContext) {
   }[];
   await page.goto(mails.at(-1)!.url);
   await page.getByRole("button", { name: "確認登入", exact: true }).click();
+  await expect(page.getByTestId("ready")).toHaveText("可編輯", {
+    timeout: 15000,
+  });
   await saved(page);
 }
 const urls = (page: Page) =>

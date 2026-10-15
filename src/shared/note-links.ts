@@ -3,4 +3,8 @@ export function noteLinkId(href: unknown): string | undefined {
   return /^\/\?page=([\w-]{1,80})$/.exec(href)?.[1];
 }
 export const noteLinkHref = (id: string) => '/?page=' + encodeURIComponent(id);
-export type Backlink = { id: string; title: string; kind: 'note' | 'journal'; journal_date: string | null };
+export type Backlink = {
+  id: string; title: string; kind: 'note' | 'journal'; journal_date: string | null;
+  icon?: string | null; database_config?: string | null;
+  metadata_revision?: number; sync_generation?: string;
+};

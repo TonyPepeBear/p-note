@@ -48,6 +48,14 @@
   cursor: pointer;
 }
 
+.note-link-option-row { display: flex; align-items: center; min-width: 0; border-radius: 3px; padding-left: 4px; }
+.note-link-option-row > .note-link-option { flex: 1; width: auto; padding-left: 4px; }
+.note-link-option-row:hover, .note-link-option-row[data-selected="true"] { background: #efefed; }
+.note-link-option-row .note-link-option-picker { flex: none; }
+
+.note-inline-icon { display: inline-flex; vertical-align: middle; margin-right: 2px; user-select: none; }
+.note-inline-icon .note-inline-icon-picker { width: 24px; min-width: 24px; height: 24px; min-height: 24px; vertical-align: middle; }
+
 .note-link-option:hover,
 .note-link-option[aria-selected="true"] {
   background: #efefed;
@@ -233,6 +241,9 @@
   text-decoration: none;
 }
 
+.note-backlink-row { display: flex; align-items: center; gap: 1px; max-width: 100%; min-width: 0; }
+.note-backlink-row > .note-backlink { flex: 1; min-width: 0; }
+
 .note-backlink:hover {
   background: #efefed;
   color: #37352f;
@@ -276,4 +287,6 @@
   .note-backlinks-content {
     padding-left: 6px;
   }
+
+  .note-inline-icon .note-inline-icon-picker { width: 32px; min-width: 32px; height: 32px; min-height: 32px; }
 }

@@ -130,10 +130,12 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
   await expect(
     page.getByRole("button", { name: "選擇還原", exact: true }),
   ).toHaveCount(1);
-  expect((await page.request.post("/__test/clear-product")).status()).toBe(200);
+  // 清空會刻意中止 Durable Object；連線重設時重送這個冪等的測試請求。
+  expect((await page.request.post("/__test/clear-product", { maxRetries: 2 })).status()).toBe(200);
   await page.getByRole("button", { name: "選擇還原", exact: true }).click();
   await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
   await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
+  await expect(page.getByTestId("ready")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
     timeout: 15000,
   });

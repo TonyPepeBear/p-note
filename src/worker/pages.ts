@@ -1,5 +1,6 @@
 import { roomName } from '../shared/room';
 import { today, validDate, type PageRow } from '../shared/pages';
+import { isPageIcon } from '../shared/page-icon';
 import { body, bytes } from './request';
 import * as Y from 'yjs';
 
@@ -44,6 +45,10 @@ function title(value: unknown): string {
 function parent(value: unknown): string | null {
   if (value === null || value === undefined) return null;
   if (typeof value !== 'string' || !/^[\w-]{1,80}$/.test(value)) return fail(400, '無效的上層識別');
+  return value;
+}
+function icon(value: unknown): string | null {
+  if (!isPageIcon(value)) return fail(400, '圖示須為單一 emoji；移除請傳入 null');
   return value;
 }
 
@@ -111,11 +116,11 @@ export async function handlePages(request: Request, env: Env, owner: string, now
     return pageResponse(env, owner, page!);
   }
   if (path === '/api/pages' && request.method === 'POST') {
-    const data = await input(request); const name = title(data.title); const parentId = parent(data.parent_id); const id = crypto.randomUUID();
-    const created = await db.prepare(`${VISIBLE} INSERT INTO pages (id, owner_id, kind, title, parent_id, sync_generation, created_at, updated_at)
-      SELECT ?, ?, 'note', ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
+    const data = await input(request); const name = title(data.title); const parentId = parent(data.parent_id); const pageIcon = icon(data.icon === undefined ? null : data.icon); const id = crypto.randomUUID();
+    const created = await db.prepare(`${VISIBLE} INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, sync_generation, created_at, updated_at)
+      SELECT ?, ?, 'note', ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)
       AND (? IS NULL OR ? IN (SELECT id FROM visible WHERE kind = 'note'))`)
-      .bind(owner, id, owner, name, parentId, crypto.randomUUID(), now, now, owner, parentId, parentId).run();
+      .bind(owner, id, owner, name, pageIcon, parentId, crypto.randomUUID(), now, now, owner, parentId, parentId).run();
     if (!created.meta.changes) fail(409, '上層無效或頁面變更處理中');
     return pageResponse(env, owner, (await db.prepare('SELECT * FROM pages WHERE id = ?').bind(id).first<PageRow>())!);
   }
@@ -123,7 +128,7 @@ export async function handlePages(request: Request, env: Env, owner: string, now
     const backlinks = path.match(/^\/api\/pages\/([\w-]{1,80})\/backlinks$/);
     if (backlinks) {
       if (!await visiblePage(db, owner, backlinks[1])) fail(404, '找不到頁面');
-      return json((await db.prepare(`${VISIBLE} SELECT p.id, p.title, p.kind, p.journal_date FROM visible p
+      return json((await db.prepare(`${VISIBLE} SELECT p.id, p.title, p.icon, p.kind, p.journal_date, p.database_config, p.metadata_revision, p.sync_generation FROM visible p
         JOIN page_search s ON s.page_id = p.id AND s.owner_id = p.owner_id AND s.indexed_generation = p.sync_generation
         WHERE p.id <> ? AND EXISTS (SELECT 1 FROM json_each(s.linked_pages) WHERE value = ?)
         ORDER BY p.updated_at DESC, p.id`).bind(owner, backlinks[1], backlinks[1]).all()).results);
@@ -143,7 +148,7 @@ export async function handlePages(request: Request, env: Env, owner: string, now
         WHERE instr(lower(p.title), lower(?)) > 0 OR instr(lower(s.plain_text), lower(?)) > 0 ORDER BY p.updated_at DESC, p.id`).bind(owner, q, q).all()).results);
     }
   }
-  const match = path.match(/^\/api\/pages\/([\w-]{1,80})(?:\/(title|move|delete|restore))?$/);
+  const match = path.match(/^\/api\/pages\/([\w-]{1,80})(?:\/(title|icon|move|delete|restore))?$/);
   if (!match) return null;
   const [, id, action] = match;
   const page = await db.prepare('SELECT * FROM pages WHERE id = ? AND owner_id = ?').bind(id, owner).first<PageRow>();
@@ -159,6 +164,8 @@ export async function handlePages(request: Request, env: Env, owner: string, now
   }
   if (action === 'title') changed = await db.prepare(`${VISIBLE} UPDATE pages SET title = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
     .bind(owner, title(data.title), now, id, owner, owner).run();
+  else if (action === 'icon') changed = await db.prepare(`${VISIBLE} UPDATE pages SET icon = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
+    .bind(owner, icon(data.icon), now, id, owner, owner).run();
   else {
     if (!('parent_id' in data)) fail(400, '請選擇移動目標；最上層需明確指定');
     const parentId = parent(data.parent_id);
