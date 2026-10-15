@@ -7,6 +7,10 @@ import { VISIBLE } from './pages';
 import { roomName } from '../shared/room';
 import * as Y from 'yjs';
 import { noteLinkId } from '../shared/note-links';
+import type { PageVersion, PageVersionReason, PageVersionRestore } from '../shared/history';
+import type { PageRow } from '../shared/pages';
+import { PageError } from './pages';
+import { AUTO_HISTORY_INTERVAL, currentHistoryPage, historyReply, restoredPage, saveVersion, storedVersion, versionBytes, type HistoryReply, type HistoryRestoreOperation, type HistoryScope } from './history';
 
 type Permission = { session: string; owner: string; page: string; generation: string; allowed: boolean };
 type Scope = Pick<Permission, 'owner' | 'page' | 'generation'>;
@@ -15,6 +19,138 @@ export class SyncRoom extends ProbeRoom {
   private permissionTail: Promise<void> = Promise.resolve();
   private paused = false;
   protected async now(): Promise<number> { return Date.now(); }
+
+  private async snapshotVersion(scope: Scope, reason: PageVersionReason, force = true): Promise<PageVersion | undefined> {
+    const page = await currentHistoryPage(this.env, scope);
+    const latest = await this.env.DB.prepare('SELECT created_at FROM page_versions WHERE owner_id = ? AND page_id = ? AND reason = ? ORDER BY sequence DESC LIMIT 1').bind(scope.owner, scope.page, 'auto').first<{ created_at: number }>();
+    const now = await this.now();
+    if (!force && latest && now - latest.created_at < AUTO_HISTORY_INTERVAL) return;
+    const doc = await this.onLoad();
+    try {
+      const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
+      return await saveVersion(this.env, page, Y.encodeStateAsUpdate(doc), checkpoint, reason, now);
+    } finally { doc.destroy(); }
+  }
+
+  protected async changing(): Promise<void> {
+    const scope = await this.ctx.storage.get<Scope>('scope');
+    if (!scope) return;
+    const page = await this.env.DB.prepare('SELECT database_config FROM pages WHERE id = ? AND owner_id = ?').bind(scope.page, scope.owner).first<{ database_config: string | null }>();
+    if (page?.database_config) return;
+    const existing = await this.env.DB.prepare('SELECT 1 FROM page_versions WHERE owner_id = ? AND page_id = ?').bind(scope.owner, scope.page).first();
+    if (!existing) await this.snapshotVersion(scope, 'auto');
+  }
+
+  protected async changed(): Promise<void> {
+    const scope = await this.ctx.storage.get<Scope>('scope');
+    if (scope) await this.snapshotVersion(scope, 'auto', false);
+  }
+
+  async historyCurrent(scope: HistoryScope, reason: 'auto' | 'manual'): Promise<HistoryReply<PageVersion>> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(() => historyReply(async () => {
+      if (this.paused || await roomName(scope.owner, scope.page, scope.generation) !== this.name) throw new PageError(409, '頁面狀態已改變');
+      return (await this.snapshotVersion(scope, reason))!;
+    }));
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
+  async renameTitle(scope: HistoryScope, title: string, now: number, container?: { parent: string; config: string }): Promise<HistoryReply<void>> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(() => historyReply(async () => {
+      if (this.paused || await roomName(scope.owner, scope.page, scope.generation) !== this.name) throw new PageError(409, '頁面狀態已改變');
+      const page = await currentHistoryPage(this.env, scope);
+      if (container && (page.parent_id !== container.parent || !await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND database_config = ?`).bind(scope.owner, container.parent, container.config).first())) throw new PageError(409, '欄位設定或筆記狀態已改變，請重新載入');
+      if (page.title === title) return;
+      await this.ctx.storage.put('scope', scope);
+      await this.changing();
+      const changed = await this.env.DB.prepare(`UPDATE pages SET title = ?, updated_at = ?, metadata_revision = metadata_revision + 1
+        WHERE id = ? AND owner_id = ? AND sync_generation = ? AND metadata_revision = ?
+        AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?) AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
+        AND (? IS NULL OR (parent_id = ? AND EXISTS (SELECT 1 FROM pages container WHERE container.id = ? AND container.owner_id = ? AND container.database_config = ?)))`)
+        .bind(title, now, page.id, scope.owner, scope.generation, page.metadata_revision, scope.owner, scope.owner, container?.parent ?? null, container?.parent ?? null, container?.parent ?? null, scope.owner, container?.config ?? null).run();
+      if (!changed.meta.changes) throw new PageError(409, '頁面狀態已改變，請重試');
+      await this.changed().catch(() => {});
+    }));
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
+  async restoreHistory(scope: HistoryScope, versionId: string, requestId: string): Promise<HistoryReply<PageVersionRestore>> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(() => historyReply(async () => {
+      if (await roomName(scope.owner, scope.page, scope.generation) !== this.name) throw new PageError(409, '頁面世代已改變');
+      const db = this.env.DB;
+      const completed = await db.prepare('SELECT page_id, version_id, before_version_id FROM completed_page_history_restores WHERE request_id = ? AND owner_id = ?').bind(requestId, scope.owner).first<{ page_id: string; version_id: string; before_version_id: string }>();
+      if (completed) {
+        if (completed.page_id !== scope.page || completed.version_id !== versionId) throw new PageError(409, '此請求識別已用於其他還原');
+        return { ok: true as const, page: await restoredPage(this.env, scope.owner, scope.page), before_version_id: completed.before_version_id };
+      }
+      const target = await storedVersion(this.env, scope.owner, scope.page, versionId);
+      const targetData = await versionBytes(this.env, target);
+      let operation = await db.prepare('SELECT * FROM page_history_restores WHERE owner_id = ?').bind(scope.owner).first<HistoryRestoreOperation>();
+      if (operation && (operation.page_id !== scope.page || operation.version_id !== versionId || operation.request_id !== requestId)) throw new PageError(409, '請繼續原版本還原');
+      if (!operation) {
+        const current = await currentHistoryPage(this.env, scope);
+        const now = await this.now(); const next = crypto.randomUUID();
+        const before = crypto.randomUUID(); const restored = crypto.randomUUID();
+        const result = await db.batch([
+          db.prepare(`INSERT INTO page_operations (id, owner_id, page_id, action, created_at)
+            SELECT ?, ?, ?, 'restore', ? WHERE NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)
+            AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
+            AND EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ? AND metadata_revision = ? AND deleted_at IS NULL)`)
+            .bind(requestId, scope.owner, scope.page, now, scope.owner, scope.owner, scope.page, scope.owner, scope.generation, current.metadata_revision),
+          db.prepare(`INSERT INTO page_operation_members SELECT ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM page_operations WHERE id = ? AND owner_id = ?)`)
+            .bind(requestId, scope.page, scope.owner, scope.generation, requestId, scope.owner),
+          db.prepare(`INSERT INTO page_history_restores SELECT ?, ?, ?, ?, ?, ?, ?, ?, 'pausing', ? WHERE EXISTS (SELECT 1 FROM page_operations WHERE id = ? AND owner_id = ?)`)
+            .bind(requestId, scope.owner, scope.page, versionId, scope.generation, next, before, restored, now, requestId, scope.owner),
+        ]);
+        if (!result[0].meta.changes) throw new PageError(409, '頁面變更處理中，請重試');
+        operation = { request_id: requestId, owner_id: scope.owner, page_id: scope.page, version_id: versionId, old_generation: scope.generation, new_generation: next, before_version_id: before, restored_version_id: restored, phase: 'pausing', created_at: now };
+      }
+      if (operation.phase === 'pausing') {
+        this.paused = true; await this.ctx.storage.put('page-paused', true); await this.ctx.storage.sync();
+        for (const connection of super.getConnections()) connection.close(4002, '版本還原處理中');
+        await db.prepare("UPDATE page_history_restores SET phase = 'capturing' WHERE request_id = ?").bind(requestId).run(); operation.phase = 'capturing';
+      }
+      if (operation.phase === 'capturing') {
+        const page = await currentHistoryPage(this.env, scope, requestId); const doc = await this.onLoad();
+        try {
+          const checkpoint = this.ctx.storage.sql.exec<{ checkpoint: number }>('SELECT COALESCE(MAX(checkpoint), 0) AS checkpoint FROM (SELECT checkpoint FROM updates UNION ALL SELECT checkpoint FROM snapshot)').one().checkpoint;
+          await saveVersion(this.env, page, Y.encodeStateAsUpdate(doc), checkpoint, 'before_restore', operation.created_at, { id: operation.before_version_id, operation: requestId });
+        } finally { doc.destroy(); }
+        await db.prepare("UPDATE page_history_restores SET phase = 'preparing' WHERE request_id = ?").bind(requestId).run(); operation.phase = 'preparing';
+      }
+      const newScope = { ...scope, generation: operation.new_generation };
+      const nextRoom = this.env.SYNC.getByName(await roomName(scope.owner, scope.page, operation.new_generation));
+      if (operation.phase === 'preparing') {
+        await nextRoom.prepare(newScope, targetData, target.checkpoint);
+        await db.prepare("UPDATE page_history_restores SET phase = 'switching' WHERE request_id = ?").bind(requestId).run(); operation.phase = 'switching';
+      }
+      if (operation.phase === 'switching') {
+        const result = await db.batch([
+          db.prepare(`UPDATE pages SET title = ?, sync_generation = ?, metadata_revision = metadata_revision + 1, updated_at = ?
+            WHERE id = ? AND owner_id = ? AND sync_generation = ? AND EXISTS (SELECT 1 FROM page_history_restores WHERE request_id = ? AND phase = 'switching')`)
+            .bind(target.title, operation.new_generation, await this.now(), scope.page, scope.owner, operation.old_generation, requestId),
+          db.prepare(`UPDATE page_history_restores SET phase = 'resuming' WHERE request_id = ? AND EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?)`)
+            .bind(requestId, scope.page, scope.owner, operation.new_generation),
+        ]);
+        if (!result[1].meta.changes) throw new PageError(409, '頁面世代切換失敗，請重試原還原');
+        operation.phase = 'resuming';
+      }
+      if (operation.phase === 'resuming') {
+        await nextRoom.reindex(newScope); await nextRoom.resume();
+        const page = await currentHistoryPage(this.env, newScope, requestId);
+        await saveVersion(this.env, page, targetData, target.checkpoint, 'restore', await this.now(), { id: operation.restored_version_id, operation: requestId });
+        await db.batch([
+          db.prepare('INSERT INTO completed_page_history_restores VALUES (?, ?, ?, ?, ?, ?)').bind(requestId, scope.owner, scope.page, versionId, operation.before_version_id, await this.now()),
+          db.prepare('DELETE FROM page_history_restores WHERE request_id = ?').bind(requestId),
+          db.prepare('DELETE FROM page_operations WHERE id = ? AND owner_id = ?').bind(requestId, scope.owner),
+        ]);
+      }
+      return { ok: true as const, page: await restoredPage(this.env, scope.owner, scope.page), before_version_id: operation.before_version_id };
+    }));
+    this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
   async onStart(): Promise<void> {
     this.paused = await this.ctx.storage.get<boolean>('page-paused') ?? false;
     await this.prune(); await super.onStart();
@@ -119,6 +255,8 @@ export class SyncRoom extends ProbeRoom {
           await this.prune();
           if (!await contentPermission(this.env, credential, scope.owner, true, await this.now())) return { status: 401, message: 'API key 已撤銷' };
           const modified = await this.now();
+          await this.ctx.storage.put('scope', scope);
+          await this.changing();
           this.ctx.storage.transactionSync(() => {
             this.ctx.storage.sql.exec('INSERT INTO updates (payload) VALUES (?)', update);
             this.ctx.storage.sql.exec('INSERT INTO document_metadata VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET modified_at = MAX(modified_at, excluded.modified_at)', modified);
@@ -126,6 +264,7 @@ export class SyncRoom extends ProbeRoom {
           await this.ctx.storage.sync();
           Y.applyUpdate(this.document, update);
           await this.ctx.storage.put('scope', scope);
+          await this.changed().catch(() => {});
           await this.index(scope).catch(() => {});
           try {
             const pending = this.ctx.storage.sql.exec<{ count: number; bytes: number }>('SELECT count(*) AS count, COALESCE(SUM(length(payload)), 0) AS bytes FROM updates').one();

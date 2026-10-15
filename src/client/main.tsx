@@ -24,6 +24,7 @@ import type { PageInfo } from "../shared/pages";
 import { api, navigate, saveDraft, signedOut } from "./api";
 import { BackupSettings } from "./backup-settings";
 import { MyImages } from "./my-images";
+import { HistoryRestoreRecovery, PageHistory, type PendingHistoryRestore } from "./page-history";
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
 import { readLocal, saveLocal } from "./cache";
@@ -47,13 +48,15 @@ function App() {
   const [apiSettings, setApiSettings] = useState(false);
   const [images, setImages] = useState(false);
   const viewNavigation = useRef(0);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [pendingHistoryRestore, setPendingHistoryRestore] = useState<PendingHistoryRestore>();
   const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
   const backupNavigation = useRef<{ url: string; state: unknown } | null>(null);
   useEffect(() => {
-    backupNavigation.current = backupNavigationLocked
+    backupNavigation.current = backupNavigationLocked || historyOpen || pendingHistoryRestore
       ? { url: location.href, state: history.state }
       : null;
-  }, [backupNavigationLocked]);
+  }, [backupNavigationLocked, historyOpen, pendingHistoryRestore]);
   useEffect(() => {
     if (login) {
       viewNavigation.current++;
@@ -77,6 +80,7 @@ function App() {
         setSettings(false);
         setApiSettings(false);
         setImages(false);
+        setHistoryOpen(false);
         setRoute((current) => ({
           serial: current.serial + 1,
           fresh,
@@ -84,6 +88,11 @@ function App() {
         }));
       });
     const pushed = (event: Event) => {
+      const locked = backupNavigation.current;
+      if (locked) {
+        history.replaceState(locked.state, "", locked.url);
+        return;
+      }
       go((event as CustomEvent<{ fresh: boolean }>).detail.fresh);
       scrollTo(0, 0);
     };
@@ -108,6 +117,34 @@ function App() {
     };
   }, []);
   const [draftDismissed, setDraftDismissed] = useState(false);
+  useEffect(() => {
+    if (confirm) return;
+    let disposed = false;
+    const controller = new AbortController();
+    const checkRestore = async () => {
+      if (!navigator.onLine) return;
+      try {
+        // 背景尋找中斷的操作，不延遲已下載頁面的本機開啟。
+        const response = await api("/api/history-restore", undefined, controller.signal);
+        if (!response.ok || disposed) return;
+        const value = await response.json() as PendingHistoryRestore;
+        if (disposed || !value.restore) return;
+        viewNavigation.current++;
+        setImages(false);
+        setPendingHistoryRestore(value);
+        setHistoryOpen(false);
+        setSettings(false);
+        setApiSettings(false);
+      } catch { /* 離線仍可開啟已下載頁面，連線恢復時重新檢查。 */ }
+    };
+    void checkRestore();
+    addEventListener("online", checkRestore);
+    return () => {
+      disposed = true;
+      controller.abort();
+      removeEventListener("online", checkRestore);
+    };
+  }, [confirm, route.serial]);
   useEffect(() => {
     document.title = images ? "我的圖片 · p-note" : page ? page.title + " · p-note" : "p-note";
     if (page)
@@ -397,7 +434,20 @@ function App() {
       setForking(false);
     }
   };
-  if (login && !session) return <Login />;
+  if (login && !session && !pendingHistoryRestore) return <Login />;
+  const reloadHistoryPage = (pageId: string) => {
+    // 直接重開目前頁，沿用 generation 檢查與舊本機草稿保護。
+    flushSync(() => {
+      viewNavigation.current++;
+      setImages(false);
+      setHistoryOpen(false);
+      setPendingHistoryRestore(undefined);
+      setSession(undefined);
+      history.replaceState(history.state, "", "/?page=" + encodeURIComponent(pageId));
+      setRoute((current) => ({ serial: current.serial + 1, fresh: false, scrollY: undefined }));
+    });
+    scrollTo(0, 0);
+  };
   const rename = async (title: string) => {
     if (!page) return;
     const response = await api(`/api/pages/${page.id}/title`, { title });
@@ -410,11 +460,11 @@ function App() {
   };
   const closeImages = () => { viewNavigation.current++; setImages(false); };
   const openWorkspaceView = (view: "images" | "api" | "backup") => {
-    if (backupNavigationLocked) return;
+    if (backupNavigationLocked || historyOpen || pendingHistoryRestore) return;
     const ticket = ++viewNavigation.current;
     void saveDraft().then(() => {
-      // 保存期間可能已返回其他文件，舊切換不得重新打開工作區視圖。
-      if (ticket !== viewNavigation.current) return;
+      // 保存期間可能已換頁或進入版本還原，舊切換不得重新打開工作區視圖。
+      if (ticket !== viewNavigation.current || backupNavigation.current) return;
       setImages(view === "images");
       setApiSettings(view === "api");
       setSettings(view === "backup");
@@ -422,7 +472,7 @@ function App() {
       if (ticket === viewNavigation.current) setError("本機儲存失敗，請重試");
     });
   };
-  const notice = error && (
+  const notice = error && !pendingHistoryRestore && (
     <Alert
       className="workspace-notice"
       color="red"
@@ -437,6 +487,8 @@ function App() {
   );
   const content = (
     <>
+      {pendingHistoryRestore && <HistoryRestoreRecovery pending={pendingHistoryRestore}
+        restored={reloadHistoryPage} unauthorized={() => { setPendingHistoryRestore(undefined); setLogin(true); }} />}
       {login && (
         <div className="reauth-card">
           <Login embedded />
@@ -569,7 +621,7 @@ function App() {
         </Paper>
       )}
       {(session || page?.database_config) && page && (!isolated || viewDraft) ? (
-        <>{page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated} /> : <>
+        <>{page.database_config && !viewDraft ? <DatabasePage key={page.id + page.sync_generation} page={page} rename={rename} readOnly={login || !!isolated || !!pendingHistoryRestore} /> : <>
         <Editor
           key={session!.room}
           session={session!}
@@ -578,13 +630,13 @@ function App() {
           kind={page.kind}
           rename={rename}
           focusTitle={route.fresh}
-          readOnly={login || !!isolated}
-          properties={<NoteProperties key={page.id} page={page} readOnly={login || !!isolated} />}
+          readOnly={login || !!isolated || !!pendingHistoryRestore}
+          properties={<NoteProperties key={page.id} page={page} readOnly={login || !!isolated || !!pendingHistoryRestore} />}
         />
         </>}
         {!login && !isolated && <Backlinks key={page.id + page.sync_generation} id={page.id} />}</>
       ) : (
-        !error && (
+        !error && !pendingHistoryRestore && (
           <Stack className="loading-document" gap="lg" role="status" aria-label="正在載入文件">
             <Skeleton height={16} width={100} />
             <Skeleton height={42} width="60%" mb="lg" />
@@ -597,17 +649,23 @@ function App() {
       )}
     </>
   );
-  if (page || recovery)
+  if (page || recovery || pendingHistoryRestore?.page)
     return (
       <Navigation
-        page={(page ?? recovery)!}
+        page={(page ?? recovery ?? pendingHistoryRestore?.page)!}
         changed={setPage}
         error={setError}
         settingsView={images ? "images" : apiSettings ? "api" : settings ? "backup" : undefined}
         databaseView={!!page?.database_config}
-        navigationLocked={backupNavigationLocked}
+        navigationLocked={backupNavigationLocked || historyOpen || !!pendingHistoryRestore}
         images={() => openWorkspaceView("images")}
         imagesClose={closeImages}
+        pageHistory={session && !login && !isolated && !pendingHistoryRestore && !page?.database_config ? () => {
+          if (backupNavigationLocked || historyOpen || pendingHistoryRestore) return;
+          viewNavigation.current++;
+          setImages(false);
+          setHistoryOpen(true);
+        } : undefined}
         settings={() => openWorkspaceView("api")}
         backups={() => openWorkspaceView("backup")}
       >
@@ -616,6 +674,8 @@ function App() {
         {images && <MyImages close={closeImages} unauthorized={() => { closeImages(); setLogin(true); }} />}
         {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
         {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
+        {historyOpen && page && session && <PageHistory key={page.id + page.sync_generation} page={page} session={session}
+          close={() => setHistoryOpen(false)} restored={() => reloadHistoryPage(page.id)} />}
       </Navigation>
     );
   return (

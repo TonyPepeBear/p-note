@@ -8,6 +8,7 @@ import {
 import { PageError, visiblePage, VISIBLE } from "./pages";
 import { body } from "./request";
 import type { PageRow } from "../shared/pages";
+import { roomName } from '../shared/room';
 import { mergeConfig, sameConfigValue } from './database-config';
 const json = (v: unknown) =>
   Response.json(v, { headers: { "Cache-Control": "no-store" } });
@@ -138,6 +139,14 @@ export async function handleDatabases(
         : !p || !validValue(p, data.value)
     )
       return fail(400, "欄位值、類型或選項無效");
+    if (isTitle) {
+      const result = await env.SYNC.getByName(await roomName(owner, page.id, page.sync_generation)).renameTitle(
+        { owner, page: page.id, generation: page.sync_generation }, String(data.value).trim().normalize('NFC'), now,
+        { parent: parent.id, config: parent.database_config },
+      );
+      if (result.status !== 200) fail(result.status, result.message ?? '欄位設定或筆記狀態已改變，請重新載入');
+      return json(await visiblePage(db, owner, page.id));
+    }
     // 明確比對設定與原始歸屬，避免移動或刪欄位競爭把舊值寫回。
     const changed = await db
       .prepare(

@@ -15,7 +15,8 @@
 - 同一輪產品驗收的 `settings-navigation.spec.ts`／`backup.spec.ts` 三瀏覽器共 24／24 通過，涵蓋還原鎖定與操作失敗提示。
 - 首輪圖片驗收出現測試重複點擊已自動關閉的手機抽屜，以及 WebKit Service Worker 繞過 Playwright route 的故障注入差異；改為等待抽屜關閉，並損毀隔離 R2 fixture、斷言真實讀取 503 後重跑圖片驗收通過。未因此修改產品行為。
 - `npm run test:spec-coverage -- --assets`：26／26 必需結果通過；`npm run check:spec`、`openspec validate my-images --strict` 通過。
-- 已整合最新 master 的資料庫變更，圖片索引使用 `0010_asset_listing.sql`，避免和資料庫 revisions 遷移編號衝突。驗收及規格檢查均在整合後執行。
+- 已整合 master 的資料庫 revisions 與頁面版本歷史，圖片索引使用 `0011_asset_listing.sql`，避免遷移編號衝突。圖片切換也遵守版本歷史與還原導覽鎖定，發現待恢復操作會關閉圖片頁並取消過期切換。
+- 最終整合驗收：`assets.spec.ts`、`my-images.spec.ts`、`settings-navigation.spec.ts`、`backup.spec.ts`、`history.spec.ts` 三瀏覽器共 81／81 通過；圖片與歷史 Workers 共 20／20 通過。型別、圖片／歷史規格覆蓋、正式設定及規格檢查均在整合後通過。
 
 ## 測試環境與範圍
 

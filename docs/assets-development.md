@@ -17,7 +17,7 @@
 - 成功回 `201` 與 `{ id, url, mime_type, byte_size, checksum }`；SHA-256 同時寫入 R2 校驗與 D1。R2 原檔使用隨機 ID，conditional put 拒絕覆寫，R2 完成後才寫入 D1。任一失敗均不回傳可引用 URL。
 - `GET /api/assets/:id`：每次檢查 session 與 D1 owner，再讀私有 R2。未登入 401、其他 owner／不存在 ID 404；缺原檔／大小不符 503。使用 `Cache-Control: no-store`、`X-Content-Type-Options: nosniff` 與原 MIME，不用公開 bucket、短期 URL 或前端宣告 owner 授權。Service Worker 沿用 `/api/` 排除規則。
 
-沿用 [0001.sql](../migrations/0001.sql) assets 表與既有 ASSETS binding；[0010_asset_listing.sql](../migrations/0010_asset_listing.sql) 新增 owner／上傳時間／ID 複合索引。R2 與 D1 不共用交易：索引失敗或回應遺失可能留下未引用原檔；沒有永久清理，避免誤刪本機／共享／備份引用。移除圖片區塊、頁面垃圾桶與還原均保留原檔及穩定 ID。
+沿用 [0001.sql](../migrations/0001.sql) assets 表與既有 ASSETS binding；[0011_asset_listing.sql](../migrations/0011_asset_listing.sql) 新增 owner／上傳時間／ID 複合索引。R2 與 D1 不共用交易：索引失敗或回應遺失可能留下未引用原檔；沒有永久清理，避免誤刪本機／共享／備份引用。移除圖片區塊、頁面垃圾桶與還原均保留原檔及穩定 ID。
 
 ## 我的圖片
 

@@ -69,3 +69,4 @@ npm run dev
 - [Codex plugin 安裝與設定](plugins/p-note/README.md)
 - [筆記資料庫、自訂欄位與儲存檢視](docs/note-databases.md)
 - [筆記連結與反向連結](docs/note-links.md)
+- [頁面版本歷史與單頁還原](docs/page-history.md)
