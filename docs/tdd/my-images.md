@@ -9,9 +9,13 @@
 ## Green 與回歸
 
 - Workers 私有圖片：8／8 通過；驗證登入與 owner 隔離、純 D1 清單、同時間排序、完整分頁、參數與安全整數限制、空集合、列表層 D1 故障與重試。
-- Chromium 桌面：首次 5／5 通過；新增麵包屑返回與保存延遲換頁情境後納入最終三瀏覽器驗收。
+- Chromium 桌面：首次 5／5 通過；新增麵包屑返回與保存延遲換頁情境後 6／6 通過。
 - 型別、正式設定檢查通過；Vite 建置及真正 HTTPS dist 的登入、wss 儲存、離線刷新 2／2 冒煙測試通過。
-- 最終三瀏覽器圖片、設定與備份導覽驗收尚待完成；完成後更新本紀錄並封存 OpenSpec。
+- `npm run test:e2e -- tests/e2e/assets.spec.ts tests/e2e/my-images.spec.ts`：Chromium 桌面、Chromium 手機、WebKit 手機共 33／33 通過。
+- 同一輪產品驗收的 `settings-navigation.spec.ts`／`backup.spec.ts` 三瀏覽器共 24／24 通過，涵蓋還原鎖定與操作失敗提示。
+- 首輪圖片驗收出現測試重複點擊已自動關閉的手機抽屜，以及 WebKit Service Worker 繞過 Playwright route 的故障注入差異；改為等待抽屜關閉，並損毀隔離 R2 fixture、斷言真實讀取 503 後重跑圖片驗收通過。未因此修改產品行為。
+- `npm run test:spec-coverage -- --assets`：26／26 必需結果通過；`npm run check:spec`、`openspec validate my-images --strict` 通過。
+- 已整合最新 master 的資料庫變更，圖片索引使用 `0010_asset_listing.sql`，避免和資料庫 revisions 遷移編號衝突。驗收及規格檢查均在整合後執行。
 
 ## 測試環境與範圍
 

@@ -290,7 +290,7 @@ test("ASSET-08：草稿本機儲存失敗時保留文件，不開啟我的圖片
     .getByRole("button", { name: "我的圖片", exact: true })
     .click();
   const closeNavigation = page.getByRole("button", { name: "關閉導覽", exact: true });
-  if (await closeNavigation.isVisible()) await closeNavigation.click();
+  await expect(closeNavigation).toBeHidden();
   await expect(
     page.getByRole("alert").filter({ hasText: "本機儲存失敗" }).first(),
   ).toBeVisible();
@@ -440,9 +440,11 @@ test("ASSET-09：空集合、列表失敗重試、縮圖失敗與 401 均有明�
   await expect(view.getByText("還沒有上傳圖片", { exact: true })).toHaveCount(0);
   await expect(view.getByRole("article")).toHaveCount(0);
 
-  await page.route(`**${asset.url}`, (route) =>
-    route.fulfill({ status: 503, body: "測試原檔暫時無法讀取" }),
-  );
+  // WebKit 的 Service Worker 可能繞過 Playwright route；直接損毀隔離的 R2 fixture，走真實讀取失敗。
+  const session = (await (await page.request.get("/api/session")).json()) as { user: { id: string } };
+  const corrupted = await page.request.post(`/__test/assets/${session.user.id}/${asset.id}`, { data: Buffer.from([0]) });
+  expect(corrupted.ok()).toBe(true);
+  expect((await page.request.get(asset.url)).status()).toBe(503);
   await gate(page, [{ pattern: listPattern, result: "pass" }]);
   await view.getByRole("button", { name: "重試", exact: true }).click();
   const card = view.getByRole("article", { name: asset.original_name, exact: true });
