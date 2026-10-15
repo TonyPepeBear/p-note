@@ -110,6 +110,7 @@ test("PAGE-03：日期補寫與月份列表返回原日記，修改標題不改�
   const original = new URL(page.url()).searchParams.get("page");
   await text(page, "補寫二月的日記");
   await menu(page);
+  await page.getByRole("menuitem", { name: "重新命名", exact: true }).click();
   await page.getByLabel("頁面標題", { exact: true }).fill("閏日補寫");
   await page.getByRole("button", { name: "儲存標題", exact: true }).click();
   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue(
@@ -152,16 +153,17 @@ test("PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回"
   await saved(page);
   const parent = new URL(page.url()).searchParams.get("page")!;
   await menu(page);
+  await page.getByRole("menuitem", { name: "重新命名", exact: true }).click();
   await page.getByLabel("頁面標題", { exact: true }).fill("我的上層");
   await page.getByRole("button", { name: "儲存標題", exact: true }).click();
   await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue(
     "我的上層",
   );
   await expect(
-    page.getByRole("dialog", { name: "頁面操作", exact: true }),
+    page.getByRole("dialog", { name: "重新命名頁面", exact: true }),
   ).toBeHidden();
   await menu(page);
-  const childButton = page.getByRole("button", {
+  const childButton = page.getByRole("menuitem", {
     name: "新增子頁面",
     exact: true,
   });
@@ -196,6 +198,7 @@ test("PAGE-04：桌面鍵盤／手機觸控建立子頁、編輯與路徑返回"
   );
   await expect(page.locator(".tiptap")).toContainText("子頁仍可寫正文");
   await menu(page);
+  await page.getByRole("menuitem", { name: "移動頁面", exact: true }).click();
   await page.getByLabel("移動至上層", { exact: true }).selectOption("");
   await page.getByRole("button", { name: "移動頁面", exact: true }).click();
   await expect
@@ -286,6 +289,8 @@ test("PAGE-07：同日期垃圾桶提示還原原日記，還原後正文與 ID 
   page,
   request,
 }) => {
+  // 與上層垃圾桶情境相同，此流程多次換頁並重建連線，保留每步斷言的原本逾時。
+  test.setTimeout(45_000);
   await login(page, request);
   await openJournal(page);
   await page.getByLabel("日記日期", { exact: true }).fill("2024-01-01");

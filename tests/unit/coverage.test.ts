@@ -30,4 +30,6 @@ it('ENV-06：實際報告解析保留環境、失敗及未執行狀態', () => {
     .toMatchObject([{ id: 'UI-03@webkit-mobile', status: 'failed' }]);
   expect(reportCases({ suites: [{ specs: [{ title: 'UX-01：保存狀態', tests: [{ projectName: 'chromium-mobile', results: [{ status: 'passed' }] }] }] }] }, 'e2e'))
     .toMatchObject([{ id: 'UX-01@chromium-mobile', status: 'passed' }]);
+  expect(reportCases({ suites: [{ specs: [{ title: 'HIST-03 HIST-04：還原與舊端隔離', tests: [{ projectName: 'webkit-mobile', results: [{ status: 'failed' }] }] }] }] }, 'e2e'))
+    .toMatchObject([{ id: 'HIST-03@webkit-mobile', status: 'failed' }, { id: 'HIST-04@webkit-mobile', status: 'failed' }]);
 });

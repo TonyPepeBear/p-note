@@ -89,13 +89,13 @@ export async function openPageActions(page: Page) {
   if ((await trigger.getAttribute("aria-expanded")) !== "true")
     await trigger.click();
   await expect(
-    page.getByRole("dialog", { name: "頁面操作", exact: true }),
+    page.getByRole("menu", { name: "頁面操作", exact: true }),
   ).toBeVisible();
 }
 
 export async function moveToTrash(page: Page) {
   await openPageActions(page);
-  await page.getByRole("button", { name: "移到垃圾桶", exact: true }).click();
+  await page.getByRole("menuitem", { name: "移到垃圾桶", exact: true }).click();
   await page
     .getByRole("button", { name: "確認移到垃圾桶", exact: true })
     .click();

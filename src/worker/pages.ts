@@ -48,6 +48,7 @@ function parent(value: unknown): string | null {
 }
 
 async function trash(env: Env, owner: string, page: PageRow, action: 'delete' | 'restore', now: number): Promise<Response> {
+  if (await env.DB.prepare('SELECT 1 FROM page_history_restores WHERE owner_id = ?').bind(owner).first()) fail(409, '請先繼續原版本還原');
   let operation = await env.DB.prepare('SELECT * FROM page_operations WHERE owner_id = ?').bind(owner).first<{ id: string; page_id: string; action: string; created_at: number }>();
   if (operation && (operation.page_id !== page.id || operation.action !== action)) fail(409, '另一頁面變更處理中，請先重試原操作');
   if (!operation) {
@@ -151,6 +152,11 @@ export async function handlePages(request: Request, env: Env, owner: string, now
   if (request.method !== 'POST' || !action) return null;
   if (action === 'delete' || action === 'restore') return trash(env, owner, page!, action, now);
   const data = await input(request); let changed: D1Result;
+  if (action === 'title' && !page!.database_config) {
+    const result = await env.SYNC.getByName(await roomName(owner, id, page!.sync_generation)).renameTitle({ owner, page: id, generation: page!.sync_generation }, title(data.title), now);
+    if (result.status !== 200) fail(result.status, result.message ?? '標題未能保存，請重試');
+    return pageResponse(env, owner, (await db.prepare('SELECT * FROM pages WHERE id = ?').bind(id).first<PageRow>())!);
+  }
   if (action === 'title') changed = await db.prepare(`${VISIBLE} UPDATE pages SET title = ?, metadata_revision = metadata_revision + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible) AND NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
     .bind(owner, title(data.title), now, id, owner, owner).run();
   else {

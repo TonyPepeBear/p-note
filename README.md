@@ -27,7 +27,7 @@ git diff --check
 
 `npm run test:spec-coverage -- --pages` 比對 PAGE-01～08 的 Workers 與三種瀏覽器結果；頁面、日期、垃圾桶、搜尋及儲存保護詳見 [頁面開發文件](docs/pages-development.md)。
 
-`npm run test:spec-coverage -- --assets` 比對 ASSET-01～04、EDIT-03 的私有圖片結果；ASSET-05 由完整產品追蹤涵蓋。上傳限制、權限與原檔保留詳見 [圖片開發文件](docs/assets-development.md)。
+`npm run test:spec-coverage -- --assets` 比對 ASSET-01～04、06～09、EDIT-03 的私有圖片結果；ASSET-05 由完整產品追蹤涵蓋。工作區「我的圖片」可每頁 20 張瀏覽自己上傳的圖片與 metadata，縮圖沿用私有讀取路由；此版只提供瀏覽。上傳限制、權限與原檔保留詳見 [圖片開發文件](docs/assets-development.md)。
 
 ## 本機登入與今日編輯器
 
@@ -69,3 +69,4 @@ npm run dev
 - [Codex plugin 安裝與設定](plugins/p-note/README.md)
 - [筆記資料庫、自訂欄位與儲存檢視](docs/note-databases.md)
 - [筆記連結與反向連結](docs/note-links.md)
+- [頁面版本歷史與單頁還原](docs/page-history.md)

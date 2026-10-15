@@ -156,6 +156,8 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
 
 for (const backDuring of ["還原中", "中斷後"]) {
   test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
+    // 多次瀏覽器返回、手機導覽與真實備份還原需完整流程時間；個別斷言仍保留原本逾時。
+    test.setTimeout(40000);
     const previous = await openPrivate(page);
     await openCreateMenu(page);
     await page.getByRole("menuitem", { name: "新增筆記", exact: true }).click();
@@ -211,6 +213,11 @@ for (const backDuring of ["還原中", "中斷後"]) {
       await showNavigation(page);
       for (const name of ["設定", "今天", "登出", "安裝 p-note"])
         await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
+      await expect(page.getByRole("button", { name: "頁面操作：未命名", exact: true })).toBeDisabled();
+      const note = page.getByRole("navigation", { name: "筆記頁面" }).getByRole("link", { name: "未命名", exact: true });
+      await expect(note).toBeInViewport({ ratio: 1 });
+      await note.click({ button: "right", force: true });
+      await expect(page.getByRole("menu", { name: /^頁面操作/ })).toHaveCount(0);
       const close = page.getByRole("button", { name: "關閉導覽", exact: true });
       if (await close.isVisible()) await close.click();
     };

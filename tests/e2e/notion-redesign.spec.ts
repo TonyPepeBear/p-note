@@ -24,8 +24,9 @@ async function noOverflow(page: Page) {
 async function touchTarget(locator: Locator) {
   await expect(locator).toBeVisible();
   const bounds = (await locator.boundingBox())!;
-  expect(bounds.height).toBeGreaterThanOrEqual(44);
-  expect(bounds.width).toBeGreaterThanOrEqual(44);
+  // 瀏覽器縮放後的座標可能把 44px 回報成 43.999984px，忽略百分之一像素內的浮點誤差。
+  expect(bounds.height).toBeGreaterThanOrEqual(44 - 0.01);
+  expect(bounds.width).toBeGreaterThanOrEqual(44 - 0.01);
 }
 
 test("UI-02：收合與展開側邊欄保留目前文件及正在編輯的內容", async ({ page }) => {
