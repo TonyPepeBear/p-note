@@ -9,7 +9,8 @@
   },
   "compatibility_date": "2026-10-13",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "global_fetch_strictly_public"
   ],
   "workers_dev": false,
   "preview_urls": false,
@@ -99,6 +100,12 @@
     {
       "pattern": "note.tonypepe.com",
       "custom_domain": true
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "b3f294b225744392ae180eda732a8444"
     }
   ]
 }

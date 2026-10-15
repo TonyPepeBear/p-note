@@ -166,7 +166,7 @@ test("UX-19：輸入後立即換頁，修改保留並保存到雲端", async ({
   await page.goBack();
   await arrive(page, a, "甲頁");
   await expect(page.locator(".tiptap")).toContainText("來不及等確認的字");
-  const other = await browser.newContext({
+  const other = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: {
       cookies: (await page.context().storageState()).cookies,
       origins: [],

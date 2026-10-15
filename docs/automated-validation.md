@@ -81,6 +81,8 @@ CI 依相同入口執行相關測試，收集 TDD 報告與情境對照。初次
 
 每個 Playwright worker 使用自己的一組 preview＋測試 Worker（port 與 `.wrangler/test-state-i` 各自獨立），`/__test/reset`、時鐘與故障注入不會互相干擾。port 公式集中在 [ports.ts](../tests/e2e/ports.ts)，服務由 [e2e-servers.mjs](../scripts/e2e-servers.mjs) 啟動。
 
+E2E 前後端皆使用本機 HTTPS，讓 OAuth 的 Secure／HttpOnly cookie 與 wss 同源檢查符合正式環境。啟動需要 OpenSSL；憑證在系統暫存目錄產生，結束時清除。Playwright 的測試 context 信任該測試憑證，不改動正式驗證或一般 `npm run dev` 的 HTTP 開發入口。
+
 | 用途 | 命令 |
 | --- | --- |
 | TDD Red／Green 迴圈 | `npm run test:e2e:fast -- tests/e2e/<相關>.spec.ts`；也可加 `--last-failed`、`--only-changed` |

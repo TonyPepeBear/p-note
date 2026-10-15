@@ -93,7 +93,7 @@ test("UX-21：雲端連線緩慢時，已下載頁面立即可編輯並在背景
   await expect(page.getByTestId("cloud-status")).toHaveText("雲端已儲存", {
     timeout: 10000,
   });
-  const other = await browser.newContext({
+  const other = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: {
       cookies: (await page.context().storageState()).cookies,
       origins: [],
@@ -114,7 +114,7 @@ test("UX-22：未下載的頁面等雲端內容到達後才可編輯", async ({
   browser,
 }) => {
   const id = await prepareNote(page, "只在雲端的內容");
-  const other = await browser.newContext({
+  const other = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: {
       cookies: (await page.context().storageState()).cookies,
       origins: [],
@@ -185,7 +185,7 @@ const go = (page: Page, id: string) =>
   }, id);
 
 async function cloudText(page: Page, browser: Browser, id: string) {
-  const other = await browser.newContext({
+  const other = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: {
       cookies: (await page.context().storageState()).cookies,
       origins: [],

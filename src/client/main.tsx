@@ -653,4 +653,5 @@ if (location.pathname === "/probe") {
         </main>,
       );
     });
-} else render(<App />);
+} else if (location.pathname === '/oauth/login') render(<Login />);
+else render(<App />);

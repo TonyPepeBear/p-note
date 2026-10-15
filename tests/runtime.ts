@@ -2,6 +2,7 @@ import { createBackup, checksum } from '../src/worker/backups';
 import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRestoreCoordinator } from '../src/worker/app';
 import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
+import mcpMigration from '../migrations/0008_mcp_grants.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
 import migration from '../migrations/0001.sql';
@@ -46,7 +47,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
@@ -65,12 +66,6 @@ export default {
     await setup(env);
     const path = new URL(request.url).pathname;
     if (path.startsWith('/__test/')) {
-      if (path === '/__test/pwa-sw' && request.method === 'GET') {
-        const source = await (await fetch(new URL('/sw.js', env.BETTER_AUTH_URL))).text();
-        return new Response(source.replace(/p-note-shell-([^']+)/, 'p-note-shell-$1-test-update'), {
-          headers: { 'Content-Type': 'application/javascript', 'Cache-Control': 'no-store', 'Service-Worker-Allowed': '/' },
-        });
-      }
       if (path === '/__test/storage-failure' && request.method === 'POST') {
         const { room, fail } = await request.json<{ room: string; fail: boolean }>();
         if (!/^[a-f0-9]{64}$/.test(room) || typeof fail !== 'boolean') return new Response('無效測試故障', { status: 400 });
@@ -112,6 +107,10 @@ export default {
         return Response.json({ ok: true });
       }
       if (path === '/__test/mailbox') return Response.json((await env.DB.prepare('SELECT * FROM test_mailbox').all()).results);
+      if (path === '/__test/change-owner' && request.method === 'POST') {
+        await env.DB.prepare('UPDATE user SET email = ?').bind('other@example.test').run();
+        return Response.json({ ok: true });
+      }
       if (path === '/__test/database-backup' && request.method === 'POST') {
         const input = await request.json<{ legacy?: boolean; invalid?: boolean }>();
         const owner = (await env.DB.prepare('SELECT id FROM user LIMIT 1').first<{ id: string }>())!.id;
@@ -132,6 +131,12 @@ export default {
         return Response.json(backup);
       }
       if (path === '/__test/reset' && request.method === 'POST') {
+        let cursor: string | undefined;
+        do {
+          const batch = await env.OAUTH_KV.list({ cursor });
+          await Promise.all(batch.keys.map(key => env.OAUTH_KV.delete(key.name)));
+          cursor = batch.list_complete ? undefined : batch.cursor;
+        } while (cursor);
         const tables = (await env.DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").all<{ name: string }>()).results;
         await env.DB.batch(tables.map(({ name }) => env.DB.prepare(`DELETE FROM "${name}"`)).reverse());
         return Response.json({ ok: true });

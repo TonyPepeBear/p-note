@@ -4,6 +4,8 @@
 
 所有操作只限 key 所屬帳號；不接受請求自行指定 owner。API 不開放刪除、備份、還原、圖片上傳或 WebSocket。既有網站 API 仍需 cookie；程式使用下列獨立入口。
 
+Codex／ChatGPT 雲端可改用 [遠端 MCP plugin](../plugins/p-note/README.md)，網址為 `https://note.tonypepe.com/mcp`，使用 Email 登入後的 OAuth 授權；此入口不接受 API key 或網站 cookie 取代 OAuth token。
+
 ## 請求
 
 Base URL：`https://note.tonypepe.com/api/v1`

@@ -1,0 +1,22 @@
+{
+  "name": "p-note",
+  "version": "0.2.0",
+  "description": "從 Codex 或 ChatGPT 雲端透過 Email OAuth 連接私人 p-note。",
+  "author": {
+    "name": "TonyPepe"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "p-note",
+    "shortDescription": "連接私人筆記與日記",
+    "longDescription": "登入 p-note 並授權後，從雲端搜尋、讀取、建立及整理筆記日記，具有版本保護與可撤銷連線。",
+    "developerName": "TonyPepe",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "幫我搜尋 p-note 中的筆記。"
+  }
+}

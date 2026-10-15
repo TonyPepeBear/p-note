@@ -1,4 +1,5 @@
-import { apiKeyOwner, keyHash } from './api-keys';
+import { contentPermission, type ContentCredential } from './mcp-permissions';
+import { keyHash } from './api-keys';
 import { blockEditor, validatedBlocks, replaceBlocks, readBlocks } from './block-json';
 import type { Connection, ConnectionContext } from 'partyserver';
 import { ProbeRoom } from './index';
@@ -92,12 +93,11 @@ export class SyncRoom extends ProbeRoom {
     this.permissionTail = work.catch(() => {}); return work;
   }
 
-  async content(scope: Scope, hash: string, input?: { blocks: unknown; etag: string }): Promise<{ status: number; message?: string; blocks?: ReturnType<typeof readBlocks>; etag?: string }> {
+  async content(scope: Scope, credential: ContentCredential, input?: { blocks: unknown; etag: string }): Promise<{ status: number; message?: string; blocks?: ReturnType<typeof readBlocks>; etag?: string }> {
     await this.setName(this.ctx.id.name!);
     const work = this.permissionTail.then(async () => {
       try {
-        const key = await apiKeyOwner(this.env, hash);
-        if (!key || key.owner_id !== scope.owner) return { status: 401, message: 'API key 無效或已撤銷' };
+        if (!await contentPermission(this.env, credential, scope.owner, !!input, await this.now())) return { status: 401, message: 'API key 無效或已撤銷' };
         if (this.paused || await roomName(scope.owner, scope.page, scope.generation) !== this.name) return { status: 409, message: '頁面狀態已改變' };
         const allowed = await this.env.DB.prepare(`${VISIBLE} SELECT 1 FROM visible WHERE id = ? AND sync_generation = ?
           AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
@@ -117,7 +117,7 @@ export class SyncRoom extends ProbeRoom {
           const update = Y.encodeStateAsUpdate(doc, vector);
           if (update.length > 512 * 1024) return { status: 400, message: '正文更新超過大小限制' };
           await this.prune();
-          if (!await apiKeyOwner(this.env, hash)) return { status: 401, message: 'API key 已撤銷' };
+          if (!await contentPermission(this.env, credential, scope.owner, true, await this.now())) return { status: 401, message: 'API key 已撤銷' };
           const modified = await this.now();
           this.ctx.storage.transactionSync(() => {
             this.ctx.storage.sql.exec('INSERT INTO updates (payload) VALUES (?)', update);

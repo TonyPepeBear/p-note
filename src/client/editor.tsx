@@ -850,9 +850,9 @@ export async function start(
       party: checkAccess ? "sync" : "rooms",
       connect: false,
       disableBc: true,
+      protocol: location.protocol === "https:" ? "wss" : "ws",
       ...(checkAccess
         ? {
-            protocol: location.protocol === "https:" ? "wss" : "ws",
             params: { page: scope[1], generation: scope[2] },
           }
         : {}),
