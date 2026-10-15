@@ -394,7 +394,8 @@ test('SB-21：手機可直接點擊操作，鍵盤可開清單與解除同步，
     await page.keyboard.press('End');
     await page.keyboard.press('Shift+Home');
     await expect.poll(() => page.evaluate(() => getSelection()?.toString())).toBe('手機選取格式文字');
-    await expect(references(page).getByRole('toolbar')).toBeVisible();
+    // 浮動格式列依瀏覽器與可用空間透過 portal 呈現在頁面層，文字選取仍須屬於內層正文。
+    await expect(page.getByRole('toolbar')).toBeVisible();
   };
   if (info.project.use.hasTouch) await selectInnerText();
   expect(await references(page).evaluate(element => Number.parseFloat(getComputedStyle(element).borderTopWidth))).toBeGreaterThan(0);
