@@ -10,6 +10,7 @@ import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
 import backupsMigration from '../migrations/0003.sql';
 import restoreMigration from '../migrations/0004.sql';
+import historyMigration from '../migrations/0010_page_history.sql';
 import { roomName } from '../src/shared/room';
 import * as Y from 'yjs';
 import { toBase64 } from 'lib0/buffer';
@@ -48,7 +49,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration + historyMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
@@ -111,6 +112,13 @@ export default {
         await env.DB.prepare('INSERT OR REPLACE INTO test_control VALUES (1, ?, ?)').bind(now ?? Date.now(), fail ? 1 : 0).run();
         return Response.json({ ok: true });
       }
+      if (path === '/__test/history-failure' && request.method === 'POST') {
+        const { fail } = await request.json<{ fail: boolean }>();
+        if (typeof fail !== 'boolean') return new Response('無效故障設定', { status: 400 });
+        await env.DB.exec('DROP TRIGGER IF EXISTS __test_history_switch_failure');
+        if (fail) await env.DB.exec("CREATE TRIGGER __test_history_switch_failure BEFORE UPDATE OF sync_generation ON pages WHEN NEW.sync_generation <> OLD.sync_generation BEGIN SELECT RAISE(ABORT, '測試歷史世代切換故障'); END");
+        return Response.json({ ok: true });
+      }
       if (path === '/__test/mailbox') return Response.json((await env.DB.prepare('SELECT * FROM test_mailbox').all()).results);
       if (path === '/__test/change-owner' && request.method === 'POST') {
         await env.DB.prepare('UPDATE user SET email = ?').bind('other@example.test').run();
@@ -136,6 +144,7 @@ export default {
         return Response.json(backup);
       }
       if (path === '/__test/reset' && request.method === 'POST') {
+        await env.DB.exec('DROP TRIGGER IF EXISTS __test_history_switch_failure');
         let cursor: string | undefined;
         do {
           const batch = await env.OAUTH_KV.list({ cursor });

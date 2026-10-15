@@ -43,6 +43,7 @@ import { isCurrentReceipt } from "../shared/receipt";
 import { roomName } from "../shared/room";
 import { IMAGE_TYPES, IMAGE_RULE } from "../shared/image";
 import { uploadImage } from "./assets";
+import { registerDraft } from "./api";
 import { NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
@@ -87,6 +88,9 @@ function DocumentTitle({
   const [error, setError] = useState("");
   const input = useRef<HTMLTextAreaElement>(null);
   const cancelled = useRef(false);
+  const saving = useRef<Promise<void> | undefined>(undefined);
+  const current = useRef({ value, title, rename });
+  current.current = { value, title, rename };
   useEffect(() => setValue(title), [title]);
   useEffect(() => {
     if (!focus) return;
@@ -99,31 +103,44 @@ function DocumentTitle({
     element.style.height = "auto";
     element.style.height = element.scrollHeight + "px";
   }, [value]);
-  const commit = async () => {
+  const commit = async (required = false) => {
+    if (saving.current) {
+      try { await saving.current; }
+      catch (failure) { if (required) throw failure; return; }
+    }
     if (cancelled.current) {
       cancelled.current = false;
       return;
     }
-    const next = value.trim();
-    if (!rename || next === title) {
-      setValue(title);
+    const { value: latest, title: saved, rename: save } = current.current;
+    const next = latest.trim();
+    if (!save || next === saved) {
+      setValue(saved);
       return;
     }
     if (!next || next.length > 200) {
-      setValue(title);
+      setValue(saved);
       setError(next ? "標題最多 200 個字元" : "標題不能空白");
+      if (required) throw new Error(next ? "標題最多 200 個字元" : "標題不能空白");
       return;
     }
     setError("");
     try {
-      await rename(next);
+      saving.current = save(next);
+      await saving.current;
+      current.current.title = next;
+      setValue(next);
     } catch (failure) {
-      setValue(title);
+      setValue(saved);
       setError(
         failure instanceof Error ? failure.message : "標題保存失敗，請重試",
       );
+      if (required) throw failure;
+    } finally {
+      saving.current = undefined;
     }
   };
+  useEffect(() => registerDraft(() => commit(true), () => !!saving.current || current.current.value.trim() !== current.current.title), []);
   return (
     <>
       <Title order={1} className="document-title">
@@ -237,6 +254,11 @@ export function Editor({
     let connecting = false;
     let retryDelay = 1000;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    const cloudWaiters = new Set<{ resolve: () => void; reject: (reason: Error) => void }>();
+    const failCloud = (message: string) => {
+      for (const waiter of cloudWaiters) waiter.reject(new Error(message));
+      cloudWaiters.clear();
+    };
     const flush = async () => {
       const current = ++revision;
       latestId = undefined;
@@ -266,6 +288,7 @@ export function Editor({
         }
       } catch {
         if (!disposed && current === revision) setLocal("本機儲存失敗");
+        failCloud("本機儲存失敗，請重試儲存後再操作版本歷史");
       }
     };
     const update = (_bytes: Uint8Array, origin: unknown) => {
@@ -280,16 +303,23 @@ export function Editor({
     const receipt = (message: string) => {
       try {
         const value: unknown = JSON.parse(message);
-        if (isCurrentReceipt(latestId, value)) setCloud("雲端已儲存");
+        if (isCurrentReceipt(latestId, value)) {
+          setCloud("雲端已儲存");
+          for (const waiter of cloudWaiters) waiter.resolve();
+          cloudWaiters.clear();
+        }
         else if (
           value &&
           typeof value === "object" &&
           "type" in value &&
           value.type === "error"
-        )
+        ) {
           setCloud("雲端儲存失敗，可重試");
+          failCloud("雲端儲存失敗，請重試儲存後再操作版本歷史");
+        }
       } catch {
         setCloud("雲端回應異常，可重試");
+        failCloud("雲端回應異常，請重試儲存後再操作版本歷史");
       }
     };
     const offline = () => {
@@ -298,6 +328,7 @@ export function Editor({
       latestId = undefined;
       provider.disconnect();
       setCloud("離線，待同步");
+      failCloud("版本歷史需要連線，請連線後重試");
     };
     const retryLater = () => {
       if (disposed || blocked || !navigator.onLine || retryTimer) return;
@@ -317,6 +348,7 @@ export function Editor({
         if (session.checkAccess && !(await session.checkAccess())) {
           blocked = true;
           setCloud("登入或頁面權限已失效");
+          failCloud("登入或頁面權限已失效，請重新登入或載入目前頁面");
           return;
         }
         if (disposed) return;
@@ -339,6 +371,7 @@ export function Editor({
         .catch(() => {
           if (!disposed) {
             setCloud("連線失敗，可重試");
+            failCloud("同步連線失敗，請重試儲存後再操作版本歷史");
             retryLater();
           }
         })
@@ -348,6 +381,7 @@ export function Editor({
     };
     const closed = (event: CloseEvent) => {
       if (session.checkAccess) {
+        failCloud("同步連線中斷，請重試儲存後再操作版本歷史");
         latestId = undefined;
         provider.disconnect();
         setCloud(navigator.onLine ? "連線失敗，可重試" : "離線，待同步");
@@ -386,6 +420,20 @@ export function Editor({
       provider,
       cache,
       flush,
+      saveCloud: () => {
+        if (readOnly) return Promise.reject(new Error("目前頁面僅供檢視，無法儲存版本"));
+        if (!navigator.onLine) return Promise.reject(new Error("版本歷史需要連線，請連線後重試"));
+        return new Promise<void>((resolve, reject) => {
+          const waiter = {
+            resolve: () => { clearTimeout(timer); cloudWaiters.delete(waiter); resolve(); },
+            reject: (reason: Error) => { clearTimeout(timer); cloudWaiters.delete(waiter); reject(reason); },
+          };
+          const timer = setTimeout(() => waiter.reject(new Error("雲端尚未確認儲存，請重試儲存後再操作版本歷史")), 15000);
+          cloudWaiters.add(waiter);
+          if (!provider.wsconnected || !provider.synced) online();
+          void flush();
+        });
+      },
       localState: () => readLocal(cache),
       room,
     };
@@ -396,6 +444,7 @@ export function Editor({
     void flush();
     return () => {
       disposed = true;
+      failCloud("頁面已切換，請在目前頁面重新開啟版本歷史");
       clearTimeout(retryTimer);
       reconnect.current = () => {};
       doc.off("update", update);

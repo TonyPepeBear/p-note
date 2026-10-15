@@ -11,6 +11,7 @@ declare global {
       provider: YProvider;
       cache: IndexeddbPersistence;
       flush: () => Promise<void>;
+      saveCloud: () => Promise<void>;
       localState: () => Promise<Uint8Array>;
       room: string;
     };

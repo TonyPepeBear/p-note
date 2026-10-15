@@ -5,6 +5,8 @@ import { origin } from './ports';
 test.beforeEach(async ({ request }) => { await request.post('/__test/reset'); await request.post('/__test/control', { data: { now: Date.now() + 86400000 } }); });
 
 for (const [idCase, action] of [['SYNC-10', 'delete'], ['SYNC-11', 'restore'], ['BACKUP-09', 'restore']] as const) test(`${idCase}：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記`, async ({ page, browser }) => {
+  // 多個裝置、離線刷新、覆蓋還原與另存需完整流程時間；個別斷言仍保留原本逾時。
+  test.setTimeout(60_000);
   const id = await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.replaceBlocks(window.probe!.editor.document, [{ type: 'paragraph', content: '雲端原稿' }])); await saved(page);
   const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });

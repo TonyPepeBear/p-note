@@ -15,6 +15,7 @@ import { handleAssets } from './assets';
 import { sendLoginMail } from './mail';
 import { cleanupBackups, createBackup, handleBackups } from './backups';
 import { RestoreCoordinator } from './restore';
+import { handleHistory } from './history';
 
 export { ProbeRoom, SyncRoom, RestoreCoordinator };
 
@@ -98,6 +99,9 @@ export async function handle(request: Request, env: Env, services: Services = { 
     const connectionsResponse = await handleConnections(request, env, session.user.id, services);
     if (connectionsResponse) return connectionsResponse;
     if (!path.startsWith('/api/backups') && await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(session.user.id).first()) return error('還原處理中，請重試原備份', 503);
+    if (path !== '/api/history-restore' && !/^\/api\/pages\/[\w-]{1,80}\/history(?:\/|$)/.test(path) && await env.DB.prepare('SELECT 1 FROM page_history_restores WHERE owner_id = ?').bind(session.user.id).first()) return error('版本還原處理中，請重試原版本', 503);
+    const historyResponse = await handleHistory(request, env, session.user.id);
+    if (historyResponse) return historyResponse;
     const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
     const assetResponse = await handleAssets(request, env, session.user.id, services.now());
