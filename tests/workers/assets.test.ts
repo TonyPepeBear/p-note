@@ -2,10 +2,12 @@ import { env, exports } from 'cloudflare:workers';
 import { reset, abortAllDurableObjects, runInDurableObject } from 'cloudflare:test';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import { handle } from '../../src/worker/app';
+import { handleAssets } from '../../src/worker/assets';
 import { images } from '../fixtures/images';
 import { animatedImages } from '../fixtures/animated-images';
 import * as Y from 'yjs';
 import { toBase64 } from 'lib0/buffer';
+import type { AssetList } from '../../src/shared/assets';
 
 const origin = 'http://127.0.0.1:5173';
 let cookie: string;
@@ -110,6 +112,85 @@ it('ASSET-04：垃圾桶／還原與移除引用保留相同原檔及穩定 ID',
   expect(await hash(await (await get(asset.url)).arrayBuffer())).toBe(asset.checksum);
   expect((await app(asset.url, { method: 'DELETE', headers: { Cookie: cookie, Origin: origin } })).status).toBe(404);
   expect(await hash(await (await get(asset.url)).arrayBuffer())).toBe(asset.checksum);
+});
+
+it('ASSET-06：列表僅列自己的全部圖片，忽略偽造 owner 且不提供儲存／公開資訊', async () => {
+  const own = await upload(images.png, 'image/png', '尚未引用的中文原圖.png');
+  const other = await upload(images.jpeg, 'image/jpeg', '其他人的原圖.jpeg');
+  const date = new Date().toISOString();
+  await env.DB.prepare("INSERT INTO user VALUES ('other', '其他人', 'other@example.test', 1, NULL, ?, ?)").bind(date, date).run();
+  await env.DB.prepare('UPDATE assets SET owner_id = ? WHERE id = ?').bind('other', other.id).run();
+  expect((await get('/api/assets', '')).status).toBe(401);
+  expect((await app('/api/assets', { headers: { Cookie: cookie, Origin: 'https://evil.example' } })).status).toBe(403);
+  expect((await app('/api/assets', { headers: { Cookie: cookie, 'Sec-Fetch-Site': 'cross-site' } })).status).toBe(403);
+  expect((await app('/api/assets', { headers: { Cookie: cookie, Authorization: 'Bearer fixture' } })).status).toBe(401);
+  const objectRead = vi.spyOn(env.ASSETS, 'get').mockRejectedValue(new Error('列表不可讀取 R2 原檔'));
+  const objectList = vi.spyOn(env.ASSETS, 'list').mockRejectedValue(new Error('列表不可掃描 R2'));
+  const response = await handle(new Request(origin + '/api/assets?owner_id=other', { headers: { Cookie: cookie } }), env, { now: Date.now, sendMail: async () => {} });
+  expect(response.status).toBe(200); expect(response.headers.get('Cache-Control')).toBe('no-store');
+  const result = await response.json<AssetList>();
+  expect(result).toEqual({ items: [{ id: own.id, url: own.url, original_name: '尚未引用的中文原圖.png', mime_type: 'image/png', byte_size: images.png.length, created_at: expect.any(Number) }], page: 1, page_size: 20, total: 1, total_pages: 1 });
+  expect(JSON.stringify(result)).not.toMatch(/object_key|owner_id|checksum|https?:\/\//);
+  expect(objectRead).not.toHaveBeenCalled(); expect(objectList).not.toHaveBeenCalled();
+  vi.restoreAllMocks();
+  expect((await get(result.items[0].url)).status).toBe(200);
+  expect((await get(other.url + '?owner_id=other')).status).toBe(404);
+  expect((await app(own.url, { method: 'DELETE', headers: { Cookie: cookie, Origin: origin } })).status).toBe(404);
+  await post('/api/logout', {}); expect((await get('/api/assets')).status).toBe(401);
+});
+
+it('ASSET-07：上傳時間與同時 ID 穩定排序，分頁完整且拒絕無效或溢位參數', async () => {
+  const session = await (await get('/api/session')).json<{ user: { id: string } }>();
+  const rows = Array.from({ length: 45 }, (_, index) => ({ id: `image-${String(index).padStart(2, '0')}`, created_at: 1000 + Math.floor((44 - index) / 2) }));
+  const expected = [...rows].sort((a, b) => b.created_at - a.created_at || b.id.localeCompare(a.id));
+  await env.DB.batch(rows.map(row => env.DB.prepare('INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(row.id, session.user.id, `${session.user.id}/${row.id}`, `${row.id}.png`, 'image/png', images.png.length, 'fixture-checksum', row.created_at)));
+  const seen: string[] = [];
+  for (const page of [1, 2, 3, 4]) {
+    const response = await get(page === 1 ? '/api/assets' : `/api/assets?page=${page}`);
+    expect(response.status).toBe(200); const result = await response.json<AssetList>();
+    expect(result).toMatchObject({ page, page_size: 20, total: 45, total_pages: 3 });
+    expect(result.items.map(item => ({ id: item.id, created_at: item.created_at }))).toEqual(expected.slice((page - 1) * 20, page * 20));
+    seen.push(...result.items.map(item => item.id));
+  }
+  expect(seen).toEqual(expected.map(row => row.id)); expect(new Set(seen).size).toBe(45);
+  const small = await (await get('/api/assets?page=2&page_size=2')).json<AssetList>();
+  expect(small).toMatchObject({ page: 2, page_size: 2, total: 45, total_pages: 23 });
+  expect(small.items.map(item => item.id)).toEqual(['image-01', 'image-04']);
+  const maximum = await (await get('/api/assets?page_size=100')).json<AssetList>();
+  expect(maximum.items).toHaveLength(45); expect(maximum.page_size).toBe(100);
+  for (const query of [
+    'page=', 'page=0', 'page=-1', 'page=1.5', 'page=abc', 'page=01', 'page=1e2', 'page=%201', 'page=1&page=2',
+    'page=9007199254740992', 'page=9007199254740991&page_size=20',
+    'page_size=', 'page_size=0', 'page_size=-1', 'page_size=1.5', 'page_size=abc', 'page_size=101', 'page_size=20&page_size=10',
+  ]) {
+    const response = await get('/api/assets?' + query);
+    expect(response.status, query).toBe(400); expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(await response.text()).toMatch(/分頁|每頁/);
+  }
+  const safeLast = await (await get('/api/assets?page=9007199254740991&page_size=1')).json<AssetList>();
+  expect(safeLast.items).toEqual([]); expect(safeLast.page).toBe(Number.MAX_SAFE_INTEGER);
+});
+
+it('ASSET-09：空集合保留分頁資訊，D1 暫時故障後可重新取得列表', async () => {
+  const empty = await get('/api/assets'); expect(empty.status).toBe(200);
+  expect(await empty.json<AssetList>()).toEqual({ items: [], page: 1, page_size: 20, total: 0, total_pages: 0 });
+  expect(await (await get('/api/assets?page=2')).json<AssetList>()).toEqual({ items: [], page: 2, page_size: 20, total: 0, total_pages: 0 });
+  const asset = await upload();
+  const session = await (await get('/api/session')).json<{ user: { id: string } }>();
+  const batch = vi.spyOn(env.DB, 'batch').mockRejectedValue(new Error('測試 D1 列表故障'));
+  const request = (path = '/api/assets') => new Request(origin + path, { headers: { Cookie: cookie } });
+  const services = { now: Date.now, sendMail: async () => {} };
+  expect((await handle(request('/api/session'), env, services)).status).toBe(200);
+  await expect(handleAssets(request(), env, session.user.id, Date.now())).rejects.toThrow('測試 D1 列表故障');
+  const failed = await handle(request(), env, services); expect(failed.status).toBe(503);
+  expect(await failed.text()).not.toMatch(/object_key|owner_id|checksum|fixture/);
+  batch.mockRestore();
+  const recovered = await handleAssets(request(), env, session.user.id, Date.now());
+  expect(recovered!.status).toBe(200);
+  expect((await recovered!.json<AssetList>()).items.map(item => item.id)).toEqual([asset.id]);
+  const retried = await handle(request(), env, services); expect(retried.status).toBe(200);
+  expect((await retried.json<AssetList>()).items.map(item => item.id)).toEqual([asset.id]);
 });
 
 it('EDIT-03：真正 Yjs 持久引用重啟後仍為同一原檔，第二讀取不依賴短期 URL', async () => {

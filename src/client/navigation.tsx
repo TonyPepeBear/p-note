@@ -8,7 +8,7 @@ import {
   IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
   IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
   IconDatabase, IconDots, IconFileText, IconLogout, IconMenu2, IconPlus,
-  IconSearch, IconSettings, IconTrash, IconHistory,
+  IconSearch, IconSettings, IconTrash, IconPhoto, IconHistory,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
@@ -16,14 +16,16 @@ import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
 import "./navigation.css";
 
-export function Navigation({ page, changed, error, backups, settings, pageHistory, settingsView, databaseView, navigationLocked = false, children }: {
+export function Navigation({ page, changed, error, backups, settings, images, imagesClose, pageHistory, settingsView, databaseView, navigationLocked = false, children }: {
   page: PageInfo;
   changed: (page: PageInfo) => void;
   error: (message: string) => void;
   backups: () => void;
   settings: () => void;
+  images: () => void;
+  imagesClose: () => void;
   pageHistory?: () => void;
-  settingsView?: "backup" | "api";
+  settingsView?: "backup" | "api" | "images";
   databaseView?: boolean;
   navigationLocked?: boolean;
   children: ReactNode;
@@ -219,6 +221,9 @@ export function Navigation({ page, changed, error, backups, settings, pageHistor
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
       <PwaControls disabled={navigationLocked} onHelpOpenChange={setPwaHelpOpen} />
+      <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "images" || undefined} aria-current={settingsView === "images" ? "page" : undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); images(); }}>
+        <IconPhoto size={17} /><span>我的圖片</span>
+      </button>
       <button className="pn-nav-item" disabled={navigationLocked} data-active={settingsView === "api" || undefined} onClick={() => { if (navigationLockedRef.current) return; setNavOpen(false); settings(); }}>
         <IconSettings size={17} /><span>設定</span>
       </button>
@@ -255,19 +260,20 @@ export function Navigation({ page, changed, error, backups, settings, pageHistor
             <Anchor component="button" disabled={navigationLocked} aria-disabled={navigationLocked || undefined} aria-label={settingsView ? "返回目前文件" : page.kind === "journal" ? "日記回顧" : "筆記列表"}
               onClick={(event: MouseEvent<HTMLButtonElement>) => {
                 if (navigationLockedRef.current) { event.preventDefault(); return; }
-                if (settingsView) void run(() => navigate(page.id));
+                if (settingsView === "images") imagesClose();
+                else if (settingsView) void run(() => navigate(page.id));
                 else if (page.kind === "journal") openJournals(event.currentTarget);
                 else if (matchMedia("(max-width: 47.99em)").matches) setNavOpen(true);
                 else {
                   setSidebar(false);
                   requestAnimationFrame(() => document.querySelector<HTMLElement>('.workspace-sidebar [aria-current="page"]')?.focus());
                 }
-              }}>{settingsView ? "設定" : page.kind === "journal" ? "日記" : "筆記"}</Anchor>
+              }}>{settingsView === "images" ? "工作區" : settingsView ? "設定" : page.kind === "journal" ? "日記" : "筆記"}</Anchor>
             {!settingsView && page.ancestors?.map((item, index) => <span key={item.id} className="pn-ancestor"
               data-direct-parent={index === (page.ancestors?.length ?? 0) - 1 || undefined}>{pageLink(item)}</span>)}
             <span className="pn-current-page" title={settingsView ? undefined : page.title}>
-              {settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
-              <span>{settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
+              {settingsView === "images" ? <IconPhoto size={15} /> : settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
+              <span>{settingsView === "images" ? "我的圖片" : settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
             </span>
           </Breadcrumbs>
         </nav>

@@ -23,6 +23,7 @@ import { Backlinks } from './note-links';
 import type { PageInfo } from "../shared/pages";
 import { api, navigate, saveDraft, signedOut } from "./api";
 import { BackupSettings } from "./backup-settings";
+import { MyImages } from "./my-images";
 import { HistoryRestoreRecovery, PageHistory, type PendingHistoryRestore } from "./page-history";
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
@@ -45,6 +46,8 @@ function App() {
   const confirm = location.pathname === "/login/confirm";
   const [settings, setSettings] = useState(false);
   const [apiSettings, setApiSettings] = useState(false);
+  const [images, setImages] = useState(false);
+  const viewNavigation = useRef(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pendingHistoryRestore, setPendingHistoryRestore] = useState<PendingHistoryRestore>();
   const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
@@ -56,8 +59,10 @@ function App() {
   }, [backupNavigationLocked, historyOpen, pendingHistoryRestore]);
   useEffect(() => {
     if (login) {
+      viewNavigation.current++;
       setSettings(false);
       setApiSettings(false);
+      setImages(false);
     }
   }, [login]);
   const [route, setRoute] = useState(() => ({
@@ -70,9 +75,11 @@ function App() {
     const go = (fresh: boolean, scroll?: number) =>
       // 同步卸載舊編輯器，避免換頁途中仍顯示前一頁的狀態。
       flushSync(() => {
+        viewNavigation.current++;
         setSession(undefined);
         setSettings(false);
         setApiSettings(false);
+        setImages(false);
         setHistoryOpen(false);
         setRoute((current) => ({
           serial: current.serial + 1,
@@ -122,6 +129,8 @@ function App() {
         if (!response.ok || disposed) return;
         const value = await response.json() as PendingHistoryRestore;
         if (disposed || !value.restore) return;
+        viewNavigation.current++;
+        setImages(false);
         setPendingHistoryRestore(value);
         setHistoryOpen(false);
         setSettings(false);
@@ -137,12 +146,12 @@ function App() {
     };
   }, [confirm, route.serial]);
   useEffect(() => {
-    document.title = page ? page.title + " · p-note" : "p-note";
+    document.title = images ? "我的圖片 · p-note" : page ? page.title + " · p-note" : "p-note";
     if (page)
       setDraftDismissed(
         sessionStorage.getItem("p-note-draft-dismissed") === page.id,
       );
-  }, [page?.id, page?.title]);
+  }, [page?.id, page?.title, images]);
   useEffect(() => {
     if (confirm) return;
     let disposed = false;
@@ -429,6 +438,8 @@ function App() {
   const reloadHistoryPage = (pageId: string) => {
     // 直接重開目前頁，沿用 generation 檢查與舊本機草稿保護。
     flushSync(() => {
+      viewNavigation.current++;
+      setImages(false);
       setHistoryOpen(false);
       setPendingHistoryRestore(undefined);
       setSession(undefined);
@@ -446,6 +457,20 @@ function App() {
     if (response.status === 401) setLogin(true);
     if (!response.ok) throw new Error(value.message ?? "標題保存失敗，請重試");
     setPage(value);
+  };
+  const closeImages = () => { viewNavigation.current++; setImages(false); };
+  const openWorkspaceView = (view: "images" | "api" | "backup") => {
+    if (backupNavigationLocked || historyOpen || pendingHistoryRestore) return;
+    const ticket = ++viewNavigation.current;
+    void saveDraft().then(() => {
+      // 保存期間可能已換頁或進入版本還原，舊切換不得重新打開工作區視圖。
+      if (ticket !== viewNavigation.current || backupNavigation.current) return;
+      setImages(view === "images");
+      setApiSettings(view === "api");
+      setSettings(view === "backup");
+    }).catch(() => {
+      if (ticket === viewNavigation.current) setError("本機儲存失敗，請重試");
+    });
   };
   const notice = error && !pendingHistoryRestore && (
     <Alert
@@ -630,24 +655,23 @@ function App() {
         page={(page ?? recovery ?? pendingHistoryRestore?.page)!}
         changed={setPage}
         error={setError}
-        settingsView={apiSettings ? "api" : settings ? "backup" : undefined}
+        settingsView={images ? "images" : apiSettings ? "api" : settings ? "backup" : undefined}
         databaseView={!!page?.database_config}
         navigationLocked={backupNavigationLocked || historyOpen || !!pendingHistoryRestore}
-        pageHistory={session && !login && !isolated && !pendingHistoryRestore && !page?.database_config ? () => setHistoryOpen(true) : undefined}
-        settings={() => { if (backupNavigationLocked || historyOpen || pendingHistoryRestore) return; void saveDraft().then(() => { setSettings(false); setApiSettings(true); }).catch(() => setError("本機儲存失敗，請重試")); }}
-        backups={() => {
+        images={() => openWorkspaceView("images")}
+        imagesClose={closeImages}
+        pageHistory={session && !login && !isolated && !pendingHistoryRestore && !page?.database_config ? () => {
           if (backupNavigationLocked || historyOpen || pendingHistoryRestore) return;
-          void saveDraft()
-            .then(() => { setApiSettings(false); setSettings(true); })
-            .catch((failure) =>
-              setError(
-                failure instanceof Error ? failure.message : "本機儲存失敗",
-              ),
-            );
-        }}
+          viewNavigation.current++;
+          setImages(false);
+          setHistoryOpen(true);
+        } : undefined}
+        settings={() => openWorkspaceView("api")}
+        backups={() => openWorkspaceView("backup")}
       >
         {notice}
-        <div hidden={settings || apiSettings}>{content}</div>
+        <div hidden={settings || apiSettings || images}>{content}</div>
+        {images && <MyImages close={closeImages} unauthorized={() => { closeImages(); setLogin(true); }} />}
         {settings && <BackupSettings onNavigationLockChange={setBackupNavigationLocked} close={() => setSettings(false)} unauthorized={() => { setSettings(false); setLogin(true); }} />}
         {apiSettings && <ApiKeySettings close={() => setApiSettings(false)} unauthorized={() => { setApiSettings(false); setLogin(true); }} />}
         {historyOpen && page && session && <PageHistory key={page.id + page.sync_generation} page={page} session={session}

@@ -70,7 +70,7 @@ async function main() {
         if (databases && !id.startsWith('DB-')) continue;
         if (pages && !id.startsWith('PAGE-')) continue;
         if (editor && !id.startsWith('EDIT-')) continue;
-        if (assets && !['ASSET-01','ASSET-02','ASSET-03','ASSET-04','EDIT-03'].includes(id)) continue;
+        if (assets && !['ASSET-01','ASSET-02','ASSET-03','ASSET-04','ASSET-06','ASSET-07','ASSET-08','ASSET-09','EDIT-03'].includes(id)) continue;
         if (method.includes('Workers')) required.push(`${id}@integration`);
         else if (method.includes('Vitest')) required.push(`${id}@unit`);
         if (method.includes('Playwright')) required.push(...projects.map(project => `${id}@${project}`));

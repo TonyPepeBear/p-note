@@ -3,6 +3,7 @@ import { handle, ProbeRoom, SyncRoom as AppSyncRoom, RestoreCoordinator as AppRe
 import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
 import mcpMigration from '../migrations/0008_mcp_grants.sql';
+import assetListingMigration from '../migrations/0011_asset_listing.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
 import databaseRevisionsMigration from '../migrations/0009_database_revisions.sql';
@@ -49,7 +50,7 @@ export class SyncRoom extends AppSyncRoom {
 }
 
 async function setup(env: Env) {
-  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration + historyMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
+  for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration + historyMigration + assetListingMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
   await env.DB.exec('CREATE TABLE IF NOT EXISTS test_control (id INTEGER PRIMARY KEY, now INTEGER, fail INTEGER); CREATE TABLE IF NOT EXISTS test_mailbox (email TEXT, url TEXT)');
