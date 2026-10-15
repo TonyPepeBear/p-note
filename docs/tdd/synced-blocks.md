@@ -10,6 +10,8 @@
 
 同一 checkout 只保留一組 E2E 常駐服務；多瀏覽器測試由既有 worker port／資料目錄隔離。後端檔案更新會重載服務，因此可重現驗收只採用來源穩定且沒有其他 runner 共同 reset 的執行。
 
+本機 CPU quota 為 4 核。整合後四工 E2E 的既有登入與備份案例曾達 20 秒逾時，改為兩工後於 407 個案例執行完成時中止：402 通過、5 個逾時；其中桌面 197/197、Chromium 手機 196/197。接著 WebKit 單工完整執行 197 個案例，192 通過、5 失敗，退出碼 1；確認多選時浮動工具列遮住同步按鈕，其餘待隔離復驗。未將中止或失敗的執行宣稱為完整通過，並沿用既有 timeout 與 `retries: 0`。
+
 ## 有效 Red 與已確認 Green
 
 | 範圍 | 命令與版本 | 實際結果 |
@@ -49,10 +51,10 @@ MCP API 的 Workers 案例透過真正 HTTP transport 呼叫工具，檢查同�
 
 | 驗證 | 命令 | 結果 |
 | --- | --- | --- |
-| Workers 行為及回歸 | `npm run test:integration` | `b6e8371` 加本次實作；24 檔、132 個案例通過，退出碼 0，報告 `reports/integration.json`。 |
+| Workers 行為及回歸 | `npm run test:integration` | 最終產品來源 `64a4154`；`npm run test:integration -- --bail=1` 全 27 檔、161 個案例通過，退出碼 0，耗時 258.93 秒，報告 `reports/integration.json`。 |
 | 單元回歸 | `npm run test:unit` | `b6e8371` 加本次實作；5 檔、8 個案例通過，退出碼 0。 |
-| 相關 Chromium 桌面 Green／Refactor | `npm run test:e2e:fast -- tests/e2e/synced-blocks.spec.ts` | 待補穩定來源結果 |
-| 三瀏覽器相關功能驗收 | `npm run test:e2e -- tests/e2e/synced-blocks.spec.ts tests/e2e/synced-blocks-api.spec.ts tests/e2e/plugin.spec.ts` | 待補實際執行範圍、數量與退出碼 |
+| 相關 Chromium 桌面 Green／Refactor | `npm run test:e2e:fast -- tests/e2e/synced-blocks.spec.ts tests/e2e/synced-blocks-api.spec.ts tests/e2e/synced-reference-target.spec.ts` | 整合前 19 個案例：首輪 18 通過；SB-08 因自動重試成功使手動按鈕消失，修正 fixture 後 1/1 通過；目標切換回歸另於 4.9 秒通過。最終整合版本由完整 E2E 再驗。 |
+| 完整三瀏覽器驗收 | `npm run test:e2e -- --workers=2` | 待補實際執行範圍、數量與退出碼 |
 | 同步區塊必要環境覆蓋 | `npm run test:spec-coverage -- --synced-blocks` | 待補；不得以測試存在或 `--list` 代替執行報告 |
 | 型別、建置與文件契約 | `npm run check`、`npm run build`、`npm run check:spec`、`git diff --check` | 規格／文件檢查已通過；最終實作版本尚待統一補記 |
 | OpenSpec | `openspec validate add-synced-blocks --strict` | 開發規格嚴格驗證通過；封存後尚待驗證主規格 |
