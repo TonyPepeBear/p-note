@@ -1,4 +1,6 @@
 import { handleKeys } from './api-keys';
+import { handleOAuth, handleConnections, oauthPath } from './oauth';
+import { oauthReturnTo } from '../shared/oauth';
 import { handleDatabases } from './databases';
 import { handleContentApi } from './content-api';
 import { routePartykitRequest } from 'partyserver';
@@ -25,6 +27,11 @@ const error = (message: string, status: number) => Response.json({ message }, { 
 
 export async function handle(request: Request, env: Env, services: Services = { now: Date.now, sendMail: (email, url) => sendLoginMail(env, email, url) }, ctx?: ExecutionContext): Promise<Response> {
   const url = new URL(request.url); const path = url.pathname;
+  if (oauthPath(path)) {
+    if (!configured(env) || !ctx) return error('授權服務設定不完整', 503);
+    try { return await handleOAuth(request, env, services, ctx); }
+    catch { return error('授權服務暫時無法完成', 503); }
+  }
   if (path === '/health') return new Response('ok');
   if (path === '/login/confirm' && request.method === 'GET') return new Response('請在網站按下確認登入', { headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
   if (!path.startsWith('/api/') && !path.startsWith('/parties/sync/')) return new Response('Not found', { status: 404 });
@@ -43,6 +50,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
       let value: Record<string, unknown>;
       try { value = await body(request); } catch { return error('請輸入有效 Email', 400); }
       if (typeof value.email !== 'string') return error('請輸入有效 Email', 400);
+      const returnTo = oauthReturnTo(value.returnTo);
+      if (value.returnTo !== undefined && !returnTo) return error('無效的登入返回路徑', 400);
       const email = value.email.trim().toLowerCase();
       if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return error('請輸入有效 Email', 400);
       const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown'; const now = services.now();
@@ -54,7 +63,10 @@ export async function handle(request: Request, env: Env, services: Services = { 
           (SELECT count(*) FROM auth_requests WHERE ip = ?) < 20`).bind(email, ip, now, email, email, now - 60000, ip),
       ]);
       if (!results[1].meta.changes) return error('申請太頻繁，請稍後重試', 429);
-      if (email === env.OWNER_EMAIL.toLowerCase()) await createAuth(env, services).api.signInMagicLink({ headers: request.headers, body: { email } });
+      if (email === env.OWNER_EMAIL.toLowerCase()) await createAuth(env, returnTo ? { ...services, sendMail: (recipient, link) => {
+        const target = new URL(link); target.searchParams.set('returnTo', returnTo);
+        return services.sendMail(recipient, target.toString());
+      } } : services).api.signInMagicLink({ headers: request.headers, body: { email } });
       return Response.json({ message: '若此 Email 可登入，請查看登入郵件' }, { headers: { 'Cache-Control': 'no-store' } });
     }
     if (path === '/api/confirm' && request.method === 'POST') {
@@ -83,6 +95,8 @@ export async function handle(request: Request, env: Env, services: Services = { 
     }
     const keysResponse = await handleKeys(request, env, session.user.id, services.now());
     if (keysResponse) return keysResponse;
+    const connectionsResponse = await handleConnections(request, env, session.user.id, services);
+    if (connectionsResponse) return connectionsResponse;
     if (!path.startsWith('/api/backups') && await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(session.user.id).first()) return error('還原處理中，請重試原備份', 503);
     const backupResponse = await handleBackups(request, env, session.user.id, services.now, ctx);
     if (backupResponse) return backupResponse;
@@ -111,9 +125,9 @@ export async function handle(request: Request, env: Env, services: Services = { 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url); const path = url.pathname;
-    if (path.startsWith('/api/') || path.startsWith('/parties/') || path === '/health') return handle(request, env, undefined, ctx);
+    if (oauthPath(path) || path.startsWith('/api/') || path.startsWith('/parties/') || path === '/health') return handle(request, env, undefined, ctx);
     if (path.startsWith('/__test') || path === '/probe' || !['GET', 'HEAD'].includes(request.method)) return new Response('Not found', { status: 404 });
-    const confirm = path === '/login/confirm';
+    const confirm = path === '/login/confirm' || path === '/oauth/login';
     if (confirm) { url.pathname = '/'; url.search = ''; }
     const response = await env.STATIC.fetch(confirm ? new Request(url, request) : request);
     if (!confirm) return response;

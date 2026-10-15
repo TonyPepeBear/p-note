@@ -2,7 +2,7 @@
   "name": "p-note-local-test",
   "main": "tests/runtime.ts",
   "compatibility_date": "2026-10-13",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": false,
   "preview_urls": false,
   "vars": { "OWNER_EMAIL": "owner@example.test", "BETTER_AUTH_URL": "http://127.0.0.1:5173", "BETTER_AUTH_SECRET": "test-only-secret-with-at-least-32-characters", "SENDER_EMAIL": "noreply@example.test", "API_KEY_ENCRYPTION_SECRET": "abababababababababababababababababababababababababababababababab" },
@@ -10,6 +10,7 @@
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "ProbeRoom" }, { "name": "SYNC", "class_name": "SyncRoom" }, { "name": "RESTORES", "class_name": "RestoreCoordinator" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ProbeRoom", "SyncRoom"] }, { "tag": "v2", "new_sqlite_classes": ["RestoreCoordinator"] }],
   "d1_databases": [{ "binding": "DB", "database_name": "p-note-local-test", "database_id": "00000000-0000-0000-0000-000000000003" }],
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "00000000000000000000000000000008" }],
   "r2_buckets": [{ "binding": "ASSETS", "bucket_name": "p-note-local-test" }, { "binding": "BACKUPS", "bucket_name": "p-note-local-test-backups" }],
   "rules": [{ "type": "Text", "globs": ["**/*.sql"], "fallthrough": true }]
 }

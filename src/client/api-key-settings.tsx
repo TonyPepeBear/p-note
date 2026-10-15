@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconKey, IconPlus } from "@tabler/icons-react";
 import { api } from "./api";
+import { McpConnections } from './mcp-connections';
 import "./settings.css";
 
 type KeyInfo = {
@@ -272,6 +273,7 @@ export function ApiKeySettings({
           </Text>
         </Stack>
       </section>
+      <McpConnections unauthorized={unauthorized} />
 
       <Modal
         opened={!!selected}

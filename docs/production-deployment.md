@@ -20,11 +20,14 @@
 | D1 | `p-note-production`，`5a1ead73-a776-4e75-824c-387e0f9bd5c6`，APAC |
 | 私人圖片 R2 | `p-note-production-assets`，APAC，無公開網域 |
 | 私人備份 R2 | `p-note-production-backups`，APAC，無公開網域 |
+| OAuth KV | `OAUTH_KV`，供 MCP OAuth client、同意交易及 token 使用 |
 | DO | `ProbeRoom`、`SyncRoom`、`RestoreCoordinator`，SQLite migrations v1／v2 |
 | 備份 cron | `0 19 * * *`，台北每日 03:00 |
 | Custom Domain | `note.tonypepe.com`，由 Cloudflare 管理 DNS／TLS |
 
 私人發布輸入只在 git 忽略的 `.dev.vars.release`，最初四個設定以 Cloudflare `secret_text` 上傳；本次另由忽略的 0600 `.env.api-key-secrets.json` 新增 `API_KEY_ENCRYPTION_SECRET`，目前共五個 secrets；版本控制與報告不含密鑰、登入 token 或 session cookie。平台紀錄已啟用 query string 遮蔽。資源與 secret 名稱證據見 [雲端設定](tdd/production-cloud.json)、[私人 R2](tdd/production-r2.json)。
+
+遠端 MCP 與 Email OAuth 使用同一 Worker 的 `/mcp`、`/oauth/*` 與 discovery 入口。D1 migration `0008_mcp_grants.sql` 新增連線權限、期限與撤銷紀錄，產品備份不含 OAuth 憑證；token 由 OAuth 套件在獨立 KV 保存。每次工具請求與正文保存前重新查核 D1，避免只依賴 KV 撤銷傳播。啟用 `global_fetch_strictly_public`，供 CIMD metadata 安全解析。發布 token 需能使用既有 OAuth KV binding；不額外新增 Worker secret。
 
 ## 發布與重跑
 

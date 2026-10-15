@@ -10,7 +10,7 @@ test('PROBE-SYNC-01：隔離裝置同時修改不同區塊，兩端與本機快�
     { id: 'desktop', type: 'paragraph', content: '電腦' }, { id: 'phone', type: 'paragraph', content: '手機' },
   ]));
   await saved(page);
-  const otherContext = await browser.newContext({ baseURL: origin });
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, baseURL: origin });
   try {
     const peer = await otherContext.newPage();
     await open(peer, room);
@@ -37,7 +37,7 @@ test('PROBE-SYNC-08：離線修改並刷新後保留，重連合併在線裝置�
     { id: 'offline', type: 'paragraph', content: '離線端' }, { id: 'online', type: 'paragraph', content: '在線端' },
   ]));
   await saved(page);
-  const otherContext = await browser.newContext({ baseURL: origin });
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, baseURL: origin });
   try {
     const peer = await otherContext.newPage();
     await open(peer, room);

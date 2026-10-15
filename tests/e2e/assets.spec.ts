@@ -98,7 +98,7 @@ test("EDIT-03：上傳原圖後另一 context／重開讀到穩定引用與相�
   await login(page, request);
   const url = await insert(page);
   expect(url).toMatch(/^\/api\/assets\/[\w-]+$/);
-  const context = await browser.newContext({
+  const context = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: await page.context().storageState(),
   });
   try {

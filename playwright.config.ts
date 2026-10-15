@@ -10,10 +10,10 @@ export default defineConfig({
   timeout: 20000,
   expect: { timeout: 5000 },
   reporter: [['list'], ['json', { outputFile: 'reports/e2e.json' }]],
-  use: { baseURL: origin, trace: 'retain-on-failure' },
+  use: { baseURL: origin, ignoreHTTPSErrors: true, trace: 'retain-on-failure' },
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--ignore-certificate-errors'] } } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'], launchOptions: { args: ['--ignore-certificate-errors'] } } },
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'] } },
   ],
   webServer: { command: 'node scripts/e2e-servers.mjs', url: `http://127.0.0.1:${readyPort}`, reuseExistingServer: !process.env.CI, timeout: 180000 },

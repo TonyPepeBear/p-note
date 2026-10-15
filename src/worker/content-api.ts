@@ -1,3 +1,4 @@
+import { contentPermission, type ContentCredential } from './mcp-permissions';
 import { bytes } from './request';
 import { roomName } from '../shared/room';
 import { apiKeyOwner, keyHash, keyJson } from './api-keys';
@@ -10,18 +11,23 @@ export async function handleContentApi(request: Request, env: Env, now: number):
   if (!key) return keyJson({ message: 'API key 無效或已撤銷' }, 401);
   const origin = request.headers.get('Origin');
   if ((origin && origin !== env.BETTER_AUTH_URL) || request.headers.get('Sec-Fetch-Site') === 'cross-site') return keyJson({ message: '來源不允許' }, 403);
+  await env.DB.prepare('UPDATE api_keys SET last_used_at = ? WHERE id = ?').bind(now, key.id).run();
+  return handleAuthorizedContent(request, env, now, key.owner_id, hash);
+}
+
+export async function handleAuthorizedContent(request: Request, env: Env, now: number, owner: string, credential: ContentCredential): Promise<Response> {
+  if (!await contentPermission(env, credential, owner, request.method !== 'GET', now)) return keyJson({ message: '存取授權無效或已撤銷' }, 401);
   const url = new URL(request.url); const path = url.pathname.slice('/api/v1'.length);
   const content = path.match(/^\/pages\/([\w-]{1,80})\/content$/);
   const isContent = !!content && ['GET', 'PUT'].includes(request.method);
   const allowed = request.method === 'GET' ? /^\/(pages(?:\/[\w-]{1,80})?|journals|search)$/.test(path)
     : request.method === 'POST' && /^\/(pages|journal|pages\/[\w-]{1,80}\/(title|move))$/.test(path);
   if (!allowed && !isContent) return keyJson({ message: 'API key 不允許此操作' }, 403);
-  if (await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(key.owner_id).first()) throw new PageError(503, '還原處理中，請稍後重試');
+  if (await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(owner).first()) throw new PageError(503, '還原處理中，請稍後重試');
   const page = path.match(/^\/pages\/([\w-]{1,80})/);
-  if (page && !await visiblePage(env.DB, key.owner_id, page[1])) throw new PageError(404, '找不到頁面');
-  await env.DB.prepare('UPDATE api_keys SET last_used_at = ? WHERE id = ?').bind(now, key.id).run();
+  if (page && !await visiblePage(env.DB, owner, page[1])) throw new PageError(404, '找不到頁面');
   if (isContent && content) {
-    const current = await visiblePage(env.DB, key.owner_id, content[1]);
+    const current = await visiblePage(env.DB, owner, content[1]);
     if (!current) throw new PageError(404, '找不到頁面');
     let input: { blocks: unknown; etag: string } | undefined;
     if (request.method === 'PUT') {
@@ -33,9 +39,9 @@ export async function handleContentApi(request: Request, env: Env, now: number):
         input = { blocks: value.blocks, etag };
       } catch { throw new PageError(400, '請提供最多 256 KiB 的區塊 JSON'); }
     }
-    const result = await env.SYNC.getByName(await roomName(key.owner_id, current.id, current.sync_generation)).content({ owner: key.owner_id, page: current.id, generation: current.sync_generation }, hash, input);
+    const result = await env.SYNC.getByName(await roomName(owner, current.id, current.sync_generation)).content({ owner: owner, page: current.id, generation: current.sync_generation }, credential, input);
     return Response.json(result.status === 200 ? { blocks: result.blocks } : { message: result.message }, { status: result.status, headers: { 'Cache-Control': 'no-store', ...(result.etag ? { ETag: result.etag } : {}) } });
   }
   url.pathname = '/api' + path;
-  return await handlePages(new Request(url, request), env, key.owner_id, now) ?? keyJson({ message: '找不到 API' }, 404);
+  return await handlePages(new Request(url, request), env, owner, now) ?? keyJson({ message: '找不到 API' }, 404);
 }

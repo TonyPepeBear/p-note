@@ -1,0 +1,12 @@
+{
+  "name": "p-note-local",
+  "interface": { "displayName": "p-note" },
+  "plugins": [
+    {
+      "name": "p-note",
+      "source": { "source": "local", "path": "./plugins/p-note" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

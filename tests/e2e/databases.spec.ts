@@ -385,7 +385,7 @@ test("DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋", 
   await page.evaluate(() => { (window as unknown as { databaseFailure: { fail: boolean } }).databaseFailure.fail = false; });
   await page.getByRole("button", { name: "重試保存", exact: true }).click();
   await expect(page.getByTestId("property-status")).toContainText("已儲存");
-  const other = await browser.newContext({
+  const other = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: await page.context().storageState(),
   });
   const p2 = await other.newPage();
@@ -425,7 +425,7 @@ test("DB-07：權限、刪除、舊世代與离線屬性限制", async ({ page, 
     properties: [property("a", "摘要")],
     views: [view()],
   });
-  const anon = await browser.newContext();
+  const anon = await browser.newContext({ ignoreHTTPSErrors: true });
   expect(
     (await anon.request.get(origin + "/api/databases/" + db.id)).status(),
   ).toBe(401);
@@ -580,7 +580,7 @@ test("DB-09：ZIP 與還原保留資料庫、檢視、欄位與正文", async ({
       })
     ).status(),
   ).toBe(409);
-  const fresh = await browser.newContext({
+  const fresh = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: {
       cookies: (await page.context().storageState()).cookies,
       origins: [],

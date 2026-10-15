@@ -7,7 +7,7 @@ test.beforeEach(async ({ request }) => { await request.post('/__test/reset'); aw
 for (const [idCase, action] of [['SYNC-10', 'delete'], ['SYNC-11', 'restore'], ['BACKUP-09', 'restore']] as const) test(`${idCase}：舊離線日記可唯讀檢視與另存筆記，不能回寫原頁或另建同日期日記`, async ({ page, browser }) => {
   const id = await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.replaceBlocks(window.probe!.editor.document, [{ type: 'paragraph', content: '雲端原稿' }])); await saved(page);
-  const otherContext = await browser.newContext({ storageState: await page.context().storageState() });
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });
   try {
     const other = await otherContext.newPage(); await openPrivate(other, id);
     const original = await (await other.request.get('/api/pages/' + id)).json();
@@ -49,7 +49,7 @@ for (const [idCase, action] of [['SYNC-10', 'delete'], ['SYNC-11', 'restore'], [
     expect(journals.filter((row: { journal_date: string }) => row.journal_date === original.journal_date)).toHaveLength(action === 'delete' ? 0 : 1);
     if (action === 'restore') {
       // 新 context 沒有舊快取，讀到的仍是還原正文。
-      const cleanContext = await browser.newContext({ storageState: { cookies: (await otherContext.storageState()).cookies, origins: [] } });
+      const cleanContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: { cookies: (await otherContext.storageState()).cookies, origins: [] } });
       try {
         const clean = await cleanContext.newPage(); await openPrivate(clean, id);
         expect(JSON.stringify(await blocks(clean))).toContain('雲端原稿'); expect(JSON.stringify(await blocks(clean))).not.toContain('只在舊裝置的草稿');

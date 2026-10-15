@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-15",
+  "red": {
+    "test": "PLUGIN-05",
+    "missingRegistrationStatus": 404
+  },
+  "unit": {
+    "passed": 8,
+    "failed": 0
+  },
+  "relatedWorkers": {
+    "passed": 12,
+    "failed": 0
+  },
+  "fullE2E": {
+    "passed": 434,
+    "failed": 4,
+    "skipped": 0,
+    "failures": [
+      {
+        "id": "UI-10",
+        "project": "webkit-mobile",
+        "passed": false
+      },
+      {
+        "id": "PWA-06",
+        "project": "chromium-desktop",
+        "passed": false
+      },
+      {
+        "id": "PWA-06",
+        "project": "chromium-mobile",
+        "passed": false
+      },
+      {
+        "id": "PWA-06",
+        "project": "webkit-mobile",
+        "passed": false
+      }
+    ]
+  },
+  "plugin": [
+    {
+      "id": "PLUGIN-05",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-01",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-02",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-03",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-06",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-07",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-08",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-04",
+      "project": "chromium-desktop",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-05",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-01",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-02",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-03",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-06",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-07",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-08",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-04",
+      "project": "chromium-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-05",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-01",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-02",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-03",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-06",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-07",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-08",
+      "project": "webkit-mobile",
+      "passed": true
+    },
+    {
+      "id": "PLUGIN-04",
+      "project": "webkit-mobile",
+      "passed": true
+    }
+  ],
+  "httpsPrototypeFocused": {
+    "passed": 17,
+    "failed": 0
+  },
+  "pwaFixtureFocusedChromium": {
+    "passed": 1,
+    "failed": 0
+  },
+  "actualCloudAccountAuthorizationVerified": false
+}

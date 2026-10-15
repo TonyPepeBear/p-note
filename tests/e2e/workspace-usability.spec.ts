@@ -350,7 +350,7 @@ test("UX-08：隔離與錯誤提示使用易懂文字並正確分隔", async ({
     ]),
   );
   await saved(page);
-  const otherContext = await browser.newContext({
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true,
     storageState: await page.context().storageState(),
   });
   try {

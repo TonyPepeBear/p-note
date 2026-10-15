@@ -6,7 +6,7 @@ test('SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確�
   const id = await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.replaceBlocks(window.probe!.editor.document, [{ id: 'a', type: 'paragraph', content: '甲' }, { id: 'b', type: 'paragraph', content: '乙' }]));
   await saved(page);
-  const otherContext = await browser.newContext({ storageState: await page.context().storageState() });
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });
   try {
     const other = await otherContext.newPage(); await openPrivate(other, id);
     await Promise.all([page.evaluate(() => window.probe!.editor.updateBlock('a', { content: '電腦' })), other.evaluate(() => window.probe!.editor.updateBlock('b', { content: '手機' }))]);
@@ -20,7 +20,7 @@ test('SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併�
   const id = await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.replaceBlocks(window.probe!.editor.document, [{ id: 'a', type: 'paragraph', content: '原甲' }, { id: 'b', type: 'paragraph', content: '原乙' }]));
   await saved(page);
-  const otherContext = await browser.newContext({ storageState: await page.context().storageState() });
+  const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });
   try {
     const other = await otherContext.newPage(); await openPrivate(other, id);
     await page.context().setOffline(true); await expect(page.getByTestId('cloud-status')).toHaveText('離線，待同步');

@@ -5,7 +5,7 @@ test.beforeEach(async ({ request }) => { await request.post('/__test/reset'); aw
 test('SYNC-03：SQLite 寫入失敗時保留本機草稿，不確認／廣播，解除故障後可重試', async ({ page, browser }) => {
   const id = await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '雲端原稿' })); await saved(page);
-  const peerContext = await browser.newContext({ storageState: { cookies: (await page.context().storageState()).cookies, origins: [] } });
+  const peerContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: { cookies: (await page.context().storageState()).cookies, origins: [] } });
   const room = await page.evaluate(() => window.probe!.room);
   const control = async (fail: boolean) => {
     const response = await page.request.post('/__test/storage-failure', { data: { room, fail } }); expect(response.status()).toBe(200);

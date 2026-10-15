@@ -17,6 +17,7 @@ import {
   IconMail,
 } from "@tabler/icons-react";
 import { api } from "./api";
+import { oauthReturnTo } from '../shared/oauth';
 import { Brand } from "./ui";
 import "./login.css";
 
@@ -33,6 +34,7 @@ export function Login({
   const [busy, setBusy] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const confirming = confirm && !requesting;
+  const returnTo = oauthReturnTo(new URLSearchParams(location.search).get('returnTo'));
   const send = async (confirming: boolean) => {
     setBusy(true);
     setMessage("");
@@ -42,7 +44,7 @@ export function Login({
         confirming ? "/api/confirm" : "/api/login",
         confirming
           ? { token: new URLSearchParams(location.search).get("token") }
-          : { email },
+          : { email, ...(returnTo ? { returnTo } : {}) },
       );
       const data = (await response.json()) as { message?: string };
       if (!response.ok) {
@@ -51,7 +53,7 @@ export function Login({
       }
       if (confirming) {
         history.replaceState(null, "", "/");
-        location.replace(sessionStorage.getItem("p-note-return-url") ?? "/");
+        location.replace(returnTo ?? sessionStorage.getItem("p-note-return-url") ?? "/");
       } else setMessage(data.message ?? "請查看登入郵件");
     } catch {
       setError("連線失敗，請稍後重試");

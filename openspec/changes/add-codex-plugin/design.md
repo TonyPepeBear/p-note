@@ -18,6 +18,7 @@
 - OAuth token／code 由 OAUTH_KV 保存；D1 mcp_grants 保存 owner、連線名稱、scope、到期與撤銷狀態，每次請求及 Durable Object 保存前重新檢查。D1 撤銷作為立即拒絕資料存取的邊界，不依賴 KV 跨區快取失效速度。token refresh callback 也檢查連線仍有效。
 - 抽出既有 handleContentApi 的已驗證身分內容處理；API key 與 OAuth 使用不同憑證分支，均保留正文 ETag、帳號所有權、還原鎖及即時同步，不模擬 cookie 或將私人 key 固定在 Worker。
 - plugin 改為遠端 HTTP OAuth 設定並移除本機執行旗標與 stdio 程式；技能保留筆記為資料、問句不寫入及衝突合併規則。
+- E2E 前後端改用暫存憑證的 HTTPS，保留 Secure／HttpOnly cookie 與同源 WebSocket 檢查；不以放寬正式 cookie 來適應 WebKit 的 HTTP 測試限制。
 
 ## Risks / Trade-offs
 
