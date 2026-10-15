@@ -28,7 +28,7 @@ for (const file of files) {
     const found = Array.from(text.matchAll(/\*\*自動化驗證\*\*: `([^`]+)`；([^\n]+)/g));
     assert.equal(found.length, Array.from(text.matchAll(/^#### Scenario:/gm)).length, `${file}: 情境缺驗證方法`);
     for (const [, id, method] of found) {
-      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB|HIST)-\d{2}$/.test(id), id);
+      assert(/^(AUTH|PAGE|EDIT|SYNC|ASSET|BACKUP|DEPLOY|UI|UX|KEY|LFN|DB|CICD|LINK|PWA|PLUGIN|SB|HIST|ICON)-\d{2}$/.test(id), id);
       assert(method.includes('斷言') || method.includes('檢查'), `${id}: 缺機器斷言`);
       const capability = file.match(/\/specs\/([^/]+)\//)?.[1];
       const sources = idSources.get(id) ?? [];
@@ -57,6 +57,7 @@ assert.deepEqual(ids.filter(id => id.startsWith('PWA-')).sort(), Array.from({ le
 assert.deepEqual(ids.filter(id => id.startsWith('PLUGIN-')).sort(), Array.from({ length: 8 }, (_, i) => `PLUGIN-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('SB-')).sort(), Array.from({ length: 22 }, (_, i) => `SB-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('HIST-')).sort(), Array.from({ length: 6 }, (_, i) => `HIST-0${i + 1}`));
+assert.deepEqual([...new Set(ids.filter(id => id.startsWith('ICON-')))].sort(), ['ICON-01', 'ICON-02', 'ICON-03', 'ICON-04']);
 // 依能力驗證完整編號，避免新增能力後仍被歷史情境總數擋住。
 assert.equal(new Set(ids).size, ids.length, '情境 ID 必須唯一');
 const scope = await readFile('docs/v1-scope.md', 'utf8');

@@ -11,3 +11,12 @@
   .synced-block-actions .mantine-Button-root, .synced-block-header .mantine-Button-root { min-height: 34px; }
   .synced-block-editor .bn-editor { padding-inline: 22px 10px; }
 }
+
+@media (max-width: 47.99em) {
+  .editor-toolbar button,
+  .synced-block-header button,
+  .synced-block-actions button {
+    scroll-margin-top: 64px;
+    scroll-margin-bottom: 12px;
+  }
+}

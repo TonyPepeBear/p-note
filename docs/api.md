@@ -16,8 +16,9 @@ Base URL：`https://note.tonypepe.com/api/v1`
 | --- | --- | --- |
 | GET | `/pages` | 列出自己的可見筆記與日記 |
 | GET | `/pages/:id` | 頁面資訊，正文使用下一個入口 |
-| POST | `/pages` | 建立筆記，`{"title":"新筆記","parent_id":null}` |
+| POST | `/pages` | 建立筆記，`{"title":"新筆記","parent_id":null,"icon":"📝"}`；icon 可省略 |
 | POST | `/pages/:id/title` | 改名，`{"title":"新標題"}` |
+| POST | `/pages/:id/icon` | 設定單一 emoji，`{"icon":"👩🏽‍💻"}`；傳 `{"icon":null}` 移除 |
 | POST | `/pages/:id/move` | 移動，`{"parent_id":null}` 或上層 ID |
 | POST | `/journal` | 開啟或建立每日唯一日記，`{"date":"2026-10-14"}` |
 | GET | `/journals?month=2026-10` | 月份日記 |
@@ -27,6 +28,8 @@ Base URL：`https://note.tonypepe.com/api/v1`
 | GET | `/pages/:id/content?expandSyncedBlocks=true` | 保留頁面引用節點，另回傳 `syncedBlocks` 正文與各自 ETag |
 | GET | `/synced-blocks/:id/content` | 讀取單一同步區塊，回傳 `{"blocks":[...]}` 及該區塊 ETag |
 | PUT | `/synced-blocks/:id/content` | 以 `{"blocks":[...]}` 更新共用正文，必須提供該區塊的 `If-Match` |
+
+頁面 metadata 的 `icon` 為單一完整 emoji 或 null，列表、搜尋及日記皆會回傳。支援複合 emoji、膚色及旗幟；一般文字、多個 emoji 或空字串會回應 400。圖示變更會更新 metadata revision、同步至開啟的網頁並納入備份。MCP 的 `create_page` 同樣接受 `icon`，既有頁面可用 `set_page_icon` 更換或傳 null 移除；寫入需要 `notes:write` 權限。
 
 ## 正文範例
 
@@ -84,7 +87,7 @@ HTTP `ETag` 標頭保護頁面正文與引用關係；展開項目的 `etag` 各
 
 ## 遠端 MCP
 
-遠端 MCP 共提供 12 個工具。同步區塊使用相同權限、JSON 驗證與版本保護：
+遠端 MCP 共提供 13 個工具。同步區塊使用相同權限、JSON 驗證與版本保護：
 
 | 工具 | 參數與結果 |
 | --- | --- |

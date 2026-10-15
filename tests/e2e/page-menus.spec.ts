@@ -17,6 +17,10 @@ const item = (page: Page, name: string) => menu(page).getByRole("menuitem", { na
 
 async function sidebarMenu(page: Page, title: string, right = false) {
   await showNavigation(page);
+  const drawer = page.locator(".mantine-Drawer-content");
+  if (await drawer.isVisible()) {
+    await expect(drawer).toHaveCSS("transform", /^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+  }
   const row = page.getByRole("navigation", { name: "筆記頁面" })
     .getByRole("link", { name: title, exact: true }).locator("..");
   if (right) await row.click({ button: "right" });
@@ -50,6 +54,8 @@ test("UI-04：右上角為動作列表，鍵盤、Escape、外部點擊與日記
 });
 
 test("UI-04：側欄點擊與右鍵操作其他頁面，取消與刪除不影響目前正文", async ({ page }) => {
+  // 此流程包含重新命名與兩次刪除面板往返；每步斷言仍維持原本 5 秒。
+  test.setTimeout(45_000);
   const current = await openPrivate(page);
   const target = await create(page, "側欄目標");
   await page.reload();
@@ -134,7 +140,12 @@ for (const database of [false, true]) {
       const id = new URL(page.url()).searchParams.get("page");
       return (await (await page.request.get("/api/pages/" + id)).json()).parent_id;
     }).toBe(target.id);
-    await showNavigation(page);
+    // 網址先更新，等新文件掛載後再開手機導覽，避免換頁 effect 將抽屜關閉。
+    if (database) await expect(page.getByTestId("database-ready")).toBeVisible();
+    else {
+      await expect(page.getByLabel("文件標題", { exact: true })).toHaveValue("未命名");
+      await expect(page.getByTestId("ready")).toHaveText("可編輯");
+    }
     await sidebarMenu(page, database ? "未命名資料庫" : "未命名");
     await expect(item(page, "新增子資料庫")).toHaveCount(database ? 0 : 1);
   });

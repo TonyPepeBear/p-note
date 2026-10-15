@@ -103,8 +103,8 @@ export class RestoreCoordinator extends DurableObject<Env> {
         db.prepare('DELETE FROM synced_blocks WHERE owner_id = ?').bind(owner),
         ...(target.synced_blocks ?? []).map(({ metadata: b }) => db.prepare('INSERT INTO synced_blocks (id, owner_id, sync_generation, created_at, updated_at) VALUES (?, ?, ?, ?, ?)')
           .bind(b.id, owner, blockGenerations.get(b.id)!, b.created_at, b.updated_at)),
-        ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-          .bind(p.id, owner, p.kind, p.title, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at, p.database_config ?? null, p.property_values ?? '{}')),
+        ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+          .bind(p.id, owner, p.kind, p.title, p.icon ?? null, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at, p.database_config ?? null, p.property_values ?? '{}')),
         ...(target.page_synced_blocks ?? []).map(ref => db.prepare('INSERT INTO page_synced_blocks (page_id, synced_block_id) VALUES (?, ?)').bind(ref.page_id, ref.synced_block_id)),
         ...target.assets.map(({ metadata: a }) => db.prepare(`INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET object_key = excluded.object_key, original_name = excluded.original_name, mime_type = excluded.mime_type, byte_size = excluded.byte_size, checksum = excluded.checksum, created_at = excluded.created_at WHERE assets.owner_id = excluded.owner_id`)

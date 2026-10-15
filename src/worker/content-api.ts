@@ -75,7 +75,7 @@ export async function handleAuthorizedContent(request: Request, env: Env, now: n
   const synced = path.match(/^\/synced-blocks\/([\w-]{1,80})\/content$/);
   const isContent = !!(content || synced) && ['GET', 'PUT'].includes(request.method);
   const allowed = request.method === 'GET' ? /^\/(pages(?:\/[\w-]{1,80})?|journals|search)$/.test(path)
-    : request.method === 'POST' && /^\/(pages|journal|pages\/[\w-]{1,80}\/(title|move))$/.test(path);
+    : request.method === 'POST' && /^\/(pages|journal|pages\/[\w-]{1,80}\/(title|icon|move))$/.test(path);
   if (!allowed && !isContent) return keyJson({ message: 'API key 不允許此操作' }, 403);
   if (await env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(owner).first()) throw new PageError(503, '還原處理中，請稍後重試');
   const page = path.match(/^\/pages\/([\w-]{1,80})/);

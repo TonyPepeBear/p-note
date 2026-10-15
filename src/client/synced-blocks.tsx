@@ -1,15 +1,16 @@
 import { Alert, Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconCopy, IconLink, IconRefresh, IconUnlink } from '@tabler/icons-react';
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BlockNoteSchema, defaultBlockSpecs, type BlockNoteEditor } from '@blocknote/core';
-import { createReactBlockSpec, useCreateBlockNote } from '@blocknote/react';
+import { createReactBlockSpec, FormattingToolbarController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { withCollaboration } from '@blocknote/core/yjs';
 import { zhTW } from '@blocknote/core/locales';
 import { syncedBlockConfig } from '../shared/block-schema';
 import { api, navigate } from './api';
 import { uploadImage } from './assets';
-import { NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from './note-links';
+import { createNoteLinkIconsExtension, NoteLinkIcons, NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from './note-links';
 import { acquireSyncedSession, type SyncedScope, type SyncedSession, type SyncedState } from './synced-block-session';
 import './synced-blocks.css';
 import { useSafeRemoteNodeSelection } from './yjs-selection';
@@ -22,11 +23,19 @@ export function SyncedBlocksProvider({ children, ...context }: Context & { child
   return <SyncedContext.Provider value={context}>{children}</SyncedContext.Provider>;
 }
 
+export function ResponsiveFormattingToolbar() {
+  const narrow = useMediaQuery('(max-width: 47.99em)');
+  // 小螢幕將格式列放在選取內容下方，保留上方頁面與同步區塊按鈕的觸控區域。
+  return <FormattingToolbarController floatingUIOptions={narrow ? { useFloatingOptions: { placement: 'bottom-start' } } : undefined} />;
+}
+
 function SyncedContent({ session, readOnly, ownerId, onEditor }: {
   session: SyncedSession; readOnly: boolean; ownerId: string; onEditor: (editor: AnyEditor) => void;
 }) {
+  const noteLinkIcons = useMemo(() => createNoteLinkIconsExtension(), []);
   const editor = useCreateBlockNote(withCollaboration({
     dictionary: zhTW,
+    extensions: [noteLinkIcons.extension],
     // provider 是 BlockNote 官方可選的游標 awareness，文件同步由共用 session 自行處理。
     // 同一文件的多個視圖不能共用一個游標狀態，否則 focus 與 blur 會互相清除並持續送出更新。
     collaboration: { fragment: session.doc.getXmlFragment('body'), user: { name: '我', color: '#2383e2' } },
@@ -45,8 +54,10 @@ function SyncedContent({ session, readOnly, ownerId, onEditor }: {
       }
     }}>
     {error && <Alert role="alert" color="red">{error}</Alert>}
-    <BlockNoteView editor={editor} theme="light" editable={!readOnly}>
+    <BlockNoteView editor={editor} theme="light" editable={!readOnly} formattingToolbar={false}>
+      <ResponsiveFormattingToolbar />
       {!readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
+      <NoteLinkIcons editor={editor} owner={ownerId} disabled={readOnly} controller={noteLinkIcons} />
     </BlockNoteView>
   </div>;
 }

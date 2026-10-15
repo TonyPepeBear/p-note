@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { CreateMenu } from "./create-menu";
 import { PwaControls } from "./pwa-controls";
 import { PageMenu, type PageAction } from "./page-menu";
 import {
@@ -8,13 +9,14 @@ import {
 import {
   IconArrowRight, IconCalendar, IconCalendarEvent, IconChevronDown,
   IconChevronRight, IconChevronsLeft, IconChevronsRight, IconCloud,
-  IconDatabase, IconFileText, IconLogout, IconMenu2, IconPlus,
+  IconDatabase, IconFileText, IconLogout, IconMenu2,
   IconSearch, IconSettings, IconTrash, IconPhoto,
 } from "@tabler/icons-react";
 import type { PageInfo, PageRow } from "../shared/pages";
 import { today } from "../shared/pages";
 import { api, navigate, saveDraft } from "./api";
 import { Brand } from "./ui";
+import { PageIcon, PageIconPicker } from "./page-icon";
 import "./navigation.css";
 
 export function Navigation({ page, changed, error, backups, settings, images, imagesClose, pageHistory, settingsView, databaseView, navigationLocked = false, children }: {
@@ -38,6 +40,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const [panel, setPanel] = useState("");
   const [actionPage, setActionPage] = useState<PageRow>(page);
   const [navOpen, setNavOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [pwaHelpOpen, setPwaHelpOpen] = useState(false);
   const [pageMenuOpen, setPageMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -65,7 +68,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const navigationLockedRef = useRef(navigationLocked);
   navigationLockedRef.current = navigationLocked;
   useEffect(() => {
-    if (navigationLocked) setPanel("");
+    if (navigationLocked) { setPanel(""); setCreateOpen(false); }
   }, [navigationLocked]);
   const setSidebar = (closed: boolean) => {
     setSidebarCollapsed(closed);
@@ -94,22 +97,60 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   const refresh = async () => {
     const response = await api("/api/pages");
     if (!response.ok) throw new Error("無法載入頁面列表");
-    setPages((await response.json()) as PageRow[]);
+    const incoming = (await response.json()) as PageRow[];
+    setPages((items) => incoming.map((item) => {
+      const current = items.find((value) => value.id === item.id);
+      return current && current.sync_generation === item.sync_generation && current.metadata_revision > item.metadata_revision ? current : item;
+    }));
+    const merge = <T extends PageRow>(items: T[]): T[] => items.map((item) => {
+      const updated = incoming.find((value) => value.id === item.id);
+      return updated && (item.sync_generation !== updated.sync_generation || updated.metadata_revision >= item.metadata_revision)
+        ? { ...item, ...updated } : item;
+    });
+    setJournals(merge); setResults(merge);
   };
+  useEffect(() => {
+    const metadata = (event: Event) => {
+      const updated = (event as CustomEvent<PageInfo>).detail;
+      if (!updated || updated.owner_id !== page.owner_id) return;
+      const merge = <T extends PageRow>(items: T[]): T[] => items.map((item) => item.id === updated.id
+        && (item.sync_generation !== updated.sync_generation || updated.metadata_revision >= item.metadata_revision) ? { ...item, ...updated } : item);
+      setPages(merge); setTrash(merge); setJournals(merge); setResults(merge);
+    };
+    const refreshVisible = () => {
+      if (navigator.onLine && document.visibilityState !== "hidden") void refresh().catch(() => {});
+    };
+    const timer = setInterval(refreshVisible, 3000);
+    window.addEventListener("p-note:page-metadata", metadata);
+    window.addEventListener("focus", refreshVisible);
+    window.addEventListener("online", refreshVisible);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("p-note:page-metadata", metadata);
+      window.removeEventListener("focus", refreshVisible);
+      window.removeEventListener("online", refreshVisible);
+    };
+  }, [page.owner_id]);
   useEffect(() => {
     void refresh().catch(() => error("無法載入頁面列表，請重新整理"));
     const ancestors = new Set(page.ancestors?.map((item) => item.id));
     setCollapsed((items) => items.filter((id) => !ancestors.has(id)));
     setPanel("");
+    setCreateOpen(false);
     setNavOpen(false);
     setPageMenuOpen(false);
     setDate(page.journal_date ?? today(Date.now()));
     setMonth((page.journal_date ?? today(Date.now())).slice(0, 7));
   }, [page.id]);
   useEffect(() => {
+    if (actionPage.id !== page.id) return;
+    setTitle(page.title);
+    setParent(page.parent_id ?? "");
+  }, [actionPage.id, page.id, page.title, page.parent_id]);
+  useEffect(() => {
     setPages((items) => items.map((item) => item.id === page.id
-      ? { ...item, title: page.title, parent_id: page.parent_id } : item));
-  }, [page.title, page.parent_id]);
+      ? { ...item, title: page.title, parent_id: page.parent_id, icon: page.icon, metadata_revision: page.metadata_revision } : item));
+  }, [page.id, page.title, page.parent_id, page.icon, page.metadata_revision]);
   useEffect(() => {
     const search = (event: KeyboardEvent) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "k") return;
@@ -154,7 +195,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     void run(() => navigate(id));
   };
   const pageLink = (item: PageRow, label = item.title) => (
-    <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
+    <span className="pn-breadcrumb-page">
+      <PageIconPicker page={pages.find((value) => value.id === item.id) ?? item} size={15} disabled={navigationLocked} />
+      <Anchor href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} onClick={(event) => link(event, item.id)}>{label}</Anchor>
+    </span>
   );
   const open = (name: string, target?: HTMLElement) => {
     if (navigationLockedRef.current) return;
@@ -203,10 +247,10 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           aria-label={(closed ? "展開 " : "收合 ") + item.title} aria-expanded={!closed} onClick={() => toggle(item.id)}>
           {closed ? <IconChevronRight size={14} /> : <IconChevronDown size={14} />}
         </button> : <span className="pn-tree-spacer" />}
+        <PageIconPicker page={item} size={17} disabled={navigationLocked} className="pn-note-icon" />
         <a href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} className="pn-note-link note-link"
           aria-current={!settingsView && item.id === page.id ? "page" : undefined}
           onClick={(event) => link(event, item.id)} title={item.title}>
-          {item.database_config ? <IconDatabase size={17} /> : <IconFileText size={17} />}
           <span>{item.title}</span>
         </a>
       </PageMenu>
@@ -219,8 +263,14 @@ export function Navigation({ page, changed, error, backups, settings, images, im
     ]);
   const openJournals = (target: HTMLElement) => { open("journals", target); void run(() => loadMonth(month)); };
   const newNote = () => void run(async () => {
+    setNavOpen(false);
     const note = await request("/api/pages", { title: "未命名", parent_id: null });
     if (note) await navigate(note.id, true);
+  });
+  const newDatabase = () => void run(async () => {
+    setNavOpen(false);
+    const database = await request("/api/databases", { title: "未命名資料庫" });
+    if (database) await navigate(database.id);
   });
   const sidebar = <div className="pn-sidebar-content">
     <div className="pn-workspace-switcher">
@@ -238,16 +288,14 @@ export function Navigation({ page, changed, error, backups, settings, images, im
         <IconCalendar size={18} /><span>日記</span>
       </button>
     </nav>
-    <div className="pn-section-label"><span>私人頁面</span><span className="pn-note-count">{pages.filter((item) => item.kind === "note").length}</span></div>
+    <div className="pn-section-label"><span>私人頁面</span><div className="pn-section-actions">
+      <span className="pn-note-count">{pages.filter((item) => item.kind === "note").length}</span>
+      <CreateMenu key={"create-" + page.id} sidebar disabled={busy || navigationLocked} onNote={newNote} onDatabase={newDatabase} onOpenChange={setCreateOpen} />
+    </div></div>
     <div className="pn-notes-scroll">
       <nav aria-label="筆記頁面">
         {pages.some((item) => item.kind === "note") ? tree(null) : <div className="pn-sidebar-empty">還沒有筆記</div>}
       </nav>
-      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={newNote}><IconPlus size={18} /><span>新增筆記</span></button>
-      <button className="pn-nav-item pn-add-page" disabled={busy || navigationLocked} onClick={() => void run(async () => {
-        const database = await request("/api/databases", { title: "未命名資料庫" });
-        if (database) await navigate(database.id);
-      })}><IconDatabase size={18} /><span>新增資料庫</span></button>
     </div>
     <nav className="pn-sidebar-footer" aria-label="工作區管理">
       <PwaControls disabled={navigationLocked} onHelpOpenChange={setPwaHelpOpen} />
@@ -275,7 +323,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
   return <div className="pn-workspace app-shell" data-sidebar-collapsed={sidebarCollapsed} data-navigation-locked={navigationLocked || undefined}>
     <aside id="workspace-sidebar" className="pn-sidebar workspace-sidebar" aria-label="側邊欄">{sidebar}</aside>
     <Drawer opened={navOpen} onClose={() => setNavOpen(false)} title="導覽" size={300}
-      trapFocus={!pwaHelpOpen && !pageMenuOpen} closeOnEscape={!pwaHelpOpen && !pageMenuOpen}
+      trapFocus={!pwaHelpOpen && !pageMenuOpen && !createOpen} closeOnEscape={!pwaHelpOpen && !pageMenuOpen && !createOpen}
       closeButtonProps={{ "aria-label": "關閉導覽" }} className="pn-navigation-drawer navigation-drawer" padding={0}>
       {sidebar}
     </Drawer>
@@ -302,12 +350,14 @@ export function Navigation({ page, changed, error, backups, settings, images, im
             {!settingsView && page.ancestors?.map((item, index) => <span key={item.id} className="pn-ancestor"
               data-direct-parent={index === (page.ancestors?.length ?? 0) - 1 || undefined}>{pageLink(item)}</span>)}
             <span className="pn-current-page" title={settingsView ? undefined : page.title}>
-              {settingsView === "images" ? <IconPhoto size={15} /> : settingsView ? <IconSettings size={15} /> : page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />}
+              {settingsView === "images" ? <IconPhoto size={15} /> : settingsView ? <IconSettings size={15} /> : <PageIconPicker page={page} size={15} disabled={navigationLocked}
+                fallback={page.database_config ? <IconDatabase size={15} /> : <IconFileText size={15} />} />}
               <span>{settingsView === "images" ? "我的圖片" : settingsView ? settingsView === "backup" ? "備份設定" : "API 與整合" : page.title}</span>
             </span>
           </Breadcrumbs>
         </nav>
         <div className="pn-topbar-actions">
+          <CreateMenu key={"create-" + page.id} disabled={busy || navigationLocked} onNote={newNote} onDatabase={newDatabase} onOpenChange={setCreateOpen} />
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="搜尋筆記" title="搜尋筆記"
             onClick={(event) => open("search", event.currentTarget)}><IconSearch size={18} /></button>
           <button disabled={navigationLocked} className={"pn-icon-button " + (sidebarCollapsed ? "" : "pn-mobile-only")} aria-label="備份設定" title="備份設定"
@@ -347,11 +397,13 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           {searched ? <section aria-label="搜尋結果" className="pn-result-list">
             <div className="pn-list-caption">{results.length} 個搜尋結果</div>
             {!results.length ? <div className="pn-empty-state"><IconSearch size={28} stroke={1.4} /><Text>沒有符合的頁面</Text><Text size="sm" c="dimmed">試試其他關鍵字。</Text></div>
-              : results.map((item) => <a key={item.id} className="pn-result-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
-                {item.kind === "journal" ? <IconCalendar size={19} /> : item.database_config ? <IconDatabase size={19} /> : <IconFileText size={19} />}
-                <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
-                <IconArrowRight size={16} className="pn-result-arrow" />
-              </a>)}
+              : results.map((item) => <div key={item.id} className="pn-result-row">
+                <PageIconPicker page={item} size={19} disabled={navigationLocked} fallback={item.kind === "journal" ? <IconCalendar size={19} /> : undefined} />
+                <a className="pn-result-link" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined} aria-label={item.title} onClick={(event) => link(event, item.id)}>
+                  <div><span className="pn-result-title">{item.title}</span><span className="pn-result-summary">{item.summary || "開啟頁面"}</span></div>
+                  <IconArrowRight size={16} className="pn-result-arrow" />
+                </a>
+              </div>)}
           </section> : <div className="pn-search-help"><IconSearch size={26} stroke={1.4} /><Text size="sm">搜尋你的筆記與日記</Text><Text size="xs" c="dimmed">可搜尋標題及已同步的內容</Text></div>}
           <div className="pn-dialog-footer"><span><kbd>Esc</kbd> 關閉</span><span><kbd>Enter</kbd> 搜尋</span></div>
         </>}
@@ -375,12 +427,15 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           </div>
           <section aria-label="月份日記" className="pn-result-list">
             <div className="pn-list-caption">{month.replace("-", " 年 ")} 月 · {journals.length} 篇日記</div>
-            {journals.length ? journals.map((item) => <a key={item.id} className="pn-journal-row" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
-              onClick={(event) => link(event, item.id)}>
-              <span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>
-              <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
-              <IconChevronRight size={15} />
-            </a>) : <div className="pn-empty-state"><IconCalendar size={28} stroke={1.4} /><Text size="sm">這個月還沒有日記</Text><Text size="xs" c="dimmed">選擇日期，開始記錄。</Text></div>}
+            {journals.length ? journals.map((item) => <div key={item.id} className="pn-journal-row">
+              <PageIconPicker page={item} size={19} disabled={navigationLocked}
+                fallback={<span className="pn-journal-day" aria-hidden="true">{item.journal_date?.slice(8)}</span>} />
+              <a className="pn-journal-link" href={navigationLocked ? undefined : "/?page=" + item.id} role="link" aria-disabled={navigationLocked || undefined} tabIndex={navigationLocked ? -1 : undefined}
+                onClick={(event) => link(event, item.id)}>
+                <span className="pn-journal-title">{item.title === item.journal_date ? item.title : item.journal_date + " " + item.title}</span>
+                <IconChevronRight size={15} />
+              </a>
+            </div>) : <div className="pn-empty-state"><IconCalendar size={28} stroke={1.4} /><Text size="sm">這個月還沒有日記</Text><Text size="xs" c="dimmed">選擇日期，開始記錄。</Text></div>}
           </section>
         </>}
         {panel === "trash" && <section aria-label="垃圾桶內容">
@@ -388,7 +443,7 @@ export function Navigation({ page, changed, error, backups, settings, images, im
           {notice && <Alert color="gray" role="status" mb={12}>{notice}</Alert>}
           {!trash.length && <div className="pn-empty-state"><IconTrash size={30} stroke={1.4} /><Text fw={500}>垃圾桶是空的</Text></div>}
           <div className="pn-trash-list">{trash.map((item) => <div className="pn-trash-row" key={item.id}>
-            <IconFileText size={18} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
+            <PageIcon page={item} size={18} fallback={<IconFileText size={18} />} /><Text lineClamp={2} className="trash-title">{item.title}</Text>
             <Button variant="default" disabled={busy || navigationLocked} aria-label={"還原 " + item.title} onClick={() => {
               setNotice("");
               void run(async () => {

@@ -21,7 +21,7 @@
 
 ## Modified Capabilities
 
-- `codex-plugin`：遠端工具由 10 個擴充為 12 個，加入單一同步區塊正文的讀寫與版本保護。
+- `codex-plugin`：遠端工具由 11 個擴充為 13 個，加入單一同步區塊正文的讀寫與版本保護。
 
 # Impact
 

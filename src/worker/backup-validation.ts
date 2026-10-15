@@ -1,6 +1,7 @@
 import { readConfig, readValues, validValue } from '../shared/databases';
 import type { BackupFile, BackupManifest } from '../shared/backup';
 import { validDate } from '../shared/pages';
+import { isPageIcon } from '../shared/page-icon';
 import { IMAGE_LIMIT, IMAGE_TYPES } from '../shared/image';
 import { PageError } from './pages';
 
@@ -23,11 +24,12 @@ export function validateManifest(data: BackupManifest): void {
     const p = item?.metadata;
     if (!p || !identifier(p.id) || pages.has(p.id) || p.owner_id !== data.owner.id || !identifier(p.sync_generation)
       || typeof p.title !== 'string' || !p.title.trim() || p.title.length > 200 || !['note', 'journal'].includes(p.kind)
+      || (p.icon !== undefined && !isPageIcon(p.icon))
       || !integer(p.metadata_revision) || !integer(p.created_at) || !integer(p.updated_at) || (p.deleted_at !== null && !integer(p.deleted_at))
       || (p.parent_id !== null && !identifier(p.parent_id)) || !integer(item.checkpoint) || !integer(item.captured_at)
       || item.captured_at < data.started_at || item.captured_at > data.captured_until
       || !keys(item, ['metadata', 'checkpoint', 'captured_at', 'file'])
-      || !keys(p, ['id', 'owner_id', 'kind', 'title', 'parent_id', 'journal_date', 'sync_generation', 'metadata_revision', 'created_at', 'updated_at', 'deleted_at', 'database_config', 'property_values'])) invalid();
+      || !keys(p, ['id', 'owner_id', 'kind', 'title', 'icon', 'parent_id', 'journal_date', 'sync_generation', 'metadata_revision', 'created_at', 'updated_at', 'deleted_at', 'database_config', 'property_values'])) invalid();
     try {
       if (p.database_config !== undefined && p.database_config !== null) { if (p.kind !== 'note' || typeof p.database_config !== 'string') invalid(); readConfig(p.database_config); }
       if (p.property_values !== undefined) { if (typeof p.property_values !== 'string') invalid(); readValues(p.property_values); }

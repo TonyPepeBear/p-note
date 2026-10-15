@@ -17,12 +17,16 @@ test('SYNC-01：正式有權限雙 context 併發編輯不同段落，持久確�
 });
 
 test('SYNC-08：正式頁面離線修改／刷新保留，重連同世代合併雙方修改', async ({ page, browser }) => {
-  const id = await openPrivate(page);
+  await openPrivate(page);
   await page.evaluate(() => window.probe!.editor.replaceBlocks(window.probe!.editor.document, [{ id: 'a', type: 'paragraph', content: '原甲' }, { id: 'b', type: 'paragraph', content: '原乙' }]));
   await saved(page);
   const otherContext = await browser.newContext({ ignoreHTTPSErrors: true, storageState: await page.context().storageState() });
   try {
-    const other = await otherContext.newPage(); await openPrivate(other, id);
+    const other = await otherContext.newPage();
+    await other.goto(page.url());
+    await expect(other.getByTestId('ready')).toBeVisible({ timeout: 15000 });
+    await expect(other.getByTestId('ready')).toHaveText('可編輯', { timeout: 15000 });
+    await saved(other);
     await page.context().setOffline(true); await expect(page.getByTestId('cloud-status')).toHaveText('離線，待同步');
     await page.evaluate(() => window.probe!.editor.updateBlock('a', { content: '離線草稿' }));
     await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');

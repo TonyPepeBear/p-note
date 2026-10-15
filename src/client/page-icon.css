@@ -1,0 +1,88 @@
+.page-icon {
+  display: inline-flex;
+  width: var(--page-icon-size);
+  min-width: var(--page-icon-size);
+  height: var(--page-icon-size);
+  align-items: center;
+  justify-content: center;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: var(--page-icon-size);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.page-icon-trigger {
+  display: inline-flex;
+  min-width: 32px;
+  min-height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #6f6e69;
+  cursor: pointer;
+}
+
+.page-icon-trigger:hover:not(:disabled),
+.page-icon-choice:hover:not(:disabled) {
+  background: #efefed;
+}
+
+.page-icon-trigger:focus-visible,
+.page-icon-choice:focus-visible {
+  outline: 2px solid #2383e2;
+  outline-offset: 2px;
+}
+
+.page-icon-trigger:disabled {
+  cursor: default;
+}
+
+.page-icon-trigger-large {
+  margin: 0 0 16px -6px;
+  padding: 6px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.page-icon-choices {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.page-icon-choice {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.page-icon-choice[aria-pressed="true"] {
+  background: #e8f1fb;
+}
+
+.page-icon-choice:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+@media (max-width: 767px) {
+  .page-icon-trigger {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}

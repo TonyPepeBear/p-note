@@ -29,7 +29,7 @@ import {
   IconTrash,
   IconDots,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getDefaultReactSlashMenuItems, SuggestionMenuController, useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { zhTW } from "@blocknote/core/locales";
@@ -44,12 +44,12 @@ import { roomName } from "../shared/room";
 import { IMAGE_TYPES, IMAGE_RULE } from "../shared/image";
 import { uploadImage } from "./assets";
 import { registerDraft } from "./api";
-import { NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
+import { createNoteLinkIconsExtension, NoteLinkIcons, NoteLinkSuggestions, followNoteLink, selectNoteLinkSuggestion } from "./note-links";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./style.css";
 import "./editor.css";
-import { SyncedBlocksProvider, syncedEditorSchema, SYNCED_CLIPBOARD_PREFIX } from './synced-blocks';
+import { ResponsiveFormattingToolbar, SyncedBlocksProvider, syncedEditorSchema, SYNCED_CLIPBOARD_PREFIX } from './synced-blocks';
 import { createSyncedBlock, type SyncedMetadata, type SyncedState } from './synced-block-session';
 import { api } from './api';
 import { useSafeRemoteNodeSelection } from './yjs-selection';
@@ -191,6 +191,7 @@ export function Editor({
   focusTitle = false,
   readOnly = false,
   properties,
+  icon,
   ownerId,
 }: {
   session: Session;
@@ -200,6 +201,7 @@ export function Editor({
   focusTitle?: boolean;
   readOnly?: boolean;
   properties?: ReactNode;
+  icon?: ReactNode;
   ownerId?: string;
 }) {
   const { doc, cache, provider, room } = session;
@@ -214,10 +216,13 @@ export function Editor({
     id: string;
     code: boolean;
   }>();
+  // 初始化時加入裝飾插件，避免動態重設插件破壞協作復原紀錄。
+  const noteLinkIcons = useMemo(() => createNoteLinkIconsExtension(), []);
   const editor = useCreateBlockNote(
     withCollaboration({
       schema: syncedEditorSchema,
       dictionary: zhTW,
+      extensions: [noteLinkIcons.extension],
       collaboration: {
         fragment: doc.getXmlFragment("body"),
         provider,
@@ -619,6 +624,7 @@ export function Editor({
       checkAccess={session.checkAccess} readOnly={readOnly} report={reportSynced}>
     <section className="editor-document">
       <div className="document-heading">
+        {icon && <div className="document-icon">{icon}</div>}
         <div className="document-kind">
           {kind === "journal" ? <IconBook2 size={18} /> : <IconFileText size={18} />}
           <span>{kind === "journal" ? "日記" : "筆記"}</span>
@@ -859,7 +865,8 @@ export function Editor({
           event.preventDefault(); event.stopPropagation(); addReference(id);
         }}
       >
-        <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly} slashMenu={false}>
+        <BlockNoteView className="editor-blocknote" editor={editor} theme="light" editable={!readOnly} slashMenu={false} formattingToolbar={false}>
+          <ResponsiveFormattingToolbar />
           <SuggestionMenuController triggerCharacter="/" getItems={async query => {
             const items = getDefaultReactSlashMenuItems(editor);
             if (title && !readOnly) items.push({ title: '同步區塊', subtext: '建立可在多個頁面同步編輯的內容', group: '基本區塊', aliases: ['sync', 'synced', '同步'], onItemClick: () => void createSynced(false) });
@@ -867,6 +874,7 @@ export function Editor({
             return items.filter(item => item.title.toLocaleLowerCase().includes(needle) || item.aliases?.some(alias => alias.toLocaleLowerCase().includes(needle)));
           }} />
           {ownerId && !readOnly && <NoteLinkSuggestions editor={editor} owner={ownerId} />}
+          {ownerId && <NoteLinkIcons editor={editor} owner={ownerId} disabled={readOnly} controller={noteLinkIcons} />}
         </BlockNoteView>
       </div>
       {title && !readOnly && (

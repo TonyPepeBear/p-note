@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Anchor, Button, Checkbox, Group, MultiSelect, NativeSelect, Text, TextInput } from "@mantine/core";
-import { IconCalendar, IconCheck, IconDatabase, IconHash, IconLink, IconListDetails, IconTypography } from "@tabler/icons-react";
+import { IconCalendar, IconCheck, IconHash, IconLink, IconListDetails, IconTypography } from "@tabler/icons-react";
 import { navigate, registerDraft } from "../api";
+import { PageIcon } from "../page-icon";
 import type { PageInfo, PageRow } from "../../shared/pages";
 import { readConfig, readValues, type Property, type PropertyValue } from "../../shared/databases";
 import { useDatabase } from "./use-database";
@@ -207,7 +208,7 @@ export function NoteProperties({
             void navigate(parent.id).catch((e) => setStatus(e.message));
           }}
         >
-          <IconDatabase size={14} aria-hidden="true" />
+          <PageIcon page={data?.page ?? parent} size={14} />
           返回 {parent.title}
         </Anchor>
         <Text size="xs" c="dimmed" role="status" data-testid="property-status">

@@ -5,17 +5,20 @@ import { handleAuthorizedContent } from './content-api';
 import { PageError } from './pages';
 import { activeMcpGrant } from './mcp-permissions';
 import type { OAuthResourceContext } from '@cloudflare/workers-oauth-provider';
+import { isPageIcon } from '../shared/page-icon';
 
 export type McpIdentity = { owner: string; connectionId: string };
 const id = z.string().regex(/^[\w-]{1,80}$/);
 const title = z.string().trim().min(1).max(200);
 const parent = id.nullable();
+const icon = z.string().max(64).refine(isPageIcon, '圖示須為單一 emoji').nullable();
 const definitions = [
   { name: 'list_pages', description: '列出自己的可見筆記與日記。', input: z.object({}).strict(), method: 'GET', path: () => '/pages' },
   { name: 'get_page', description: '讀取頁面資訊與上層；正文請使用 get_content。', input: z.object({ page_id: id }).strict(), method: 'GET', path: (a: Args) => `/pages/${a.page_id}` },
   { name: 'search', description: '搜尋中文標題與正文，排除垃圾桶。', input: z.object({ query: z.string().trim().min(1).max(500) }).strict(), method: 'GET', path: (a: Args) => '/search?q=' + encodeURIComponent(String(a.query)) },
-  { name: 'create_page', description: '建立筆記；parent_id 省略或 null 表示根目錄。', input: z.object({ title, parent_id: parent.optional() }).strict(), method: 'POST', path: () => '/pages', body: (a: Args) => ({ title: a.title, parent_id: a.parent_id ?? null }) },
+  { name: 'create_page', description: '建立筆記；parent_id 省略或 null 表示根目錄；icon 可設定單一 emoji。', input: z.object({ title, parent_id: parent.optional(), icon: icon.optional() }).strict(), method: 'POST', path: () => '/pages', body: (a: Args) => ({ title: a.title, parent_id: a.parent_id ?? null, icon: a.icon ?? null }) },
   { name: 'rename_page', description: '修改指定筆記的標題。', input: z.object({ page_id: id, title }).strict(), method: 'POST', path: (a: Args) => `/pages/${a.page_id}/title`, body: (a: Args) => ({ title: a.title }) },
+  { name: 'set_page_icon', description: '設定指定筆記或日記的單一 emoji 圖示；icon 為 null 時移除圖示。', input: z.object({ page_id: id, icon }).strict(), method: 'POST', path: (a: Args) => `/pages/${a.page_id}/icon`, body: (a: Args) => ({ icon: a.icon }) },
   { name: 'move_page', description: '移動筆記；parent_id 為 null 表示移到根目錄。', input: z.object({ page_id: id, parent_id: parent }).strict(), method: 'POST', path: (a: Args) => `/pages/${a.page_id}/move`, body: (a: Args) => ({ parent_id: a.parent_id }) },
   { name: 'open_journal', description: '開啟或建立指定日期唯一日記；日期依使用者時區。', input: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).strict(), method: 'POST', path: () => '/journal', body: (a: Args) => ({ date: a.date }) },
   { name: 'list_journals', description: '列出指定月份日記。', input: z.object({ month: z.string().regex(/^\d{4}-\d{2}$/) }).strict(), method: 'GET', path: (a: Args) => '/journals?month=' + encodeURIComponent(String(a.month)) },

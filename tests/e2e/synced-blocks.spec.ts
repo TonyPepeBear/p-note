@@ -171,6 +171,7 @@ test('SB-03：現有區塊、圖片、程式碼與筆記連結往返，貼入巢
   await expect(inner.locator('img')).toHaveCount(1);
   await expect(inner.locator('pre')).toContainText('const sync = "中文";');
   await expect(inner.locator('a')).toHaveAttribute('href', '/?page=' + target.id);
+  await expect(inner.locator('.note-inline-icon .page-icon-trigger')).toHaveCount(1);
   const original = await inner.innerText(); const copied = await copy(page);
   await paste(page, copied, inner);
   await expect(references(page).getByRole('alert')).toContainText('同步區塊不能放在另一個同步區塊裡');
@@ -182,6 +183,16 @@ test('SB-03：現有區塊、圖片、程式碼與筆記連結往返，貼入巢
   await page.keyboard.type('[['); await page.keyboard.insertText('同步內連結');
   await page.getByRole('option', { name: /同步內連結目標/ }).click(); await saved(page);
   await expect(content(references(page)).locator('a')).toHaveCount(2);
+  await content(references(page)).locator('p').last().click(); await page.keyboard.press('End');
+  await page.keyboard.type('[['); await page.keyboard.insertText('同步內連結');
+  const iconOption = page.locator('.note-link-option-row').filter({ hasText: target.title });
+  await iconOption.getByRole('button', { name: '新增「' + target.title + '」圖示', exact: true }).click();
+  const iconDialog = page.getByRole('dialog', { name: '頁面圖示', exact: true });
+  await expect(iconDialog).toHaveCount(1);
+  await iconDialog.getByLabel('自訂 emoji', { exact: true }).fill('🌱');
+  await iconDialog.getByRole('button', { name: '套用圖示', exact: true }).click();
+  await expect(iconDialog).toHaveCount(0);
+  await expect(content(references(page)).locator('.note-inline-icon [data-page-icon="🌱"]')).toHaveCount(2);
 });
 
 test('SB-04：不同引用頁與隔離裝置並行編輯合併，重新開啟仍一致', async ({ page, browser }) => {
@@ -368,12 +379,22 @@ test('SB-21：手機可直接點擊操作，鍵盤可開清單與解除同步，
   const create = page.getByRole('menuitem', { name: '新增同步區塊', exact: true });
   if (info.project.use.hasTouch) await create.tap(); else { await create.focus(); await page.keyboard.press('Enter'); }
   await expect(content(references(page))).toBeVisible(); await saved(page);
+  await append(page, references(page), '手機選取格式文字'); await saved(page);
+  const selectInnerText = async () => {
+    await content(references(page)).locator('p').last().click();
+    await page.keyboard.press('End');
+    await page.keyboard.press('Shift+Home');
+    await expect.poll(() => page.evaluate(() => getSelection()?.toString())).toBe('手機選取格式文字');
+    await expect(references(page).getByRole('toolbar')).toBeVisible();
+  };
+  if (info.project.use.hasTouch) await selectInnerText();
   expect(await references(page).evaluate(element => Number.parseFloat(getComputedStyle(element).borderTopWidth))).toBeGreaterThan(0);
   const usage = references(page).getByRole('button', { name: /已在 1 個頁面使用/ });
   if (info.project.use.hasTouch) await usage.tap(); else { await usage.focus(); await page.keyboard.press('Enter'); }
   await expect(page.getByRole('dialog')).toContainText('同步區塊 ID'); await page.keyboard.press('Escape');
   await page.setViewportSize({ width: 390, height: 500 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await selectInnerText();
   const unlink = references(page).getByRole('button', { name: '解除同步', exact: true });
   await expect(unlink).toBeVisible();
   if (info.project.use.hasTouch) await unlink.tap(); else { await unlink.focus(); await page.keyboard.press('Enter'); }

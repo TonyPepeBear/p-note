@@ -4,9 +4,10 @@ import probe from '../src/worker/index';
 import keysMigration from '../migrations/0005_api_keys.sql';
 import mcpMigration from '../migrations/0008_mcp_grants.sql';
 import assetListingMigration from '../migrations/0011_asset_listing.sql';
+import iconMigration from '../migrations/0012_page_icons.sql';
 import databaseMigration from '../migrations/0006_note_databases.sql';
 import linksMigration from '../migrations/0007_note_links.sql';
-import syncedBlocksMigration from '../migrations/0012_synced_blocks.sql';
+import syncedBlocksMigration from '../migrations/0013_synced_blocks.sql';
 import databaseRevisionsMigration from '../migrations/0009_database_revisions.sql';
 import migration from '../migrations/0001.sql';
 import pagesMigration from '../migrations/0002.sql';
@@ -53,7 +54,7 @@ export class SyncRoom extends AppSyncRoom {
 async function setup(env: Env) {
   // E2E reset 只清資料；避免每次引用輪詢重跑整份 DDL，阻塞同一個本機 D1。
   // Workers reset 會清空 schema，下一個請求仍會完整初始化。
-  if (await env.DB.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'test_schema_ready_v12'").first()) return;
+  if (await env.DB.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'test_schema_ready_v13'").first()) return;
   for (const sql of (migration + pagesMigration + backupsMigration + restoreMigration + keysMigration + mcpMigration + historyMigration + assetListingMigration + syncedBlocksMigration).split(';').map(sql => sql.trim()).filter(sql => sql && !/^--[^\n]*$/.test(sql))) {
     await env.DB.prepare(sql).run();
   }
@@ -69,7 +70,10 @@ async function setup(env: Env) {
     // 觸發器內含分號；以完整陳述式之間的空白行分組。
     await env.DB.batch(databaseRevisionsMigration.trim().split(/\n\s*\n/).map(sql => env.DB.prepare(sql)));
   }
-  await env.DB.exec('CREATE TABLE IF NOT EXISTS test_schema_ready_v12 (id INTEGER PRIMARY KEY)');
+  if (!await env.DB.prepare("SELECT 1 FROM pragma_table_info('pages') WHERE name = 'icon'").first()) {
+    await env.DB.batch(iconMigration.trim().split(/\n\s*\n/).map(sql => env.DB.prepare(sql)));
+  }
+  await env.DB.exec('CREATE TABLE IF NOT EXISTS test_schema_ready_v13 (id INTEGER PRIMARY KEY)');
 }
 
 export default {

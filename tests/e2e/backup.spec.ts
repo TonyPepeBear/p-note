@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from "@zip.js/zip.js";
 import * as Y from "yjs";
-import { openPrivate, saved, openImageUpload, moveToTrash, showNavigation } from "./helpers";
+import { openPrivate, saved, openImageUpload, moveToTrash, showNavigation, openCreateMenu } from "./helpers";
 import type { BackupManifest } from "../../src/shared/backup";
 import { images } from "../fixtures/images";
 
@@ -133,10 +133,12 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
   await expect(
     page.getByRole("button", { name: "選擇還原", exact: true }),
   ).toHaveCount(1);
-  expect((await page.request.post("/__test/clear-product")).status()).toBe(200);
+  // 清空會刻意中止 Durable Object；連線重設時重送這個冪等的測試請求。
+  expect((await page.request.post("/__test/clear-product", { maxRetries: 2 })).status()).toBe(200);
   await page.getByRole("button", { name: "選擇還原", exact: true }).click();
   await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
   await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
+  await expect(page.getByTestId("ready")).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId("ready")).toHaveText("可編輯", {
     timeout: 15000,
   });
@@ -162,8 +164,8 @@ for (const backDuring of ["還原中", "中斷後"]) {
     // 多次瀏覽器返回、手機導覽與真實備份還原需完整流程時間；個別斷言仍保留原本逾時。
     test.setTimeout(40000);
     const previous = await openPrivate(page);
-    await showNavigation(page);
-    await page.getByRole("button", { name: "新增筆記", exact: true }).click();
+    await openCreateMenu(page);
+    await page.getByRole("menuitem", { name: "新增筆記", exact: true }).click();
     await expect(page).not.toHaveURL(new RegExp(`page=${previous}$`));
     await expect(page.getByTestId("ready")).toHaveText("可編輯");
     await saved(page);
@@ -210,9 +212,11 @@ for (const backDuring of ["還原中", "中斷後"]) {
     await page.getByLabel("我知道將以備份覆蓋目前頁面", { exact: true }).check();
     await page.getByRole("button", { name: "覆蓋還原", exact: true }).click();
     const assertNavigationLocked = async () => {
+      await expect(page.getByRole("button", { name: "新增", exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "返回編輯", exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "返回目前文件", exact: true })).toBeDisabled();
       await showNavigation(page);
+      await expect(page.getByRole("button", { name: "新增私人頁面", exact: true })).toBeDisabled();
       for (const name of ["設定", "今天", "登出", "安裝 p-note"])
         await expect(page.getByRole("button", { name, exact: true })).toBeDisabled();
       await expect(page.getByRole("button", { name: "頁面操作：未命名", exact: true })).toBeDisabled();

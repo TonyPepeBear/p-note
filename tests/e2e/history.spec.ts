@@ -45,6 +45,7 @@ test('HIST-01：從頁面操作開啟歷史並手動建立持久版本', async (
   await expect(dialog).toContainText('手動建立');
   await page.reload();
   await expect(page.getByTestId('ready')).toHaveText('可編輯');
+  await saved(page);
   expect(await blocks(page)).toEqual(before);
   await expect(await history(page)).toContainText('手動建立');
 });

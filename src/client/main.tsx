@@ -28,6 +28,7 @@ import { HistoryRestoreRecovery, PageHistory, type PendingHistoryRestore } from 
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
 import { readLocal, saveLocal } from "./cache";
+import { PageIconPicker, publishPageMetadata } from "./page-icon";
 
 function App() {
   const [session, setSession] = useState<Session>();
@@ -51,6 +52,22 @@ function App() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pendingHistoryRestore, setPendingHistoryRestore] = useState<PendingHistoryRestore>();
   const [backupNavigationLocked, setBackupNavigationLocked] = useState(false);
+  useEffect(() => {
+    const updated = (event: Event) => {
+      const next = (event as CustomEvent<PageInfo>).detail;
+      setPage(current => {
+        if (!current || current.owner_id !== next.owner_id) return current;
+        if (current.id === next.id) {
+          return current.sync_generation === next.sync_generation && current.metadata_revision <= next.metadata_revision
+            ? { ...current, ...next } : current;
+        }
+        if (!current.ancestors?.some(item => item.id === next.id)) return current;
+        return { ...current, ancestors: current.ancestors.map(item => item.id === next.id && item.metadata_revision <= next.metadata_revision ? next : item) };
+      });
+    };
+    addEventListener('p-note:page-metadata', updated);
+    return () => removeEventListener('p-note:page-metadata', updated);
+  }, []);
   const backupNavigation = useRef<{ url: string; state: unknown } | null>(null);
   useEffect(() => {
     backupNavigation.current = backupNavigationLocked || historyOpen || pendingHistoryRestore
@@ -271,12 +288,7 @@ function App() {
           });
           return false;
         }
-        try {
-          rememberPage(info);
-        } catch {
-          /* 頁面資訊仍以伺服器回應更新畫面。 */
-        }
-        setPage(info);
+        publishPageMetadata(info);
         return true;
       };
       opened = await start(
@@ -393,6 +405,19 @@ function App() {
     };
   }, [confirm, route.serial]);
   useEffect(() => {
+    if (!session?.checkAccess || login || isolated || backupNavigationLocked || historyOpen || pendingHistoryRestore) return;
+    let checking = false;
+    const refresh = () => {
+      if (checking || !navigator.onLine || document.visibilityState === 'hidden') return;
+      checking = true;
+      void session.checkAccess!().catch(() => {
+        // 背景 metadata 查詢失敗時保留目前頁面，連線流程會處理同步狀態。
+      }).finally(() => { checking = false; });
+    };
+    const timer = setInterval(refresh, 3000);
+    return () => clearInterval(timer);
+  }, [session, login, isolated, backupNavigationLocked, historyOpen, pendingHistoryRestore]);
+  useEffect(() => {
     const target = route.scrollY;
     if (!session || target === undefined) return;
     let frame = 0;
@@ -456,7 +481,7 @@ function App() {
     };
     if (response.status === 401) setLogin(true);
     if (!response.ok) throw new Error(value.message ?? "標題保存失敗，請重試");
-    setPage(value);
+    publishPageMetadata(value);
   };
   const closeImages = () => { viewNavigation.current++; setImages(false); };
   const openWorkspaceView = (view: "images" | "api" | "backup") => {
@@ -632,6 +657,7 @@ function App() {
           focusTitle={route.fresh}
           readOnly={login || !!isolated || !!pendingHistoryRestore}
           properties={<NoteProperties key={page.id} page={page} readOnly={login || !!isolated || !!pendingHistoryRestore} />}
+          icon={<PageIconPicker page={page} size="large" disabled={login || !!isolated || !!pendingHistoryRestore} />}
         />
         </>}
         {!login && !isolated && <Backlinks key={page.id + page.sync_generation} id={page.id} />}</>

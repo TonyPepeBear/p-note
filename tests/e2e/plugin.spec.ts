@@ -70,13 +70,13 @@ test('PLUGIN-05：Email 跨分頁登入後回到同意畫面，拒絕不授權',
   await second.close();
 });
 
-test('PLUGIN-01：HTTP MCP 的 12 個工具與網站及同步區塊往返', async ({ page, baseURL }) => {
+test('PLUGIN-01：HTTP MCP 的 13 個工具與網站及同步區塊往返', async ({ page, baseURL }) => {
   const id = await openPrivate(page);
   const auth = await authorize(page, baseURL!);
   const init = await rpc(page.request, auth.access_token, 'initialize', { protocolVersion: '2025-11-25', capabilities: {}, clientInfo: { name: 'test', version: '1.0.0' } });
   expect((await init.json()).result.serverInfo.name).toBe('p-note');
   const tools = (await (await rpc(page.request, auth.access_token, 'tools/list')).json()).result.tools;
-  expect(tools.map((x: any) => x.name).sort()).toEqual(['create_page', 'get_content', 'get_page', 'get_synced_block_content', 'list_journals', 'list_pages', 'move_page', 'open_journal', 'rename_page', 'search', 'update_content', 'update_synced_block_content']);
+  expect(tools.map((x: any) => x.name).sort()).toEqual(['create_page', 'get_content', 'get_page', 'get_synced_block_content', 'list_journals', 'list_pages', 'move_page', 'open_journal', 'rename_page', 'search', 'set_page_icon', 'update_content', 'update_synced_block_content']);
   const run = (name: string, args = {}) => call(page.request, auth.access_token, name, args);
   expect(data(await run('list_pages')).some((x: any) => x.id === id)).toBe(true);
   expect(data(await run('get_page', { page_id: id })).id).toBe(id);

@@ -1,5 +1,7 @@
 # TDD 開發與驗證證據
 
+頁面 emoji 圖示的 Red／Green、同步競爭、MCP、備份相容與三瀏覽器驗收見 [圖示驗證報告](page-icons.md)。
+
 此文件保留本機技術驗證與正式產品 TDD 證據。最新部署前結果為 [248 個結果全部通過](final-results.json)，正式情境 [129／129](final-product-coverage.log)。完整需求／命令／限制見 [部署前驗證](../predeployment.md)。未部署、不封存；下方階段保留當時的範圍與狀態。
 
 ## 最終部署前驗證
