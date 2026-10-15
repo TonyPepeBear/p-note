@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-15",
+  "productCommit": "55707dff264b63e864dd47e0a514141c4237443b",
+  "workers": {
+    "command": "npm run test:integration -- --bail=1",
+    "source": "e530b13",
+    "exitCode": 0,
+    "files": 30,
+    "passed": 176,
+    "failed": 0,
+    "durationSeconds": 379.2
+  },
+  "unit": {
+    "command": "npm run test:unit",
+    "exitCode": 0,
+    "files": 5,
+    "passed": 11,
+    "failed": 0
+  },
+  "e2e": {
+    "initialFullAttempt": {
+      "command": "npm run test:e2e -- --workers=2",
+      "source": "64a4154 (產品來源；後續文件提交不影響)",
+      "exitCode": 143,
+      "passed": 402,
+      "failed": 5,
+      "executed": 407,
+      "planned": 591,
+      "evidence": "實際 stdout；中止未產生 JSON"
+    },
+    "webkitFull": {
+      "command": "npm run test:e2e -- --project=webkit-mobile --workers=1",
+      "exitCode": 1,
+      "stats": {
+        "startTime": "2026-10-15T07:39:49.488Z",
+        "duration": 1551075.319,
+        "expected": 192,
+        "skipped": 0,
+        "unexpected": 5,
+        "flaky": 0
+      }
+    },
+    "focusedBeforeFixes": {
+      "exitCode": 1,
+      "stats": {
+        "startTime": "2026-10-15T08:13:55.722Z",
+        "duration": 141003.838,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      }
+    },
+    "focusedGreen": {
+      "exitCode": 0,
+      "stats": {
+        "startTime": "2026-10-15T08:19:45.489Z",
+        "duration": 37712.163,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "relatedIntegration": {
+      "source": "22e723a",
+      "exitCode": 1,
+      "stats": {
+        "startTime": "2026-10-15T08:20:31.691Z",
+        "duration": 659073.529,
+        "expected": 95,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "remainingFailure": "SB-21 Chromium mobile：格式列 portal 的 locator 範圍；以最終主要 spec 復驗"
+    },
+    "warmRuntimeAttempt": {
+      "source": "df34e07",
+      "exitCode": 143,
+      "passed": 18,
+      "failed": 2,
+      "executed": 20,
+      "planned": 51,
+      "evidence": "實際 stdout；重連等待逾時後停止舊服務"
+    },
+    "final": {
+      "command": "npm run test:e2e -- tests/e2e/synced-blocks.spec.ts --workers=1",
+      "source": "55707df",
+      "exitCode": 0,
+      "stats": {
+        "startTime": "2026-10-15T08:36:25.062Z",
+        "duration": 370614.576,
+        "expected": 51,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "projects": {
+        "chromium-desktop": 17,
+        "chromium-mobile": 17,
+        "webkit-mobile": 17
+      },
+      "retries": 0
+    }
+  },
+  "buildSmoke": {
+    "command": "npm run test:build",
+    "exitCode": 0,
+    "stats": {
+      "startTime": "2026-10-15T08:42:51.512Z",
+      "duration": 12897.967999999999,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "requiredCoverage": {
+    "範圍": "同步區塊",
+    "必需結果": 56,
+    "已通過": 56,
+    "未通過": []
+  },
+  "limitations": [
+    "手機為 Playwright 裝置模擬",
+    "中文輸入以 composition fixture 與選取斷言驗證",
+    "原始 trace 及含測試身分資料的回應不提交"
+  ]
+}

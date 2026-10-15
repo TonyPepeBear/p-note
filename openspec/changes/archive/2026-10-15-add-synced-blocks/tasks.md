@@ -23,7 +23,9 @@
 
 ## 4. 驗收與交付
 
-- [ ] 4.1 執行相關 Workers 與三瀏覽器同步區塊 E2E，確認全部 SB 情境與必要層級覆蓋。
-- [ ] 4.2 通過型別、建置、OpenSpec 嚴格驗證、文件檢查及 `npm run test:spec-coverage -- --synced-blocks`。
-- [ ] 4.3 更新自動化證據、完成 OpenSpec archive、同步主規格並提交封存結果。
+- [x] 4.1 執行相關 Workers 與三瀏覽器同步區塊 E2E，確認全部 SB 情境與必要層級覆蓋。
+- [x] 4.2 通過型別、建置、OpenSpec 嚴格驗證、文件檢查及 `npm run test:spec-coverage -- --synced-blocks`。
+- [x] 4.3 更新自動化證據、完成 OpenSpec archive、同步主規格並提交封存結果。
 - [ ] 4.4 依專案規則完成 push、PR、合併與確認部署 workflow 遷移／發布結果。
+
+4.4 是封存提交後的外部交付步驟，實際完成結果以本次 PR 與對應 master workflow 為準。
