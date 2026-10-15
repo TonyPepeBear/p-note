@@ -154,8 +154,17 @@ test("BACKUP-08：設定頁在清空產品儲存後恢復日記正文／原圖�
   expect(search.map((row: { id: string }) => row.id)).toContain(id);
 });
 
-test("BACKUP-UI-LOCK-01：還原失敗後鎖定導覽，保留原備份並以相同請求重試", async ({ page }) => {
-  await openPrivate(page);
+for (const backDuring of ["還原中", "中斷後"]) {
+test(`BACKUP-UI-LOCK-01：${backDuring}返回仍鎖定導覽，保留原備份並以相同請求重試`, async ({ page }) => {
+  const previous = await openPrivate(page);
+  await showNavigation(page);
+  await page.getByRole("button", { name: "新增筆記", exact: true }).click();
+  await expect(page).not.toHaveURL(new RegExp(`page=${previous}$`));
+  await expect(page.getByTestId("ready")).toHaveText("可編輯");
+  await saved(page);
+  const currentUrl = page.url();
+  const currentHistory = await page.evaluate(() => history.state);
+  await showNavigation(page);
   await page.getByRole("button", { name: "備份設定", exact: true }).click();
   await page.getByRole("button", { name: "建立備份", exact: true }).click();
   await expect(page.getByRole("button", { name: "選擇還原", exact: true })).toHaveCount(1);
@@ -204,7 +213,17 @@ test("BACKUP-UI-LOCK-01：還原失敗後鎖定導覽，保留原備份並以相
     const close = page.getByRole("button", { name: "關閉導覽", exact: true });
     if (await close.isVisible()) await close.click();
   };
+  const assertBackLocked = async () => {
+    // 真正走瀏覽器歷史，確保不是只測側欄或合成 popstate。
+    await page.goBack();
+    await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
+    await expect(page).toHaveURL(currentUrl);
+    expect(await page.evaluate(() => history.state)).toEqual(currentHistory);
+    await expect(page.locator(".tiptap")).toBeHidden();
+    await assertNavigationLocked();
+  };
   await assertNavigationLocked();
+  if (backDuring === "還原中") await assertBackLocked();
 
   await page.evaluate(() => {
     (window as unknown as { backupFailure: { release: () => void } }).backupFailure.release();
@@ -212,6 +231,7 @@ test("BACKUP-UI-LOCK-01：還原失敗後鎖定導覽，保留原備份並以相
   await expect(page.getByRole("status")).toContainText("還原尚未完成，請重試相同備份");
   await expect(page.getByRole("alert")).toContainText("測試還原中斷");
   await assertNavigationLocked();
+  if (backDuring === "中斷後") await assertBackLocked();
   await expect(page.getByRole("heading", { name: "備份設定", exact: true })).toBeVisible();
   await expect(page.locator('.backup-card[aria-current="true"]')).toHaveCount(1);
   await expect(page.locator(".tiptap")).toBeHidden();
@@ -228,3 +248,4 @@ test("BACKUP-UI-LOCK-01：還原失敗後鎖定導覽，保留原備份並以相
   await showNavigation(page);
   await expect(page.getByRole("button", { name: "設定", exact: true })).toBeEnabled();
 });
+}
