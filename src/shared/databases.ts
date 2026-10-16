@@ -1,4 +1,4 @@
-import { validDate, type PageRow } from "./pages";
+import { today, validDate, type PageRow } from "./pages";
 
 export const PROPERTY_TYPES = {
   text: "文字",
@@ -10,11 +10,24 @@ export const PROPERTY_TYPES = {
   url: "網址",
 } as const;
 export type PropertyType = keyof typeof PROPERTY_TYPES;
+export const OPTION_COLORS = [
+  "gray",
+  "blue",
+  "cyan",
+  "green",
+  "yellow",
+  "orange",
+  "red",
+  "pink",
+  "violet",
+] as const;
+export type OptionColor = (typeof OPTION_COLORS)[number];
+export type PropertyOption = { id: string; name: string; color?: OptionColor };
 export type Property = {
   id: string;
   name: string;
   type: PropertyType;
-  options: { id: string; name: string }[];
+  options: PropertyOption[];
 };
 export type PropertyValue = string | number | boolean | string[] | null;
 export type Values = Record<string, PropertyValue>;
@@ -24,6 +37,8 @@ export type DatabaseView = {
   name: string;
   layout: "table" | "list";
   columns: string[];
+  widths?: Record<string, number>;
+  wrap?: boolean;
   filters: Filter[];
   filterMode: "and" | "or";
   sorts: { property: string; direction: "asc" | "desc" }[];
@@ -36,8 +51,8 @@ export type DatabaseData = {
 };
 export const BUILTIN = [
   { id: "title", name: "名稱", type: "text" },
-  { id: "created_at", name: "建立時間", type: "number" },
-  { id: "updated_at", name: "更新時間", type: "number" },
+  { id: "created_at", name: "建立時間", type: "date" },
+  { id: "updated_at", name: "更新時間", type: "date" },
 ] as const;
 const id = (v: unknown): v is string =>
   typeof v === "string" && /^[\w-]{1,80}$/.test(v);
@@ -70,7 +85,8 @@ export const OPERATOR_NAMES: Record<string, string> = {
   lt: "小於",
 };
 export function validConfig(v: unknown): v is DatabaseConfig {
-  if (new TextEncoder().encode(JSON.stringify(v)).length > 64 * 1024) return false;
+  if (new TextEncoder().encode(JSON.stringify(v)).length > 64 * 1024)
+    return false;
   if (
     !object(v) ||
     !allowed(v, ["properties", "views"]) ||
@@ -102,7 +118,9 @@ export function validConfig(v: unknown): v is DatabaseConfig {
     for (const o of p.options) {
       if (
         !object(o) ||
-        !allowed(o, ["id", "name"]) ||
+        !allowed(o, ["id", "name", "color"]) ||
+        (o.color !== undefined &&
+          !OPTION_COLORS.includes(o.color as OptionColor)) ||
         !id(o.id) ||
         options.has(o.id) ||
         !name(o.name)
@@ -123,10 +141,23 @@ export function validConfig(v: unknown): v is DatabaseConfig {
         "name",
         "layout",
         "columns",
+        "widths",
+        "wrap",
         "filters",
         "filterMode",
         "sorts",
       ]) ||
+      (w.wrap !== undefined && typeof w.wrap !== "boolean") ||
+      (w.widths !== undefined &&
+        (!object(w.widths) ||
+          Object.entries(w.widths).some(
+            ([key, width]) =>
+              !ids.has(key) ||
+              typeof width !== "number" ||
+              !Number.isFinite(width) ||
+              width < 80 ||
+              width > 1200,
+          ))) ||
       !id(w.id) ||
       views.has(w.id) ||
       !name(w.name) ||
@@ -229,6 +260,8 @@ export function initialView(id: string, name = "全部筆記"): DatabaseView {
     name,
     layout: "table",
     columns: ["title"],
+    widths: {},
+    wrap: false,
     filters: [],
     filterMode: "and",
     sorts: [],
@@ -266,7 +299,12 @@ export function selectRows(
   query: string,
 ): PageRow[] {
   const match = (row: PageRow, f: Filter) => {
-    const v = fieldValue(row, f.property);
+    const raw = fieldValue(row, f.property);
+    const v =
+      (f.property === "created_at" || f.property === "updated_at") &&
+      typeof raw === "number"
+        ? today(raw)
+        : raw;
     const empty = v === null || v === "" || (Array.isArray(v) && !v.length);
     if (f.operator === "empty") return empty;
     if (f.operator === "notEmpty") return !empty;

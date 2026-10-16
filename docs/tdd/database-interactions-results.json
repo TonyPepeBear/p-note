@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "passed": 13,
+    "failed": 0
+  },
+  "integration": {
+    "passed": 177,
+    "failed": 0
+  },
+  "e2e": {
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "scope": [
+      "database-interactions.spec.ts",
+      "databases.spec.ts",
+      "page-icons.spec.ts",
+      "notion-redesign.spec.ts"
+    ],
+    "projects": [
+      "chromium-desktop",
+      "chromium-mobile",
+      "webkit-mobile"
+    ]
+  },
+  "smoke": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0
+  }
+}

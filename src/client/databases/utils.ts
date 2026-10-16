@@ -3,6 +3,7 @@ import { api } from "../api";
 import type { DatabaseConfig } from "../../shared/databases";
 
 export type ConfigSession = {
+  field?: string;
   config: DatabaseConfig;
   previous: string;
   generation: string;

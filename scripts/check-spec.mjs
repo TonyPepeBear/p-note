@@ -50,7 +50,7 @@ assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UI-')))].sort(), Ar
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('UX-')))].sort(), Array.from({ length: 22 }, (_, i) => `UX-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('KEY-')).sort(), Array.from({ length: 6 }, (_, i) => `KEY-0${i + 1}`));
 assert.deepEqual([...new Set(ids.filter(id => id.startsWith('LFN-')))].sort(), Array.from({ length: 7 }, (_, i) => `LFN-0${i + 1}`));
-assert.deepEqual([...new Set(ids.filter(id => id.startsWith('DB-')))].sort(), Array.from({ length: 12 }, (_, i) => `DB-${String(i + 1).padStart(2, '0')}`));
+assert.deepEqual([...new Set(ids.filter(id => id.startsWith('DB-')))].sort(), Array.from({ length: 16 }, (_, i) => `DB-${String(i + 1).padStart(2, '0')}`));
 assert.deepEqual(ids.filter(id => id.startsWith('CICD-')).sort(), ['CICD-01', 'CICD-02', 'CICD-03']);
 assert.deepEqual(ids.filter(id => id.startsWith('LINK-')).sort(), Array.from({ length: 6 }, (_, i) => `LINK-0${i + 1}`));
 assert.deepEqual(ids.filter(id => id.startsWith('PWA-')).sort(), Array.from({ length: 6 }, (_, i) => `PWA-0${i + 1}`));

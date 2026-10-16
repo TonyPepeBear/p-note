@@ -116,6 +116,55 @@ export async function handleDatabases(
         .first<PageRow>(),
     );
   }
+  const duplicate = path.match(/^\/api\/pages\/([\w-]{1,80})\/duplicate$/);
+  if (duplicate && request.method === "POST") {
+    const source = await visiblePage(db, owner, duplicate[1]);
+    if (!source || source.database_config || !source.parent_id)
+      return fail(404, "找不到資料庫筆記");
+    const container = await visibleDatabase(db, owner, source.parent_id);
+    if (!container) return fail(404, "找不到資料庫");
+    const data = await input(request);
+    if (data.generation !== source.sync_generation)
+      return fail(409, "筆記版本已改變，請重新載入");
+    const snapshot = await env.SYNC.getByName(
+      await roomName(owner, source.id, source.sync_generation),
+    ).capture({ owner, page: source.id, generation: source.sync_generation });
+    const id = crypto.randomUUID(),
+      generation = crypto.randomUUID();
+    const scope = { owner, page: id, generation };
+    const room = env.SYNC.getByName(await roomName(owner, id, generation));
+    await room.prepare(scope, snapshot.data, 0);
+    const result = await db
+      .prepare(
+        `${VISIBLE} INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, sync_generation, created_at, updated_at, property_values)
+      SELECT ?, owner_id, 'note', ?, icon, parent_id, ?, ?, ?, property_values FROM pages
+      WHERE id = ? AND owner_id = ? AND sync_generation = ? AND parent_id = ? AND metadata_revision = ? AND id IN (SELECT id FROM visible)
+        AND ${unlocked} AND EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND database_config = ?)`,
+      )
+      .bind(
+        owner,
+        id,
+        (source.title + " 副本").slice(0, 200),
+        generation,
+        now,
+        now,
+        source.id,
+        owner,
+        source.sync_generation,
+        container.id,
+        source.metadata_revision,
+        owner,
+        owner,
+        container.id,
+        owner,
+        container.database_config,
+      )
+      .run();
+    if (!result.meta.changes) return fail(409, "筆記或欄位設定已改變，請重試");
+    await room.reindex(scope);
+    await room.resume();
+    return json(await visiblePage(db, owner, id));
+  }
   const properties = path.match(/^\/api\/pages\/([\w-]{1,80})\/properties$/);
   if (properties && request.method === "POST") {
     const page = await visiblePage(db, owner, properties[1]);
