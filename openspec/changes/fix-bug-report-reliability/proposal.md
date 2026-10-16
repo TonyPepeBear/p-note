@@ -9,6 +9,7 @@
 
 ## Capabilities
 ### Modified Capabilities
+- `block-editing`: 補強既有手機可視編輯區契約，避免鍵盤佔位後工具列遮住游標區塊。
 - `note-databases`: 欄位保存、檢視、篩選與排序。
 - `realtime-sync`: 合法媒體與連結同步。
 - `page-history`: 與其他頁面操作隔離及版本寫入清理。
