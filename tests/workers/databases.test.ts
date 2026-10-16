@@ -140,7 +140,7 @@ it('DB-12：資料庫設定：保留檢視排序，合併不能重新引用已�
   expect(readConfig(saved.database_config!).views.map(view => view.id)).toEqual(reordered.views.map(view => view.id));
 });
 
-it('DB-12：資料庫設定：純檢視儲存不受子列修改阻擋，已刪除列仍保護欄位相容性', async () => {
+it('DB-04 DB-12：資料庫設定：純檢視儲存不受子列修改阻擋，垃圾桶衝突明確指出筆記且保留可還原資料', async () => {
   const database = await create();
   const record = await row(database.id);
   const config: DatabaseConfig = {
@@ -154,7 +154,13 @@ it('DB-12：資料庫設定：純檢視儲存不受子列修改阻擋，已刪�
   const changed = await page(save(database, prepared.database_config!, renamed));
   await client.post(`/api/pages/${record.id}/delete`, {});
   renamed.properties[0].type = 'number';
-  expect((await save(database, changed.database_config!, renamed)).status).toBe(409);
+  const rejected = await save(database, changed.database_config!, renamed);
+  expect(rejected.status).toBe(409);
+  expect((await rejected.json<{ message: string }>()).message).toContain('垃圾桶中的筆記');
+  expect((await client.post(`/api/pages/${record.id}/restore`, {})).status).toBe(200);
+  const restored = await data(database.id);
+  expect(restored.config.properties[0].type).toBe('text');
+  expect(JSON.parse(restored.rows[0].property_values!).text).toBe('已保存');
 });
 
 it('DB-11：資料庫輪詢：304 只查祖先與版本，純檢視更新也不讀取全部子列', async () => {

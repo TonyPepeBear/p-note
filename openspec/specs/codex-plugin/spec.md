@@ -44,7 +44,7 @@ plugin SHALL 提供遠端 MCP OAuth 設定、Codex 相容 manifest、技能、ma
 
 ### Requirement: Email 登入授權
 
-系統 SHALL 提供 OAuth 2.1 discovery、相容 client 註冊、PKCE 及 token 交換。授權 MUST 經既有 Email 登入與明確同意，顯示 client 與回呼主機、權限及本機回呼警示。登入連結跨分頁開啟後仍能回到原授權；只接受同站的授權返回路徑。
+系統 SHALL 提供 OAuth 2.1 discovery、相容 client 註冊、PKCE 及 token 交換。授權 MUST 經既有 Email 登入與明確同意，顯示 client 與回呼主機、權限及本機回呼警示。登入連結跨分頁開啟後仍能回到原授權；只接受同站的授權返回路徑。 已註冊的跨來源 callback MUST 能在瀏覽器完成同意與拒絕重導，完成授權失敗不得留下連線紀錄。
 
 #### Scenario: 登入與同意
 

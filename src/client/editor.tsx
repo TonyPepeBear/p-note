@@ -98,7 +98,14 @@ function DocumentTitle({
   const saving = useRef<Promise<void> | undefined>(undefined);
   const current = useRef({ value, title, rename });
   current.current = { value, title, rename };
-  useEffect(() => setValue(title), [title]);
+  const observedTitle = useRef(title);
+  useEffect(() => {
+    if (current.current.value === observedTitle.current) {
+      current.current.value = title;
+      setValue(title);
+    }
+    observedTitle.current = title;
+  }, [title]);
   useEffect(() => {
     if (!focus) return;
     input.current?.focus();
@@ -111,7 +118,7 @@ function DocumentTitle({
     element.style.height = element.scrollHeight + "px";
   }, [value]);
   const commit = async (required = false) => {
-    if (saving.current) {
+    while (saving.current) {
       try { await saving.current; }
       catch (failure) { if (required) throw failure; return; }
     }
@@ -136,9 +143,9 @@ function DocumentTitle({
       saving.current = save(next);
       await saving.current;
       current.current.title = next;
-      setValue(next);
+      if (current.current.value === latest) { current.current.value = next; setValue(next); }
     } catch (failure) {
-      setValue(saved);
+      if (current.current.value === latest) { current.current.value = saved; setValue(saved); }
       setError(
         failure instanceof Error ? failure.message : "標題保存失敗，請重試",
       );
@@ -158,7 +165,7 @@ function DocumentTitle({
           rows={1}
           value={value}
           readOnly={!rename}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => { current.current.value = event.target.value; setValue(event.target.value); }}
           onBlur={() => void commit()}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.nativeEvent.isComposing) {
@@ -441,10 +448,13 @@ export function Editor({
     };
     const resized = () =>
       requestAnimationFrame(() => {
-        if (!disposed && editor.prosemirrorView.hasFocus())
-          editor.prosemirrorView.dispatch(
-            editor.prosemirrorView.state.tr.scrollIntoView(),
-          );
+        if (!disposed && editor.prosemirrorView.hasFocus()) {
+          editor.prosemirrorView.dispatch(editor.prosemirrorView.state.tr.scrollIntoView());
+          const anchor = getSelection()?.anchorNode;
+          const element = anchor instanceof Element ? anchor : anchor?.parentElement;
+          // 原生捲動會採用 scroll-margin，避免手機格式工具列遮住目前區塊。
+          element?.closest('.bn-block-content')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
       });
     doc.on("update", update);
     provider.on("sync", synced);
@@ -1000,49 +1010,57 @@ export async function start(
   const room = await roomName(scope[0], scope[1], scope[2]);
   const doc = new Y.Doc();
   const cache = new IndexeddbPersistence(`p-note:${room}`, doc);
-  await cache._db;
-  await cache.whenSynced;
-  const downloaded = await cache.get("downloaded");
-  // shortcut: y-indexeddb 9.0.12 不回報寫入完成／錯誤；升級前重驗此掛鉤與 saveLocal。
-  doc.off("update", cache._storeUpdate);
-  if ((!navigator.onLine || localOnly || isolated) && !downloaded)
-    throw new Error("此頁尚未下載，請連線後再開啟");
-  const provider = new YProvider(
-    location.host,
-    room,
-    doc,
-    {
-      party: checkAccess ? "sync" : "rooms",
-      connect: false,
-      disableBc: true,
-      protocol: location.protocol === "https:" ? "wss" : "ws",
-      ...(checkAccess
-        ? {
-            params: { page: scope[1], generation: scope[2] },
+  let provider: YProvider | undefined;
+  try {
+    await cache._db;
+    await cache.whenSynced;
+    const downloaded = await cache.get("downloaded");
+    // shortcut: y-indexeddb 9.0.12 不回報寫入完成／錯誤；升級前重驗此掛鉤與 saveLocal。
+    doc.off("update", cache._storeUpdate);
+    if ((!navigator.onLine || localOnly || isolated) && !downloaded)
+      throw new Error("此頁尚未下載，請連線後再開啟");
+    provider = new YProvider(
+      location.host,
+      room,
+      doc,
+      {
+        party: checkAccess ? "sync" : "rooms",
+        connect: false,
+        disableBc: true,
+        protocol: location.protocol === "https:" ? "wss" : "ws",
+        ...(checkAccess
+          ? {
+              params: { page: scope[1], generation: scope[2] },
+            }
+          : {}),
+      },
+    );
+    // 已下載的正式頁面先以本機內容開啟，同步交給 Editor 在背景連線。
+    if (navigator.onLine && !localOnly && !isolated && !(downloaded && checkAccess)) {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          provider!.disconnect();
+          reject(new Error("同步服務未連線"));
+        }, 10000);
+        provider!.on("sync", (value: boolean) => {
+          if (value) {
+            clearTimeout(timer);
+            resolve();
           }
-        : {}),
-    },
-  );
-  // 已下載的正式頁面先以本機內容開啟，同步交給 Editor 在背景連線。
-  if (navigator.onLine && !localOnly && !isolated && !(downloaded && checkAccess)) {
-    await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        provider.disconnect();
-        reject(new Error("同步服務未連線"));
-      }, 10000);
-      provider.on("sync", (value: boolean) => {
-        if (value) {
+        });
+        void provider!.connect().catch((error) => {
           clearTimeout(timer);
-          resolve();
-        }
+          reject(error);
+        });
+      }).catch((failure) => {
+        if (!checkAccess || !downloaded) throw failure;
       });
-      void provider.connect().catch((error) => {
-        clearTimeout(timer);
-        reject(error);
-      });
-    }).catch((failure) => {
-      if (!checkAccess || !downloaded) throw failure;
-    });
+    }
+    return { doc, cache, provider, room, checkAccess, ownerId: scope[0], pageId: scope[1], generation: scope[2] };
+  } catch (error) {
+    provider?.destroy();
+    await cache.destroy().catch(() => {});
+    doc.destroy();
+    throw error;
   }
-  return { doc, cache, provider, room, checkAccess, ownerId: scope[0], pageId: scope[1], generation: scope[2] };
 }

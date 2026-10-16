@@ -73,7 +73,17 @@ export function PropertyManager({
   };
   const saveConfig = async (next: DatabaseConfig) => {
     if (!session) return;
-    const saved = await onSave(next, previous.current, session.generation);
+    const normalized = {
+      ...next,
+      views: next.views.map(view => ({ ...view, filters: view.filters.filter(filter => {
+        const property = next.properties.find(item => item.id === filter.property);
+        if (!property) return BUILTIN.some(item => item.id === filter.property);
+        const original = config.properties.find(item => item.id === property.id);
+        return (!original || original.type === property.type) &&
+          (!['select', 'multiSelect'].includes(property.type) || !filter.value || ['empty', 'notEmpty'].includes(filter.operator) || property.options.some(option => option.id === filter.value));
+      }) })),
+    };
+    const saved = await onSave(normalized, previous.current, session.generation);
     previous.current = JSON.stringify(saved);
     setConfig(saved);
     setProperties(structuredClone(saved.properties));
@@ -372,12 +382,7 @@ export function PropertyManager({
                     properties,
                     views: config.views.map((v) => ({
                       ...v,
-                      columns: [
-                        ...v.columns.filter((id) =>
-                          BUILTIN.some((p) => p.id === id),
-                        ),
-                        ...order.filter((id) => v.columns.includes(id)),
-                      ],
+                      columns: v.columns.filter(id => BUILTIN.some(p => p.id === id) || order.includes(id)),
                     })),
                   };
                   await saveConfig(next);

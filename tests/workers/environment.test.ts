@@ -44,7 +44,7 @@ it('ENV-07：測試寄件匣／時鐘／故障隔離且 reset 清除，不存在
   expect(Date.parse(expiration!)).toBe(now + 600000);
   expect((await env.DB.prepare('SELECT url FROM test_mailbox').all()).results).toHaveLength(1);
   await post('/__test/control', { now: now + 60000, fail: true });
-  expect((await post('/api/login', { email: 'owner@example.test' })).status).toBe(503);
+  expect((await post('/api/login', { email: 'owner@example.test' })).status).toBe(200);
   expect((await env.DB.prepare('SELECT url FROM test_mailbox').all()).results).toHaveLength(1);
   expect((await handle(new Request(origin + '/__test/control', { method: 'POST' }), env)).status).toBe(404);
   await reset();

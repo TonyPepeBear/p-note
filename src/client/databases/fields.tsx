@@ -31,7 +31,7 @@ import {
 import { OptionInput } from "./option-input";
 import { useLiveConfig } from "./live-config";
 import { useDatabase } from "./use-database";
-import { request, useOnline } from "./utils";
+import { RequestError, request, useOnline } from "./utils";
 
 export function PropertyIcon({
   type,
@@ -78,6 +78,8 @@ export function FieldInput({
       : (readValues(row.property_values)[property.id] ?? null);
   const [draft, setDraft] = useState<PropertyValue>(value);
   const dirty = useRef(false);
+  const rejected = useRef(false);
+  const latestDraft = useRef(value);
   const version = useRef(0);
   const [saved, setSaved] = useState(false);
   const editGeneration = useRef(row.sync_generation);
@@ -86,13 +88,14 @@ export function FieldInput({
   const online = useOnline();
   const pending = useRef<Promise<void> | undefined>(undefined);
   useEffect(() => {
-    if (!dirty.current) setDraft(value);
+    if (!dirty.current && !rejected.current) { setDraft(value); latestDraft.current = value; }
   }, [JSON.stringify(value)]);
-  const save = async (next = draft) => {
-    if (pending.current) await pending.current;
+  const save = async () => {
+    while (pending.current) await pending.current.catch(() => {});
     if (!dirty.current) return;
     if (!navigator.onLine || disabled) throw new Error("欄位修改需要連線");
     const savingVersion = version.current;
+    const next = latestDraft.current;
     setSaved(false);
     setBusy(true);
     status("儲存中");
@@ -105,9 +108,13 @@ export function FieldInput({
       .then(() => {
         if (version.current === savingVersion) dirty.current = false;
         setSaved(!dirty.current);
-        status("已儲存");
+        status(dirty.current ? "尚未儲存" : "已儲存");
       })
       .catch((e: Error) => {
+        if (e instanceof RequestError && [400, 409].includes(e.status) && version.current === savingVersion) {
+          dirty.current = false;
+          rejected.current = true;
+        }
         setFailure(e.message);
         status(e.message);
         throw e;
@@ -131,16 +138,19 @@ export function FieldInput({
   );
   const change = (v: PropertyValue, immediately = false) => {
     setDraft(v);
+    latestDraft.current = v;
+    rejected.current = false;
+    setFailure("");
     version.current++;
     setSaved(false);
     if (!dirty.current) editGeneration.current = row.sync_generation;
     dirty.current = true;
     status("尚未儲存");
-    if (immediately) void save(v).catch(() => {});
+    if (immediately) void save().catch(() => {});
   };
   const input = {
     "aria-label": property.name,
-    disabled: disabled || !online || busy,
+    disabled: disabled || !online,
   };
   return (
     <div
@@ -238,7 +248,7 @@ export function FieldInput({
           size="compact-xs"
           color="red"
           variant="subtle"
-          onClick={() => void save().catch(() => {})}
+          onClick={() => { dirty.current = true; rejected.current = false; editGeneration.current = row.sync_generation; void save().catch(() => {}); }}
           disabled={!online || busy}
         >
           重試保存
@@ -251,6 +261,8 @@ export function FieldInput({
           disabled={busy}
           onClick={() => {
             dirty.current = false;
+            rejected.current = false;
+            latestDraft.current = value;
             setDraft(value);
             setFailure("");
             status("已放棄欄位修改");

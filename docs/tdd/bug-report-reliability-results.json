@@ -1,0 +1,88 @@
+{
+  "狀態": "通過",
+  "日期": "2026-10-16",
+  "Red": [
+    {
+      "命令": "npm run test:e2e:fast -- tests/e2e/bug-regressions.spec.ts",
+      "原始版本": "51790c3",
+      "結果": "同步保存、OAuth 回呼與永久欄位錯誤重現；標題原始 gate 只支援 GET，另以原始 editor 與正確攔截重驗"
+    },
+    {
+      "命令": "npm run test:e2e:fast -- tests/e2e/bug-regressions.spec.ts -g 較早標題回應",
+      "原始版本": "51790c3 的 editor",
+      "結果": "最後輸入被第一版回應覆蓋，失敗"
+    },
+    {
+      "命令": "npm run test:unit -- tests/unit/databases.test.ts",
+      "結果": "選項依 UUID 排序，失敗"
+    },
+    {
+      "命令": "npm run test:integration -- tests/workers/bug-regressions.test.ts -t 大量已引用候選",
+      "結果": "正常引用占用清理配額，孤兒未回收，失敗"
+    },
+    {
+      "命令": "npm run test:e2e -- tests/e2e/formal-focus.spec.ts --project=chromium-mobile",
+      "原始版本": "51790c3 的 editor",
+      "結果": "段落 bottom 341，viewport 340，失敗"
+    }
+  ],
+  "Green": {
+    "單元": {
+      "命令": "npm run test:unit",
+      "通過": 19
+    },
+    "Workers": {
+      "命令": "npm run test:integration",
+      "通過": 183
+    },
+    "最終垃圾桶與還原回歸": {
+      "命令": "npm run test:integration -- tests/workers/databases.test.ts tests/workers/restore.test.ts",
+      "通過": 19
+    },
+    "E2E": {
+      "完整首輪": {
+        "startTime": "2026-10-16T07:56:33.143Z",
+        "duration": 1432418.394,
+        "expected": 677,
+        "skipped": 0,
+        "unexpected": 43,
+        "flaky": 0
+      },
+      "失敗重跑": {
+        "startTime": "2026-10-16T08:21:04.588Z",
+        "duration": 266160.01800000004,
+        "expected": 37,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "最終相關三瀏覽器回歸": {
+        "startTime": "2026-10-16T08:27:31.521Z",
+        "duration": 86687.404,
+        "expected": 33,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "各案例最新自動化結果": {
+        "passed": 720
+      },
+      "唯一案例": 720,
+      "初輪WebKit缺少函式庫": 36,
+      "備註": "保留首輪及重跑失敗計數，不將重跑報告冒充單次完整全綠；Service Worker 攔截修正與既有手機游標問題均經最後回歸驗證"
+    },
+    "建置": {
+      "命令": "npm run test:build",
+      "smoke通過": 2
+    },
+    "型別": "npm run check 通過",
+    "正式設定": "npm run check:production 通過",
+    "規格": "OpenSpec strict、npm run check:spec、git diff --check 通過"
+  },
+  "邊界": [
+    "手機為瀏覽器模擬，非實體 OS 鍵盤",
+    "儲存清理走既有每日排程，候選寬限一小時；不回溯掃除先前未索引孤兒",
+    "圖片隱私清理套用新上傳，保留安全方向資訊；舊圖片與備份不重編碼",
+    "垃圾桶相容性保護保留，改為明確指出相關筆記，避免還原資料失效"
+  ]
+}

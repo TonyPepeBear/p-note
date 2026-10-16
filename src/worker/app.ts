@@ -13,6 +13,7 @@ import type { PageRow } from '../shared/pages';
 import { body } from './request';
 import { handleAssets } from './assets';
 import { sendLoginMail } from './mail';
+import { cleanupStorage } from './storage-cleanup';
 import { cleanupBackups, createBackup, handleBackups } from './backups';
 import { RestoreCoordinator } from './restore';
 import { handleSyncedBlocks, syncedBlockInfo } from './synced-blocks';
@@ -65,10 +66,12 @@ export async function handle(request: Request, env: Env, services: Services = { 
           (SELECT count(*) FROM auth_requests WHERE ip = ?) < 20`).bind(email, ip, now, email, email, now - 60000, ip),
       ]);
       if (!results[1].meta.changes) return error('申請太頻繁，請稍後重試', 429);
+      try {
       if (email === env.OWNER_EMAIL.toLowerCase()) await createAuth(env, returnTo ? { ...services, sendMail: (recipient, link) => {
         const target = new URL(link); target.searchParams.set('returnTo', returnTo);
         return services.sendMail(recipient, target.toString());
       } } : services).api.signInMagicLink({ headers: request.headers, body: { email } });
+      } catch { console.error('登入郵件未能寄送'); }
       return Response.json({ message: '若此 Email 可登入，請查看登入郵件' }, { headers: { 'Cache-Control': 'no-store' } });
     }
     if (path === '/api/confirm' && request.method === 'POST') {
@@ -164,6 +167,6 @@ export default {
     if (controller.cron !== '0 19 * * *' || !configured(env)) throw new Error('備份排程設定不完整');
     const owner = await env.DB.prepare('SELECT id FROM user WHERE email = ?').bind(env.OWNER_EMAIL.toLowerCase()).first<string>('id');
     try { if (owner) await createBackup(env, owner, Date.now); }
-    finally { await cleanupBackups(env, Date.now()); }
+    finally { try { await cleanupBackups(env, Date.now()); } finally { await cleanupStorage(env, Date.now()); } }
   },
 } satisfies ExportedHandler<Env>;

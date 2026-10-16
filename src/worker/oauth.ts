@@ -51,7 +51,7 @@ function options(env: Env, services: Services): OAuthProviderOptions<Env> {
           const consent = await oauth.beginConsent(auth);
           consent.headers.set('Content-Type', 'text/html; charset=utf-8');
           consent.headers.set('Referrer-Policy', 'same-origin');
-          consent.headers.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+          consent.headers.set('Content-Security-Policy', `default-src 'none'; style-src 'unsafe-inline'; form-action 'self' ${new URL(auth.redirectUri).origin}; frame-ancestors 'none'; base-uri 'none'`);
           return new Response(consentHtml(details, consent.handle), { headers: consent.headers });
         }
         if (request.method !== 'POST') return new Response(null, { status: 405 });
@@ -70,9 +70,9 @@ function options(env: Env, services: Services): OAuthProviderOptions<Env> {
         const approved = await oauth.approveConsent(request, handle, { scope });
         const details = await oauth.describeConsent(approved.request);
         const id = crypto.randomUUID(); const now = services.now();
+        const { redirectTo } = await oauth.completeAuthorization({ request: approved.request, userId: session.user.id, metadata: { connectionId: id }, scope, props: { owner: session.user.id, connectionId: id } satisfies McpIdentity });
         await current.DB.prepare('INSERT INTO mcp_grants (id, owner_id, name, scopes, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)')
           .bind(id, session.user.id, details.clientName.slice(0, 200), scope.join(' '), now, now + MONTH).run();
-        const { redirectTo } = await oauth.completeAuthorization({ request: approved.request, userId: session.user.id, metadata: { connectionId: id }, scope, props: { owner: session.user.id, connectionId: id } satisfies McpIdentity });
         approved.headers.set('Location', redirectTo);
         return new Response(null, { status: 302, headers: approved.headers });
       } catch (error) {

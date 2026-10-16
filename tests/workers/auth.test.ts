@@ -88,7 +88,7 @@ it('AUTH-03：10 分鐘邊界過期、重用及併發只建立一個 session', a
 it('AUTH-04：寄信故障、60 秒與 Email／IP 滑動視窗持久限流', async () => {
   const now = Date.now(); await control(now, true);
   const failed = await post('/api/login', { email: 'owner@example.test' });
-  expect(failed.status).toBe(503); expect(await failed.text()).not.toMatch(/token|secret/);
+  expect(failed.status).toBe(200); expect(await failed.text()).not.toMatch(/token|secret/);
   expect(await (await fetchApp('/__test/mailbox')).json()).toEqual([]);
   expect(await env.DB.prepare('SELECT count(*) AS n FROM verification').first('n')).toBe(0);
   await control(now + 60000);

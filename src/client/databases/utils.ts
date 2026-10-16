@@ -18,10 +18,14 @@ export function move<T>(list: T[], index: number, delta: number): T[] {
   return next;
 }
 
+export class RequestError extends Error {
+  constructor(public status: number, message: string) { super(message); }
+}
+
 export async function request(path: string, body?: object) {
   const response = await api(path, body);
-  const value = await response.json();
-  if (!response.ok) throw new Error(value.message ?? "資料庫操作失敗，請重試");
+  const value = await response.json().catch(() => ({}));
+  if (!response.ok) throw new RequestError(response.status, value.message || "資料庫操作失敗，請重試");
   return value;
 }
 export function useOnline() {

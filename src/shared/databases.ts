@@ -297,9 +297,11 @@ export function selectRows(
   rows: PageRow[],
   view: DatabaseView,
   query: string,
+  properties: Property[] = [],
 ): PageRow[] {
   const match = (row: PageRow, f: Filter) => {
-    const raw = fieldValue(row, f.property);
+    const field = properties.find(p => p.id === f.property);
+    const raw = fieldValue(row, f.property) ?? (field?.type === "checkbox" ? false : null);
     const v =
       (f.property === "created_at" || f.property === "updated_at") &&
       typeof raw === "number"
@@ -308,6 +310,7 @@ export function selectRows(
     const empty = v === null || v === "" || (Array.isArray(v) && !v.length);
     if (f.operator === "empty") return empty;
     if (f.operator === "notEmpty") return !empty;
+    if (f.value.trim() === "") return true;
     const same = Array.isArray(v)
       ? v.includes(f.value)
       : String(v ?? "") === f.value;
@@ -328,29 +331,35 @@ export function selectRows(
         ? v < Number(f.value)
         : String(v) < f.value;
   };
+  const filters = view.filters.filter(f => ["empty", "notEmpty"].includes(f.operator) || f.value.trim() !== "");
   return rows
     .filter(
       (row) =>
         row.title.toLocaleLowerCase().includes(query.toLocaleLowerCase()) &&
-        (!view.filters.length ||
+        (!filters.length ||
           (view.filterMode === "or"
-            ? view.filters.some((f) => match(row, f))
-            : view.filters.every((f) => match(row, f)))),
+            ? filters.some((f) => match(row, f))
+            : filters.every((f) => match(row, f)))),
     )
     .sort((a, b) => {
       for (const sort of view.sorts) {
-        const x = fieldValue(a, sort.property),
-          y = fieldValue(b, sort.property);
-        const result =
-          x === y
-            ? 0
-            : x === null
-              ? 1
-              : y === null
-                ? -1
-                : typeof x === "number" && typeof y === "number"
-                  ? x - y
-                  : String(x).localeCompare(String(y), "zh-TW");
+        const field = properties.find(p => p.id === sort.property);
+        const normalized = (row: PageRow) => {
+          const raw = fieldValue(row, sort.property);
+          if (field?.type === "checkbox") return raw ?? false;
+          if (raw === null || raw === "" || (Array.isArray(raw) && !raw.length)) return null;
+          if (field?.type === "select" || field?.type === "multiSelect") {
+            const rank = (id: string) => { const i = field.options.findIndex(o => o.id === id); return i < 0 ? field.options.length : i; };
+            return (Array.isArray(raw) ? raw : [String(raw)]).map(rank).sort((x, y) => x - y);
+          }
+          return raw;
+        };
+        const x = normalized(a), y = normalized(b);
+        if (x === null || y === null) { if (x !== y) return x === null ? 1 : -1; continue; }
+        let result = 0;
+        if (Array.isArray(x) && Array.isArray(y)) {
+          for (let i = 0; i < Math.max(x.length, y.length); i++) { result = Number(x[i] ?? -1) - Number(y[i] ?? -1); if (result) break; }
+        } else result = typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y), "zh-TW");
         if (result) return sort.direction === "asc" ? result : -result;
       }
       return a.created_at - b.created_at || a.id.localeCompare(b.id);

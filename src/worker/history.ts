@@ -1,4 +1,5 @@
 import * as Y from 'yjs';
+import { queueCleanup } from './storage-cleanup';
 import type { PageHistory, PageVersion, PageVersionReason, PageVersionRestore } from '../shared/history';
 import type { PageInfo, PageRow } from '../shared/pages';
 import { roomName } from '../shared/room';
@@ -30,7 +31,7 @@ function unwrap<T>(reply: HistoryReply<T>): T {
 }
 export async function currentHistoryPage(env: Env, scope: HistoryScope, operation?: string): Promise<PageRow> {
   const page = await env.DB.prepare(`SELECT * FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ?
-    AND (? IS NOT NULL OR NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?))
+    AND (? IS NOT NULL OR NOT EXISTS (SELECT 1 FROM page_operation_members WHERE owner_id = ? AND page_id = pages.id))
     AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)`)
     .bind(scope.page, scope.owner, scope.generation, operation ?? null, scope.owner, scope.owner).first<PageRow>();
   if (!page || page.deleted_at !== null || (!operation && !await visiblePage(env.DB, scope.owner, scope.page))) throw new PageError(409, '頁面狀態已改變，請重新載入');
@@ -59,15 +60,16 @@ export async function saveVersion(env: Env, page: PageRow, data: Uint8Array, che
   if (existing && existing.checksum === hash && existing.title === page.title && (explicit || reason === 'auto' || existing.reason === reason)) return versionInfo(existing);
   if (explicit && existing) throw new PageError(409, '還原前版本內容已改變，請重試原操作');
   const id = explicit?.id ?? crypto.randomUUID(); const key = `versions/${page.owner_id}/${page.id}/${id}.yjs`;
+  await queueCleanup(env, page.owner_id, 'version', key);
   await env.BACKUPS.put(key, data, { onlyIf: { etagDoesNotMatch: '*' }, sha256: await crypto.subtle.digest('SHA-256', data), httpMetadata: { contentType: 'application/octet-stream' } });
   const candidate: StoredVersion = { id, page_id: page.id, owner_id: page.owner_id, generation: page.sync_generation, title: page.title, created_at: now, reason, checkpoint, checksum: hash, byte_size: data.length, object_key: key, sequence: 0 };
   await versionBytes(env, candidate);
   const inserted = await env.DB.prepare(`INSERT INTO page_versions (id, owner_id, page_id, generation, title, created_at, reason, checkpoint, checksum, byte_size, object_key)
     SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM pages WHERE id = ? AND owner_id = ? AND sync_generation = ? AND title = ? AND metadata_revision = ?)
-    AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ? AND id <> ?)
+    AND NOT EXISTS (SELECT 1 FROM page_operation_members WHERE owner_id = ? AND page_id = ? AND operation_id <> ?)
     AND NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?) ON CONFLICT(id) DO NOTHING`)
     .bind(id, page.owner_id, page.id, page.sync_generation, page.title, now, reason, checkpoint, hash, data.length, key,
-      page.id, page.owner_id, page.sync_generation, page.title, page.metadata_revision, page.owner_id, explicit?.operation ?? '', page.owner_id).run();
+      page.id, page.owner_id, page.sync_generation, page.title, page.metadata_revision, page.owner_id, page.id, explicit?.operation ?? '', page.owner_id).run();
   if (!inserted.meta.changes && !await env.DB.prepare('SELECT 1 FROM page_versions WHERE id = ?').bind(id).first()) throw new PageError(409, '頁面狀態已改變，請重試');
   return versionInfo(candidate);
 }

@@ -38,14 +38,14 @@ it('MAIL-01：預設服務以原生 binding 送出可兌換連結與繁體中文
   expect(confirmed.status).toBe(200); expect(confirmed.headers.has('set-cookie')).toBe(true);
 });
 
-it('MAIL-02：原生服務拒絕或未提供接受識別時撤銷連結、回傳一般錯誤且不洩漏密鑰', async () => {
+it('MAIL-02：原生服務拒絕或未提供接受識別時撤銷連結、回傳一致公開訊息且不洩漏密鑰', async () => {
   for (const rejected of [true, false]) {
     await exports.default.fetch(origin + '/__test/reset', { method: 'POST' });
     const { send, configured } = mailEnv();
     if (rejected) send.mockRejectedValue(new Error('E_SENDER_NOT_VERIFIED secret-sensitive-token'));
     else send.mockResolvedValue({ messageId: '' });
     const response = await login(configured);
-    expect(response.status).toBe(503); expect(send).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(200); expect(send).toHaveBeenCalledTimes(1);
     expect(await response.text()).not.toMatch(/secret|token|E_SENDER|noreply/);
     expect(await env.DB.prepare('SELECT count(*) AS n FROM verification').first('n')).toBe(0);
     expect(await env.DB.prepare('SELECT count(*) AS n FROM session').first('n')).toBe(0);
@@ -57,13 +57,13 @@ it('MAIL-03：缺少 binding／寄件地址及非法地址不寄信，也不留�
     await exports.default.fetch(origin + '/__test/reset', { method: 'POST' });
     const { send, configured } = mailEnv();
     const response = await login({ ...configured, SENDER_EMAIL: address });
-    expect(response.status).toBe(503); expect(send).not.toHaveBeenCalled();
+    expect(response.status).toBe(200); expect(send).not.toHaveBeenCalled();
     expect(await env.DB.prepare('SELECT count(*) AS n FROM verification').first('n')).toBe(0);
   }
   await exports.default.fetch(origin + '/__test/reset', { method: 'POST' });
   const { configured } = mailEnv();
   const response = await login({ ...configured, EMAIL: undefined } as unknown as Env);
-  expect(response.status).toBe(503);
+  expect(response.status).toBe(200);
   expect(await env.DB.prepare('SELECT count(*) AS n FROM verification').first('n')).toBe(0);
 });
 

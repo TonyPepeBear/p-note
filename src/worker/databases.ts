@@ -1,3 +1,4 @@
+import { prepareRoom } from './storage-cleanup';
 import {
   readConfig,
   readValues,
@@ -133,7 +134,7 @@ export async function handleDatabases(
       generation = crypto.randomUUID();
     const scope = { owner, page: id, generation };
     const room = env.SYNC.getByName(await roomName(owner, id, generation));
-    await room.prepare(scope, snapshot.data, 0);
+    await prepareRoom(env, scope, snapshot.data, 0);
     const result = await db
       .prepare(
         `${VISIBLE} INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, sync_generation, created_at, updated_at, property_values)
@@ -243,14 +244,19 @@ export async function handleDatabases(
     const merged = mergeConfig(previous, current, data.config);
     if (!merged) return fail(409, '設定已被其他裝置修改，請重新載入');
     const propertiesChanged = !sameConfigValue(current.properties, merged.properties);
-    const rows = propertiesChanged ? (await db.prepare('SELECT id, property_values FROM pages WHERE parent_id = ? AND owner_id = ?')
-      .bind(page.id, owner).all<Pick<PageRow, 'id' | 'property_values'>>()).results : [];
+    const rows = propertiesChanged ? (await db.prepare('SELECT id, title, deleted_at, property_values FROM pages WHERE parent_id = ? AND owner_id = ?')
+      .bind(page.id, owner).all<Pick<PageRow, 'id' | 'title' | 'deleted_at' | 'property_values'>>()).results : [];
     for (const property of merged.properties) {
       const original = current.properties.find(item => item.id === property.id);
-      if (rows.some(row => {
+      const conflicts = rows.filter(row => {
         const value = readValues(row.property_values)[property.id];
         return value !== undefined && value !== null && ((original && original.type !== property.type) || !validValue(property, value));
-      })) return fail(409, '欄位已有不相容資料，請新增欄位或保留已使用選項');
+      });
+      if (conflicts.length) {
+        const hidden = conflicts.find(row => row.deleted_at !== null);
+        if (hidden && conflicts.every(row => row.deleted_at !== null)) return fail(409, `垃圾桶中的筆記「${hidden.title}」仍有此欄資料，請先還原檢查、另建欄位或保留已使用選項`);
+        return fail(409, '欄位已有不相容資料，請新增欄位或保留已使用選項');
+      }
     }
     const changed = await db.prepare(`${DATABASE} UPDATE pages SET database_config = ?, metadata_revision = metadata_revision + 1, updated_at = ?
       WHERE id = ? AND owner_id = ? AND id IN (SELECT id FROM visible_database)

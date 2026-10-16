@@ -12,7 +12,7 @@ function object(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 function only(value: Record<string, unknown>, keys: string[]) { if (Object.keys(value).some(k => !keys.includes(k))) invalid(); }
-function link(value: unknown) { if (typeof value !== 'string' || !/^(https?:\/\/|mailto:|\/[^/]|#)/i.test(value)) invalid(); }
+function link(value: unknown) { if (typeof value !== 'string' || !/^(https?:\/\/|mailto:|tel:|ftp:\/\/|\/[^/]|#)/i.test(value)) invalid(); }
 export async function validatedBlocks(value: unknown, env: Env, owner: string, editor: ReturnType<typeof blockEditor>, options: { allowSyncedBlocks?: boolean } = {}): Promise<AppPartialBlock[]> {
   let count = 0; const ids = new Set<string>(); const assets = new Set<string>(); const syncedBlocks = new Set<string>();
   function inline(content: unknown, links = true): void {
@@ -49,8 +49,13 @@ export async function validatedBlocks(value: unknown, env: Env, owner: string, e
       }
       if (['image', 'file', 'audio', 'video'].includes(b.type as string)) {
         const url = b.props ? object(b.props).url : undefined;
-        if (typeof url !== 'string' || !/^\/api\/assets\/[\w-]{1,80}$/.test(url)) invalid();
-        assets.add((url as string).slice('/api/assets/'.length));
+        if (url === undefined || url === '') { /* 編輯器尚未上傳的媒體佔位。 */ }
+        else if (typeof url !== 'string') invalid();
+        else if (/^\/api\/assets\/[\w-]{1,80}$/.test(url)) assets.add(url.slice('/api/assets/'.length));
+        else {
+          try { const parsed = new URL(url); if (!['http:', 'https:'].includes(parsed.protocol)) invalid(); }
+          catch { invalid(); }
+        }
       }
       if (b.content !== undefined) {
         if (schema.content === 'none') invalid();

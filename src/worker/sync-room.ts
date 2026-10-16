@@ -1,3 +1,4 @@
+import { prepareRoom, queueCleanup } from './storage-cleanup';
 import { contentPermission, type ContentCredential } from './mcp-permissions';
 import { keyHash } from './api-keys';
 import { blockEditor, validatedBlocks, replaceBlocks, readBlocks } from './block-json';
@@ -139,7 +140,7 @@ export class SyncRoom extends ProbeRoom {
       const newScope = { ...scope, generation: operation.new_generation };
       const nextRoom = this.env.SYNC.getByName(await roomName(scope.owner, scope.page, operation.new_generation));
       if (operation.phase === 'preparing') {
-        await nextRoom.prepare(newScope, targetData, target.checkpoint);
+        await prepareRoom(this.env, newScope, targetData, target.checkpoint);
         await db.prepare("UPDATE page_history_restores SET phase = 'switching' WHERE request_id = ?").bind(requestId).run(); operation.phase = 'switching';
       }
       if (operation.phase === 'switching') {
@@ -157,6 +158,7 @@ export class SyncRoom extends ProbeRoom {
         await nextRoom.reindex(newScope); await nextRoom.resume();
         const page = await currentHistoryPage(this.env, newScope, requestId);
         await saveVersion(this.env, page, targetData, target.checkpoint, 'restore', await this.now(), { id: operation.restored_version_id, operation: requestId });
+        await queueCleanup(this.env, scope.owner, 'room', JSON.stringify(scope));
         await db.batch([
           db.prepare('INSERT INTO completed_page_history_restores VALUES (?, ?, ?, ?, ?, ?)').bind(requestId, scope.owner, scope.page, versionId, operation.before_version_id, await this.now()),
           db.prepare('DELETE FROM page_history_restores WHERE request_id = ?').bind(requestId),
@@ -394,6 +396,24 @@ export class SyncRoom extends ProbeRoom {
       } finally { doc.destroy(); }
     });
     this.permissionTail = work.then(() => {}, () => {}); return work;
+  }
+
+  async discard(scope: Scope): Promise<boolean> {
+    await this.setName(this.ctx.id.name!);
+    const work = this.permissionTail.then(async () => {
+      if (await scopeRoomName(scope) !== this.name) throw new Error('無效清理房間');
+      const table = scope.kind === 'syncedBlock' ? 'synced_blocks' : 'pages';
+      if (await this.env.DB.prepare(`SELECT 1 FROM ${table} WHERE id = ? AND owner_id = ? AND sync_generation = ?`).bind(scope.page, scope.owner, scope.generation).first()) return true;
+      if (await this.env.DB.prepare('SELECT 1 FROM restore_operations WHERE owner_id = ?').bind(scope.owner).first()
+        || await this.env.DB.prepare('SELECT 1 FROM page_history_restores WHERE owner_id = ? AND page_id = ? AND (old_generation = ? OR new_generation = ?)').bind(scope.owner, scope.page, scope.generation, scope.generation).first()) return false;
+      this.paused = true;
+      for (const connection of this.getConnections()) connection.close(1000, '已清理舊文件');
+      this.document.destroy();
+      await this.ctx.storage.deleteAll();
+      return true;
+    });
+    this.permissionTail = work.then(() => {}, () => {});
+    return work;
   }
 
   async prepare(scope: Scope, data: Uint8Array, checkpoint: number): Promise<void> {

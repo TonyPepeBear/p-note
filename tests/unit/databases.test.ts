@@ -112,3 +112,13 @@ describe("DB-15：日期與檢視設定", () => {
     ).toBe(true);
   });
 });
+
+it('DB-05：選項排序、空值及未完成篩選一致', () => {
+  const properties = [{ id: 'p', name: '選項', type: 'select' as const, options: [{ id: 'z', name: '第一' }, { id: 'a', name: '第二' }] }];
+  const rows = ['unset', 'empty', 'first', 'second'].map((id, i) => ({ ...record(id, '2026-01-01'), property_values: JSON.stringify(i === 0 ? {} : { p: ['', 'z', 'a'][i - 1] }) }));
+  const view = { ...initialView('v'), sorts: [{ property: 'p', direction: 'asc' as const }] };
+  expect(selectRows(rows, view, '', properties).map(r => r.id)).toEqual(['first', 'second', 'empty', 'unset']);
+  expect(selectRows(rows, { ...view, sorts: [{ property: 'p', direction: 'desc' }] }, '', properties).map(r => r.id)).toEqual(['second', 'first', 'empty', 'unset']);
+  expect(selectRows(rows, { ...view, filters: [{ property: 'p', operator: 'eq', value: '' }] }, '', properties)).toHaveLength(4);
+  expect(selectRows(rows, { ...view, filters: [{ property: 'p', operator: 'eq', value: 'false' }] }, '', [{ id: 'p', name: '勾選', type: 'checkbox', options: [] }]).map(r => r.id)).toContain('unset');
+});

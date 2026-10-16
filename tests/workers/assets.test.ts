@@ -73,7 +73,7 @@ function sizedPng(size: number): Uint8Array {
   const extra = size - images.png.length; const data = new Uint8Array(size);
   data.set(images.png.subarray(0, -12)); const offset = images.png.length - 12;
   const view = new DataView(data.buffer); view.setUint32(offset, extra - 12);
-  data.set([116, 69, 88, 116], offset + 4);
+  data.set([110, 112, 65, 68], offset + 4);
   let crc = 0xffffffff;
   for (const n of data.subarray(offset + 4, size - 16)) { crc ^= n; for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0); }
   view.setUint32(size - 16, (crc ^ 0xffffffff) >>> 0); data.set(images.png.subarray(-12), size - 12);

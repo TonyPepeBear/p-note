@@ -17,6 +17,9 @@ export function PageMenu({ page, disabled, active, history, onAction, onOpenChan
   const [opened, setOpened] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const restoreFocus = useRef(false);
+  const lifecycle = useRef({ opened, onOpenChange });
+  lifecycle.current = { opened, onOpenChange };
+  useEffect(() => () => { if (lifecycle.current.opened) lifecycle.current.onOpenChange(false); }, []);
   const change = (value: boolean) => { setOpened(value); onOpenChange(value); };
   useEffect(() => {
     if (disabled && opened) change(false);

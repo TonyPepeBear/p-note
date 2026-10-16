@@ -38,3 +38,22 @@ export function readLocal(cache: IndexeddbPersistence): Promise<Uint8Array> {
     };
   });
 }
+
+// 只讀既有資料庫的下載標記，metadata 索引本身不代表有正文草稿。
+export async function hasDownloaded(page: { owner_id: string; id: string; sync_generation: string }): Promise<boolean> {
+  const { roomName } = await import('../shared/room');
+  const name = `p-note:${await roomName(page.owner_id, page.id, page.sync_generation)}`;
+  return new Promise(resolve => {
+    const request = indexedDB.open(name);
+    request.onupgradeneeded = () => request.transaction?.abort();
+    request.onerror = () => resolve(false);
+    request.onsuccess = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('custom')) { db.close(); resolve(false); return; }
+      const tx = db.transaction('custom', 'readonly');
+      const value = tx.objectStore('custom').get('downloaded');
+      tx.oncomplete = () => { db.close(); resolve(value.result === true); };
+      tx.onerror = tx.onabort = () => { db.close(); resolve(false); };
+    };
+  });
+}

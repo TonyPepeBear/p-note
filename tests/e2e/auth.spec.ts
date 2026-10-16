@@ -91,7 +91,7 @@ test("AUTH-03：重用與過期連結顯示錯誤及重新申請入口", async (
   await expect(page.getByRole("alert")).toContainText("過期");
 });
 
-test("AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證", async ({
+test("AUTH-04：寄信失敗與一般申請訊息一致，限流不洩漏憑證", async ({
   page,
   request,
 }) => {
@@ -100,8 +100,8 @@ test("AUTH-04：寄信失敗與限流只有錯誤，沒有成功提示或憑證"
   await page.goto("/");
   await page.getByLabel("Email").fill("owner@example.test");
   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("稍後重試");
-  await expect(page.getByRole("status")).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText("若此 Email 可登入");
+  await expect(page.getByRole("alert")).toHaveCount(0);
   await page.getByRole("button", { name: "寄送登入連結", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("頻繁");
   expect(await page.locator("main").innerText()).not.toMatch(/token|secret/);

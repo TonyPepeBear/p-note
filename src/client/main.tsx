@@ -27,7 +27,7 @@ import { MyImages } from "./my-images";
 import { HistoryRestoreRecovery, PageHistory, type PendingHistoryRestore } from "./page-history";
 import { Navigation } from "./navigation";
 import { rememberPage, cachedPage, cachedVersions } from "./page-cache";
-import { readLocal, saveLocal } from "./cache";
+import { hasDownloaded, readLocal, saveLocal } from "./cache";
 import { PageIconPicker, publishPageMetadata } from "./page-icon";
 
 function App() {
@@ -68,6 +68,8 @@ function App() {
     addEventListener('p-note:page-metadata', updated);
     return () => removeEventListener('p-note:page-metadata', updated);
   }, []);
+  const currentNavigation = useRef({ url: location.href, state: history.state });
+  useEffect(() => { currentNavigation.current = { url: location.href, state: history.state }; }, [page?.id]);
   const backupNavigation = useRef<{ url: string; state: unknown } | null>(null);
   useEffect(() => {
     backupNavigation.current = backupNavigationLocked || historyOpen || pendingHistoryRestore
@@ -82,6 +84,24 @@ function App() {
       setImages(false);
     }
   }, [login]);
+  useEffect(() => {
+    if (!login || confirm) return;
+    let active = true;
+    const recheck = async () => {
+      try {
+        const response = await api("/api/session");
+        if (active && response.ok) {
+          setLogin(false);
+          setRoute(current => ({ ...current, serial: current.serial + 1 }));
+        }
+      } catch { /* 保留登入畫面，待下次恢復連線。 */ }
+    };
+    const storage = (event: StorageEvent) => { if (event.key === "p-note:signed-out" && event.newValue === null) void recheck(); };
+    addEventListener("focus", recheck);
+    addEventListener("online", recheck);
+    addEventListener("storage", storage);
+    return () => { active = false; removeEventListener("focus", recheck); removeEventListener("online", recheck); removeEventListener("storage", storage); };
+  }, [login, confirm]);
   const [route, setRoute] = useState(() => ({
     serial: 0,
     fresh: new URLSearchParams(location.search).get("new") === "1",
@@ -120,7 +140,18 @@ function App() {
         history.pushState(locked.state, "", locked.url);
         return;
       }
-      go(false, (event.state as { scrollY?: number } | null)?.scrollY ?? 0);
+      const previous = currentNavigation.current;
+      const target = { url: location.href, state: event.state };
+      const ticket = ++viewNavigation.current;
+      void saveDraft().then(() => {
+        if (ticket !== viewNavigation.current) return;
+        currentNavigation.current = target;
+        go(false, (event.state as { scrollY?: number } | null)?.scrollY ?? 0);
+      }).catch(failure => {
+        if (ticket !== viewNavigation.current) return;
+        history.replaceState(previous.state, "", previous.url);
+        setError((failure as Error).message);
+      });
     };
     const failed = (event: Event) =>
       setError((event as CustomEvent<string>).detail);
@@ -220,7 +251,8 @@ function App() {
         old &&
         old.sync_generation !== page.sync_generation &&
         accepted !== page.id &&
-        accepted !== "restored"
+        accepted !== "restored" &&
+        await hasDownloaded(old)
       ) {
         setError("這頁已在其他地方更新，你的本機修改已另外保留");
         await isolate(old, page);
@@ -229,7 +261,7 @@ function App() {
       sessionStorage.removeItem("p-note-load-current");
       try {
         rememberPage(page);
-        const previousVersions = cachedVersions(page);
+        const previousVersions = (await Promise.all(cachedVersions(page).map(async item => await hasDownloaded(item) ? item : undefined))).filter((item): item is PageInfo => !!item);
         setVersions(previousVersions);
         setDraftVersion(previousVersions[0]?.sync_generation ?? "");
       } catch {
@@ -370,7 +402,7 @@ function App() {
               }
             ).user?.id;
           const old = owner && localPage(id, owner);
-          if (old && !disposed) await isolate(old);
+          if (old && !disposed && await hasDownloaded(old)) await isolate(old);
         }
         return;
       }
@@ -383,7 +415,7 @@ function App() {
         const version = cachedVersions(page).find(
           (item) => item.sync_generation === draft,
         );
-        if (!version) throw new Error("本機草稿資訊不完整，請載入目前版本");
+        if (!version || !await hasDownloaded(version)) throw new Error("本機草稿資訊不完整，請載入目前版本");
         await isolate(version, page);
         return;
       }
