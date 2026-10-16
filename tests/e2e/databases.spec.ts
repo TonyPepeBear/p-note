@@ -183,8 +183,8 @@ test("DB-12：兩端開啟的檢視草稿在背景更新後仍獨立保存", asy
   try {
     const p2 = await other.newPage();
     await openDB(p2, db.id);
-    await p2.getByLabel("目前檢視", { exact: true }).selectOption("b");
-    for (const p of [page, p2]) await p.getByRole("button", { name: "檢視設定", exact: true }).click();
+    await p2.getByRole("tab", { name: "乙檢視", exact: true }).click();
+    for (const [p, name] of [[page, "甲檢視"], [p2, "乙檢視"]] as const) { await p.getByRole("button", { name: "檢視選單 " + name, exact: true }).click(); await p.getByRole("menuitem", { name: "重新命名檢視", exact: true }).click(); }
     await page.getByLabel("檢視名稱", { exact: true }).fill("甲端保存");
     await p2.getByLabel("檢視名稱", { exact: true }).fill("乙端保存");
     await page.getByRole("button", { name: "儲存檢視", exact: true }).click();
@@ -209,6 +209,8 @@ test("DB-01：建立資料庫、筆記與移入移出保留正文", async ({ pag
     .locator(".database-page")
     .getByRole("button", { name: "新增筆記", exact: true })
     .click();
+  await expect(page.getByTestId("database-row")).toHaveCount(1);
+  await page.getByRole("link", { name: "開啟 未命名", exact: true }).click();
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
   const id = new URL(page.url()).searchParams.get("page")!;
   await page.evaluate(() =>
@@ -280,8 +282,8 @@ test("DB-03：各欄位在表格與筆記往返、重新命名保留值", async 
   await page.getByLabel("名稱", { exact: true }).blur();
   await expect(page.getByTestId("property-status")).toContainText("已儲存");
   const area = page.getByTestId("database-rows");
-  await area.getByLabel("摘要").fill("中文摘要");
-  await area.getByLabel("摘要").blur();
+  await area.getByLabel("摘要", { exact: true }).fill("中文摘要");
+  await area.getByLabel("摘要", { exact: true }).blur();
   await expect(page.getByTestId("property-status")).toContainText("已儲存");
   for (const [key, value] of [
     ["num", 42],
@@ -293,9 +295,9 @@ test("DB-03：各欄位在表格與筆記往返、重新命名保留值", async 
   ] as const)
     await values(page, record, key, value);
   await openPrivate(page, record.id);
-  await expect(page.getByLabel("摘要")).toHaveValue("中文摘要");
-  await page.getByLabel("摘要").fill("筆記頁編輯");
-  await page.getByLabel("摘要").blur();
+  await expect(page.getByLabel("摘要", { exact: true })).toHaveValue("中文摘要");
+  await page.getByLabel("摘要", { exact: true }).fill("筆記頁編輯");
+  await page.getByLabel("摘要", { exact: true }).blur();
   await expect(page.getByTestId("property-status")).toContainText("已儲存");
   props[0].name = "說明";
   await config(page, db, {
@@ -313,7 +315,7 @@ test("DB-03：各欄位在表格與筆記往返、重新命名保留值", async 
     ],
   });
   await openDB(page, db.id);
-  await expect(area.getByLabel("說明")).toHaveValue("筆記頁編輯");
+  await expect(area.getByLabel("說明", { exact: true })).toHaveValue("筆記頁編輯");
   expect(
     JSON.parse(
       (await (await page.request.get("/api/pages/" + record.id)).json())
@@ -403,22 +405,27 @@ test("DB-05：儲存檢視獨立篩選、排序、隱藏與重開", async ({ pag
   await page.getByRole("button", { name: "新增檢視", exact: true }).click();
   await page.getByLabel("檢視名稱", { exact: true }).fill("技術清單");
   await page.getByLabel("檢視形式", { exact: true }).selectOption("list");
-  await page.getByRole("button", { name: "新增篩選", exact: true }).click();
-  await page.getByLabel("篩選欄位 1").selectOption("topic");
-  await page.getByLabel("篩選值 1").selectOption("tech");
-  await page.getByRole("button", { name: "新增排序", exact: true }).click();
-  await page.getByLabel("排序欄位 1").selectOption("score");
-  await page.getByLabel("排序方向 1").selectOption("desc");
   await page.getByRole("button", { name: "儲存檢視", exact: true }).click();
+  await page.getByRole("button", { name: "篩選", exact: true }).click();
+  await page.getByRole("button", { name: "新增篩選", exact: true }).click();
+  await page.getByLabel("篩選欄位 1", { exact: true }).selectOption("topic");
+  await page.getByLabel("篩選值 1", { exact: true }).selectOption("tech");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "排序", exact: true }).click();
+  await page.getByRole("button", { name: "新增排序", exact: true }).click();
+  await page.getByLabel("排序欄位 1", { exact: true }).selectOption("score");
+  await page.getByLabel("排序方向 1", { exact: true }).selectOption("desc");
+  await page.keyboard.press("Escape");
+  await expect.poll(async () => (await (await page.request.get("/api/databases/" + db.id)).json()).config.views.find((v: { name: string }) => v.name === "技術清單").sorts).toEqual([{ property: "score", direction: "desc" }]);
   await expect(
     page.getByTestId("database-rows").getByTestId("database-row"),
   ).toHaveText(["丙", "甲"]);
   await page.reload();
-  await page.getByLabel("目前檢視").selectOption({ label: "技術清單" });
+  await page.getByRole("tab", { name: "技術清單", exact: true }).click();
   await expect(
     page.getByTestId("database-rows").getByTestId("database-row"),
   ).toHaveText(["丙", "甲"]);
-  await page.getByLabel("目前檢視").selectOption({ label: "全部筆記" });
+  await page.getByRole("tab", { name: "全部筆記", exact: true }).click();
   await expect(page.getByTestId("database-row")).toHaveCount(3);
   const cases = [
     {
@@ -504,12 +511,12 @@ test("DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋", 
       return original(input, init);
     };
   });
-  await page.getByLabel("甲欄").fill("保留草稿");
-  await page.getByLabel("甲欄").blur();
+  await page.getByLabel("甲欄", { exact: true }).fill("保留草稿");
+  await page.getByLabel("甲欄", { exact: true }).blur();
   await expect(page.getByTestId("property-status")).toContainText(
     "測試保存失敗",
   );
-  await expect(page.getByLabel("甲欄")).toHaveValue("保留草稿");
+  await expect(page.getByLabel("甲欄", { exact: true })).toHaveValue("保留草稿");
   expect(await page.evaluate(() => (window as unknown as { databaseFailure: { count: number } }).databaseFailure.count)).toBeGreaterThan(0);
   await page.evaluate(() => { (window as unknown as { databaseFailure: { fail: boolean } }).databaseFailure.fail = false; });
   await page.getByRole("button", { name: "重試保存", exact: true }).click();
@@ -523,7 +530,7 @@ test("DB-06：保存失敗保留輸入供重試，不同欄位併發不覆蓋", 
     values(page, record, "a", "第一端"),
     values(p2, record, "b", "第二端"),
   ]);
-  await expect(p2.getByLabel("甲欄")).toHaveValue("第一端", { timeout: 10000 });
+  await expect(p2.getByLabel("甲欄", { exact: true })).toHaveValue("第一端", { timeout: 10000 });
   const old = (await (await page.request.get("/api/pages/" + db.id)).json())
     .database_config;
   await config(page, db, {
@@ -594,7 +601,7 @@ test("DB-07：權限、刪除、舊世代與离線屬性限制", async ({ page, 
   await expect(
     page.getByText("欄位修改需要連線", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByLabel("摘要")).toBeDisabled();
+  await expect(page.getByLabel("摘要", { exact: true })).toBeDisabled();
   await page.evaluate(() =>
     window.probe!.editor.updateBlock(window.probe!.editor.document[0], {
       content: "離線正文",
@@ -620,9 +627,9 @@ test("DB-08：手機與鍵盤可新增欄位且整頁不溢出", async ({ page }
   await row(page, db, "手機筆記");
   await openDB(page, db.id);
   await page.getByRole("button", { name: "管理欄位", exact: true }).click();
-  await page.getByLabel("新欄位名稱").fill("手機摘要");
-  await page.getByLabel("新欄位類型").selectOption("text");
-  await page.getByLabel("新欄位名稱").press("Enter");
+  await page.getByLabel("新欄位名稱", { exact: true }).fill("手機摘要");
+  await page.getByLabel("新欄位類型", { exact: true }).selectOption("text");
+  await page.getByLabel("新欄位名稱", { exact: true }).press("Enter");
   await page.getByRole("button", { name: "關閉欄位管理", exact: true }).click();
   await page.getByLabel("手機摘要", { exact: true }).fill("觸控與鍵盤");
   await page.getByLabel("手機摘要", { exact: true }).blur();

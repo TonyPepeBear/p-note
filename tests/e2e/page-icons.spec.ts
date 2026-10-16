@@ -119,7 +119,7 @@ test('ICON-02：資料庫標題與兩種檢視的資料列圖示可獨立編輯'
   await expect(rows.locator('[data-page-icon="⭐"]')).toBeVisible();
   await page.getByRole('button', { name: '檢視設定', exact: true }).click();
   await page.getByLabel('檢視形式', { exact: true }).selectOption('list');
-  await page.getByRole('button', { name: '儲存檢視', exact: true }).click();
+  await page.keyboard.press('Escape');
   await expect(rows.locator('[data-page-icon="⭐"]')).toBeVisible();
   await rows.getByRole('button', { name: '更換「' + row.title + '」圖示', exact: true }).click();
   await apply(page, '📚');

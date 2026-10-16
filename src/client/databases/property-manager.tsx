@@ -1,7 +1,28 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, Group, Modal, NativeSelect, Stack, Text, TextInput } from "@mantine/core";
-import { IconArrowDown, IconArrowUp, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
-import { BUILTIN, PROPERTY_TYPES, type DatabaseConfig, type Property } from "../../shared/databases";
+import {
+  Alert,
+  Button,
+  Group,
+  Modal,
+  NativeSelect,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconPlus,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
+import {
+  BUILTIN,
+  OPTION_COLORS,
+  PROPERTY_TYPES,
+  type DatabaseConfig,
+  type Property,
+} from "../../shared/databases";
 import { PropertyIcon } from "./fields";
 import { move, type ConfigSession, type SaveConfig } from "./utils";
 
@@ -11,8 +32,16 @@ type Props = {
   onClose: () => void;
   onSave: SaveConfig;
 };
-export function PropertyManager({ session, disabled: parentDisabled, onClose, onSave }: Props) {
-  const [config, setConfig] = useState<DatabaseConfig>({ properties: [], views: [] });
+export function PropertyManager({
+  session,
+  disabled: parentDisabled,
+  onClose,
+  onSave,
+}: Props) {
+  const [config, setConfig] = useState<DatabaseConfig>({
+    properties: [],
+    views: [],
+  });
   const [properties, setProperties] = useState<Property[]>([]);
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState<Property["type"]>("text");
@@ -34,9 +63,13 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
     setFailure("");
-    try { await action(); }
-    catch (error) { setFailure((error as Error).message); }
-    finally { setBusy(false); }
+    try {
+      await action();
+    } catch (error) {
+      setFailure((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
   const saveConfig = async (next: DatabaseConfig) => {
     if (!session) return;
@@ -52,68 +85,127 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
         onClose={onClose}
         title="管理欄位"
         size="lg"
-        classNames={{ content: "database-dialog", header: "database-dialog-header", body: "database-dialog-body" }}
+        transitionProps={{
+          onEntered: () => {
+            if (session?.field)
+              document
+                .querySelector<HTMLInputElement>(
+                  '[data-property="' + session.field + '"] input',
+                )
+                ?.focus();
+          },
+        }}
+        classNames={{
+          content: "database-dialog",
+          header: "database-dialog-header",
+          body: "database-dialog-body",
+        }}
         closeButtonProps={{ "aria-label": "關閉欄位管理" }}
       >
         <Stack gap="md">
-          {failure && <Alert color="red" role="alert">{failure}</Alert>}
+          {failure && (
+            <Alert color="red" role="alert">
+              {failure}
+            </Alert>
+          )}
           <Text size="sm" c="dimmed">
             自訂筆記的屬性與順序。已有內容的欄位如需變更類型，請新增另一個欄位。
           </Text>
           <div className="database-field-list">
-          {!properties.length && <Text className="database-settings-empty" size="sm" c="dimmed">尚未新增屬性。新增日期、標籤或其他欄位，讓筆記更好整理。</Text>}
-          {properties.map((p, index) => (
-            <div className="database-field-editor" key={p.id}>
-              <div className="database-field-editor-main">
-                <PropertyIcon type={p.type} />
-                <TextInput
-                  aria-label={"欄位名稱 " + (index + 1)}
-                  value={p.name}
-                  onChange={(e) =>
-                    setProperties((items) =>
-                      items.map((x) =>
-                        x.id === p.id ? { ...x, name: e.target.value } : x,
-                      ),
-                    )
-                  }
-                />
-                <NativeSelect
-                  aria-label={"欄位類型 " + (index + 1)}
-                  value={p.type}
-                  data={Object.entries(PROPERTY_TYPES).map(
-                    ([value, label]) => ({ value, label }),
-                  )}
-                  onChange={(e) =>
-                    setProperties((items) =>
-                      items.map((x) =>
-                        x.id === p.id
-                          ? {
-                              ...x,
-                              type: e.target.value as Property["type"],
-                              options: [],
-                            }
-                          : x,
-                      ),
-                    )
-                  }
-                />
-                <div className="database-field-actions">
-                  <Button variant="subtle" className="database-icon-button" aria-label={"上移 " + p.name} title="上移欄位" disabled={index === 0} onClick={() => setProperties(move(properties, index, -1))}>
-                    <IconArrowUp size={14} aria-hidden="true" />
-                  </Button>
-                  <Button variant="subtle" className="database-icon-button" aria-label={"下移 " + p.name} title="下移欄位" disabled={index === properties.length - 1} onClick={() => setProperties(move(properties, index, 1))}>
-                    <IconArrowDown size={14} aria-hidden="true" />
-                  </Button>
-                  <Button color="red" variant="subtle" className="database-icon-button" aria-label={"刪除 " + p.name} title={"刪除 " + p.name} onClick={() => setRemove(p.id)}>
-                    <IconTrash size={14} aria-hidden="true" />
-                  </Button>
+            {!properties.length && (
+              <Text className="database-settings-empty" size="sm" c="dimmed">
+                尚未新增屬性。新增日期、標籤或其他欄位，讓筆記更好整理。
+              </Text>
+            )}
+            {properties.map((p, index) => (
+              <div
+                className="database-field-editor"
+                key={p.id}
+                data-property={p.id}
+              >
+                <div className="database-field-editor-main">
+                  <PropertyIcon type={p.type} />
+                  <TextInput
+                    autoFocus={session?.field === p.id}
+                    data-autofocus={session?.field === p.id || undefined}
+                    aria-label={"欄位名稱 " + (index + 1)}
+                    value={p.name}
+                    onChange={(e) =>
+                      setProperties((items) =>
+                        items.map((x) =>
+                          x.id === p.id ? { ...x, name: e.target.value } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <NativeSelect
+                    aria-label={"欄位類型 " + (index + 1)}
+                    value={p.type}
+                    data={Object.entries(PROPERTY_TYPES).map(
+                      ([value, label]) => ({ value, label }),
+                    )}
+                    onChange={(e) =>
+                      setProperties((items) =>
+                        items.map((x) =>
+                          x.id === p.id
+                            ? {
+                                ...x,
+                                type: e.target.value as Property["type"],
+                                options: [],
+                              }
+                            : x,
+                        ),
+                      )
+                    }
+                  />
+                  <div className="database-field-actions">
+                    <Button
+                      variant="subtle"
+                      className="database-icon-button"
+                      aria-label={"上移 " + p.name}
+                      title="上移欄位"
+                      disabled={index === 0}
+                      onClick={() => setProperties(move(properties, index, -1))}
+                    >
+                      <IconArrowUp size={14} aria-hidden="true" />
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      className="database-icon-button"
+                      aria-label={"下移 " + p.name}
+                      title="下移欄位"
+                      disabled={index === properties.length - 1}
+                      onClick={() => setProperties(move(properties, index, 1))}
+                    >
+                      <IconArrowDown size={14} aria-hidden="true" />
+                    </Button>
+                    <Button
+                      color="red"
+                      variant="subtle"
+                      className="database-icon-button"
+                      aria-label={"刪除 " + p.name}
+                      title={"刪除 " + p.name}
+                      onClick={() => setRemove(p.id)}
+                    >
+                      <IconTrash size={14} aria-hidden="true" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
                 {["select", "multiSelect"].includes(p.type) && (
                   <div className="database-options-editor">
-                    <Text size="xs" c="dimmed" className="database-section-caption">選項</Text>
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      className="database-section-caption"
+                    >
+                      選項
+                    </Text>
                     {p.options.map((o, i) => (
-                      <Group className="database-option-row" key={o.id} gap="xs">
+                      <Group
+                        className="database-option-row"
+                        key={o.id}
+                        gap="xs"
+                      >
                         <TextInput
                           aria-label={"選項 " + p.name + " " + (i + 1)}
                           value={o.name}
@@ -130,6 +222,31 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
                                       ),
                                     }
                                   : x,
+                              ),
+                            )
+                          }
+                        />
+                        <NativeSelect
+                          aria-label={"選項顏色 " + p.name + " " + (i + 1)}
+                          value={o.color ?? "gray"}
+                          data={[...OPTION_COLORS]}
+                          onChange={(e) =>
+                            setProperties((items) =>
+                              items.map((item) =>
+                                item.id === p.id
+                                  ? {
+                                      ...item,
+                                      options: item.options.map((option) =>
+                                        option.id === o.id
+                                          ? {
+                                              ...option,
+                                              color: e.target
+                                                .value as (typeof OPTION_COLORS)[number],
+                                            }
+                                          : option,
+                                      ),
+                                    }
+                                  : item,
                               ),
                             )
                           }
@@ -174,7 +291,11 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
                                   ...x,
                                   options: [
                                     ...x.options,
-                                    { id: crypto.randomUUID(), name },
+                                    {
+                                      id: crypto.randomUUID(),
+                                      name,
+                                      color: "blue",
+                                    },
                                   ],
                                 }
                               : x,
@@ -185,10 +306,11 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
                     />
                   </div>
                 )}
-            </div>
-          ))}
+              </div>
+            ))}
           </div>
-          <form className="database-new-field"
+          <form
+            className="database-new-field"
             onSubmit={(e) => {
               e.preventDefault();
               void run(async () => {
@@ -227,37 +349,44 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
                 }))}
                 onChange={(e) => setNewType(e.target.value as Property["type"])}
               />
-              <Button type="submit" variant="default" leftSection={<IconPlus size={14} aria-hidden="true" />} disabled={disabled}>
+              <Button
+                type="submit"
+                variant="default"
+                leftSection={<IconPlus size={14} aria-hidden="true" />}
+                disabled={disabled}
+              >
                 新增欄位
               </Button>
             </div>
           </form>
           <div className="database-dialog-footer">
-          <Text size="xs" c="dimmed">刪除欄位後，原值仍保留於筆記與備份。</Text>
-          <Button
-            disabled={disabled}
-            onClick={() =>
-              void run(async () => {
-                const order = properties.map((p) => p.id);
-                const next = {
-                  properties,
-                  views: config.views.map((v) => ({
-                    ...v,
-                    columns: [
-                      ...v.columns.filter((id) =>
-                        BUILTIN.some((p) => p.id === id),
-                      ),
-                      ...order.filter((id) => v.columns.includes(id)),
-                    ],
-                  })),
-                };
-                await saveConfig(next);
-                onClose();
-              })
-            }
-          >
-            儲存欄位
-          </Button>
+            <Text size="xs" c="dimmed">
+              刪除欄位後，原值仍保留於筆記與備份。
+            </Text>
+            <Button
+              disabled={disabled}
+              onClick={() =>
+                void run(async () => {
+                  const order = properties.map((p) => p.id);
+                  const next = {
+                    properties,
+                    views: config.views.map((v) => ({
+                      ...v,
+                      columns: [
+                        ...v.columns.filter((id) =>
+                          BUILTIN.some((p) => p.id === id),
+                        ),
+                        ...order.filter((id) => v.columns.includes(id)),
+                      ],
+                    })),
+                  };
+                  await saveConfig(next);
+                  onClose();
+                })
+              }
+            >
+              儲存欄位
+            </Button>
           </div>
         </Stack>
       </Modal>
@@ -265,7 +394,11 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
         opened={!!session && !!remove}
         onClose={() => setRemove(undefined)}
         title="刪除欄位"
-        classNames={{ content: "database-dialog", header: "database-dialog-header", body: "database-dialog-body" }}
+        classNames={{
+          content: "database-dialog",
+          header: "database-dialog-header",
+          body: "database-dialog-body",
+        }}
       >
         <Stack>
           <Text>
@@ -287,6 +420,11 @@ export function PropertyManager({ session, disabled: parentDisabled, onClose, on
                     views: config.views.map((v) => ({
                       ...v,
                       columns: v.columns.filter((id) => id !== remove),
+                      widths: Object.fromEntries(
+                        Object.entries(v.widths ?? {}).filter(
+                          ([id]) => id !== remove,
+                        ),
+                      ),
                       filters: v.filters.filter((f) => f.property !== remove),
                       sorts: v.sorts.filter((s) => s.property !== remove),
                     })),

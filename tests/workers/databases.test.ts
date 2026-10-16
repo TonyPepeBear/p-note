@@ -242,3 +242,29 @@ it('DB-11：資料庫條件讀取：版本檢查後發生變更，200 本文與 
   expect((await response!.json<DatabaseData>()).rows[0].title).toBe('檢查後的標題');
   expect((await get(database.id, response!.headers.get('ETag')!)).status).toBe(304);
 });
+
+it('DB-16：複製保留持久正文、圖示與屬性，拒絕越權、舊世代及垃圾桶', async () => {
+  const database = await create(); const record = await row(database.id);
+  const config = readConfig(database.database_config!);
+  config.properties.push({ id: 'score', name: '分數', type: 'number', options: [] });
+  await page(save(database, database.database_config!, config));
+  await page(client.post(`/api/pages/${record.id}/properties`, { property: 'score', value: 42, generation: record.sync_generation }));
+  await page(client.post(`/api/pages/${record.id}/icon`, { icon: '📚' }));
+  const { connect, commit, persisted } = await import('./helpers');
+  const { roomName } = await import('../../src/shared/room');
+  const Y = await import('yjs');
+  const info = await client.result(client.get(`/api/pages/${record.id}`));
+  const connection = await connect(info, client.cookie); const doc = new Y.Doc();
+  doc.getXmlFragment('body').insert(0, [new Y.XmlText('複製的持久正文')]);
+  expect((await commit(connection, doc, crypto.randomUUID())).type).toBe('persisted');
+  const copy = await page(client.post(`/api/pages/${record.id}/duplicate`, { generation: record.sync_generation }));
+  expect(copy.parent_id).toBe(database.id); expect(copy.icon).toBe('📚');
+  expect(JSON.parse(copy.property_values!)).toEqual({ score: 42 }); expect(copy.sync_generation).not.toBe(record.sync_generation);
+  const copied = await persisted({ stub: env.SYNC.getByName(await roomName(copy.owner_id, copy.id, copy.sync_generation)) });
+  expect(copied.getXmlFragment('body').toString()).toContain('複製的持久正文');
+  expect((await client.post(`/api/pages/${record.id}/duplicate`, { generation: 'old' })).status).toBe(409);
+  expect((await exports.default.fetch(`${origin}/api/pages/${record.id}/duplicate`, { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify({ generation: record.sync_generation }) })).status).toBe(401);
+  await page(client.post(`/api/pages/${record.id}/delete`, {}));
+  expect((await client.post(`/api/pages/${record.id}/duplicate`, { generation: record.sync_generation })).status).toBe(404);
+  connection.socket.close(); doc.destroy(); copied.destroy();
+});

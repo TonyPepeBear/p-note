@@ -196,6 +196,7 @@ test("UI-05：資料庫以鍵盤切換檢視、搜尋並新增有正文的筆記
   await all.click();
   await expect(rows).toHaveCount(2);
   await toolbar.getByRole("button", { name: "新增筆記", exact: true }).click();
+  await page.getByRole("link", { name: "開啟 未命名", exact: true }).click();
   await expect(page.getByTestId("ready")).toHaveText("可編輯");
   await page.getByLabel("文件標題", { exact: true }).fill("閱讀心得");
   await page.getByLabel("文件標題", { exact: true }).press("Enter");
