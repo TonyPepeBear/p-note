@@ -5,8 +5,8 @@ const cacheable = url => ['http:', 'https:'].includes(url.protocol) && url.origi
     || url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/') || url.pathname === '/fixtures/pixel.png');
 const shell = url => ['/', '/probe'].includes(url.pathname);
 self.addEventListener('install', event => {
-  // 完整下載才可安裝；新版等待使用者保存草稿後明確啟用。
-  event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(PRECACHE)));
+  // 完整預快取後自動啟用；分頁由換頁流程保存草稿後載入新版。
+  event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', event => {
   // 舊分頁仍可能需要上一版雜湊資源；不在更新時刪除其快取或 IndexedDB。
@@ -42,10 +42,6 @@ self.addEventListener('fetch', event => {
   })());
 });
 self.addEventListener('message', event => {
-  if (event.data?.type === 'skip-waiting') {
-    event.waitUntil(self.skipWaiting());
-    return;
-  }
   if (event.data?.type !== 'cache-resources' || !Array.isArray(event.data.urls)) return;
   event.waitUntil((async () => {
     try {

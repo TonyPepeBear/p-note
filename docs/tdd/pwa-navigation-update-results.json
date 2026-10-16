@@ -1,0 +1,90 @@
+{
+  "日期": "2026-10-16",
+  "工具版本": {
+    "Node": "24.19.0",
+    "npm": "11.9.0",
+    "Playwright": "1.64.0",
+    "Vitest": "4.1.11"
+  },
+  "Red": {
+    "unit": {
+      "命令": "npm run test:unit -- tests/unit/service-worker.test.ts",
+      "退出碼": 1,
+      "通過": 3,
+      "失敗": 1,
+      "原因": "預快取後 skipWaiting 預期 1 次，實際 0 次"
+    },
+    "e2e": {
+      "階段": "Red",
+      "命令": "npm run test:e2e:fast -- tests/e2e/pwa.spec.ts --grep PWA-06",
+      "退出碼": 1,
+      "預期失敗": [
+        "更新按鈕仍存在（預期 0、實際 1）",
+        "新版仍等待，未取得控制權"
+      ],
+      "統計": {
+        "expected": 0,
+        "unexpected": 2,
+        "skipped": 0,
+        "flaky": 0
+      }
+    }
+  },
+  "Green": {
+    "unit": {
+      "退出碼": 0,
+      "通過": 4
+    },
+    "e2e": {
+      "階段": "Green",
+      "命令": "npm run test:e2e:fast -- tests/e2e/pwa.spec.ts tests/e2e/spa-navigation.spec.ts",
+      "退出碼": 0,
+      "統計": {
+        "expected": 14,
+        "unexpected": 0,
+        "skipped": 0,
+        "flaky": 0
+      }
+    }
+  },
+  "首次驗收": {
+    "階段": "四 worker 驗收中止",
+    "退出碼": 130,
+    "原因": "UX-16、UX-17 超過原本 20 秒案例上限；降低並行數重新驗收",
+    "統計": {
+      "expected": 8,
+      "unexpected": 4,
+      "skipped": 30,
+      "flaky": 0
+    }
+  },
+  "最終驗收": {
+    "命令": "E2E_WORKERS=2 npm run test:e2e -- tests/e2e/pwa.spec.ts tests/e2e/spa-navigation.spec.ts --timeout=45000",
+    "退出碼": 0,
+    "通過": 42,
+    "失敗": 0,
+    "跳過": 0,
+    "環境": [
+      "chromium-desktop",
+      "chromium-mobile",
+      "webkit-mobile"
+    ]
+  },
+  "情境報告比對": {
+    "方法": "以 scripts/spec-coverage.mjs 的 reportCases 與 checkCoverage 比對 PWA-01～06、UX-20、LFN-01",
+    "必需結果": 23,
+    "未通過": []
+  },
+  "其他檢查": {
+    "npm run check": 0,
+    "npm run test:build": {
+      "退出碼": 0,
+      "smoke通過": 2
+    },
+    "openspec validate pwa-navigation-update --strict": 0,
+    "openspec archive pwa-navigation-update --yes": 0,
+    "openspec validate progressive-web-app --strict": 0,
+    "npm run check:spec": 0,
+    "git diff --check": 0
+  }
+}

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { openPrivate, saved, showNavigation } from './helpers';
 
 test.beforeEach(async ({ request }) => {
@@ -129,62 +129,54 @@ test('PWA-04：離線重開同筆記保留草稿，未知筆記明確拒絕', as
   await expect(page.locator('.tiptap')).toContainText('PWA 離線草稿');
 });
 
-async function waitingUpdate(page: Page) {
-  await page.evaluate(async () => {
-    const registration = await navigator.serviceWorker.getRegistration();
-    const waiting = { postMessage: async () => {
-      const cache = window.probe!.cache;
-      const request = cache.db!.transaction('updates', 'readonly').objectStore('updates').count();
-      request.onsuccess = () => { document.body.dataset.activated = String(request.result > 0); };
-    } };
-    Object.defineProperty(registration, 'waiting', { configurable: true, value: waiting });
-    registration!.dispatchEvent(new Event('updatefound'));
-  });
-}
-
-for (const fail of [false, true]) test(`PWA-06：${fail ? '保存失敗不啟用且保留可編輯草稿' : '保存成功才送出新版啟用訊息'}`, async ({ page }) => {
+test('PWA-06：等待中的舊版更新不顯示手動入口，控制權變更仍可編輯', async ({ page }) => {
   await openPrivate(page);
-  await page.evaluate(() => { document.body.dataset.marker = '原分頁'; navigator.serviceWorker.dispatchEvent(new Event('controllerchange')); });
-  await expect(page.locator('body')).toHaveAttribute('data-marker', '原分頁');
+  await page.evaluate(async () => {
+    document.body.dataset.marker = '原分頁';
+    const registration = await navigator.serviceWorker.getRegistration();
+    Object.defineProperty(registration, 'waiting', { configurable: true, value: { postMessage() {} } });
+    registration!.dispatchEvent(new Event('updatefound'));
+    navigator.serviceWorker.dispatchEvent(new Event('controllerchange'));
+  });
   await showNavigation(page);
-  await waitingUpdate(page);
-  await page.evaluate((fail) => {
-    if (fail) {
-      const native = IDBDatabase.prototype.transaction;
-      IDBDatabase.prototype.transaction = function (...args) {
-        if (args[1] === 'readwrite') throw new DOMException('測試容量不足', 'QuotaExceededError');
-        return Reflect.apply(native, this, args);
-      };
-    }
-    window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '更新前最後的字' });
-  }, fail);
-  await page.getByRole('button', { name: '更新 p-note', exact: true }).filter({ visible: true }).click();
-  if (fail) {
-    await expect(page.getByRole('alert').filter({ hasText: '本機儲存失敗' }).first()).toBeVisible();
-    await expect(page.locator('body')).not.toHaveAttribute('data-activated');
-    await expect(page.locator('.tiptap')).toHaveAttribute('contenteditable', 'true');
-  } else await expect(page.locator('body')).toHaveAttribute('data-activated', 'true');
-  await expect(page.locator('.tiptap')).toContainText('更新前最後的字');
+  await expect(page.getByRole('button', { name: '更新 p-note', exact: true })).toHaveCount(0);
   await expect(page.locator('body')).toHaveAttribute('data-marker', '原分頁');
+  expect(await page.evaluate(() => document.body.inert)).toBe(false);
+  await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '仍可編輯的字' }));
+  await expect(page.locator('.tiptap')).toHaveAttribute('contenteditable', 'true');
+  await expect(page.locator('.tiptap')).toContainText('仍可編輯的字');
+  await saved(page);
 });
 
-test('PWA-06：真實新版等待套用，重新載入後保留草稿且其他分頁不重載', async ({ page, context }) => {
+test('PWA-06：真實新版自動啟用不重載分頁，保留草稿與舊版雜湊資源', async ({ page, context }) => {
   const id = await openPrivate(page);
   const other = await context.newPage();
   await other.goto('/?page=' + id); await saved(other);
   await other.evaluate(() => { document.body.dataset.marker = '保留分頁'; });
-  await page.evaluate(async () => {
-    document.body.dataset.marker = '更新分頁';
-    await navigator.serviceWorker.register('/__test/pwa-sw', { scope: '/', updateViaCache: 'none' });
-  });
-  await showNavigation(page);
-  await expect(page.getByRole('button', { name: '更新 p-note', exact: true }).filter({ visible: true })).toBeVisible();
-  await expect(page.locator('body')).toHaveAttribute('data-marker', '更新分頁');
   await page.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '真實更新保留的字' }));
-  await page.getByRole('button', { name: '更新 p-note', exact: true }).filter({ visible: true }).click();
-  await expect(page.locator('body')).not.toHaveAttribute('data-marker');
-  await expect(page.getByTestId('ready')).toHaveText('可編輯');
-  await expect(page.locator('.tiptap')).toContainText('真實更新保留的字');
+  await expect(page.getByTestId('local-status')).toHaveText('本機已儲存');
+  const oldCaches = await page.evaluate(async () => {
+    document.body.dataset.marker = '更新分頁';
+    const names = await caches.keys();
+    const cache = await caches.open(names.find(name => name.startsWith('p-note-shell-'))!);
+    await cache.put('/assets/pwa-old-fixture.js', new Response('舊版雜湊資源', { headers: { 'Content-Type': 'application/javascript' } }));
+    await navigator.serviceWorker.register('/__test/pwa-sw', { scope: '/', updateViaCache: 'none' });
+    return names;
+  });
+  await page.waitForFunction(() => navigator.serviceWorker.controller?.scriptURL.endsWith('/__test/pwa-sw'));
+  await other.waitForFunction(() => navigator.serviceWorker.controller?.scriptURL.endsWith('/__test/pwa-sw'));
+  const cacheNames = await page.evaluate(() => caches.keys());
+  expect(cacheNames).toEqual(expect.arrayContaining(oldCaches));
+  expect(cacheNames.some(name => name.endsWith('-test-update'))).toBe(true);
+  expect(await page.evaluate(async () => (await fetch('/assets/pwa-old-fixture.js')).text())).toBe('舊版雜湊資源');
+  await expect(page.locator('body')).toHaveAttribute('data-marker', '更新分頁');
   await expect(other.locator('body')).toHaveAttribute('data-marker', '保留分頁');
-  await saved(page);
+  await expect(page.locator('.tiptap')).toContainText('真實更新保留的字');
+  await expect(page.locator('.tiptap')).toHaveAttribute('contenteditable', 'true');
+  expect(await page.evaluate(() => document.body.inert)).toBe(false);
+  await showNavigation(page);
+  await expect(page.getByRole('button', { name: '更新 p-note', exact: true })).toHaveCount(0);
+  await other.evaluate(() => window.probe!.editor.updateBlock(window.probe!.editor.document[0], { content: '啟用後繼續書寫' }));
+  await expect(other.locator('.tiptap')).toContainText('啟用後繼續書寫');
+  await saved(other);
 });
