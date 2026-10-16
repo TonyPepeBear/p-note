@@ -35,7 +35,7 @@ export function imageType(bytes: Uint8Array): string | null {
         if (bytes[at++] !== 0xff) return null;
         while (bytes[at] === 0xff) at++;
         const marker = bytes[at++];
-        if (marker === 0xd9) return frame && scan && at === bytes.length ? 'image/jpeg' : null;
+        if (marker === 0xd9) return frame && scan ? 'image/jpeg' : null;
         const size = view.getUint16(at); if (size < 2 || at + size > bytes.length) return null;
         if ([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf].includes(marker)) {
           if (size < 8 || !view.getUint16(at + 3) || !view.getUint16(at + 5)) return null;

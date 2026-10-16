@@ -17,7 +17,7 @@ export async function api(path: string, body?: object, signal?: AbortSignal, hea
   const response = await fetch(path, { ...(body ? { method: 'POST', body: JSON.stringify(body) } : { cache: 'no-store' as const }), ...(body || headers ? { headers: requestHeaders } : {}), ...(signal ? { signal } : {}) });
   try {
     if (response.status === 401 || (path === '/api/logout' && response.ok)) localStorage.setItem(SIGNED_OUT, '1');
-    else if (response.ok && !body && /^\/api\/(pages\/[\w-]+$|today(?:\?|$))/.test(path)) localStorage.removeItem(SIGNED_OUT);
+    else if (response.ok && !body && /^\/api\/(session$|pages\/[\w-]+$|today(?:\?|$))/.test(path)) localStorage.removeItem(SIGNED_OUT);
   } catch { /* 無法記錄時仍以伺服器回應為準。 */ }
   return response;
 }
@@ -27,7 +27,7 @@ export function signedOut(): boolean {
 }
 
 export async function saveDraft(): Promise<void> {
-  for (const entry of metadataDrafts) await entry.save();
+  for (const entry of metadataDrafts) if (entry.dirty()) await entry.save();
   if (window.probe) {
     try { await saveLocal(window.probe.cache); }
     catch { throw new Error('本機儲存失敗，已保留目前頁面，請先重試儲存'); }

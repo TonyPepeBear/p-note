@@ -108,7 +108,7 @@ export function DatabasePage({
   );
   const config = live.config;
   const view = config.views.find((v) => v.id === selected) ?? config.views[0];
-  const rows = selectRows(data?.rows ?? [], view, query);
+  const rows = selectRows(data?.rows ?? [], view, query, config.properties);
   const visibleRows =
     focusedRow && !rows.some((row) => row.id === focusedRow)
       ? [...rows, ...(data?.rows.filter((row) => row.id === focusedRow) ?? [])]
@@ -123,7 +123,7 @@ export function DatabasePage({
   useEffect(() => {
     setFocusedRow("");
     setSelectedRows([]);
-  }, [selected, query]);
+  }, [selected, query, JSON.stringify(view.filters), view.filterMode]);
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
     setFailure("");

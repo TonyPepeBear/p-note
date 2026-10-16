@@ -1,3 +1,4 @@
+import { prepareRoom } from './storage-cleanup';
 import * as Y from 'yjs';
 import { roomName } from '../shared/room';
 import type { SyncedBlockInfo, SyncedBlockReference, SyncedBlockRow } from '../shared/synced-blocks';
@@ -31,7 +32,7 @@ export async function handleSyncedBlocks(request: Request, env: Env, owner: stri
     const doc = new Y.Doc(); let data: Uint8Array;
     try { replaceBlocks(doc, blocks, editor); data = Y.encodeStateAsUpdate(doc); } finally { doc.destroy(); }
     if (data.length > 512 * 1024) throw new PageError(400, '同步區塊超過大小限制');
-    await room.prepare({ owner, page: id, generation, kind: 'syncedBlock' }, data, 0);
+    await prepareRoom(env, { owner, page: id, generation, kind: 'syncedBlock' }, data, 0);
     const inserted = await env.DB.prepare(`INSERT INTO synced_blocks (id, owner_id, sync_generation, created_at, updated_at)
       SELECT ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM restore_operations WHERE owner_id = ?)
       AND NOT EXISTS (SELECT 1 FROM page_operations WHERE owner_id = ?)`).bind(id, owner, generation, now, now, owner, owner).run();

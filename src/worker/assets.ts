@@ -1,3 +1,5 @@
+import { queueCleanup } from './storage-cleanup';
+import { privateImage } from '../shared/image-privacy';
 import { IMAGE_LIMIT, IMAGE_RULE, IMAGE_TYPES, imageType } from '../shared/image';
 import { ASSET_PAGE_SIZE, type AssetList, type AssetSummary } from '../shared/assets';
 import { PageError } from './pages';
@@ -58,13 +60,16 @@ export async function handleAssets(request: Request, env: Env, owner: string, no
     let name: string;
     try { name = decodeURIComponent(request.headers.get('X-File-Name') ?? '圖片'); } catch { return fail(400, '無效圖片檔名'); }
     if (!name.trim() || name.length > 255 || /[\x00-\x1f\x7f]/.test(name)) fail(400, '圖片檔名須為 1～255 字元且不含控制字元');
-    const bytes = await readImage(request); if (imageType(bytes) !== mime) fail(415);
+    const original = await readImage(request); if (imageType(original) !== mime) fail(415);
+    const bytes = privateImage(original, mime);
+    if (imageType(bytes) !== mime) fail(415);
     const digest = await crypto.subtle.digest('SHA-256', bytes);
     const checksum = Array.from(new Uint8Array(digest), n => n.toString(16).padStart(2, '0')).join('');
     const id = crypto.randomUUID(); const key = `${owner}/${id}`;
+    await queueCleanup(env, owner, 'asset', key);
     const object = await env.ASSETS.put(key, bytes, { onlyIf: { etagDoesNotMatch: '*' }, sha256: digest, httpMetadata: { contentType: mime } });
     if (!object) fail(503, '圖片上傳失敗，請重試');
-    // D1 失敗時保留未引用原檔，避免跨儲存補償誤刪可恢復資料。
+    // D1 失敗時由持久清理紀錄回收未引用物件。
     await env.DB.prepare('INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(id, owner, key, name, mime, bytes.length, checksum, now).run();
     return Response.json({ id, url: `/api/assets/${id}`, mime_type: mime, byte_size: bytes.length, checksum }, { status: 201, headers: { 'Cache-Control': 'no-store' } });

@@ -22,6 +22,11 @@ import { api } from "./api";
 import type { BackupCatalog } from "../shared/backup";
 import "./settings.css";
 
+async function failureMessage(response: Response, fallback: string): Promise<string> {
+  const value = await response.json().catch(() => null) as { message?: unknown } | null;
+  return typeof value?.message === 'string' && value.message.trim() ? value.message : fallback;
+}
+
 export function BackupSettings({
   close,
   unauthorized,
@@ -95,9 +100,7 @@ export function BackupSettings({
       });
       if (response.status === 401) unauthorized();
       if (!response.ok)
-        throw new Error(
-          ((await response.json()) as { message: string }).message,
-        );
+        throw new Error(await failureMessage(response, "備份操作未完成，請稍後重試"));
       sessionStorage.removeItem("p-note-restore-request");
       sessionStorage.removeItem("p-note-scope");
       sessionStorage.setItem("p-note-load-current", "restored");
@@ -125,9 +128,7 @@ export function BackupSettings({
       const response = await api("/api/backups", {});
       if (response.status === 401) unauthorized();
       if (!response.ok)
-        throw new Error(
-          ((await response.json()) as { message: string }).message,
-        );
+        throw new Error(await failureMessage(response, "備份操作未完成，請稍後重試"));
       await load();
     } catch (failure) {
       setError(
@@ -136,6 +137,27 @@ export function BackupSettings({
     } finally {
       setBusy(false);
     }
+  };
+  const download = async (id: string) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await api(`/api/backups/${id}/export`);
+      if (response.status === 401) unauthorized();
+      if (!response.ok) throw new Error(await failureMessage(response, "備份下載失敗，請重新登入或稍後重試"));
+      if (!response.headers.get("Content-Type")?.includes("application/zip")) throw new Error("備份下載格式無效，請稍後重試");
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `p-note-${id}.zip`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "備份下載失敗，請稍後重試");
+    } finally { setBusy(false); }
   };
   const labels = {
     pending: "處理中",
@@ -262,6 +284,8 @@ export function BackupSettings({
                       variant="default"
                       href={"/api/backups/" + backup.id + "/export"}
                       download={"p-note-" + backup.id + ".zip"}
+                      disabled={busy || interrupted}
+                      onClick={(event) => { event.preventDefault(); void download(backup.id); }}
                       leftSection={<IconDownload size={16} />}
                     >
                       下載 ZIP

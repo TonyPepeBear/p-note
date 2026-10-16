@@ -1,3 +1,4 @@
+import { prepareRoom, queueCleanup } from './storage-cleanup';
 import { DurableObject } from 'cloudflare:workers';
 import { createBackup, readFile, readManifest } from './backups';
 import type { BackupManifest } from '../shared/backup';
@@ -31,12 +32,12 @@ export class RestoreCoordinator extends DurableObject<Env> {
     for (const block of manifest.synced_blocks ?? []) backupDocument(await readFile(this.env, prefix, block.file), true).destroy();
     verifyBackupReferences(manifest, references);
     for (const asset of manifest.assets) if (imageType(await readFile(this.env, prefix, asset.file)) !== asset.metadata.mime_type) throw new Error('備份圖片格式無效');
-    const collisions = await this.env.DB.batch([
-      this.env.DB.prepare("SELECT 1 FROM pages WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.pages)),
-      this.env.DB.prepare("SELECT 1 FROM assets WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.assets)),
-      this.env.DB.prepare("SELECT 1 FROM synced_blocks WHERE owner_id <> ? AND id IN (SELECT json_extract(value, '$.metadata.id') FROM json_each(?)) LIMIT 1").bind(owner, JSON.stringify(manifest.synced_blocks ?? [])),
-    ]);
-    if (collisions.some(result => result.results.length)) throw new Error('備份識別與其他擁有者衝突');
+    for (const [table, items] of [['pages', manifest.pages], ['assets', manifest.assets], ['synced_blocks', manifest.synced_blocks ?? []]] as const) {
+      for (let i = 0; i < items.length; i += 100) {
+        const ids = items.slice(i, i + 100).map(item => item.metadata.id);
+        if (await this.env.DB.prepare(`SELECT 1 FROM ${table} WHERE owner_id <> ? AND id IN (SELECT value FROM json_each(?)) LIMIT 1`).bind(owner, JSON.stringify(ids)).first()) throw new Error('備份識別與其他擁有者衝突');
+      }
+    }
     return manifest;
   }
 
@@ -59,11 +60,14 @@ export class RestoreCoordinator extends DurableObject<Env> {
           .bind(id, owner, backup, await this.now(), owner),
         db.prepare("INSERT INTO restore_members SELECT ?, id, sync_generation, 'old' FROM pages WHERE owner_id = ? AND EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, owner, id),
         db.prepare("INSERT INTO restore_synced_block_members SELECT ?, id, sync_generation, 'old' FROM synced_blocks WHERE owner_id = ? AND EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, owner, id),
-        ...target.pages.map(page => db.prepare("INSERT INTO restore_members SELECT ?, ?, ?, 'new' WHERE EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, page.metadata.id, crypto.randomUUID(), id)),
-        ...(target.synced_blocks ?? []).map(block => db.prepare("INSERT INTO restore_synced_block_members SELECT ?, ?, ?, 'new' WHERE EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)").bind(id, block.metadata.id, crypto.randomUUID(), id)),
       ];
       const result = await db.batch(initial); if (!result[0].meta.changes) throw new PageError(409, '頁面變更處理中');
       op = { id, backup_id: backup, rollback_id: null, phase: 'pausing' };
+    }
+    // 可重試的小批次，不把整份備份綁成單一 SQL 參數。
+    for (const [table, items] of [['restore_members', target.pages], ['restore_synced_block_members', target.synced_blocks ?? []]] as const) {
+      for (let i = 0; i < items.length; i += 50) await db.batch(items.slice(i, i + 50).map(item =>
+        db.prepare(`INSERT OR IGNORE INTO ${table} SELECT ?, ?, ?, 'new' WHERE EXISTS (SELECT 1 FROM restore_operations WHERE id = ?)`).bind(op!.id, item.metadata.id, crypto.randomUUID(), op!.id)));
     }
     const members = (await db.prepare(`SELECT page_id, generation, kind, NULL AS document_kind FROM restore_members WHERE operation_id = ?
       UNION ALL SELECT synced_block_id AS page_id, generation, kind, 'syncedBlock' AS document_kind FROM restore_synced_block_members WHERE operation_id = ? ORDER BY document_kind DESC, page_id`).bind(op.id, op.id).all<Member>()).results;
@@ -81,34 +85,49 @@ export class RestoreCoordinator extends DurableObject<Env> {
       const blockGenerations = new Map(members.filter(member => member.kind === 'new' && member.document_kind).map(member => [member.page_id, member.generation]));
       for (const block of target.synced_blocks ?? []) {
         const generation = blockGenerations.get(block.metadata.id)!;
-        await this.env.SYNC.getByName(await roomName(owner, `synced-block:${block.metadata.id}`, generation)).prepare({ owner, page: block.metadata.id, generation, kind: 'syncedBlock' }, await readFile(this.env, prefix, block.file), block.checkpoint);
+        await prepareRoom(this.env, { owner, page: block.metadata.id, generation, kind: 'syncedBlock' }, await readFile(this.env, prefix, block.file), block.checkpoint);
       }
       for (const page of target.pages) {
         const generation = generations.get(page.metadata.id)!;
-        await this.env.SYNC.getByName(await roomName(owner, page.metadata.id, generation)).prepare({ owner, page: page.metadata.id, generation }, await readFile(this.env, prefix, page.file), page.checkpoint);
+        await prepareRoom(this.env, { owner, page: page.metadata.id, generation }, await readFile(this.env, prefix, page.file), page.checkpoint);
       }
       for (const asset of target.assets) {
         const key = `${owner}/${asset.metadata.id}/restore/${op.id}`; const existing = await this.env.ASSETS.get(key);
         const bytes = await readFile(this.env, prefix, asset.file);
+        await queueCleanup(this.env, owner, 'asset', key);
         if (!existing) await this.env.ASSETS.put(key, bytes, { onlyIf: { etagDoesNotMatch: '*' }, sha256: await crypto.subtle.digest('SHA-256', bytes), httpMetadata: { contentType: asset.metadata.mime_type } });
         const copied = await this.env.ASSETS.get(key);
         if (!copied || copied.size !== bytes.length || !equal(new Uint8Array(await copied.arrayBuffer()), bytes)) throw new Error('還原圖片準備失敗');
       }
-      const remaining = new Map(target.pages.map(page => [page.metadata.id, page])); const ordered: typeof target.pages = []; const inserted = new Set<string>();
-      while (remaining.size) {
-        for (const [id, page] of remaining) if (page.metadata.parent_id === null || inserted.has(page.metadata.parent_id)) { ordered.push(page); inserted.add(id); remaining.delete(id); }
-      }
+      const staging = [
+        ...target.pages.map(item => ({ kind: 'page', id: item.metadata.id, payload: item.metadata })),
+        ...(target.synced_blocks ?? []).map(item => ({ kind: 'block', id: item.metadata.id, payload: item.metadata })),
+        ...target.assets.map(item => ({ kind: 'asset', id: item.metadata.id, payload: item.metadata })),
+        ...(target.page_synced_blocks ?? []).map(item => ({ kind: 'reference', id: item.page_id + '/' + item.synced_block_id, payload: item })),
+      ];
+      for (const item of staging) await db.prepare('INSERT OR REPLACE INTO restore_staging VALUES (?, ?, ?, ?)').bind(op.id, item.kind, item.id, JSON.stringify(item.payload)).run();
+      for (const member of members.filter(member => member.kind === 'old')) await queueCleanup(this.env, owner, 'room', JSON.stringify(memberScope(owner, member)));
+      const cleanupAt = Date.now() + 3600000;
       await db.batch([
+        db.prepare("INSERT OR IGNORE INTO storage_cleanup SELECT owner_id, 'asset', object_key, ? FROM assets WHERE owner_id = ?").bind(cleanupAt, owner),
+        db.prepare("INSERT OR IGNORE INTO storage_cleanup SELECT owner_id, 'version', object_key, ? FROM page_versions WHERE owner_id = ? AND page_id NOT IN (SELECT id FROM restore_staging WHERE operation_id = ? AND kind = 'page')").bind(cleanupAt, owner, op.id),
+        db.prepare("DELETE FROM page_versions WHERE owner_id = ? AND page_id NOT IN (SELECT id FROM restore_staging WHERE operation_id = ? AND kind = 'page')").bind(owner, op.id),
         db.prepare('DELETE FROM pages WHERE owner_id = ?').bind(owner),
         db.prepare('DELETE FROM synced_blocks WHERE owner_id = ?').bind(owner),
-        ...(target.synced_blocks ?? []).map(({ metadata: b }) => db.prepare('INSERT INTO synced_blocks (id, owner_id, sync_generation, created_at, updated_at) VALUES (?, ?, ?, ?, ?)')
-          .bind(b.id, owner, blockGenerations.get(b.id)!, b.created_at, b.updated_at)),
-        ...ordered.map(({ metadata: p }) => db.prepare('INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-          .bind(p.id, owner, p.kind, p.title, p.icon ?? null, p.parent_id, p.journal_date, generations.get(p.id)!, p.metadata_revision, p.created_at, p.updated_at, p.deleted_at, p.database_config ?? null, p.property_values ?? '{}')),
-        ...(target.page_synced_blocks ?? []).map(ref => db.prepare('INSERT INTO page_synced_blocks (page_id, synced_block_id) VALUES (?, ?)').bind(ref.page_id, ref.synced_block_id)),
-        ...target.assets.map(({ metadata: a }) => db.prepare(`INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(id) DO UPDATE SET object_key = excluded.object_key, original_name = excluded.original_name, mime_type = excluded.mime_type, byte_size = excluded.byte_size, checksum = excluded.checksum, created_at = excluded.created_at WHERE assets.owner_id = excluded.owner_id`)
-          .bind(a.id, owner, `${owner}/${a.id}/restore/${op!.id}`, a.original_name, a.mime_type, a.byte_size, a.checksum, a.created_at)),
+        db.prepare(`INSERT INTO synced_blocks (id, owner_id, sync_generation, created_at, updated_at)
+          SELECT s.id, ?, m.generation, json_extract(payload, '$.created_at'), json_extract(payload, '$.updated_at')
+          FROM restore_staging s JOIN restore_synced_block_members m ON m.operation_id = s.operation_id AND m.synced_block_id = s.id AND m.kind = 'new'
+          WHERE s.operation_id = ? AND s.kind = 'block'`).bind(owner, op.id),
+        db.prepare(`INSERT INTO pages (id, owner_id, kind, title, icon, parent_id, journal_date, sync_generation, metadata_revision, created_at, updated_at, deleted_at, database_config, property_values)
+          SELECT s.id, ?, json_extract(payload, '$.kind'), json_extract(payload, '$.title'), json_extract(payload, '$.icon'), json_extract(payload, '$.parent_id'), json_extract(payload, '$.journal_date'),
+            m.generation, json_extract(payload, '$.metadata_revision'), json_extract(payload, '$.created_at'), json_extract(payload, '$.updated_at'), json_extract(payload, '$.deleted_at'), json_extract(payload, '$.database_config'), COALESCE(json_extract(payload, '$.property_values'), '{}')
+          FROM restore_staging s JOIN restore_members m ON m.operation_id = s.operation_id AND m.page_id = s.id AND m.kind = 'new'
+          WHERE s.operation_id = ? AND s.kind = 'page'`).bind(owner, op.id),
+        db.prepare(`INSERT INTO page_synced_blocks (page_id, synced_block_id) SELECT json_extract(payload, '$.page_id'), json_extract(payload, '$.synced_block_id') FROM restore_staging WHERE operation_id = ? AND kind = 'reference'`).bind(op.id),
+        db.prepare(`INSERT INTO assets (id, owner_id, object_key, original_name, mime_type, byte_size, checksum, created_at)
+          SELECT id, ?, ? || '/' || id || '/restore/' || ?, json_extract(payload, '$.original_name'), json_extract(payload, '$.mime_type'), json_extract(payload, '$.byte_size'), json_extract(payload, '$.checksum'), json_extract(payload, '$.created_at')
+          FROM restore_staging WHERE operation_id = ? AND kind = 'asset'
+          ON CONFLICT(id) DO UPDATE SET object_key = excluded.object_key, original_name = excluded.original_name, mime_type = excluded.mime_type, byte_size = excluded.byte_size, checksum = excluded.checksum, created_at = excluded.created_at WHERE assets.owner_id = excluded.owner_id`).bind(owner, owner, op.id, op.id),
         db.prepare("UPDATE restore_operations SET phase = 'resuming' WHERE id = ? AND phase = 'preparing'").bind(op.id),
       ]); op.phase = 'resuming';
     }

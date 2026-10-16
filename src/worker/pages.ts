@@ -1,3 +1,4 @@
+import { prepareRoom } from './storage-cleanup';
 import { roomName } from '../shared/room';
 import { today, validDate, type PageRow } from '../shared/pages';
 import { isPageIcon } from '../shared/page-icon';
@@ -96,7 +97,7 @@ export async function handlePages(request: Request, env: Env, owner: string, now
     finally { doc.destroy(); }
     const id = crypto.randomUUID(); const generation = crypto.randomUUID();
     const room = env.SYNC.getByName(await roomName(owner, id, generation));
-    await room.prepare({ owner, page: id, generation }, data, 0); await room.resume();
+    await prepareRoom(env, { owner, page: id, generation }, data, 0); await room.resume();
     const inserted = await db.prepare(`INSERT INTO pages (id, owner_id, kind, title, sync_generation, created_at, updated_at)
       SELECT ?, ?, 'note', ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM (SELECT owner_id FROM page_operations UNION SELECT owner_id FROM restore_operations) WHERE owner_id = ?)`)
       .bind(id, owner, ((source?.title ?? '') + ' 本機草稿').trim().slice(0, 200), generation, now, now, owner).run();
