@@ -2,24 +2,26 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { expect, it } from 'vitest';
 
-function worker(options: { failPut?: boolean; offline?: boolean; cached?: boolean } = {}) {
+function worker(options: { failPut?: boolean; offline?: boolean; cached?: boolean; precache?: () => Promise<void> } = {}) {
   const listeners = new Map<string, (event: unknown) => void>();
   const puts: string[] = [], added: string[][] = [];
   let skipped = 0;
   let fetched = 0;
+  let claimed = 0;
+  const deleted: string[] = [];
   const cache = {
-    addAll: async (urls: string[]) => { added.push(urls); },
+    addAll: async (urls: string[]) => { added.push(urls); await options.precache?.(); },
     add: async (url: string) => { added.push([url]); },
     put: async (request: Request | string) => { if (options.failPut) throw new Error('測試容量不足'); puts.push(typeof request === 'string' ? request : request.url); },
     match: async () => undefined,
   };
   runInNewContext(readFileSync('public/sw.js', 'utf8'), {
     URL, Response, Request,
-    self: { location: { origin: 'https://note.example.test' }, skipWaiting: async () => { skipped++; }, clients: { claim: async () => {} }, addEventListener: (name: string, callback: (event: unknown) => void) => listeners.set(name, callback) },
+    self: { location: { origin: 'https://note.example.test' }, skipWaiting: async () => { skipped++; }, clients: { claim: async () => { claimed++; } }, addEventListener: (name: string, callback: (event: unknown) => void) => listeners.set(name, callback) },
     fetch: async () => { fetched++; if (options.offline) throw new TypeError('測試離線'); return new Response('公開外殼', { headers: { 'Content-Type': 'text/html' } }); },
-    caches: { open: async () => cache, keys: async () => [], match: async () => options.cached ? new Response('舊版雜湊資源') : undefined },
+    caches: { open: async () => cache, keys: async () => ['p-note-shell-old', 'p-note-shell-current'], delete: async (name: string) => { deleted.push(name); return true; }, match: async () => options.cached ? new Response('舊版雜湊資源') : undefined },
   });
-  return { listeners, puts, added, skipped: () => skipped, fetched: () => fetched };
+  return { listeners, puts, added, deleted, claimed: () => claimed, skipped: () => skipped, fetched: () => fetched };
 }
 
 it('PWA-05：僅攔截公開 GET，導覽鍵不保存私人查詢且快取故障不阻擋網路', async () => {
@@ -45,15 +47,32 @@ it('PWA-05：僅攔截公開 GET，導覽鍵不保存私人查詢且快取故障
   expect((await response!).status).toBe(200);
 });
 
-it('PWA-06：安裝完成才等待啟用，只接受明確的更新訊息', async () => {
-  const sw = worker();
+it('PWA-06：完整預快取後自動啟用，控制分頁時保留舊版快取', async () => {
+  let complete!: () => void;
+  const precache = new Promise<void>(resolve => { complete = resolve; });
+  const sw = worker({ precache: () => precache });
   let work: Promise<unknown> | undefined;
   const waitUntil = (value: Promise<unknown>) => { work = value; };
-  sw.listeners.get('install')!({ waitUntil }); await work;
+  sw.listeners.get('install')!({ waitUntil });
+  await expect.poll(() => sw.added.length).toBe(1);
   expect(sw.added.flat()).toContain('/manifest.webmanifest');
   expect(sw.skipped()).toBe(0);
+  complete();
+  await work;
+  expect(sw.skipped()).toBe(1);
+  sw.listeners.get('activate')!({ waitUntil }); await work;
+  expect(sw.claimed()).toBe(1);
+  expect(sw.deleted).toEqual([]);
   sw.listeners.get('message')!({ data: { type: 'skip-waiting' }, waitUntil }); await work;
   expect(sw.skipped()).toBe(1);
+});
+
+it('PWA-06：預快取失敗不啟用新版', async () => {
+  const sw = worker({ precache: async () => { throw new Error('測試下載失敗'); } });
+  let work: Promise<unknown> | undefined;
+  sw.listeners.get('install')!({ waitUntil: (value: Promise<unknown>) => { work = value; } });
+  await expect(work).rejects.toThrow('測試下載失敗');
+  expect(sw.skipped()).toBe(0);
 });
 
 it('CACHE-PLATFORM-01：POST 分析紀錄不能轉成 GET 啟動快取並阻擋編輯器', async () => {

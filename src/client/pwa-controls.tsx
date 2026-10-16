@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Modal, Stack, Text, Title } from "@mantine/core";
-import { IconDeviceDesktop, IconDeviceMobile, IconDownload, IconRefresh } from "@tabler/icons-react";
-import { applyPwaUpdate, installPwa, standalone, updateAvailable } from "./pwa";
+import { IconDeviceDesktop, IconDeviceMobile, IconDownload } from "@tabler/icons-react";
+import { installPwa, standalone } from "./pwa";
 import "./pwa-controls.css";
 
 export function PwaControls({
@@ -13,8 +13,8 @@ export function PwaControls({
 }) {
   const [, refresh] = useState(0);
   const [help, setHelp] = useState(false);
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState<"install" | "update" | null>(null);
+  const [installError, setInstallError] = useState("");
+  const [installing, setInstalling] = useState(false);
   const installButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export function PwaControls({
     const display = matchMedia("(display-mode: standalone)");
     addEventListener("p-note:pwa", change);
     display.addEventListener("change", change);
-    // 註冊可能在首次繪製與 effect 之間完成，訂閱後再讀一次 waiting 狀態。
+    // 安裝狀態可能在首次繪製與 effect 之間改變，訂閱後再讀一次。
     change();
     return () => {
       removeEventListener("p-note:pwa", change);
@@ -41,8 +41,7 @@ export function PwaControls({
   useEffect(() => () => onHelpOpenChange?.(false), [onHelpOpenChange]);
 
   const canInstall = !standalone();
-  const canUpdate = updateAvailable();
-  if (!canInstall && !canUpdate && !error && !help) return null;
+  if (!canInstall && !installError && !help) return null;
 
   return (
     <div className="pwa-controls">
@@ -53,44 +52,23 @@ export function PwaControls({
           variant="subtle"
           color="gray"
           fullWidth
-          disabled={disabled || busy !== null}
-          loading={busy === "install"}
+          disabled={disabled || installing}
+          loading={installing}
           leftSection={<IconDownload size={17} stroke={1.7} />}
           onClick={() => {
-            if (disabled || busy) return;
-            setBusy("install");
-            setError("");
+            if (disabled || installing) return;
+            setInstalling(true);
+            setInstallError("");
             void installPwa()
               .then((shown) => { if (!shown) setHelp(true); })
-              .catch(() => setError("無法開啟安裝提示，請重試或使用瀏覽器選單"))
-              .finally(() => setBusy(null));
+              .catch(() => setInstallError("無法開啟安裝提示，請重試或使用瀏覽器選單"))
+              .finally(() => setInstalling(false));
           }}
         >
           安裝 p-note
         </Button>
       )}
-      {canUpdate && (
-        <Button
-          className="pwa-control"
-          variant="subtle"
-          color="gray"
-          fullWidth
-          disabled={disabled || busy !== null}
-          loading={busy === "update"}
-          leftSection={<IconRefresh size={17} stroke={1.7} />}
-          onClick={() => {
-            if (disabled || busy) return;
-            setBusy("update");
-            setError("");
-            void applyPwaUpdate()
-              .catch((failure) => setError(failure instanceof Error ? failure.message : "更新失敗，請重試"))
-              .finally(() => setBusy(null));
-          }}
-        >
-          更新 p-note
-        </Button>
-      )}
-      {error && <Alert className="pwa-error" role="alert" color="red">{error}</Alert>}
+      {installError && <Alert className="pwa-error" role="alert" color="red">{installError}</Alert>}
       <Modal
         opened={helpOpened}
         onClose={() => setHelp(false)}
